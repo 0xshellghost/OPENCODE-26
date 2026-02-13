@@ -251,4 +251,41 @@ export const EventWinners = {
       },
     ],
   },
+
+  'Code Guerra': {
+    1: [
+      {
+        name: 'Aditya Ajay',
+        username: 'IIIT A (2nd Yr)',
+        avatar: "https://placehold.co/600x400/orange/white?text=A",
+        score: 1,
+        date: '2026-01-22',
+      },
+    ],
+    2: [
+      {
+        name: 'Vicky Agarwal',
+        username: 'IIIT A (1st Yr)',
+        avatar: "https://placehold.co/600x400/black/white?text=V",
+        score: 2,
+        date: '2026-01-22',
+      },
+    ],
+    3: [
+      {
+        name: 'Pranav',
+        username: 'IIIT A (3rd Yr)',
+        avatar: "https://placehold.co/600x400/orange/white?text=P",
+        score: 3,
+        date: '2026-01-16',
+      },
+      {
+        name: 'Himanshu',
+        username: 'IIIT A (2nd Yr)',
+        avatar: "https://placehold.co/600x400/orange/white?text=P",
+        score: 3,
+        date: '2026-01-16',
+      },
+    ],
+  },
 };

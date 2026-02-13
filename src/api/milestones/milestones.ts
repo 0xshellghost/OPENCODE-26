@@ -32,21 +32,21 @@ export const weeklyLeaderboards = [
     week: 3,
     startDate: '2024-01-15',
     endDate: '2024-01-21',
-    leaderboard: compileWeekData(week03Leaderboards)
+    leaderboard: [...compileWeekData(week03Leaderboards)]
   },
 
   {
     week: 4,
     startDate: '2024-01-22',
     endDate: '2024-01-28',
-    leaderboard: compileWeekData(week04Leaderboards)
+    leaderboard: [...compileWeekData(week04Leaderboards)]
   },
 
   {
-    week: 4,
+    week: 5,
     startDate: '2024-01-22',
     endDate: '2024-01-28',
-    leaderboard: compileWeekData(week05Leaderboards)
+    leaderboard: [...compileWeekData(week05Leaderboards)]
   },
 ];
 
