@@ -47,7 +47,7 @@ export default function EventName() {
     avatarUrl: item.avatarUrl,
     prDetailsURL: item.prDetailsURL,
   }));
-  // console.log('Leaderboard Data:', tableDataColumns.slice(0,11));
+  console.log('Leaderboard Data:', tableDataColumns.slice(0,11));
 
 
   const participantCount = tableDataColumns.length;
