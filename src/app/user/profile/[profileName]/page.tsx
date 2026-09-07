@@ -2,6 +2,7 @@
 
 import {
   Avatar,
+  Badge,
   Box,
   Flex,
   Grid,
@@ -121,6 +122,21 @@ export default function ProfileOverviewOther() {
             </Grid>
           </Box>
 
+          {getBadges(profile?.prMerged || 0).length > 0 && (
+            <Box bg={cardBg} borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
+              <Text fontWeight="800" mb="14px">
+                Badges
+              </Text>
+              <Flex gap="8px" wrap="wrap">
+                {getBadges(profile?.prMerged || 0).map((badge, idx) => (
+                  <Badge key={idx} colorScheme={badge.color} px="10px" py="4px" borderRadius="8px" textTransform="capitalize">
+                    {badge.label}
+                  </Badge>
+                ))}
+              </Flex>
+            </Box>
+          )}
+
           <Box bg={cardBg} borderRadius="20px" p="16px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
@@ -164,6 +180,21 @@ export default function ProfileOverviewOther() {
               />
             </Box>
           </Grid>
+
+          {getBadges(profile?.prMerged || 0).length > 0 && (
+            <Box bg={cardBg} borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
+              <Text fontSize="18px" fontWeight="800" mb="16px">
+                Unlocked Badges
+              </Text>
+              <Flex gap="12px" wrap="wrap">
+                {getBadges(profile?.prMerged || 0).map((badge, idx) => (
+                  <Badge key={idx} colorScheme={badge.color} px="12px" py="6px" borderRadius="10px" fontSize="14px" textTransform="capitalize">
+                    {badge.label}
+                  </Badge>
+                ))}
+              </Flex>
+            </Box>
+          )}
 
           <Box bg={cardBg} borderRadius="20px" p="24px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
@@ -250,3 +281,16 @@ function Info({ label, value }: { label: string; value?: string }) {
   );
 }
 
+function getBadges(prMerged: number) {
+  const allBadges = [
+    { threshold: 1, label: 'First PR Merge', color: 'blue' },
+    { threshold: 10, label: '10 Merges', color: 'cyan' },
+    { threshold: 50, label: '50 Merges', color: 'teal' },
+    { threshold: 75, label: '75 Merges', color: 'green' },
+    { threshold: 100, label: '100 Merges', color: 'yellow' },
+    { threshold: 150, label: '150 Merges', color: 'orange' },
+    { threshold: 175, label: '175 Merges', color: 'red' },
+    { threshold: 200, label: '200 Merges', color: 'purple' },
+  ];
+  return allBadges.filter(b => prMerged >= b.threshold);
+}
