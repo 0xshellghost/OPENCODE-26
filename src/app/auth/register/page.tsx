@@ -41,6 +41,9 @@ export default function SignIn() {
   const toast = useToast();
   const router = useRouter();
 
+  const [collegeType, setCollegeType] = useState('IIIT Allahabad');
+  const [otherCollege, setOtherCollege] = useState('');
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const querystring = window.location.search;
@@ -75,12 +78,40 @@ export default function SignIn() {
     }));
   };
 
+  const handleCollegeTypeChange = (
+    e: ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const value = e.target.value;
+    setCollegeType(value);
+    if (value === 'IIIT Allahabad') {
+      setformData((prev) => ({
+        ...prev,
+        college: 'IIIT Allahabad',
+      }));
+    } else {
+      setformData((prev) => ({
+        ...prev,
+        college: otherCollege,
+      }));
+    }
+  };
+
+  const handleOtherCollegeChange = (
+    e: ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { value } = e.target;
+    setOtherCollege(value);
+    setformData((prev) => ({
+      ...prev,
+      college: value,
+    }));
+  };
+
   const registerMutation = useMutation({
     mutationFn: sendRegData,
     onSuccess: () => {
       router.push(
-        `/user/home?token=${localStorage.getItem('token')}&avatar_url=${
-          formData.avatarUrl
+        `/user/home?token=${localStorage.getItem('token')}&avatar_url=${formData.avatarUrl
         }`,
       );
     },
@@ -98,8 +129,8 @@ export default function SignIn() {
         if (typeof value === 'string' && value.trim() === '') {
           console.error(`Error: ${key} is blank`);
           toast({
-            title: `${key} is Required `,
-            description: `Please enter the ${key}`,
+            title: `${key === 'college' ? 'College' : key} is Required `,
+            description: `Please enter ${key === 'college' ? 'your college name' : `the ${key}`}`,
             status: 'error',
             duration: 9000,
             isClosable: true,
@@ -305,22 +336,53 @@ export default function SignIn() {
                     color={textColor}
                     mb="8px"
                   >
-                    Enter College<Text color={brandStars}>*</Text>
+                    College<Text color={brandStars}>*</Text>
                   </FormLabel>
-                  <Input
+                  <Select
                     isRequired={true}
                     variant="auth"
+                    name="collegeType"
+                    value={collegeType}
                     fontSize="sm"
+                    onChange={handleCollegeTypeChange}
                     ms={{ base: '0px', md: '0px' }}
-                    type="text"
-                    name="college"
-                    onChange={handleChange}
-                    placeholder="Indian Institute of Information Techonlogy, Allahabad"
-                    mb="24px"
+                    mb={collegeType === 'Other' ? '16px' : '24px'}
                     fontWeight="500"
                     size="lg"
-                  />
+                  >
+                    <option value="IIIT Allahabad">IIIT Allahabad</option>
+                    <option value="Other">Other</option>
+                  </Select>
                 </FormControl>
+
+                {collegeType === 'Other' && (
+                  <FormControl>
+                    <FormLabel
+                      display="flex"
+                      ms="4px"
+                      fontSize="sm"
+                      fontWeight="500"
+                      color={textColor}
+                      mb="8px"
+                    >
+                      Enter College Name<Text color={brandStars}>*</Text>
+                    </FormLabel>
+                    <Input
+                      isRequired={true}
+                      variant="auth"
+                      fontSize="sm"
+                      ms={{ base: '0px', md: '0px' }}
+                      type="text"
+                      name="college"
+                      value={otherCollege}
+                      onChange={handleOtherCollegeChange}
+                      placeholder="Enter your college name"
+                      mb="24px"
+                      fontWeight="500"
+                      size="lg"
+                    />
+                  </FormControl>
+                )}
               </GridItem>
 
               {/* Discord ID */}

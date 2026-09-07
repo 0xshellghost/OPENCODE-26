@@ -75,3 +75,75 @@ export async function getUserProfileByName(profileName: string) {
 
   return response.json();
 }
+
+export type ProfileUpdatePayload = {
+  name: string;
+  college: string;
+  discordId: string;
+  gender?: string;
+  year?: string;
+};
+
+export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
+  // Never send GitHub ID or email — those fields are immutable.
+  const payload: ProfileUpdatePayload = {
+    name: updatedData.name,
+    college: updatedData.college,
+    discordId: updatedData.discordId,
+    gender: updatedData.gender,
+    year: updatedData.year,
+  };
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/update`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    let message = 'Failed to update profile';
+    try {
+      const err = await response.json();
+      message = err.message || err.error || message;
+    } catch {
+      // ignore JSON parse errors
+    }
+    throw new Error(message);
+  }
+
+  const data = await response.json();
+
+  if (typeof window !== 'undefined') {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user') ?? '{}');
+      const serverData =
+        data && typeof data === 'object' && data.data && typeof data.data === 'object'
+          ? data.data
+          : {};
+      const merged = {
+        ...currentUser,
+        ...serverData,
+        ...payload,
+        githubId: currentUser.githubId ?? serverData.githubId,
+        email: currentUser.email ?? serverData.email,
+      };
+      localStorage.setItem('user', JSON.stringify(merged));
+    } catch (e) {
+      console.error('Error updating localStorage:', e);
+    }
+  }
+
+  return data;
+}
