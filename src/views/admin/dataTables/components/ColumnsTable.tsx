@@ -14,6 +14,11 @@ import {
   Link,
   Button,
   useBreakpointValue,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
+  PopoverArrow,
 } from "@chakra-ui/react";
 import * as React from "react";
 import { isMaintainer, MAINTAINERS } from "constants/Maintainers";
@@ -237,55 +242,96 @@ export default function ColumnTable({
         const githubId = info.getValue();
         const isYou = githubId === currentGithubID;
         const maintainer = isMaintainer(githubId);
+        const rowData = info.row.original;
 
         return (
-          <Link href={`/user/profile/${githubId}`}>
-            <Flex align="center" gap="10px">
-
-              <Box position="relative">
-                <NextAvatar
-                  src={info.row.original.avatarUrl}
-                  h="40px"
-                  w="40px"
-                />
-
-                {maintainer && (
-                  <Box
-                    position="absolute"
-                    top="-12px"
-                    right="-25px"
-                    bg="yellow.400"
-                    color="black"
-                    fontSize="9px"
-                    fontWeight="900"
-                    px="6px"
-                    py="2px"
-                    borderRadius="full"
-                  >
-                    MENTOR
-                  </Box>
-                )}
+          <Popover trigger="hover" placement="right" openDelay={0} isLazy>
+            <PopoverTrigger>
+              <Box display="inline-block">
+                <Link href={`/user/profile/${githubId}`}>
+                  <Flex align="center" gap="10px">
+    
+                    <Box position="relative">
+                      <NextAvatar
+                        src={info.row.original.avatarUrl}
+                        h="40px"
+                        w="40px"
+                      />
+    
+                      {maintainer && (
+                        <Box
+                          position="absolute"
+                          top="-12px"
+                          right="-25px"
+                          bg="yellow.400"
+                          color="black"
+                          fontSize="9px"
+                          fontWeight="900"
+                          px="6px"
+                          py="2px"
+                          borderRadius="full"
+                        >
+                          MENTOR
+                        </Box>
+                      )}
+                    </Box>
+    
+                    <Flex align="center" gap="6px">
+                      <Text fontWeight="700">{githubId}</Text>
+    
+                      {isYou && (
+                        <Box
+                          px="8px"
+                          py="2px"
+                          fontSize="10px"
+                          fontWeight="800"
+                          borderRadius="full"
+                          bg="purple.500"
+                          color="white"
+                        >
+                          YOU
+                        </Box>
+                      )}
+                    </Flex>
+                  </Flex>
+                </Link>
               </Box>
-
-              <Flex align="center" gap="6px">
-                <Text fontWeight="700">{githubId}</Text>
-
-                {isYou && (
-                  <Box
-                    px="8px"
-                    py="2px"
-                    fontSize="10px"
-                    fontWeight="800"
-                    borderRadius="full"
-                    bg="purple.500"
-                    color="white"
-                  >
-                    YOU
-                  </Box>
-                )}
-              </Flex>
-            </Flex>
-          </Link>
+            </PopoverTrigger>
+            
+            <PopoverContent 
+              bg={useColorModeValue('white', 'gray.800')} 
+              color={useColorModeValue('gray.700', 'white')} 
+              border="1px solid"
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+              borderRadius="12px" 
+              w="auto" 
+              minW="220px"
+              boxShadow="xl" 
+              _focus={{ outline: 'none' }}
+              zIndex="popover"
+            >
+              <PopoverArrow bg={useColorModeValue('white', 'gray.800')} />
+              <PopoverBody p="16px">
+                <Text fontWeight="800" fontSize="md" mb="3">
+                  {rowData.name}
+                </Text>
+                
+                <Flex justify="space-between" align="center" mb="2">
+                  <Text fontSize="sm" color="gray.500" fontWeight="500">Points</Text>
+                  <Text fontSize="sm" fontWeight="700" color="purple.500">{rowData.points}</Text>
+                </Flex>
+                
+                <Flex justify="space-between" align="center" mb="4">
+                  <Text fontSize="sm" color="gray.500" fontWeight="500">PRs Merged</Text>
+                  <Text fontSize="sm" fontWeight="700">{rowData.prmerged}</Text>
+                </Flex>
+                
+                <Text fontSize="xs" color="purple.400" fontWeight="600" align="center">
+                  Click to view profile &rarr;
+                </Text>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         );
       },
     }),

@@ -59,9 +59,9 @@ export default function Project({ pr }: { pr: PullRequest }) {
 
         {/* CONTENT */}
         <Box flex="1">
-          {/* ISSUE */}
+          {/* TITLE & ISSUE */}
           <Link
-            href={`https://github.com/opencodeiiita/${pr.issue.repoName}/issues/${pr.issue.issueNumber}`}
+            href={`https://github.com/opencodeiiita/${pr.issue.repoName}/pull/${pr.prNumber}`}
             isExternal
           >
             <Text
@@ -69,8 +69,17 @@ export default function Project({ pr }: { pr: PullRequest }) {
               fontSize="md"
               color={textPrimary}
               _hover={{ textDecoration: 'underline' }}
+              mb="2px"
             >
-              Issue #{pr.issue.issueNumber}
+              {pr.title || `PR #${pr.prNumber}`}
+            </Text>
+          </Link>
+          <Link
+            href={`https://github.com/opencodeiiita/${pr.issue.repoName}/issues/${pr.issue.issueNumber}`}
+            isExternal
+          >
+            <Text fontSize="sm" color={textSecondary} _hover={{ textDecoration: 'underline' }}>
+              Related to Issue #{pr.issue.issueNumber}
             </Text>
           </Link>
 
@@ -106,21 +115,30 @@ export default function Project({ pr }: { pr: PullRequest }) {
             </Link>
           </Flex>
 
-          {/* STATUS */}
-          <Flex mt="10px" align="center" gap="8px">
-            <Text fontSize="sm" color={textSecondary}>
-              Status
-            </Text>
-            <Badge
-              colorScheme={statusColor}
-              px="10px"
-              py="2px"
-              borderRadius="full"
-              fontWeight="800"
-              textTransform="capitalize"
-            >
-              {pr.status}
-            </Badge>
+          {/* STATUS & POINTS */}
+          <Flex mt="12px" align="center" justify="space-between" flexWrap="wrap" gap="10px">
+            <Flex align="center" gap="8px">
+              <Text fontSize="sm" color={textSecondary}>
+                Status
+              </Text>
+              <Badge
+                colorScheme={statusColor}
+                px="10px"
+                py="2px"
+                borderRadius="full"
+                fontWeight="800"
+                textTransform="capitalize"
+              >
+                {pr.status}
+              </Badge>
+            </Flex>
+            {/*Need to add conditional rendering logic */}
+            <Flex align="center" gap="6px" bg={useColorModeValue('purple.50', 'rgba(117,95,255,0.1)')} px="10px" py="4px" borderRadius="8px">
+              <Text fontSize="xs" fontWeight="700" color="purple.500">POINTS</Text>
+              <Text fontSize="sm" fontWeight="800" color={useColorModeValue('purple.700', 'purple.300')}>
+                +{pr.issue.currentPoints}
+              </Text>
+            </Flex>
           </Flex>
         </Box>
       </Flex>
