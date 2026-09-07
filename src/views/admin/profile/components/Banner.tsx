@@ -2,12 +2,15 @@
 
 import {
   Box,
+  Button,
   Flex,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
 import { NextAvatar } from 'components/image/Avatar';
+import { Pencil } from 'lucide-react';
+import { RoleBadgesGroup, RoleTag } from './RoleBadge';
 
 export default function Banner(props: {
   banner?: string;
@@ -17,6 +20,9 @@ export default function Banner(props: {
   prMerged: number;
   prContributed?: number;
   pointsEarned: number;
+  tags?: RoleTag[];
+  showEdit?: boolean;
+  onEdit?: () => void;
   [x: string]: any;
 }) {
   const {
@@ -25,6 +31,9 @@ export default function Banner(props: {
     githubUrl,
     prMerged,
     pointsEarned,
+    tags,
+    showEdit,
+    onEdit,
     ...rest
   } = props;
 
@@ -52,7 +61,8 @@ export default function Banner(props: {
       borderColor={borderColor}
       borderRadius="22px"
       {...rest}
-      height="410px"
+      minH="410px"
+      height="auto"
     >
       {/* Accent bar */}
       <Box
@@ -89,10 +99,29 @@ export default function Banner(props: {
       <Text
         color={textSecondary}
         fontSize="sm"
-        mb="22px"
+        mb={tags && tags.length > 0 ? '8px' : '22px'}
       >
         @{githubUrl}
       </Text>
+
+      {/* Role Tags */}
+      {tags && tags.length > 0 && (
+        <RoleBadgesGroup tags={tags} mb="18px" />
+      )}
+
+      {showEdit && (
+        <Button
+          leftIcon={<Pencil size={14} />}
+          size="sm"
+          colorScheme="purple"
+          variant="outline"
+          borderRadius="12px"
+          mb="18px"
+          onClick={onEdit}
+        >
+          Edit Profile
+        </Button>
+      )}
 
       {/* Stats */}
       <Flex

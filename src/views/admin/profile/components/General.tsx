@@ -16,9 +16,10 @@ export default function GeneralInformation(props: {
   email?: string;
   gender?: string;
   year?: string;
+  role?: string;
   [x: string]: any;
 }) {
-  const { name, githubId, discordId, college, email, gender, year, ...rest } =
+  const { name, githubId, discordId, college, email, gender, year, role, ...rest } =
     props;
 
   const titleColor = useColorModeValue('gray.800', 'white');
@@ -97,9 +98,21 @@ export default function GeneralInformation(props: {
       >
         <Item label="Name" value={name} />
         <Item label="GitHub" value={`@${githubId}`} />
+        {role && <Item label="Role & Affiliation" value={role} />}
         {college && <Item label="College" value={college} />}
         {gender && (
-          <Item label="Gender" value={gender === 'male' ? 'Male' : 'Female'} />
+          <Item
+            label="Gender"
+            value={
+              gender.toLowerCase() === 'male'
+                ? 'Male'
+                : gender.toLowerCase() === 'female'
+                  ? 'Female'
+                  : gender.toLowerCase() === 'other'
+                    ? 'Other'
+                    : gender
+            }
+          />
         )}
         {year && <Item label="Year" value={year} />}
         {discordId && <Item label="Discord ID" value={discordId} />}
