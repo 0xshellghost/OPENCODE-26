@@ -26,7 +26,13 @@ const routes: IRoute[] = [
   {
     name: 'Change Points',
     layout: '/admin',
-    path: '/changepoints',
+    path: '/home',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+  },
+  {
+    name: 'Management',
+    layout: '/admin',
+    path: '/managements',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
   },
 

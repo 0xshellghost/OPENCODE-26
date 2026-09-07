@@ -203,8 +203,8 @@ export default function Dashboard() {
   const handlePrClick = async () => {
     try {
       setIsLoading(true);
-      await refetch();
-      setuserPrDetails(userPrDeatils);
+      const res = await refetch();
+      setuserPrDetails(res.data);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
