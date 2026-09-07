@@ -132,13 +132,14 @@ export default function Project({ pr }: { pr: PullRequest }) {
                 {pr.status}
               </Badge>
             </Flex>
-            {/*Need to add conditional rendering logic */}
-            <Flex align="center" gap="6px" bg={useColorModeValue('purple.50', 'rgba(117,95,255,0.1)')} px="10px" py="4px" borderRadius="8px">
-              <Text fontSize="xs" fontWeight="700" color="purple.500">POINTS</Text>
-              <Text fontSize="sm" fontWeight="800" color={useColorModeValue('purple.700', 'purple.300')}>
-                +{pr.issue.currentPoints}
-              </Text>
-            </Flex>
+            {status === 'merged' && (
+              <Flex align="center" gap="6px" bg={useColorModeValue('purple.50', 'rgba(117,95,255,0.1)')} px="10px" py="4px" borderRadius="8px">
+                <Text fontSize="xs" fontWeight="700" color="purple.500">POINTS</Text>
+                <Text fontSize="sm" fontWeight="800" color={useColorModeValue('purple.700', 'purple.300')}>
+                  +{pr.issue.currentPoints}
+                </Text>
+              </Flex>
+            )}
           </Flex>
         </Box>
       </Flex>
