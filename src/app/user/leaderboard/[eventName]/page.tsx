@@ -7,11 +7,13 @@ import {
   Box,
   Flex,
   Text,
+  Select,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { FaUsers } from 'react-icons/fa';
+import { Building2, CalendarDays, X } from 'lucide-react';
 
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
@@ -23,6 +25,8 @@ import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCollege, setSelectedCollege] = useState('All');
+  const [selectedYear, setSelectedYear] = useState('All');
 
   const textColor = useColorModeValue('gray.800', 'white');
   const mutedText = useColorModeValue('gray.500', 'gray.400');
@@ -30,6 +34,7 @@ export default function EventName() {
     'rgba(255,255,255,0.7)',
     'rgba(15,23,42,0.7)',
   );
+  const filterBorder = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -46,22 +51,59 @@ export default function EventName() {
     points: Number(item.points),
     avatarUrl: item.avatarUrl,
     prDetailsURL: item.prDetailsURL,
+    college: item.college ?? '',
+    graduationYear: item.graduationYear ?? '',
   }));
-  console.log('Leaderboard Data:', tableDataColumns.slice(0,11));
 
+  // Extract unique filter options from the data
+  const collegeOptions = useMemo(() => {
+    const colleges = tableDataColumns
+      .map((r) => (r.college as string)?.trim())
+      .filter(Boolean);
+    return [...new Set(colleges)].sort();
+  }, [tableDataColumns]);
 
-  const participantCount = tableDataColumns.length;
+  const yearOptions = useMemo(() => {
+    const years = tableDataColumns
+      .map((r) => String(r.graduationYear ?? '').trim())
+      .filter(Boolean);
+    return [...new Set(years)].sort();
+  }, [tableDataColumns]);
+
+  const hasActiveFilters = selectedCollege !== 'All' || selectedYear !== 'All';
 
   const filteredTableData = useMemo(() => {
-    if (!searchQuery.trim()) return tableDataColumns;
+    let data = tableDataColumns;
+    if (selectedCollege !== 'All') {
+      data = data.filter(
+        (row) =>
+          (row.college as string)?.trim().toLowerCase() ===
+          selectedCollege.toLowerCase(),
+      );
+    }
+    if (selectedYear !== 'All') {
+      data = data.filter(
+        (row) => String(row.graduationYear ?? '').trim() === selectedYear,
+      );
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      data = data.filter(
+        (row) =>
+          row.githubid?.toLowerCase().includes(q) ||
+          row.name?.toLowerCase().includes(q),
+      );
+    }
+    return data;
+  }, [searchQuery, selectedCollege, selectedYear, tableDataColumns]);
 
-    const q = searchQuery.toLowerCase();
-    return tableDataColumns.filter(
-      (row) =>
-        row.githubid?.toLowerCase().includes(q) ||
-        row.name?.toLowerCase().includes(q),
-    );
-  }, [searchQuery, tableDataColumns]);
+  const participantCount = filteredTableData.length;
+
+  const clearAllFilters = () => {
+    setSelectedCollege('All');
+    setSelectedYear('All');
+    setSearchQuery('');
+  };
 
   if (isLoading) {
     return <LeaderboardLoader />;
@@ -114,11 +156,168 @@ export default function EventName() {
           align="center"
           justify="space-between"
           gap="12px"
+          flexWrap="wrap"
         >
-          <SearchProfileBanner
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
+          <Flex
+            align="center"
+            gap={{ base: '8px', md: '12px' }}
+            flexWrap="wrap"
+            flex="1"
+          >
+            <SearchProfileBanner
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+
+            {/* College Filter */}
+            <Flex
+              align="center"
+              gap="8px"
+              px={{ base: '10px', md: '14px' }}
+              py={{ base: '8px', md: '10px' }}
+              bg={glassBg}
+              borderRadius="16px"
+              border="1px solid"
+              borderColor={selectedCollege !== 'All' ? 'purple.400' : filterBorder}
+              backdropFilter="blur(16px)"
+              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+              transition="all 0.2s ease"
+              position="relative"
+              _focusWithin={{
+                borderColor: 'purple.600',
+              }}
+            >
+              <Box
+                color={selectedCollege !== 'All' ? 'purple.500' : 'gray.400'}
+                display="flex"
+                alignItems="center"
+                transition="color 0.2s ease"
+              >
+                <Building2 size={16} />
+              </Box>
+              <Select
+                value={selectedCollege}
+                onChange={(e) => setSelectedCollege(e.target.value)}
+                variant="unstyled"
+                fontSize="13px"
+                fontWeight="600"
+                color={textColor}
+                cursor="pointer"
+                minW={{ base: '100px', md: '140px' }}
+                sx={{
+                  '> option': {
+                    bg: 'gray.800',
+                    color: 'white',
+                  },
+                }}
+              >
+                <option value="All">All Colleges</option>
+                {collegeOptions.map((college) => (
+                  <option key={college} value={college}>
+                    {college}
+                  </option>
+                ))}
+              </Select>
+              {selectedCollege !== 'All' && (
+                <Box
+                  position="absolute"
+                  top="-4px"
+                  right="-4px"
+                  w="10px"
+                  h="10px"
+                  bg="purple.500"
+                  borderRadius="full"
+                  boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                />
+              )}
+            </Flex>
+
+            <Flex
+              align="center"
+              gap="8px"
+              px={{ base: '10px', md: '14px' }}
+              py={{ base: '8px', md: '10px' }}
+              bg={glassBg}
+              borderRadius="16px"
+              border="1px solid"
+              borderColor={selectedYear !== 'All' ? 'purple.400' : filterBorder}
+              backdropFilter="blur(16px)"
+              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+              transition="all 0.2s ease"
+              position="relative"
+              _focusWithin={{
+                borderColor: 'purple.600',
+              }}
+            >
+              <Box
+                color={selectedYear !== 'All' ? 'purple.500' : 'gray.400'}
+                display="flex"
+                alignItems="center"
+                transition="color 0.2s ease"
+              >
+                <CalendarDays size={16} />
+              </Box>
+              <Select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                variant="unstyled"
+                fontSize="13px"
+                fontWeight="600"
+                color={textColor}
+                cursor="pointer"
+                minW={{ base: '80px', md: '120px' }}
+                sx={{
+                  '> option': {
+                    bg: 'gray.800',
+                    color: 'white',
+                  },
+                }}
+              >
+                <option value="All">All Years</option>
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Select>
+              {selectedYear !== 'All' && (
+                <Box
+                  position="absolute"
+                  top="-4px"
+                  right="-4px"
+                  w="10px"
+                  h="10px"
+                  bg="purple.500"
+                  borderRadius="full"
+                  boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                />
+              )}
+            </Flex>
+
+            {hasActiveFilters && (
+              <Flex
+                align="center"
+                gap="4px"
+                px="10px"
+                py="6px"
+                borderRadius="full"
+                bg="purple.500"
+                color="white"
+                fontSize="12px"
+                fontWeight="700"
+                cursor="pointer"
+                transition="all 0.2s ease"
+                _hover={{
+                  bg: 'purple.600',
+                  transform: 'scale(1.05)',
+                }}
+                onClick={clearAllFilters}
+              >
+                <X size={12} />
+                Clear
+              </Flex>
+            )}
+          </Flex>
 
           <Flex
             align="center"
@@ -150,7 +349,7 @@ export default function EventName() {
                 fontWeight="600"
                 letterSpacing="0.6px"
               >
-                TOTAL
+                {hasActiveFilters ? 'FILTERED' : 'TOTAL'}
               </Text>
             </Box>
 
@@ -165,7 +364,7 @@ export default function EventName() {
 
         </Flex>
       </Flex>
-      {searchQuery && filteredTableData.length === 0 && (
+      {(searchQuery || hasActiveFilters) && filteredTableData.length === 0 && (
         <Flex
           direction="column"
           align="center"
@@ -215,9 +414,9 @@ export default function EventName() {
             fontWeight="600"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
-            onClick={() => setSearchQuery('')}
+            onClick={clearAllFilters}
           >
-            Clear search & show all participants
+            Clear all filters & show all participants
           </Text>
         </Flex>
       )}
