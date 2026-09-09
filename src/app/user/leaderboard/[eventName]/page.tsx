@@ -7,14 +7,17 @@ import {
   Box,
   Flex,
   Text,
-  Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { FaUsers } from 'react-icons/fa';
-import { Building2, CalendarDays, X } from 'lucide-react';
-
+import {FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
+import {MdClear} from 'react-icons/md'
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
   type RowObj,
@@ -35,6 +38,9 @@ export default function EventName() {
     'rgba(15,23,42,0.7)',
   );
   const filterBorder = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
+  const menuBg = useColorModeValue('white', 'gray.800');
+  const menuHover = useColorModeValue('purple.50', 'whiteAlpha.100');
+  const menuBorder = useColorModeValue('gray.200', 'gray.700');
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -169,130 +175,209 @@ export default function EventName() {
               onChange={setSearchQuery}
             />
 
-            {/* College Filter */}
-            <Flex
-              align="center"
-              gap="8px"
-              px={{ base: '10px', md: '14px' }}
-              py={{ base: '8px', md: '10px' }}
-              bg={glassBg}
-              borderRadius="16px"
-              border="1px solid"
-              borderColor={selectedCollege !== 'All' ? 'purple.400' : filterBorder}
-              backdropFilter="blur(16px)"
-              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
-              transition="all 0.2s ease"
-              position="relative"
-              _focusWithin={{
-                borderColor: 'purple.600',
-              }}
-            >
-              <Box
-                color={selectedCollege !== 'All' ? 'purple.500' : 'gray.400'}
-                display="flex"
-                alignItems="center"
-                transition="color 0.2s ease"
-              >
-                <Building2 size={16} />
-              </Box>
-              <Select
-                value={selectedCollege}
-                onChange={(e) => setSelectedCollege(e.target.value)}
-                variant="unstyled"
-                fontSize="13px"
-                fontWeight="600"
-                color={textColor}
+            <Menu isLazy>
+              <MenuButton
+                as={Flex}
+                align="center"
+                gap="8px"
+                px={{ base: '10px', md: '14px' }}
+                py={{ base: '8px', md: '10px' }}
+                bg={glassBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={selectedCollege !== 'All' ? 'purple.400' : filterBorder}
+                backdropFilter="blur(16px)"
+                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+                transition="all 0.2s ease"
+                position="relative"
                 cursor="pointer"
-                minW={{ base: '100px', md: '140px' }}
+                _hover={{ borderColor: 'purple.400' }}
+              >
+                <Box
+                  color={selectedCollege !== 'All' ? 'purple.500' : 'gray.400'}
+                  display="flex"
+                  alignItems="center"
+                  transition="color 0.2s ease"
+                >
+                  <FaBuilding size={16} />
+                </Box>
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color={textColor}
+                  noOfLines={1}
+                  maxW={{ base: '100px', md: '140px' }}
+                >
+                  {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
+                </Text>
+                <Box color="gray.400" display="flex" alignItems="center">
+                  <ChevronDown size={14} />
+                </Box>
+                {selectedCollege !== 'All' && (
+                  <Box
+                    position="absolute"
+                    top="-4px"
+                    right="-4px"
+                    w="10px"
+                    h="10px"
+                    bg="purple.500"
+                    borderRadius="full"
+                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                  />
+                )}
+              </MenuButton>
+              <MenuList
+                bg={menuBg}
+                border="1px solid"
+                borderColor={menuBorder}
+                borderRadius="14px"
+                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                maxH="280px"
+                overflowY="auto"
+                minW="200px"
+                zIndex={20}
                 sx={{
-                  '> option': {
-                    bg: 'gray.800',
-                    color: 'white',
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-track': { bg: 'transparent' },
+                  '&::-webkit-scrollbar-thumb': {
+                    bg: 'purple.200',
+                    borderRadius: 'full',
                   },
                 }}
               >
-                <option value="All">All Colleges</option>
+                <MenuItem
+                  onClick={() => setSelectedCollege('All')}
+                  bg="transparent"
+                  _hover={{ bg: menuHover }}
+                  borderRadius="8px"
+                  mx="6px"
+                  px="12px"
+                  py="8px"
+                  fontSize="13px"
+                  fontWeight={selectedCollege === 'All' ? '700' : '500'}
+                  color={selectedCollege === 'All' ? 'purple.500' : textColor}
+                  icon={selectedCollege === 'All' ? <FaCheck size={14} /> : undefined}
+                >
+                  All Colleges
+                </MenuItem>
                 {collegeOptions.map((college) => (
-                  <option key={college} value={college}>
+                  <MenuItem
+                    key={college}
+                    onClick={() => setSelectedCollege(college)}
+                    bg="transparent"
+                    _hover={{ bg: menuHover }}
+                    borderRadius="8px"
+                    mx="6px"
+                    px="12px"
+                    py="8px"
+                    fontSize="13px"
+                    fontWeight={selectedCollege === college ? '700' : '500'}
+                    color={selectedCollege === college ? 'purple.500' : textColor}
+                    icon={selectedCollege === college ? <FaCheck size={14} /> : undefined}
+                  >
                     {college}
-                  </option>
+                  </MenuItem>
                 ))}
-              </Select>
-              {selectedCollege !== 'All' && (
-                <Box
-                  position="absolute"
-                  top="-4px"
-                  right="-4px"
-                  w="10px"
-                  h="10px"
-                  bg="purple.500"
-                  borderRadius="full"
-                  boxShadow="0 0 6px rgba(128,90,213,0.6)"
-                />
-              )}
-            </Flex>
+              </MenuList>
+            </Menu>
 
-            <Flex
-              align="center"
-              gap="8px"
-              px={{ base: '10px', md: '14px' }}
-              py={{ base: '8px', md: '10px' }}
-              bg={glassBg}
-              borderRadius="16px"
-              border="1px solid"
-              borderColor={selectedYear !== 'All' ? 'purple.400' : filterBorder}
-              backdropFilter="blur(16px)"
-              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
-              transition="all 0.2s ease"
-              position="relative"
-              _focusWithin={{
-                borderColor: 'purple.600',
-              }}
-            >
-              <Box
-                color={selectedYear !== 'All' ? 'purple.500' : 'gray.400'}
-                display="flex"
-                alignItems="center"
-                transition="color 0.2s ease"
-              >
-                <CalendarDays size={16} />
-              </Box>
-              <Select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                variant="unstyled"
-                fontSize="13px"
-                fontWeight="600"
-                color={textColor}
+            <Menu isLazy>
+              <MenuButton
+                as={Flex}
+                align="center"
+                gap="8px"
+                px={{ base: '10px', md: '14px' }}
+                py={{ base: '8px', md: '10px' }}
+                bg={glassBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={selectedYear !== 'All' ? 'purple.400' : filterBorder}
+                backdropFilter="blur(16px)"
+                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+                transition="all 0.2s ease"
+                position="relative"
                 cursor="pointer"
-                minW={{ base: '80px', md: '120px' }}
-                sx={{
-                  '> option': {
-                    bg: 'gray.800',
-                    color: 'white',
-                  },
-                }}
+                _hover={{ borderColor: 'purple.400' }}
               >
-                <option value="All">All Years</option>
-                {yearOptions.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </Select>
-              {selectedYear !== 'All' && (
                 <Box
-                  position="absolute"
-                  top="-4px"
-                  right="-4px"
-                  w="10px"
-                  h="10px"
-                  bg="purple.500"
-                  borderRadius="full"
-                  boxShadow="0 0 6px rgba(128,90,213,0.6)"
-                />
-              )}
-            </Flex>
+                  color={selectedYear !== 'All' ? 'purple.500' : 'gray.400'}
+                  display="flex"
+                  alignItems="center"
+                  transition="color 0.2s ease"
+                >
+                  <FaCalendarAlt size={16} />
+                </Box>
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color={textColor}
+                >
+                  {selectedYear === 'All' ? 'All Years' : selectedYear}
+                </Text>
+                <Box color="gray.400" display="flex" alignItems="center">
+                  <ChevronDown size={14} />
+                </Box>
+                {selectedYear !== 'All' && (
+                  <Box
+                    position="absolute"
+                    top="-4px"
+                    right="-4px"
+                    w="10px"
+                    h="10px"
+                    bg="purple.500"
+                    borderRadius="full"
+                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                  />
+                )}
+              </MenuButton>
+              <MenuList
+                bg={menuBg}
+                border="1px solid"
+                borderColor={menuBorder}
+                borderRadius="14px"
+                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                minW="160px"
+                zIndex={20}
+              >
+                <MenuItem
+                  onClick={() => setSelectedYear('All')}
+                  bg="transparent"
+                  _hover={{ bg: menuHover }}
+                  borderRadius="8px"
+                  mx="6px"
+                  px="12px"
+                  py="8px"
+                  fontSize="13px"
+                  fontWeight={selectedYear === 'All' ? '700' : '500'}
+                  color={selectedYear === 'All' ? 'purple.500' : textColor}
+                  icon={selectedYear === 'All' ? <FaCheck size={14} /> : undefined}
+                >
+                  All Years
+                </MenuItem>
+                {yearOptions.map((year) => (
+                  <MenuItem
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    bg="transparent"
+                    _hover={{ bg: menuHover }}
+                    borderRadius="8px"
+                    mx="6px"
+                    px="12px"
+                    py="8px"
+                    fontSize="13px"
+                    fontWeight={selectedYear === year ? '700' : '500'}
+                    color={selectedYear === year ? 'purple.500' : textColor}
+                    icon={selectedYear === year ? <FaCheck size={14} /> : undefined}
+                  >
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
 
             {hasActiveFilters && (
               <Flex
@@ -313,7 +398,7 @@ export default function EventName() {
                 }}
                 onClick={clearAllFilters}
               >
-                <X size={12} />
+                <MdClear size={12} />
                 Clear
               </Flex>
             )}
