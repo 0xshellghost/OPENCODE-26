@@ -7,12 +7,17 @@ import {
   Box,
   Flex,
   Text,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { FaUsers } from 'react-icons/fa';
-
+import {FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
+import {MdClear} from 'react-icons/md'
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
   type RowObj,
@@ -23,6 +28,8 @@ import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCollege, setSelectedCollege] = useState('All');
+  const [selectedYear, setSelectedYear] = useState('All');
 
   const textColor = useColorModeValue('gray.800', 'white');
   const mutedText = useColorModeValue('gray.500', 'gray.400');
@@ -30,6 +37,10 @@ export default function EventName() {
     'rgba(255,255,255,0.7)',
     'rgba(15,23,42,0.7)',
   );
+  const filterBorder = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
+  const menuBg = useColorModeValue('white', 'gray.800');
+  const menuHover = useColorModeValue('purple.50', 'whiteAlpha.100');
+  const menuBorder = useColorModeValue('gray.200', 'gray.700');
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -46,22 +57,59 @@ export default function EventName() {
     points: Number(item.points),
     avatarUrl: item.avatarUrl,
     prDetailsURL: item.prDetailsURL,
+    college: item.college ?? '',
+    graduationYear: item.graduationYear ?? '',
   }));
-  console.log('Leaderboard Data:', tableDataColumns.slice(0,11));
 
+  // Extract unique filter options from the data
+  const collegeOptions = useMemo(() => {
+    const colleges = tableDataColumns
+      .map((r) => (r.college as string)?.trim())
+      .filter(Boolean);
+    return [...new Set(colleges)].sort();
+  }, [tableDataColumns]);
 
-  const participantCount = tableDataColumns.length;
+  const yearOptions = useMemo(() => {
+    const years = tableDataColumns
+      .map((r) => String(r.graduationYear ?? '').trim())
+      .filter(Boolean);
+    return [...new Set(years)].sort();
+  }, [tableDataColumns]);
+
+  const hasActiveFilters = selectedCollege !== 'All' || selectedYear !== 'All';
 
   const filteredTableData = useMemo(() => {
-    if (!searchQuery.trim()) return tableDataColumns;
+    let data = tableDataColumns;
+    if (selectedCollege !== 'All') {
+      data = data.filter(
+        (row) =>
+          (row.college as string)?.trim().toLowerCase() ===
+          selectedCollege.toLowerCase(),
+      );
+    }
+    if (selectedYear !== 'All') {
+      data = data.filter(
+        (row) => String(row.graduationYear ?? '').trim() === selectedYear,
+      );
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      data = data.filter(
+        (row) =>
+          row.githubid?.toLowerCase().includes(q) ||
+          row.name?.toLowerCase().includes(q),
+      );
+    }
+    return data;
+  }, [searchQuery, selectedCollege, selectedYear, tableDataColumns]);
 
-    const q = searchQuery.toLowerCase();
-    return tableDataColumns.filter(
-      (row) =>
-        row.githubid?.toLowerCase().includes(q) ||
-        row.name?.toLowerCase().includes(q),
-    );
-  }, [searchQuery, tableDataColumns]);
+  const participantCount = filteredTableData.length;
+
+  const clearAllFilters = () => {
+    setSelectedCollege('All');
+    setSelectedYear('All');
+    setSearchQuery('');
+  };
 
   if (isLoading) {
     return <LeaderboardLoader />;
@@ -114,11 +162,247 @@ export default function EventName() {
           align="center"
           justify="space-between"
           gap="12px"
+          flexWrap="wrap"
         >
-          <SearchProfileBanner
-            value={searchQuery}
-            onChange={setSearchQuery}
-          />
+          <Flex
+            align="center"
+            gap={{ base: '8px', md: '12px' }}
+            flexWrap="wrap"
+            flex="1"
+          >
+            <SearchProfileBanner
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+
+            <Menu isLazy>
+              <MenuButton
+                as={Flex}
+                align="center"
+                gap="8px"
+                px={{ base: '10px', md: '14px' }}
+                py={{ base: '8px', md: '10px' }}
+                bg={glassBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={selectedCollege !== 'All' ? 'purple.400' : filterBorder}
+                backdropFilter="blur(16px)"
+                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+                transition="all 0.2s ease"
+                position="relative"
+                cursor="pointer"
+                _hover={{ borderColor: 'purple.400' }}
+              >
+                <Box
+                  color={selectedCollege !== 'All' ? 'purple.500' : 'gray.400'}
+                  display="flex"
+                  alignItems="center"
+                  transition="color 0.2s ease"
+                >
+                  <FaBuilding size={16} />
+                </Box>
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color={textColor}
+                  noOfLines={1}
+                  maxW={{ base: '100px', md: '140px' }}
+                >
+                  {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
+                </Text>
+                <Box color="gray.400" display="flex" alignItems="center">
+                  <ChevronDown size={14} />
+                </Box>
+                {selectedCollege !== 'All' && (
+                  <Box
+                    position="absolute"
+                    top="-4px"
+                    right="-4px"
+                    w="10px"
+                    h="10px"
+                    bg="purple.500"
+                    borderRadius="full"
+                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                  />
+                )}
+              </MenuButton>
+              <MenuList
+                bg={menuBg}
+                border="1px solid"
+                borderColor={menuBorder}
+                borderRadius="14px"
+                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                maxH="280px"
+                overflowY="auto"
+                minW="200px"
+                zIndex={20}
+                sx={{
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-track': { bg: 'transparent' },
+                  '&::-webkit-scrollbar-thumb': {
+                    bg: 'purple.200',
+                    borderRadius: 'full',
+                  },
+                }}
+              >
+                <MenuItem
+                  onClick={() => setSelectedCollege('All')}
+                  bg="transparent"
+                  _hover={{ bg: menuHover }}
+                  borderRadius="8px"
+                  mx="6px"
+                  px="12px"
+                  py="8px"
+                  fontSize="13px"
+                  fontWeight={selectedCollege === 'All' ? '700' : '500'}
+                  color={selectedCollege === 'All' ? 'purple.500' : textColor}
+                  icon={selectedCollege === 'All' ? <FaCheck size={14} /> : undefined}
+                >
+                  All Colleges
+                </MenuItem>
+                {collegeOptions.map((college) => (
+                  <MenuItem
+                    key={college}
+                    onClick={() => setSelectedCollege(college)}
+                    bg="transparent"
+                    _hover={{ bg: menuHover }}
+                    borderRadius="8px"
+                    mx="6px"
+                    px="12px"
+                    py="8px"
+                    fontSize="13px"
+                    fontWeight={selectedCollege === college ? '700' : '500'}
+                    color={selectedCollege === college ? 'purple.500' : textColor}
+                    icon={selectedCollege === college ? <FaCheck size={14} /> : undefined}
+                  >
+                    {college}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            <Menu isLazy>
+              <MenuButton
+                as={Flex}
+                align="center"
+                gap="8px"
+                px={{ base: '10px', md: '14px' }}
+                py={{ base: '8px', md: '10px' }}
+                bg={glassBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={selectedYear !== 'All' ? 'purple.400' : filterBorder}
+                backdropFilter="blur(16px)"
+                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+                transition="all 0.2s ease"
+                position="relative"
+                cursor="pointer"
+                _hover={{ borderColor: 'purple.400' }}
+              >
+                <Box
+                  color={selectedYear !== 'All' ? 'purple.500' : 'gray.400'}
+                  display="flex"
+                  alignItems="center"
+                  transition="color 0.2s ease"
+                >
+                  <FaCalendarAlt size={16} />
+                </Box>
+                <Text
+                  fontSize="13px"
+                  fontWeight="600"
+                  color={textColor}
+                >
+                  {selectedYear === 'All' ? 'All Years' : selectedYear}
+                </Text>
+                <Box color="gray.400" display="flex" alignItems="center">
+                  <ChevronDown size={14} />
+                </Box>
+                {selectedYear !== 'All' && (
+                  <Box
+                    position="absolute"
+                    top="-4px"
+                    right="-4px"
+                    w="10px"
+                    h="10px"
+                    bg="purple.500"
+                    borderRadius="full"
+                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                  />
+                )}
+              </MenuButton>
+              <MenuList
+                bg={menuBg}
+                border="1px solid"
+                borderColor={menuBorder}
+                borderRadius="14px"
+                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                minW="160px"
+                zIndex={20}
+              >
+                <MenuItem
+                  onClick={() => setSelectedYear('All')}
+                  bg="transparent"
+                  _hover={{ bg: menuHover }}
+                  borderRadius="8px"
+                  mx="6px"
+                  px="12px"
+                  py="8px"
+                  fontSize="13px"
+                  fontWeight={selectedYear === 'All' ? '700' : '500'}
+                  color={selectedYear === 'All' ? 'purple.500' : textColor}
+                  icon={selectedYear === 'All' ? <FaCheck size={14} /> : undefined}
+                >
+                  All Years
+                </MenuItem>
+                {yearOptions.map((year) => (
+                  <MenuItem
+                    key={year}
+                    onClick={() => setSelectedYear(year)}
+                    bg="transparent"
+                    _hover={{ bg: menuHover }}
+                    borderRadius="8px"
+                    mx="6px"
+                    px="12px"
+                    py="8px"
+                    fontSize="13px"
+                    fontWeight={selectedYear === year ? '700' : '500'}
+                    color={selectedYear === year ? 'purple.500' : textColor}
+                    icon={selectedYear === year ? <FaCheck size={14} /> : undefined}
+                  >
+                    {year}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            {hasActiveFilters && (
+              <Flex
+                align="center"
+                gap="4px"
+                px="10px"
+                py="6px"
+                borderRadius="full"
+                bg="purple.500"
+                color="white"
+                fontSize="12px"
+                fontWeight="700"
+                cursor="pointer"
+                transition="all 0.2s ease"
+                _hover={{
+                  bg: 'purple.600',
+                  transform: 'scale(1.05)',
+                }}
+                onClick={clearAllFilters}
+              >
+                <MdClear size={12} />
+                Clear
+              </Flex>
+            )}
+          </Flex>
 
           <Flex
             align="center"
@@ -150,7 +434,7 @@ export default function EventName() {
                 fontWeight="600"
                 letterSpacing="0.6px"
               >
-                TOTAL
+                {hasActiveFilters ? 'FILTERED' : 'TOTAL'}
               </Text>
             </Box>
 
@@ -165,7 +449,7 @@ export default function EventName() {
 
         </Flex>
       </Flex>
-      {searchQuery && filteredTableData.length === 0 && (
+      {(searchQuery || hasActiveFilters) && filteredTableData.length === 0 && (
         <Flex
           direction="column"
           align="center"
@@ -215,9 +499,9 @@ export default function EventName() {
             fontWeight="600"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
-            onClick={() => setSearchQuery('')}
+            onClick={clearAllFilters}
           >
-            Clear search & show all participants
+            Clear all filters & show all participants
           </Text>
         </Flex>
       )}

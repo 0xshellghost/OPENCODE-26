@@ -51,6 +51,8 @@ export type RowObj = {
   prmerged: number;
   points: number;
   prDetailsURL: string;
+  college?: string;
+  graduationYear?: string | number;
 };
 
 const columnHelper = createColumnHelper<RowObj>();
