@@ -76,7 +76,8 @@ export default function EventName() {
     return [...new Set(years)].sort();
   }, [tableDataColumns]);
 
-  const hasActiveFilters = selectedCollege !== 'All' || selectedYear !== 'All';
+  const hasActiveFilters =
+    selectedCollege !== 'All' || selectedYear !== 'All' || !!searchQuery.trim();
 
   const filteredTableData = useMemo(() => {
     let data = tableDataColumns;
@@ -177,8 +178,8 @@ export default function EventName() {
 
             <Menu isLazy>
               <MenuButton
-                as={Flex}
-                align="center"
+                display="flex"
+                alignItems="center"
                 gap="8px"
                 px={{ base: '10px', md: '14px' }}
                 py={{ base: '8px', md: '10px' }}

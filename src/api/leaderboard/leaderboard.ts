@@ -7,8 +7,8 @@ type RowObj = {
 	points: string;
   avatarUrl: string,
   prDetailsURL: string,
-  college: string,
-  graduationYear: string,
+  college?: string,
+  graduationYear?: string | number,
 };
 
 export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> => {
