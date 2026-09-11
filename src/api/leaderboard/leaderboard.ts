@@ -7,7 +7,7 @@ type RowObj = {
 	points: string;
   avatarUrl: string,
   prDetailsURL: string,
-  college?: string,
+  collegeName?: string,
   graduationYear?: string | number,
 };
 

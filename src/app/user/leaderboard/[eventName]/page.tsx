@@ -12,6 +12,7 @@ import {
   MenuList,
   MenuItem,
   useColorModeValue,
+  Switch,
 } from '@chakra-ui/react';
 import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -29,7 +30,8 @@ export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollege, setSelectedCollege] = useState('All');
-  const [selectedYear, setSelectedYear] = useState('All');
+  const [firstYearOnly, setFirstYearOnly] = useState(false);
+  const [isCollegeHovered, setIsCollegeHovered] = useState(false);
 
   const textColor = useColorModeValue('gray.800', 'white');
   const mutedText = useColorModeValue('gray.500', 'gray.400');
@@ -57,7 +59,7 @@ export default function EventName() {
     points: Number(item.points),
     avatarUrl: item.avatarUrl,
     prDetailsURL: item.prDetailsURL,
-    college: item.college ?? '',
+    college: item.collegeName ?? '',
     graduationYear: item.graduationYear ?? '',
   }));
 
@@ -69,15 +71,8 @@ export default function EventName() {
     return [...new Set(colleges)].sort();
   }, [tableDataColumns]);
 
-  const yearOptions = useMemo(() => {
-    const years = tableDataColumns
-      .map((r) => String(r.graduationYear ?? '').trim())
-      .filter(Boolean);
-    return [...new Set(years)].sort();
-  }, [tableDataColumns]);
-
   const hasActiveFilters =
-    selectedCollege !== 'All' || selectedYear !== 'All' || !!searchQuery.trim();
+    selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
 
   const filteredTableData = useMemo(() => {
     let data = tableDataColumns;
@@ -88,9 +83,9 @@ export default function EventName() {
           selectedCollege.toLowerCase(),
       );
     }
-    if (selectedYear !== 'All') {
+    if (firstYearOnly) {
       data = data.filter(
-        (row) => String(row.graduationYear ?? '').trim() === selectedYear,
+        (row) => String(row.graduationYear ?? '').trim() === '2029',
       );
     }
     if (searchQuery.trim()) {
@@ -102,13 +97,13 @@ export default function EventName() {
       );
     }
     return data;
-  }, [searchQuery, selectedCollege, selectedYear, tableDataColumns]);
+  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
 
   const participantCount = filteredTableData.length;
 
   const clearAllFilters = () => {
     setSelectedCollege('All');
-    setSelectedYear('All');
+    setFirstYearOnly(false);
     setSearchQuery('');
   };
 
@@ -176,7 +171,11 @@ export default function EventName() {
               onChange={setSearchQuery}
             />
 
-            <Menu isLazy>
+            <Box 
+              onMouseEnter={() => setIsCollegeHovered(true)} 
+              onFocus={() => setIsCollegeHovered(true)}
+            >
+              <Menu isLazy={!isCollegeHovered}>
               <MenuButton
                 display="flex"
                 alignItems="center"
@@ -283,102 +282,37 @@ export default function EventName() {
                 ))}
               </MenuList>
             </Menu>
+            </Box>
 
-            <Menu isLazy>
-              <MenuButton
-                as={Flex}
-                align="center"
-                gap="8px"
-                px={{ base: '10px', md: '14px' }}
-                py={{ base: '8px', md: '10px' }}
-                bg={glassBg}
-                borderRadius="16px"
-                border="1px solid"
-                borderColor={selectedYear !== 'All' ? 'purple.400' : filterBorder}
-                backdropFilter="blur(16px)"
-                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
-                transition="all 0.2s ease"
-                position="relative"
-                cursor="pointer"
-                _hover={{ borderColor: 'purple.400' }}
-              >
-                <Box
-                  color={selectedYear !== 'All' ? 'purple.500' : 'gray.400'}
-                  display="flex"
-                  alignItems="center"
-                  transition="color 0.2s ease"
-                >
-                  <FaCalendarAlt size={16} />
-                </Box>
-                <Text
-                  fontSize="13px"
-                  fontWeight="600"
-                  color={textColor}
-                >
-                  {selectedYear === 'All' ? 'All Years' : selectedYear}
-                </Text>
-                <Box color="gray.400" display="flex" alignItems="center">
-                  <ChevronDown size={14} />
-                </Box>
-                {selectedYear !== 'All' && (
-                  <Box
-                    position="absolute"
-                    top="-4px"
-                    right="-4px"
-                    w="10px"
-                    h="10px"
-                    bg="purple.500"
-                    borderRadius="full"
-                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
-                  />
-                )}
-              </MenuButton>
-              <MenuList
-                bg={menuBg}
-                border="1px solid"
-                borderColor={menuBorder}
-                borderRadius="14px"
-                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
-                backdropFilter="blur(20px)"
-                py="6px"
-                minW="160px"
-                zIndex={20}
-              >
-                <MenuItem
-                  onClick={() => setSelectedYear('All')}
-                  bg="transparent"
-                  _hover={{ bg: menuHover }}
-                  borderRadius="8px"
-                  mx="6px"
-                  px="12px"
-                  py="8px"
-                  fontSize="13px"
-                  fontWeight={selectedYear === 'All' ? '700' : '500'}
-                  color={selectedYear === 'All' ? 'purple.500' : textColor}
-                  icon={selectedYear === 'All' ? <FaCheck size={14} /> : undefined}
-                >
-                  All Years
-                </MenuItem>
-                {yearOptions.map((year) => (
-                  <MenuItem
-                    key={year}
-                    onClick={() => setSelectedYear(year)}
-                    bg="transparent"
-                    _hover={{ bg: menuHover }}
-                    borderRadius="8px"
-                    mx="6px"
-                    px="12px"
-                    py="8px"
-                    fontSize="13px"
-                    fontWeight={selectedYear === year ? '700' : '500'}
-                    color={selectedYear === year ? 'purple.500' : textColor}
-                    icon={selectedYear === year ? <FaCheck size={14} /> : undefined}
-                  >
-                    {year}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
+            <Flex
+              align="center"
+              gap="10px"
+              px={{ base: '12px', md: '16px' }}
+              py={{ base: '8px', md: '10px' }}
+              bg={glassBg}
+              borderRadius="16px"
+              border="1px solid"
+              borderColor={firstYearOnly ? 'purple.400' : filterBorder}
+              backdropFilter="blur(16px)"
+              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+              transition="all 0.2s ease"
+              cursor="pointer"
+              onClick={() => setFirstYearOnly(!firstYearOnly)}
+              _hover={{ borderColor: 'purple.400' }}
+            >
+              <Box color={firstYearOnly ? 'purple.500' : 'gray.400'} display="flex">
+                <FaCalendarAlt size={16} />
+              </Box>
+              <Text fontSize="13px" fontWeight="600" color={textColor}>
+                1st Years Only
+              </Text>
+              <Switch 
+                isChecked={firstYearOnly} 
+                onChange={(e) => setFirstYearOnly(e.target.checked)} 
+                colorScheme="purple" 
+                size="sm" 
+              />
+            </Flex>
 
             {hasActiveFilters && (
               <Flex

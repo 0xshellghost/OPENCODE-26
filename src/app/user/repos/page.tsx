@@ -127,7 +127,7 @@ export default function ReposPage() {
               </Text>
 
               <Flex flexWrap="wrap" gap="8px" mb="24px">
-                {repo.tags.map(tag => (
+                {repo.tags?.map((tag: string) => (
                   <Badge key={tag} colorScheme="purple" px="10px" py="4px" borderRadius="8px" textTransform="none" fontSize="11px" fontWeight="600">
                     {tag}
                   </Badge>
@@ -140,7 +140,7 @@ export default function ReposPage() {
                 </Text>
                 <Flex justify="space-between" align="center">
                   <AvatarGroup size="sm" max={3}>
-                    {repo.maintainers.map(m => (
+                    {repo.maintainers?.map((m: any) => (
                       <Tooltip key={m.name} label={`${m.name} (${m.discord})`} placement="top">
                         <Avatar name={m.name} src={`https://github.com/${m.name}.png`} />
                       </Tooltip>
