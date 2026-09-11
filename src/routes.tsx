@@ -43,6 +43,12 @@ const routes: IRoute[] = [
     path: '/leaderboard',
   },
   {
+    name: 'Repositories',
+    layout: '/user',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    path: '/repos',
+  },
+  {
     name: 'Winners',
     layout: '/user',
     icon: <Icon as={MdWorkspacePremium} width="20px" height="20px" color="inherit" />,

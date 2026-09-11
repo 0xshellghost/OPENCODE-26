@@ -45,6 +45,15 @@ export default function AdminLayout(props: DashboardLayoutProps) {
       },
     ];
 
+    baseRoutes.push(
+        {
+          name: 'Repositories',
+          layout: '/user',
+          path: '/repos',
+          icon: <Icon as={MdHome} w="20px" h="20px" />,
+        },
+      );
+
     if (auth.isLoggedIn) {
       baseRoutes.push(
         {
