@@ -12,6 +12,7 @@ import theme from 'theme/theme';
 
 import InitialLoader from 'components/common/InitialLoader';
 import PageTransition from 'components/common/PageTransition';
+import GlobalSakuraBackground from 'components/common/GlobalSakuraBackground';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
@@ -74,6 +75,7 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalSakuraBackground />
       <AuthProvider>
         <SidebarProvider>
           <ChakraProvider theme={theme}>{children}</ChakraProvider>
