@@ -157,7 +157,7 @@ const OpenCodeFAQ = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-[#0b1437] text-white overflow-hidden">
+    <section className="relative min-h-screen bg-[#211d27] text-white overflow-hidden">
       <header className="w-full border-b border-white/10">
         <div className="w-[90%] max-w-[1440px] mx-auto flex items-center justify-between py-6">
           <span className="text-xl font-semibold">OpenCode</span>

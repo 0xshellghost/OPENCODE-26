@@ -16,7 +16,7 @@ export default function MiniCalendar(props: {
   const { selectRange = false, ...rest } = props;
   const [value, onChange] = useState<Date | [Date, Date]>(new Date());
 
-  const accentColor = useColorModeValue('#7551FF', '#9F7AEA');
+  const accentColor = useColorModeValue('#e9a7b2', '#e9a7b2');
 
   return (
     <Card

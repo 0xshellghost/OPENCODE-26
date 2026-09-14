@@ -8,7 +8,7 @@ interface AuthProps extends PropsWithChildren {}
 export default function AuthLayout({ children }: AuthProps) {
   const pageBg = useColorModeValue(
     'linear-gradient(180deg, #f7f8ff 0%, #eef0ff 100%)',
-    'linear-gradient(180deg, #0b1437 0%, #060b28 100%)',
+    'linear-gradient(180deg, #211d27 0%, #1a161f 100%)',
   );
 
   return (

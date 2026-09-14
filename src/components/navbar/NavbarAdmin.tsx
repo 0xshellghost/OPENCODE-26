@@ -36,7 +36,7 @@ export default function AdminNavbar(props: AdminNavbarProps) {
   const subtitleColor = useColorModeValue('gray.600', 'gray.400');
   const navbarBg = useColorModeValue(
     'linear(to-b, #f6f7ff 0%, #edeaff 70%, rgba(237,234,255,0) 100%)',
-    'linear(to-b, #0b1437 0%, #0e1b4d 60%, rgba(14,27,77,0) 100%)',
+    'linear(to-b, #211d27 0%, #2d2737 60%, rgba(45,39,55,0) 100%)',
   );
 
   const auth = useAuth();

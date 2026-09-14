@@ -380,7 +380,7 @@ export const lineChartOptionsTotalSpent: ApexOptions = {
   markers: {
     size: 0,
     colors: "white",
-    strokeColors: "#7551FF",
+    strokeColors: "#e9a7b2",
     strokeWidth: 3,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
