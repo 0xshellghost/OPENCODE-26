@@ -4,9 +4,9 @@ import {
   Box,
   Grid,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import Card from 'components/card/Card';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 export default function GeneralInformation(props: {
   name: string;
@@ -22,15 +22,15 @@ export default function GeneralInformation(props: {
   const { name, githubId, discordId, college, email, gender, year, role, ...rest } =
     props;
 
-  const titleColor = useColorModeValue('gray.800', 'white');
-  const labelColor = useColorModeValue('gray.500', 'gray.400');
-  const valueColor = useColorModeValue('gray.800', 'white');
+  const titleColor = opencodeTokens.colors.text.primary;
+  const labelColor = opencodeTokens.colors.text.secondary;
+  const valueColor = opencodeTokens.colors.text.primary;
 
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const cardBorder = useColorModeValue('gray.200', 'gray.700');
+  const cardBg = 'transparent';
+  const cardBorder = 'transparent';
 
-  const itemBg = useColorModeValue('gray.50', 'transparent');
-  const itemBorder = useColorModeValue('gray.200', 'transparent');
+  const itemBg = opencodeTokens.colors.background.glassDark;
+  const itemBorder = opencodeTokens.colors.border.light;
 
   const Item = ({
     label,
@@ -41,9 +41,8 @@ export default function GeneralInformation(props: {
   }) => (
     <Box
       bg={itemBg}
-      
       border="1px solid"
-      borderColor="gray.500"
+      borderColor={itemBorder}
       borderRadius="14px"
       px="14px"
       py="12px"

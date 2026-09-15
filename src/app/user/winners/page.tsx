@@ -14,6 +14,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
@@ -62,26 +63,26 @@ type RawPoint = {
 };
 
 const OVERALL_COLORS = [
-  '#c65eaf', 
+  '#c65eaf',
   '#b4aea2',
-  '#3e3b40', 
+  '#3e3b40',
 
 ];
 
 const COLLEGE_COLORS = [
-  '#45c07f', 
+  '#45c07f',
   '#e690a2',
-  '#b4aea2', 
-  '#8a32cd', 
+  '#b4aea2',
+  '#8a32cd',
   '#F5C542',
 
 ];
 const RANK_COLORS = [
-  '#c65eaf', 
+  '#c65eaf',
   '#b4aea2',
   '#3e3b40',
-  '#8a32cd', 
-  '#F5C542', 
+  '#8a32cd',
+  '#F5C542',
 ]
 
 
@@ -99,31 +100,10 @@ const COLLEGE_WINNERS: Winner[] = [
   { position: 4, name: 'Khushi Shorey', githubid: 'khushishorey', points: 1100, prmerged: 22, color: COLLEGE_COLORS[4] },
 ];
 
-function WinnersBackground() {
-  return (
-    <Box
-      position="absolute"
-      inset={0}
-      zIndex={0}
-      pointerEvents="none"
-      display={{ base: 'none', lg: 'block' }}
-      bgImage="url('/Logo/opencodelogo.png')"
-      bgRepeat="no-repeat"
-      bgSize="500px"
-      bgPosition="center"
-      opacity={0.1}
-      filter="blur(1px)"
-
-
-    />
-  );
-}
+// Removed WinnersBackground as layout handles JapaneseBackground variant="winners"
 
 function VictorySideIcons() {
-  const color = useColorModeValue(
-    'blackAlpha.300',
-    'whiteAlpha.300',
-  );
+  const color = opencodeTokens.colors.text.secondary;
 
   const Icon = ({
     IconComp,
@@ -172,9 +152,9 @@ function VictorySideIcons() {
 
 
 function TopThreeCards({ winners }: { winners: Winner[] }) {
-  const bg = useColorModeValue('white', 'gray.900');
-  const text = useColorModeValue('gray.800', 'white');
-  const muted = useColorModeValue('gray.500', 'gray.400');
+  const bg = opencodeTokens.colors.background.glassDark;
+  const text = opencodeTokens.colors.text.primary;
+  const muted = opencodeTokens.colors.text.secondary;
   const medals = ['🥇', '🥈', '🥉'];
 
   return (
@@ -182,13 +162,13 @@ function TopThreeCards({ winners }: { winners: Winner[] }) {
       {winners.slice(0, 3).map((w, i) => (
         <Box
           key={w.githubid}
-          bg={bg}
+          className="glass-panel"
           borderRadius="22px"
           px="26px"
           py="22px"
           minW="270px"
-          boxShadow="2xl"
-          border={`2px solid ${RANK_COLORS[w.position - 1]}66`}
+          boxShadow={`0 10px 30px ${RANK_COLORS[w.position - 1]}33`}
+          border={`1px solid ${RANK_COLORS[w.position - 1]}66`}
           position="relative"
         >
           {/* ===== ICONS ===== */}
@@ -249,12 +229,9 @@ function TopThreeCards({ winners }: { winners: Winner[] }) {
 import { FaCodeBranch, FaUsers } from 'react-icons/fa';
 
 function OverallSideStats() {
-  const glass = useColorModeValue(
-    'rgba(255,255,255,0.6)',
-    'rgba(255,255,255,0.08)',
-  );
-  const text = useColorModeValue('gray.800', 'white');
-  const muted = useColorModeValue('gray.600', 'gray.400');
+  const glass = opencodeTokens.colors.background.glassLight;
+  const text = opencodeTokens.colors.text.primary;
+  const muted = opencodeTokens.colors.text.secondary;
 
   const Circle = ({
     icon: Icon,
@@ -297,7 +274,7 @@ function OverallSideStats() {
         <Icon />
       </Box>
 
-  
+
       <Text
         fontSize="11px"
         letterSpacing="0.14em"
@@ -307,7 +284,7 @@ function OverallSideStats() {
         {title}
       </Text>
 
-    
+
       {stats.map((s) => (
         <Box key={s.label}>
           <Text fontSize="22px" fontWeight="900" color={text}>
@@ -323,18 +300,18 @@ function OverallSideStats() {
 
   return (
     <>
-    
+
       <Circle
         icon={FaCodeBranch}
         title="Contributions"
         side="left"
         stats={[
           { value: '3,768', label: 'Pull Requests Raised' },
-      
+
         ]}
       />
 
-    
+
       <Circle
         icon={FaUsers}
         title="Community"
@@ -387,12 +364,9 @@ function normalizeProgress(raw: RawPoint[], labels: string[]) {
 
 
 function Podium({ winners, colors }: { winners: Winner[]; colors: string[] }) {
-  const text = useColorModeValue('gray.800', 'white');
-  const muted = useColorModeValue('gray.500', 'gray.400');
-  const glass = useColorModeValue(
-    'rgba(255,255,255,0.7)',
-    'rgba(0,0,0,0.45)',
-  );
+  const text = opencodeTokens.colors.text.primary;
+  const muted = opencodeTokens.colors.text.secondary;
+  const glass = opencodeTokens.colors.background.glassLight;
 
   const order =
     winners.length === 3
@@ -446,7 +420,7 @@ function Podium({ winners, colors }: { winners: Winner[]; colors: string[] }) {
                 overflow="hidden"
                 role="group"
               >
-            
+
                 <Flex
                   h="100%"
                   align="center"
@@ -460,7 +434,7 @@ function Podium({ winners, colors }: { winners: Winner[]; colors: string[] }) {
                   #{w.position}
                 </Flex>
 
-              
+
                 <Flex
                   position="absolute"
                   inset={0}
@@ -500,9 +474,9 @@ function Podium({ winners, colors }: { winners: Winner[]; colors: string[] }) {
 
 
 function WinnersHeader() {
-  const titleColor = useColorModeValue('gray.900', 'white');
-  const subtitleColor = useColorModeValue('gray.600', 'gray.400');
-  const dividerColor = useColorModeValue('gray.200', 'whiteAlpha.200');
+  const titleColor = opencodeTokens.colors.text.primary;
+  const subtitleColor = opencodeTokens.colors.text.secondary;
+  const dividerColor = opencodeTokens.colors.accent.sakura;
 
   return (
     <Stack spacing="12px" align="center" mt="20px">
@@ -510,13 +484,13 @@ function WinnersHeader() {
 
 
       <Text
-        fontSize={{ base: '32px', md: '40px' }}
-        fontWeight="900"
-        letterSpacing="-0.02em"
-        color={titleColor}
+        fontSize={{ base: '32px', md: '48px' }}
+        fontWeight="400"
+        lineHeight="1.1"
+        className="text-sakura-gradient"
         textAlign="center"
       >
-        Winners
+        Legacy of Legends
       </Text>
 
 
@@ -576,8 +550,7 @@ export default function WinnersPodiumComparisonPage() {
   }, [query.data, users, labels]);
 
   return (
-    <Box minH="100vh" pt="40px" position="relative" overflow="hidden">
-      <WinnersBackground />
+    <Box minH="100vh" position="relative" overflow="hidden">
       <Box position="relative" zIndex={1}>
 
         <Stack spacing="36px">

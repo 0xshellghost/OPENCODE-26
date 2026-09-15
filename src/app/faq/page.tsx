@@ -1,9 +1,11 @@
 'use client';
 
-import { ArrowDown, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import { ArrowDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Box, Flex, Text } from '@chakra-ui/react';
+import JapaneseBackground from '../../components/japanese/JapaneseBackground';
+import SiteNavbar from '../../components/navbar/SiteNavbar';
 
 const faqs = [
   {
@@ -11,9 +13,9 @@ const faqs = [
     answer: (
       <>
       Here is a video guide on how to contribute
-      <div className="flex flex-col items-center gap-4 mt-4">
+      <div className="flex flex-col items-start gap-4 mt-4">
       {/* Video */}
-      <div className="relative w-full max-w-2xl aspect-video rounded-xl overflow-hidden shadow-lg">
+      <div className="relative w-full max-w-2xl aspect-video rounded-xl overflow-hidden shadow-lg border border-white/10">
         <iframe
           src="https://www.youtube.com/embed/rThCmK0iBYw?controls=1&rel=0&modestbranding=1"
           title="How To Contribute"
@@ -28,12 +30,11 @@ const faqs = [
         rel="noopener noreferrer"
         className="
           inline-flex items-center gap-2
-          rounded-lg bg-red-600 px-4 py-2
+          rounded-lg bg-red-600/90 px-4 py-2
           text-sm font-semibold text-white
           shadow-md
           transition-all
-          hover:bg-red-700 hover:shadow-lg hover:-translate-y-0.5
-          active:translate-y-0
+          hover:bg-red-500 hover:shadow-lg
         "
       >
         ▶ Watch on YouTube
@@ -75,7 +76,7 @@ const faqs = [
           href="https://bit.ly/RegisterAtOpencode25"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 underline"
+          className="text-[#e9a7b2] hover:text-[#fff4ed] underline transition-colors"
         >
           Unstop
         </a>{' '}
@@ -84,7 +85,7 @@ const faqs = [
           href="https://events.geekhaven.in/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 underline"
+          className="text-[#e9a7b2] hover:text-[#fff4ed] underline transition-colors"
         >
           website
         </a>
@@ -117,7 +118,7 @@ const faqs = [
           href="https://discord.com/channels/885149696249708635/885151791329722448"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 underline"
+          className="text-[#e9a7b2] hover:text-[#fff4ed] underline transition-colors"
       > Discord</a>
       , wait for issues to be raised, and pick an issue.
     </>
@@ -157,123 +158,96 @@ const OpenCodeFAQ = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-[#211d27] text-white overflow-hidden">
-      <header className="w-full border-b border-white/10">
-        <div className="w-[90%] max-w-[1440px] mx-auto flex items-center justify-between py-6">
-          <span className="text-xl font-semibold">OpenCode</span>
+    <JapaneseBackground variant="faq">
+      <SiteNavbar />
+      
+      <Box pt="160px" pb="100px" px={{ base: '24px', md: '80px' }} maxW="1200px" mx="auto" w="100%">
+        <Flex direction={{ base: 'column', lg: 'row' }} justify="space-between" align={{ base: 'flex-start', lg: 'flex-start' }} gap="60px">
+          
+          <Box flex="1" maxW="500px">
+            <Text fontSize="14px" fontWeight="700" letterSpacing="0.1em" color="rgba(255,255,255,0.6)" mb="16px" textTransform="uppercase">
+              GET ANSWERS
+            </Text>
+            <Text fontSize={{ base: '40px', md: '56px' }} fontWeight="400" lineHeight="1.1" mb="24px" className="text-sakura-gradient">
+              Frequently Asked Questions
+            </Text>
+            <Text fontSize="16px" color="rgba(255,255,255,0.7)" lineHeight="1.6">
+              Everything you need to know about OPENCODE 2026.
+            </Text>
+          </Box>
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-white/70 hover:text-white transition"
-          >
-            <ArrowLeft size={18} />
-            Go back
-          </Link>
-        </div>
-      </header>
-
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }}
-      />
-
-      <div className="relative z-10 w-[90%] max-w-[1440px] mx-auto py-28 grid grid-cols-1 md:grid-cols-[1fr_420px] gap-24">
-        <div>
-          <h2 className="text-[3rem] sm:text-[4rem] font-normal leading-tight max-w-3xl">
-            Frequently Asked
-            <br />
-            Questions
-          </h2>
-
-          <p className="mt-6 text-white/70 max-w-xl">
-            Everything you need to know before joining OpenCode.
-          </p>
-
-          <div className="mt-20 flex flex-col gap-8 max-w-3xl">
+          <Box flex="1" w="100%" maxW="600px" display="flex" flexDirection="column" gap="16px">
             {visibleFaqs.map((faq, idx) => {
               const globalIndex = start + idx;
               const isOpen = openIndex === globalIndex;
 
               return (
-                <div
+                <Box
                   key={globalIndex}
-                  className={`border-b border-white/15 pb-6 transition-colors ${
-                    isOpen ? 'bg-white/5 rounded-xl px-5 -mx-5' : ''
-                  }`}
+                  className="glass-panel"
+                  p="20px 24px"
+                  transition="all 0.3s ease"
+                  bg={isOpen ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)'}
+                  border={isOpen ? '1px solid rgba(233,167,178,0.3)' : '1px solid rgba(255,255,255,0.05)'}
                 >
                   <button
                     onClick={() => toggle(globalIndex)}
                     aria-expanded={isOpen} 
-                    className="w-full flex justify-between gap-6 text-left"
+                    className="w-full flex justify-between gap-6 text-left items-center"
                   >
-                    <span className="text-lg sm:text-xl font-medium mt-4">
+                    <Text fontSize="16px" fontWeight="500" color={isOpen ? '#ffffff' : 'rgba(255,255,255,0.9)'}>
                       {faq.question}
-                    </span>
-                    <ArrowDown
-                      className={`transition-transform duration-300 mt-4 ${
-                        isOpen ? 'rotate-180' : ''
-                      }`}
-                    />
+                    </Text>
+                    <Box 
+                      color={isOpen ? '#e9a7b2' : 'rgba(255,255,255,0.5)'}
+                      transition="transform 0.3s"
+                      transform={isOpen ? 'rotate(180deg)' : 'none'}
+                    >
+                      <ArrowDown size={18} />
+                    </Box>
                   </button>
 
-                  <div
-                    className={`grid transition-all duration-300 ease-in-out ${
-                      isOpen
-                        ? 'grid-rows-[1fr] opacity-100 mt-4'
-                        : 'grid-rows-[0fr] opacity-0'
-                    }`}
+                  <Box
+                    overflow="hidden"
+                    transition="all 0.3s ease-in-out"
+                    maxH={isOpen ? '1000px' : '0px'}
+                    opacity={isOpen ? 1 : 0}
+                    mt={isOpen ? '16px' : '0px'}
                   >
-                    <div className="overflow-hidden text-white/70 leading-relaxed">
+                    <Text fontSize="15px" color="rgba(255,255,255,0.7)" lineHeight="1.6">
                       {faq.answer}
-                    </div>
-                  </div>
-                </div>
+                    </Text>
+                  </Box>
+                </Box>
               );
             })}
-          </div>
 
-          <div className="mt-16 flex items-center gap-4">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-              className="px-4 py-2 rounded-full border border-white/20 disabled:opacity-40 hover:bg-white/10 transition"
-            >
-              <ChevronLeft />
-            </button>
-
-            <span className="text-white/70">
-              Page {page} of {totalPages}
-            </span>
-
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 rounded-full border border-white/20 disabled:opacity-40 hover:bg-white/10 transition"
-            >
-              <ChevronRight />
-            </button>
-          </div>
-        </div>
-
-        <div className="hidden md:flex items-center justify-center">
-          <div className="relative w-[320px] h-[320px] opacity-90">
-            <Image
-              src="/Logo/OpenCode-White.png"
-              alt="OpenCode Logo"
-              fill
-              style={{ objectFit: 'contain' }}
-              priority
-            />
-          </div>
-        </div>
-      </div>
-    </section>
+            <Flex mt="24px" align="center" gap="16px" justify="flex-end">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="w-10 h-10 flex items-center justify-center rounded-full glass-panel disabled:opacity-30 hover:bg-white/10 transition"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <Text fontSize="14px" color="rgba(255,255,255,0.5)" fontWeight="500">
+                Page {page} of {totalPages}
+              </Text>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="w-10 h-10 flex items-center justify-center rounded-full glass-panel disabled:opacity-30 hover:bg-white/10 transition"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </Flex>
+          </Box>
+          
+        </Flex>
+      </Box>
+    </JapaneseBackground>
   );
 };
 
 export default OpenCodeFAQ;
+

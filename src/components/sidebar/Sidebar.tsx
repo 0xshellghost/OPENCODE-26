@@ -1,28 +1,21 @@
 'use client';
 
-import { Box, Divider, Flex, useColorModeValue } from '@chakra-ui/react';
+import { Box, Divider, Flex, Text } from '@chakra-ui/react';
 import { gsap } from 'gsap';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars-2';
+import { Flower2 } from 'lucide-react';
+import Link from 'next/link';
 
 import Content from 'components/sidebar/components/Content';
 import { IRoute } from 'types/navigation';
+import { opencodeTokens } from '../../theme/opencode-tokens';
 
 interface SidebarProps {
   routes: IRoute[];
 }
 
 function Sidebar({ routes }: SidebarProps) {
-  const sidebarBg = useColorModeValue(
-    'rgba(255,255,255,0.85)',
-    'rgba(15,23,42,0.85)',
-  );
-  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const shadow = useColorModeValue(
-    '0 20px 40px rgba(0,0,0,0.08)',
-    '0 20px 40px rgba(0,0,0,0.4)',
-  );
-
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -70,27 +63,33 @@ function Sidebar({ routes }: SidebarProps) {
         ref={sidebarRef}
         w="300px"
         h="100vh"
-        bg={sidebarBg}
-        backdropFilter="blur(18px)"
-        boxShadow={shadow}
-        borderRight="1px solid"
-        borderColor={borderColor}
+        bg={opencodeTokens.colors.background.glassDark}
+        backdropFilter="blur(24px)"
+        boxShadow="20px 0 50px rgba(0,0,0,0.5)"
+        borderRight={`1px solid ${opencodeTokens.colors.border.light}`}
       >
-        <Flex
-          h="72px"
-          align="center"
-          px="24px"
-          fontWeight="900"
-          fontSize="22px"
-        >
-          OPENCODE
-          <Box ml="8px" w="10px" h="10px" bg="purple.500" borderRadius="full" />
-        </Flex>
+        <Link href="/">
+          <Flex
+            h="80px"
+            align="center"
+            px="32px"
+            gap="10px"
+            color="white"
+            _hover={{ color: opencodeTokens.colors.accent.sakura }}
+            transition="all 0.3s"
+            cursor="pointer"
+          >
+            <Flower2 size={24} strokeWidth={1.5} />
+            <Text fontSize="20px" fontWeight="700" letterSpacing="0.05em">
+              OPENCODE
+            </Text>
+          </Flex>
+        </Link>
 
-        <Divider borderColor={borderColor} />
+        <Divider borderColor={opencodeTokens.colors.border.light} opacity={0.5} />
 
         <Scrollbars autoHide>
-          <Box px="12px" pt="12px">
+          <Box px="20px" pt="24px">
             <Content routes={routes} />
           </Box>
         </Scrollbars>

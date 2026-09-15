@@ -16,6 +16,7 @@ import {
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 import { MdFolder } from 'react-icons/md';
 import Card from 'components/card/Card';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useState } from 'react';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { FetchedRepos, FetchedEvents } from 'api/events/events';
@@ -25,11 +26,11 @@ import { RingLoader } from 'react-spinners';
 export default function ReposPage() {
   const [searchQuery, setSearchQuery] = useState('');
   
-  const textColor = useColorModeValue('gray.800', 'white');
-  const mutedText = useColorModeValue('gray.500', 'gray.400');
-  const glassBg = useColorModeValue('rgba(255,255,255,0.7)', 'rgba(15,23,42,0.7)');
-  const cardBorder = useColorModeValue('purple.100', 'whiteAlpha.200');
-  const cardHoverBg = useColorModeValue('rgba(255,255,255,0.9)', 'rgba(30,41,59,0.9)');
+  const textColor = opencodeTokens.colors.text.primary;
+  const mutedText = opencodeTokens.colors.text.secondary;
+  const glassBg = opencodeTokens.colors.background.glassDark;
+  const cardBorder = opencodeTokens.colors.border.light;
+  const cardHoverBg = opencodeTokens.colors.background.glassLight;
 
   const { data: eventData, isLoading: isLoadingEvents } = useQuery({
     queryKey: ['EventInfo'],
@@ -55,7 +56,7 @@ export default function ReposPage() {
   if (isLoading || isLoadingEvents) {
     return (
       <Flex justify="center" align="center" h="100vh">
-        <RingLoader color="#805AD5" />
+        <RingLoader color={opencodeTokens.colors.accent.sakura} />
       </Flex>
     );
   }
@@ -68,8 +69,8 @@ export default function ReposPage() {
             REPOSITORIES
           </Text>
           <Flex position="absolute" right="-20px" bottom={{ base: '-4px', md: '-6px' }} align="center" gap="6px">
-            <Box w={{ base: '22px', md: '28px' }} h="3px" bg="purple.500" borderRadius="full" />
-            <Box w="6px" h="6px" bg="purple.500" borderRadius="full" />
+            <Box w={{ base: '22px', md: '28px' }} h="3px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
+            <Box w="6px" h="6px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
           </Flex>
         </Box>
         
@@ -84,31 +85,29 @@ export default function ReposPage() {
       </Flex>
 
       {filteredRepos.length === 0 ? (
-        <Flex direction="column" align="center" justify="center" py="80px">
-          <Icon as={MdFolder} color="purple.300" mb="16px" w="48px" h="48px" />
+        <Flex direction="column" align="center" justify="center" py="80px" className="glass-panel" borderRadius="24px" boxShadow={opencodeTokens.shadows.glass}>
+          <Icon as={MdFolder} color={opencodeTokens.colors.accent.sakura} mb="16px" w="48px" h="48px" />
           <Text fontSize="xl" fontWeight="700" color={textColor}>No repositories found</Text>
           <Text color={mutedText} mt="8px">Try adjusting your search query.</Text>
         </Flex>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="24px" mb="40px">
-          {filteredRepos.map((repo, idx) => (
+          {filteredRepos.map((repo: any, idx: number) => (
             <Card
               key={idx}
-              bg={glassBg}
-              border="1px solid"
-              borderColor={cardBorder}
-              backdropFilter="blur(16px)"
+              className="glass-panel"
+              border={`1px solid ${cardBorder}`}
               p="24px"
               borderRadius="20px"
               transition="all 0.3s ease"
-              _hover={{ transform: 'translateY(-5px)', boxShadow: 'xl', bg: cardHoverBg }}
+              _hover={{ transform: 'translateY(-5px)', boxShadow: `0 15px 30px ${opencodeTokens.colors.accent.sakura}40`, bg: cardHoverBg, borderColor: opencodeTokens.colors.accent.sakura }}
               display="flex"
               flexDirection="column"
               h="100%"
             >
               <Flex justify="space-between" align="start" mb="16px">
                 <Flex align="center" gap="12px">
-                  <Box p="10px" bg="purple.100" color="purple.600" borderRadius="12px">
+                  <Box p="10px" bg={opencodeTokens.colors.background.glassLight} color={opencodeTokens.colors.accent.sakura} borderRadius="12px">
                     <Icon as={MdFolder} w="24px" h="24px" />
                   </Box>
                   <Text fontSize="xl" fontWeight="800" color={textColor} wordBreak="break-word">
@@ -116,7 +115,7 @@ export default function ReposPage() {
                   </Text>
                 </Flex>
                 <Link href={repo.githubLink} isExternal>
-                  <Box p="8px" bg="gray.100" _dark={{ bg: 'whiteAlpha.200' }} borderRadius="full" transition="all 0.2s" _hover={{ bg: 'purple.500', color: 'white' }}>
+                  <Box p="8px" bg={opencodeTokens.colors.background.glassDark} borderRadius="full" transition="all 0.2s" _hover={{ bg: opencodeTokens.colors.accent.sakura, color: 'white' }}>
                     <Icon as={FaGithub} w="18px" h="18px" />
                   </Box>
                 </Link>
@@ -128,7 +127,7 @@ export default function ReposPage() {
 
               <Flex flexWrap="wrap" gap="8px" mb="24px">
                 {repo.tags?.map((tag: string) => (
-                  <Badge key={tag} colorScheme="purple" px="10px" py="4px" borderRadius="8px" textTransform="none" fontSize="11px" fontWeight="600">
+                  <Badge key={tag} bg={opencodeTokens.colors.background.glassLight} color={opencodeTokens.colors.text.primary} px="10px" py="4px" borderRadius="8px" textTransform="none" fontSize="11px" fontWeight="600">
                     {tag}
                   </Badge>
                 ))}
@@ -146,7 +145,7 @@ export default function ReposPage() {
                       </Tooltip>
                     ))}
                   </AvatarGroup>
-                  <Flex align="center" gap="6px" color="purple.500" fontSize="13px" fontWeight="600">
+                  <Flex align="center" gap="6px" color={opencodeTokens.colors.accent.sakura} fontSize="13px" fontWeight="600">
                     <Icon as={FaDiscord} />
                     <Text>Ask on Discord</Text>
                   </Flex>

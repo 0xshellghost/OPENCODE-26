@@ -4,21 +4,21 @@ import {
   Icon,
   Link,
   Text,
-  useColorModeValue,
   Badge,
 } from '@chakra-ui/react';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import { PullRequest } from 'app/user/profile/page';
 import Card from 'components/card/Card';
 import { FaGithub, FaCodeBranch } from 'react-icons/fa';
 
 export default function Project({ pr }: { pr: PullRequest }) {
-  const textPrimary = useColorModeValue('gray.800', 'white');
-  const textSecondary = useColorModeValue('gray.600', 'gray.400');
+  const textPrimary = opencodeTokens.colors.text.primary;
+  const textSecondary = opencodeTokens.colors.text.secondary;
 
-  const cardBg = useColorModeValue('gray.50', 'rgba(15,23,42,0.8)');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const iconBg = useColorModeValue('purple.50', 'navy.800');
-  const iconColor = useColorModeValue('purple.500', 'gray.300');
+  const cardBg = opencodeTokens.colors.background.glassDark;
+  const borderColor = opencodeTokens.colors.border.light;
+  const iconBg = opencodeTokens.colors.background.glassLight;
+  const iconColor = opencodeTokens.colors.accent.sakura;
 
   const status = pr.status.toLowerCase();
   const statusColor =
@@ -32,17 +32,16 @@ export default function Project({ pr }: { pr: PullRequest }) {
 
   return (
     <Card
-      bg={cardBg}
+      className="glass-panel"
       p="16px"
       borderRadius="16px"
-      border="1px solid"
-      borderColor={borderColor}
-      transition="all 0.25s ease"
+      border={`1px solid ${borderColor}`}
+      transition="all 0.3s ease"
       _hover={{
         transform: 'translateY(-2px)',
-        boxShadow: '0 12px 24px rgba(0,0,0,0.08)',
-        borderColor: 'purple.300',
-        bg: useColorModeValue('white', 'rgba(15,23,42,0.9)'),
+        boxShadow: opencodeTokens.shadows.glass,
+        borderColor: opencodeTokens.colors.accent.sakura,
+        bg: opencodeTokens.colors.background.glassLight,
       }}
     >
       <Flex gap="14px" align="flex-start">
@@ -51,8 +50,7 @@ export default function Project({ pr }: { pr: PullRequest }) {
           p="10px"
           borderRadius="12px"
           bg={iconBg}
-          border="1px solid"
-          borderColor={useColorModeValue('purple.100', 'transparent')}
+          border={`1px solid ${opencodeTokens.colors.border.light}`}
         >
           <Icon as={FaGithub} h="20px" w="20px" color={iconColor} />
         </Box>
@@ -133,9 +131,9 @@ export default function Project({ pr }: { pr: PullRequest }) {
               </Badge>
             </Flex>
             {status === 'merged' && (
-              <Flex align="center" gap="6px" bg={useColorModeValue('purple.50', 'rgba(117,95,255,0.1)')} px="10px" py="4px" borderRadius="8px">
-                <Text fontSize="xs" fontWeight="700" color="purple.500">POINTS</Text>
-                <Text fontSize="sm" fontWeight="800" color={useColorModeValue('purple.700', 'purple.300')}>
+              <Flex align="center" gap="6px" bg={opencodeTokens.colors.background.glassLight} px="10px" py="4px" borderRadius="8px">
+                <Text fontSize="xs" fontWeight="700" color={opencodeTokens.colors.accent.sakura}>POINTS</Text>
+                <Text fontSize="sm" fontWeight="800" color={opencodeTokens.colors.accent.sakuraHover}>
                   +{pr.issue.currentPoints}
                 </Text>
               </Flex>

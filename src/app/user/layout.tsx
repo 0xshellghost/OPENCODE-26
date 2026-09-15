@@ -1,12 +1,14 @@
 'use client';
 
-import { Box, Icon, Portal, useColorModeValue } from '@chakra-ui/react';
+import { Box, Icon, Portal } from '@chakra-ui/react';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 import Footer from 'components/footer/FooterAdmin';
 import Navbar from 'components/navbar/NavbarAdmin';
 import MobileMenuBar from 'components/sidebar/MobileMenuBar';
 import Sidebar from 'components/sidebar/Sidebar';
+import JapaneseBackground from '../../components/japanese/JapaneseBackground';
 
 import { useAuth } from 'contexts/AuthContext';
 import { MdBarChart, MdEmojiEvents, MdHome, MdPerson, MdWorkspacePremium } from 'react-icons/md';
@@ -25,6 +27,7 @@ interface DashboardLayoutProps extends PropsWithChildren {
 export default function AdminLayout(props: DashboardLayoutProps) {
   const { children, ...rest } = props;
   const auth = useAuth();
+  const pathname = usePathname();
   const [fixed] = useState(false);
 
   useEffect(() => {
@@ -44,15 +47,6 @@ export default function AdminLayout(props: DashboardLayoutProps) {
         icon: <Icon as={MdHome} w="20px" h="20px" />,
       },
     ];
-
-    baseRoutes.push(
-        {
-          name: 'Repositories',
-          layout: '/user',
-          path: '/repos',
-          icon: <Icon as={MdHome} w="20px" h="20px" />,
-        },
-      );
 
     if (auth.isLoggedIn) {
       baseRoutes.push(
@@ -85,50 +79,57 @@ export default function AdminLayout(props: DashboardLayoutProps) {
     return baseRoutes;
   }, [auth.isLoggedIn]);
 
-  const bg = useColorModeValue('secondaryGray.300', 'navy.900');
+  // Determine variant based on pathname
+  const variant = useMemo(() => {
+    if (pathname.includes('/leaderboard')) return 'leaderboard';
+    if (pathname.includes('/winners')) return 'winners';
+    if (pathname.includes('/milestones')) return 'milestones';
+    if (pathname.includes('/profile')) return 'profile';
+    return 'home'; // default to events/home
+  }, [pathname]);
 
   return (
-    <Box minH="100vh" w="100%" bg={bg}>
-      <Sidebar routes={Droutes} {...rest} />
+    <JapaneseBackground variant={variant as any}>
+      <Box minH="100vh" w="100%">
+        <Sidebar routes={Droutes} {...rest} />
 
-      <MobileMenuBar routes={Droutes} />
-
-      <Box
-        float="right"
-        minHeight="100vh"
-        height="100%"
-        overflow="auto"
-        position="relative"
-        maxHeight="100%"
-        w={{ base: '100%', xl: 'calc(100% - 300px)' }}
-        maxWidth={{ base: '100%', xl: 'calc(100% - 300px)' }}
-        transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-        pb={{ base: '80px', xl: '0px' }}
-      >
-        <Portal>
-          <Box>
-            <Navbar
-              logoText="Geekhaven"
-              brandText={getActiveRoute(routes)}
-              secondary={getActiveNavbar(routes)}
-              message={getActiveNavbarText(routes)}
-              fixed={fixed}
-              routes={Droutes}
-              {...rest}
-            />
-          </Box>
-        </Portal>
+        <MobileMenuBar routes={Droutes} />
 
         <Box
-          mx="auto"
-          p={{ base: '16px', md: '30px' }}
-          minH="100vh"
-          pt={{ base: '60px', md: '60px' }}
+          float="right"
+          minHeight="100vh"
+          height="100%"
+          position="relative"
+          w={{ base: '100%', xl: 'calc(100% - 300px)' }}
+          maxWidth={{ base: '100%', xl: 'calc(100% - 300px)' }}
+          transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+          pb={{ base: '80px', xl: '0px' }}
         >
-          {children}
+          <Portal>
+            <Box>
+              <Navbar
+                logoText="Geekhaven"
+                brandText={getActiveRoute(routes)}
+                secondary={getActiveNavbar(routes)}
+                message={getActiveNavbarText(routes)}
+                fixed={fixed}
+                routes={Droutes}
+                {...rest}
+              />
+            </Box>
+          </Portal>
+
+          <Box
+            mx="auto"
+            p={{ base: '16px', md: '40px' }}
+            minH="100vh"
+            pt={{ base: '100px', md: '100px' }}
+          >
+            {children}
+          </Box>
+          <Footer />
         </Box>
-        <Footer />
       </Box>
-    </Box>
+    </JapaneseBackground>
   );
 }

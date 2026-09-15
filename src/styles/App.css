@@ -7,55 +7,88 @@ body {
   font-family: 'DM Sans', sans-serif;
 }
 
-
 :root {
-  /* Light theme */
-  --bg: #f7f8fb; /* light grey */
-  --text: #0b1437; /* dark navy */
-  --muted: #6b7280; /* gray */
-  --card-bg: #ffffff;
-  --card-text: #0f172a;
-  --navy-500: #1b3bbb;
-  --purple-400: #7c3aed;
-  --purple-500: #6d28d9;
-  --gray-50: #f7f8fb;
-  --gray-100: #f1f3f8;
-  --gray-200: #e6e9f2;
-  --gray-300: #dfe6f6;
-  --gray-400: #cfd8ea;
-  --gray-500: #9aa4b8;
-  --gray-600: #6b7280;
-  --gray-700: #4b5563;
-  --gray-800: #111827;
-  --gray-900: #0b1220;
+  /* Forcing cinematic dark theme everywhere for OPENCODE */
+  --bg: #1a1625; /* deeper midnight navy */
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.7);
+  --card-bg: #211d27;
+  --card-text: #ffffff;
+  --navy-500: #211d27;
+  --purple-400: #e9a7b2; /* repurposed as sakura primary */
+  --purple-500: #e9a7b2; /* repurposed as sakura primary */
+  --gray-50: rgba(33, 29, 39, 0.2);
+  --gray-100: rgba(33, 29, 39, 0.4);
+  --gray-200: rgba(255, 255, 255, 0.05);
+  --gray-300: rgba(255, 255, 255, 0.1);
+  --gray-400: rgba(255, 255, 255, 0.2);
+  --gray-500: rgba(255, 255, 255, 0.4);
+  --gray-600: rgba(255, 255, 255, 0.5);
+  --gray-700: rgba(255, 255, 255, 0.7);
+  --gray-800: rgba(255, 255, 255, 0.8);
+  --gray-900: #ffffff;
 }
 
 /* Dark theme scope used in app */
 .chakra-ui-dark, .dark {
-  --bg: #07132a; /* deep navy */
-  --text: #e6eef8; /* pale text */
-  --muted: #94a3b8;
-  --card-bg: #0f172a;
-  --card-text: #e6eef8;
-  --navy-500: #172355;
-  --purple-400: #8b5cf6;
-  --purple-500: #7c3aed;
-  --gray-50: #0b1220;
-  --gray-100: #0f172a;
-  --gray-200: #111c44;
-  --gray-300: #17234a;
-  --gray-400: #243657;
-  --gray-500: #4b5563;
-  --gray-600: #6b7280;
-  --gray-700: #94a3b8;
-  --gray-800: #cbd5e1;
-  --gray-900: #e6eef8;
+  --bg: #1a1625;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.7);
+  --card-bg: #211d27;
+  --card-text: #ffffff;
+  --navy-500: #211d27;
+  --purple-400: #e9a7b2;
+  --purple-500: #e9a7b2;
+  --gray-50: rgba(33, 29, 39, 0.2);
+  --gray-100: rgba(33, 29, 39, 0.4);
+  --gray-200: rgba(255, 255, 255, 0.05);
+  --gray-300: rgba(255, 255, 255, 0.1);
+  --gray-400: rgba(255, 255, 255, 0.2);
+  --gray-500: rgba(255, 255, 255, 0.4);
+  --gray-600: rgba(255, 255, 255, 0.5);
+  --gray-700: rgba(255, 255, 255, 0.7);
+  --gray-800: rgba(255, 255, 255, 0.8);
+  --gray-900: #ffffff;
 }
 
 /* apply base colors */
 body {
   background-color: var(--bg);
   color: var(--text);
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+}
+
+.text-sakura-gradient {
+  background: linear-gradient(135deg, #e9a7b2, #fff4ed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Make common 'white' card backgrounds follow theme */
@@ -67,13 +100,13 @@ body {
 .bg-gray-900 { background-color: var(--gray-900) !important; }
 
 /* Accent helper */
-.accent-purple { background-color: var(--purple-500); color: white; }
+.accent-purple { background-color: var(--purple-500); color: var(--bg); }
 .accent-navy { background-color: var(--navy-500); color: white; }
 
 .page-transition-overlay {
   left: 0;
   width: 100%;
-  --transition-bg: #ffffff;
+  --transition-bg: #1a1625;
 }
 
 @media (min-width: 1280px) {
@@ -83,27 +116,13 @@ body {
   }
 }
 
-
-/* button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none;
-} */
-
-
 option {
   color: black;
 }
 
 body.chakra-ui-light .page-transition-overlay,
-html.chakra-ui-light .page-transition-overlay {
-  --transition-bg: #ffffff;
-}
-
+html.chakra-ui-light .page-transition-overlay,
 body.chakra-ui-dark .page-transition-overlay,
 html.chakra-ui-dark .page-transition-overlay {
-  --transition-bg: #0f172a;
+  --transition-bg: #1a1625;
 }

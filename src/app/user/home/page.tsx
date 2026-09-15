@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Image } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, Grid } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { FetchedEvents } from 'api/events/events';
 import { fetchLoggedInBasicDetails } from 'api/profile/profile';
@@ -10,19 +10,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { RingLoader } from 'react-spinners';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
+import { ChevronRight } from 'lucide-react';
 
 export default function Dashboard() {
   const router = useRouter();
 
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Handles a click on the leaderboard button and redirects the user to the leaderboard page for the given event.
-   * @param {string} eventName - The name of the event to show the leaderboard for.
-   */
-  /*******  e394e68b-41d7-401d-96dd-393b660aff41  *******/ const handleLeaderboardclick =
-    (eventName: string) => {
-      router.push(`/user/leaderboard/${encodeURIComponent(eventName)}`);
-    };
+  const handleLeaderboardclick = (eventName: string) => {
+    router.push(`/user/leaderboard/${encodeURIComponent(eventName)}`);
+  };
 
   const auth = useAuth();
 
@@ -36,7 +32,6 @@ export default function Dashboard() {
   });
 
   const events = eventData?.data;
-  // console.log(events);
 
   useEffect(() => {
     const querystring = window.location.search;
@@ -68,95 +63,102 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <RingLoader color="#36d7b7" />
-      </div>
+      <Flex justify="center" align="center" h="60vh">
+        <RingLoader color={opencodeTokens.colors.accent.sakura} />
+      </Flex>
     );
   }
 
   return (
-    <>
-      {events?.map((event: any, index: number) => (
-        <Box pt={{ base: '90px', md: '80px', xl: '80px' }} key={index}>
-          <Box
+    <Box w="100%" maxW="1200px" mx="auto">
+      <Box mb="40px">
+        <Text fontSize="12px" fontWeight="700" letterSpacing="0.1em" color="rgba(255,255,255,0.6)" mb="8px" textTransform="uppercase">
+          OPENCODE EVENTS
+        </Text>
+        <Text fontSize={{ base: '32px', md: '48px' }} fontWeight="400" lineHeight="1.1" mb="16px" className="text-sakura-gradient">
+          The Journey Begins
+        </Text>
+        <Text fontSize="16px" color="rgba(255,255,255,0.7)" lineHeight="1.6" maxW="600px">
+          Select an active event to track your progress, view the leaderboard, and see your impact in the OpenCode community.
+        </Text>
+      </Box>
+
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap="32px">
+        {events?.map((event: any, index: number) => (
+          <Flex
             key={event.name}
+            className="glass-panel"
+            direction="column"
+            p="40px"
             position="relative"
-            minH={{ base: '37vh', md: '80vh' }}
             overflow="hidden"
-            borderRadius={{ base: '16px', md: '20px' }}
+            borderRadius="24px"
+            transition="all 0.4s ease"
+            _hover={{
+              transform: 'translateY(-4px)',
+              boxShadow: `0 20px 40px rgba(0,0,0,0.4), inset 0 0 0 1px ${opencodeTokens.colors.accent.sakura}`,
+            }}
           >
+            {/* Cinematic subtle glow inside the card */}
             <Box
               position="absolute"
-              top="0"
-              left="0"
+              top="-50%"
+              right="-50%"
               w="100%"
               h="100%"
-              bgGradient="linear(to-b, rgba(0,0,0,0.1), rgba(0,0,0.3,0.9))"
+              bg={`radial-gradient(circle, ${opencodeTokens.colors.accent.sakuraHover} 0%, transparent 60%)`}
+              opacity={0.15}
+              pointerEvents="none"
             />
-            <Image
-              src="/img/dashboards/opencodeBG.png"
-              alt={event.name}
-              objectFit="cover"
-              width="100%"
-              height="100%"
-            />
-            <Box
-              position="absolute"
-              top={{ base: '62%', md: '70%' }}
-              left="50%"
-              transform="translate(-50%, -50%)"
-              textAlign="center"
-              zIndex="2"
-              color="white"
-              px={{ base: '16px', md: '0' }}
-              maxW={{ base: '320px', md: '600px' }}
-            >
-              {/* <Text fontSize={{ base: '2xl', md: '4xl' }} fontWeight="bold" mb="3">
-            {event.name}
-          </Text>
-          <Text fontSize={{ base: 'sm', md: 'xl' }}>{event.description}</Text> */}
-            </Box>
-            <Box
-              position="absolute"
-              bottom={{ base: '3', md: '8' }}
-              left="50%"
-              transform="translateX(-50%)"
-              zIndex="2"
-              textAlign="center"
-              w={{ base: '100%', sm: 'auto' }}
-              px={{ base: '16px', sm: '0' }}
-            >
+
+            <Text fontSize="24px" fontWeight="300" color="white" mb="12px" position="relative" zIndex={2}>
+              {event.name}
+            </Text>
+            
+            <Text fontSize="15px" color="rgba(255,255,255,0.6)" mb="40px" flex="1" position="relative" zIndex={2}>
+              Join the competition, collaborate with others, and climb the ranks. The leaderboard awaits.
+            </Text>
+
+            <Flex gap="16px" direction={{ base: 'column', sm: 'row' }} position="relative" zIndex={2}>
               {!auth.isLoggedIn && (
-                <Link href="/auth/sign-in">
+                <Link href="/auth/sign-in" style={{ width: '100%' }}>
                   <Button
-                    w={{ base: '100%', sm: 'auto' }}
-                    colorScheme="teal"
-                    mb={{ base: '3', sm: '0' }}
-                    mr={{ base: '0', sm: '3' }}
-                    bg="linear-gradient(to right, #001f3f, #003366)"
-                    _hover={{
-                      bg: 'linear-gradient(to right, #001a33, #001f3f)',
-                    }}
+                    w="100%"
+                    h="48px"
+                    bg="rgba(255,255,255,0.1)"
                     color="white"
+                    border="1px solid rgba(255,255,255,0.2)"
+                    borderRadius="12px"
+                    _hover={{ bg: 'rgba(255,255,255,0.15)' }}
+                    transition="all 0.3s ease"
+                    fontWeight="500"
                   >
                     Join Now
                   </Button>
                 </Link>
               )}
+              
               <Button
-                w={{ base: '100%', sm: 'auto' }}
-                colorScheme="teal"
+                w={{ base: '100%', sm: auth.isLoggedIn ? '100%' : 'auto' }}
+                h="48px"
+                bg={opencodeTokens.colors.accent.sakura}
+                color={opencodeTokens.colors.background.base}
+                borderRadius="12px"
+                _hover={{ 
+                  bg: opencodeTokens.colors.accent.sakuraHover,
+                  boxShadow: `0 0 20px rgba(233,167,178,0.4)`
+                }}
+                transition="all 0.3s ease"
+                fontWeight="600"
                 onClick={() => handleLeaderboardclick(event.name)}
-                bg="linear-gradient(to right, #001f3f, #003366)"
-                _hover={{ bg: 'linear-gradient(to right, #001a33, #001f3f)' }}
-                color="white"
+                rightIcon={<ChevronRight size={18} />}
               >
-                Leaderboard
+                View Leaderboard
               </Button>
-            </Box>
-          </Box>
-        </Box>
-      ))}
-    </>
+            </Flex>
+          </Flex>
+        ))}
+      </Grid>
+    </Box>
   );
 }

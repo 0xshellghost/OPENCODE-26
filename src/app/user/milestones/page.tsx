@@ -23,11 +23,7 @@ import { MdEmojiEvents, MdLeaderboard } from 'react-icons/md';
 import { RingLoader } from 'react-spinners';
 import { EventWinnersCard } from './components/EventWinnerCard';
 import { WeeklyLeaderboardCard } from './components/WeeklyLeaderboard';
-import Particles from './components/Particles';
-import WinterCluster from './components/WinterCluster';
-import WinterDust from './components/WinterDust';
-import MilestoneRail from './components/MilestoneRail';
-import MobileWinterDecor from './components/MobileWinterDecor';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
 
 interface EventWinner {
   name: string;
@@ -49,10 +45,10 @@ export default function Milestones() {
   const WEEKS_TO_SHOW = [true, true, true, true, true];
   const SHOW_EVENTS = true;
 
-  const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('gray.800', 'white');
-  const mutedColor = useColorModeValue('gray.600', 'gray.400');
+  const bgColor = 'transparent';
+  const cardBg = opencodeTokens.colors.background.glassDark;
+  const textColor = opencodeTokens.colors.text.primary;
+  const mutedColor = opencodeTokens.colors.text.secondary;
 
   
   const { data: leaderboardData, isLoading: leaderboardLoading } = useQuery({
@@ -68,7 +64,7 @@ export default function Milestones() {
   if (leaderboardLoading || eventWinnersLoading) {
     return (
       <Flex h="100vh" align="center" justify="center" bg={bgColor}>
-        <RingLoader color="#805AD5" />
+        <RingLoader color={opencodeTokens.colors.accent.sakura} />
       </Flex>
     );
   }
@@ -98,7 +94,7 @@ export default function Milestones() {
         <TabPanel p="0" >
           
           {weeklyData.length ? (
-            <Box bg={cardBg} borderRadius="24px" p="20px" boxShadow="xl" >
+            <Box className="glass-panel" borderRadius="24px" p="20px" boxShadow={opencodeTokens.shadows.glass} >
               <WeeklyLeaderboardCard
                 weeks={weeklyData.map((weekData: any) => ({
                   week: weekData.week,
@@ -133,7 +129,7 @@ export default function Milestones() {
       panel: (
         <TabPanel p="0">
           {events.length ? (
-            <Box bg={cardBg} borderRadius="24px" p="20px" boxShadow="xl">
+            <Box className="glass-panel" borderRadius="24px" p="20px" boxShadow={opencodeTokens.shadows.glass}>
               <EventWinnersCard events={events} />
             </Box>
           ) : (
@@ -154,32 +150,6 @@ export default function Milestones() {
   return (
     <Box minH="100vh" bg={bgColor} pt={{ base: '100px', md: '100px' }} pb={{ base: '95px', md: '80px' }}>
       
-      <Box position="absolute" inset="0" zIndex={0} overflow="hidden">
-        <Particles />
-        <Box
-          position="absolute"
-          
-          left="50%"
-          transform="translateX(-50%)"
-          w="700px"
-          h="700px"
-          bg="purple.500"
-          opacity={0.08}
-          filter="blur(140px)"
-          borderRadius="full"
-        />
-      </Box>
-
-      <Box display={{ base: 'none', md: 'block' }}>
-  <WinterCluster />
-  <WinterDust />
-  <MilestoneRail />
-</Box>
-
-<WinterDust />
-<MobileWinterDecor/>
-
-      
       <Box position="relative" zIndex={1} maxW="1200px" mx="auto" px="20px">
         
         <Flex direction="column" align="center" mb="48px">
@@ -189,18 +159,19 @@ export default function Milestones() {
             align="center"
             justify="center"
             borderRadius="full"
-            bg="purple.500"
-            color="white"
-            boxShadow="lg"
+            bg={opencodeTokens.colors.background.glassLight}
+            color={opencodeTokens.colors.accent.sakura}
+            boxShadow={`0 10px 30px ${opencodeTokens.colors.accent.sakura}40`}
             mb="16px"
           >
             <Icon as={FaTrophy} w="28px" h="28px" />
           </Flex>
 
           <Text
-            fontSize={{ base: '32px', md: '44px' }}
-            fontWeight="900"
-            color={textColor}
+            fontSize={{ base: '32px', md: '48px' }}
+            fontWeight="400"
+            lineHeight="1.1"
+            className="text-sakura-gradient"
           >
             Milestones
           </Text>
@@ -269,15 +240,15 @@ export default function Milestones() {
 /* ------------------ Helpers ------------------ */
 
 function Stat({ label, value }: { label: string; value: string }) {
-  const muted = useColorModeValue('gray.500', 'gray.400');
+  const muted = opencodeTokens.colors.text.secondary;
 
   return (
     <Box
-      bg={useColorModeValue('white', 'gray.800')}
+      className="glass-panel"
       px={{ base: '16px', md: '30px' }}
       py={{ base: '14px', md: '22px' }}
       borderRadius={{ base: '16px', md: '22px' }}
-      boxShadow="md"
+      boxShadow={opencodeTokens.shadows.glass}
       textAlign="center"
       minW={{ base: '104px', md: '140px' }}
     >
@@ -313,16 +284,16 @@ function EmptyState({
   title: string;
   subtitle: string;
 }) {
-  const muted = useColorModeValue('gray.500', 'gray.400');
+  const muted = opencodeTokens.colors.text.secondary;
   return (
     <Flex
       direction="column"
       align="center"
       justify="center"
       h="300px"
-      bg={useColorModeValue('white', 'gray.800')}
+      className="glass-panel"
       borderRadius="24px"
-      boxShadow="lg"
+      boxShadow={opencodeTokens.shadows.glass}
     >
       <Icon as={icon} w="48px" h="48px" color={muted} mb="12px" />
       <Text fontWeight="700">{title}</Text>

@@ -1,20 +1,12 @@
 'use client';
-import React from 'react';
-// Chakra imports
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Icon,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
-// Custom components
-import DefaultAuthLayout from 'layouts/auth/Default';
-// Assets
-import { FaGithub } from 'react-icons/fa';
 
+import React from 'react';
+import { Box, Button, Flex, Text, Icon } from '@chakra-ui/react';
+import { FaGithub } from 'react-icons/fa';
+import JapaneseBackground from '../../../components/japanese/JapaneseBackground';
+import SiteNavbar from '../../../components/navbar/SiteNavbar';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
+import Image from 'next/image';
 
 export default function SignIn() {
   const handleLoginWithGitHub = () => {
@@ -23,81 +15,99 @@ export default function SignIn() {
     );
   };
 
-  // Chakra color mode
-  const textColor = useColorModeValue('navy.700', 'white');
-  const textColorSecondary = 'gray.400';
-  const googleBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.200');
-  const googleText = useColorModeValue('navy.700', 'white');
-  const googleHover = useColorModeValue(
-    { bg: 'gray.200' },
-    { bg: 'whiteAlpha.300' },
-  );
-  const googleActive = useColorModeValue(
-    { bg: 'secondaryGray.300' },
-    { bg: 'whiteAlpha.200' },
-  );
-
   return (
-    <DefaultAuthLayout illustrationBackground={'/img/dashboards/Debit.png'}>
-      <Flex
-        maxW={{ base: '100%', md: 'max-content' }}
-        w="100%"
-        mx={{ base: 'auto', lg: '0px' }}
-        me="auto"
-        h="100%"
-        alignItems="start"
-        justifyContent="center"
-        mb={{ base: '30px', md: '60px' }}
-        px={{ base: '10px', md: '0px' }}
-        mt={{ base: '40px', md: '14vh' }}
-        flexDirection="column"
-      >
-        <Box me="auto">
-          <Heading color={textColor} fontSize={{ base: '28px', md: '36px' }} mb="10px">
-            Sign In
-          </Heading>
-          <Text
-            mb="28px"
-            ms="4px"
-            color={textColorSecondary}
-            fontWeight="400"
-            fontSize="md"
-          >
-            Sign In with GitHub! 
-          </Text>
-        </Box>
+    <JapaneseBackground variant="auth">
+      <SiteNavbar />
+
+      <Flex minH="100vh" w="100%">
+        {/* LEFT PANEL: Authentication */}
         <Flex
-          zIndex="2"
+          w={{ base: '100%', md: '500px', lg: '600px' }}
+          minH="100vh"
+          bg="rgba(26, 22, 37, 0.6)"
+          backdropFilter="blur(24px)"
+          borderRight={{ base: 'none', md: `1px solid ${opencodeTokens.colors.border.light}` }}
+          boxShadow="20px 0 50px rgba(0,0,0,0.3)"
           direction="column"
-          w={{ base: '100%', md: '420px' }}
-          maxW="100%"
-          background="transparent"
-          borderRadius="15px"
-          mx={{ base: 'auto', lg: 'unset' }}
-          me="auto"
-          mb={{ base: '20px', md: 'auto' }}
+          justify="center"
+          px={{ base: '32px', md: '64px' }}
+          position="relative"
+          zIndex={10}
         >
+          <Box mb="40px">
+            <Text fontSize="12px" fontWeight="700" letterSpacing="0.1em" color="rgba(255,255,255,0.5)" mb="8px" textTransform="uppercase">
+              THE GATEWAY
+            </Text>
+            <Text fontSize={{ base: '36px', md: '48px' }} fontWeight="400" lineHeight="1.1" mb="16px" className="text-sakura-gradient">
+              Welcome Back
+            </Text>
+            <Text fontSize="16px" color="rgba(255,255,255,0.7)" lineHeight="1.6">
+              Continue your journey with OPENCODE 2026. Sign in to access your dashboard, track your progress, and explore the leaderboard.
+            </Text>
+          </Box>
+
           <Button
-            fontSize="sm"
-            me="0px"
-            mb="26px"
-            py="15px"
-            h="50px"
-            borderRadius="16px"
-            bgColor={googleBg}
-            color={googleText}
-            fontWeight="500"
-            _hover={googleHover}
-            _active={googleActive}
-            _focus={googleActive}
             onClick={handleLoginWithGitHub}
             w="100%"
+            h="56px"
+            borderRadius="12px"
+            bg={opencodeTokens.colors.background.glassDark}
+            border={`1px solid ${opencodeTokens.colors.border.light}`}
+            color="white"
+            fontSize="16px"
+            fontWeight="500"
+            _hover={{
+              bg: opencodeTokens.colors.background.glassLight,
+              borderColor: opencodeTokens.colors.accent.sakura,
+              transform: 'translateY(-2px)',
+              boxShadow: opencodeTokens.shadows.glow,
+            }}
+            transition="all 0.3s ease"
+            boxShadow="0 10px 30px rgba(0,0,0,0.2)"
+            leftIcon={<Icon as={FaGithub} w="22px" h="22px" />}
           >
-            <Icon as={FaGithub} w="20px" h="20px" me="10px" />
-            Sign in with Github
+            Continue with GitHub
           </Button>
+
+          <Text fontSize="13px" color="rgba(255,255,255,0.4)" textAlign="center" mt="32px">
+            By signing in, you agree to our Terms of Service and Privacy Policy.
+          </Text>
+        </Flex>
+
+        {/* RIGHT PANEL: Scene Focus */}
+        <Flex
+          flex="1"
+          display={{ base: 'none', md: 'flex' }}
+          direction="column"
+          justify="center"
+          align="center"
+          position="relative"
+          zIndex={10}
+        >
+          {/* We leave the right side completely transparent so the JapaneseBackground Torii image shines through beautifully. */}
+          <Box
+            p="40px"
+            borderRadius="24px"
+            className="glass-panel"
+            maxW="400px"
+            textAlign="center"
+            boxShadow={opencodeTokens.shadows.glass}
+            border={`1px solid ${opencodeTokens.colors.border.light}`}
+            transition="all 0.5s ease"
+            _hover={{ transform: 'translateY(-5px)', boxShadow: opencodeTokens.shadows.glow }}
+          >
+            <Flex justify="center" mb="24px">
+              <Image src="/Logo/OpenCode-White.png" alt="OpenCode 2026" width={80} height={80} />
+            </Flex>
+            <Text fontSize="26px" fontWeight="300" color="white" mb="12px" letterSpacing="0.05em">
+              Where tradition meets creation
+            </Text>
+            <Text fontSize="15px" color="rgba(255,255,255,0.7)" lineHeight="1.6">
+              A new season of ideas, collaboration, and open-source possibilities.
+            </Text>
+          </Box>
         </Flex>
       </Flex>
-    </DefaultAuthLayout>
+    </JapaneseBackground>
   );
 }

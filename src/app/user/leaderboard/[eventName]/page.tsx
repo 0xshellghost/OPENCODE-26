@@ -14,6 +14,7 @@ import {
   useColorModeValue,
   Switch,
 } from '@chakra-ui/react';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
@@ -33,16 +34,13 @@ export default function EventName() {
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
 
-  const textColor = useColorModeValue('gray.800', 'white');
-  const mutedText = useColorModeValue('gray.500', 'gray.400');
-  const glassBg = useColorModeValue(
-    'rgba(255,255,255,0.7)',
-    'rgba(15,23,42,0.7)',
-  );
-  const filterBorder = useColorModeValue('whiteAlpha.700', 'whiteAlpha.200');
-  const menuBg = useColorModeValue('white', 'gray.800');
-  const menuHover = useColorModeValue('purple.50', 'whiteAlpha.100');
-  const menuBorder = useColorModeValue('gray.200', 'gray.700');
+  const textColor = opencodeTokens.colors.text.primary;
+  const mutedText = opencodeTokens.colors.text.secondary;
+  const glassBg = opencodeTokens.colors.background.glassDark;
+  const filterBorder = opencodeTokens.colors.border.light;
+  const menuBg = opencodeTokens.colors.background.glassDark;
+  const menuHover = opencodeTokens.colors.background.glassLight;
+  const menuBorder = opencodeTokens.colors.border.light;
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -127,10 +125,9 @@ export default function EventName() {
         <Box position="relative" w="fit-content">
           <Text
             fontSize={{ base: '30px', sm: '36px', md: '44px' }}
-            fontWeight="900"
-            letterSpacing="-1.4px"
-            color={textColor}
+            fontWeight="400"
             lineHeight="1"
+            className="text-sakura-gradient"
           >
             OPENCODE
           </Text>
@@ -145,10 +142,10 @@ export default function EventName() {
             <Box
               w={{ base: '22px', md: '28px' }}
               h="3px"
-              bg="purple.500"
+              bg={opencodeTokens.colors.accent.sakura}
               borderRadius="full"
             />
-            <Box w="6px" h="6px" bg="purple.500" borderRadius="full" />
+            <Box w="6px" h="6px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
           </Flex>
         </Box>
 
@@ -185,16 +182,16 @@ export default function EventName() {
                 bg={glassBg}
                 borderRadius="16px"
                 border="1px solid"
-                borderColor={selectedCollege !== 'All' ? 'purple.400' : filterBorder}
-                backdropFilter="blur(16px)"
-                boxShadow="0 10px 30px rgba(0,0,0,0.08)"
-                transition="all 0.2s ease"
+                borderColor={selectedCollege !== 'All' ? opencodeTokens.colors.accent.sakura : filterBorder}
+                backdropFilter="blur(20px)"
+                boxShadow={opencodeTokens.shadows.glass}
+                transition="all 0.3s ease"
                 position="relative"
                 cursor="pointer"
-                _hover={{ borderColor: 'purple.400' }}
+                _hover={{ borderColor: opencodeTokens.colors.accent.sakura }}
               >
                 <Box
-                  color={selectedCollege !== 'All' ? 'purple.500' : 'gray.400'}
+                  color={selectedCollege !== 'All' ? opencodeTokens.colors.accent.sakura : opencodeTokens.colors.text.secondary}
                   display="flex"
                   alignItems="center"
                   transition="color 0.2s ease"
@@ -210,7 +207,7 @@ export default function EventName() {
                 >
                   {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
                 </Text>
-                <Box color="gray.400" display="flex" alignItems="center">
+                <Box color={opencodeTokens.colors.text.secondary} display="flex" alignItems="center">
                   <ChevronDown size={14} />
                 </Box>
                 {selectedCollege !== 'All' && (
@@ -220,9 +217,9 @@ export default function EventName() {
                     right="-4px"
                     w="10px"
                     h="10px"
-                    bg="purple.500"
+                    bg={opencodeTokens.colors.accent.sakura}
                     borderRadius="full"
-                    boxShadow="0 0 6px rgba(128,90,213,0.6)"
+                    boxShadow={`0 0 10px ${opencodeTokens.colors.accent.sakura}`}
                   />
                 )}
               </MenuButton>
@@ -231,7 +228,7 @@ export default function EventName() {
                 border="1px solid"
                 borderColor={menuBorder}
                 borderRadius="14px"
-                boxShadow="0 20px 50px rgba(0,0,0,0.2)"
+                boxShadow={opencodeTokens.shadows.glass}
                 backdropFilter="blur(20px)"
                 py="6px"
                 maxH="280px"
@@ -242,7 +239,7 @@ export default function EventName() {
                   '&::-webkit-scrollbar': { width: '4px' },
                   '&::-webkit-scrollbar-track': { bg: 'transparent' },
                   '&::-webkit-scrollbar-thumb': {
-                    bg: 'purple.200',
+                    bg: opencodeTokens.colors.border.medium,
                     borderRadius: 'full',
                   },
                 }}
@@ -257,7 +254,7 @@ export default function EventName() {
                   py="8px"
                   fontSize="13px"
                   fontWeight={selectedCollege === 'All' ? '700' : '500'}
-                  color={selectedCollege === 'All' ? 'purple.500' : textColor}
+                  color={selectedCollege === 'All' ? opencodeTokens.colors.accent.sakura : textColor}
                   icon={selectedCollege === 'All' ? <FaCheck size={14} /> : undefined}
                 >
                   All Colleges
@@ -274,7 +271,7 @@ export default function EventName() {
                     py="8px"
                     fontSize="13px"
                     fontWeight={selectedCollege === college ? '700' : '500'}
-                    color={selectedCollege === college ? 'purple.500' : textColor}
+                    color={selectedCollege === college ? opencodeTokens.colors.accent.sakura : textColor}
                     icon={selectedCollege === college ? <FaCheck size={14} /> : undefined}
                   >
                     {college}
@@ -292,15 +289,15 @@ export default function EventName() {
               bg={glassBg}
               borderRadius="16px"
               border="1px solid"
-              borderColor={firstYearOnly ? 'purple.400' : filterBorder}
-              backdropFilter="blur(16px)"
-              boxShadow="0 10px 30px rgba(0,0,0,0.08)"
-              transition="all 0.2s ease"
+              borderColor={firstYearOnly ? opencodeTokens.colors.accent.sakura : filterBorder}
+              backdropFilter="blur(20px)"
+              boxShadow={opencodeTokens.shadows.glass}
+              transition="all 0.3s ease"
               cursor="pointer"
               onClick={() => setFirstYearOnly(!firstYearOnly)}
-              _hover={{ borderColor: 'purple.400' }}
+              _hover={{ borderColor: opencodeTokens.colors.accent.sakura }}
             >
-              <Box color={firstYearOnly ? 'purple.500' : 'gray.400'} display="flex">
+              <Box color={firstYearOnly ? opencodeTokens.colors.accent.sakura : opencodeTokens.colors.text.secondary} display="flex">
                 <FaCalendarAlt size={16} />
               </Box>
               <Text fontSize="13px" fontWeight="600" color={textColor}>
@@ -309,7 +306,7 @@ export default function EventName() {
               <Switch 
                 isChecked={firstYearOnly} 
                 onChange={(e) => setFirstYearOnly(e.target.checked)} 
-                colorScheme="purple" 
+                colorScheme="pink" 
                 size="sm" 
               />
             </Flex>
@@ -321,15 +318,16 @@ export default function EventName() {
                 px="10px"
                 py="6px"
                 borderRadius="full"
-                bg="purple.500"
-                color="white"
+                bg={opencodeTokens.colors.accent.sakura}
+                color={opencodeTokens.colors.background.base}
                 fontSize="12px"
                 fontWeight="700"
                 cursor="pointer"
-                transition="all 0.2s ease"
+                transition="all 0.3s ease"
                 _hover={{
-                  bg: 'purple.600',
+                  bg: opencodeTokens.colors.accent.sakuraHover,
                   transform: 'scale(1.05)',
+                  boxShadow: `0 0 10px ${opencodeTokens.colors.accent.sakura}`
                 }}
                 onClick={clearAllFilters}
               >
@@ -345,17 +343,18 @@ export default function EventName() {
             px={{ base: '10px', md: '18px' }}
             py={{ base: '8px', md: '12px' }}
             bg={glassBg}
+            border={`1px solid ${filterBorder}`}
             borderRadius="16px"
-            backdropFilter="blur(16px)"
-            boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+            backdropFilter="blur(20px)"
+            boxShadow={opencodeTokens.shadows.glass}
             minW={{ base: 'auto', md: '180px' }}
             justify="center"
           >
             <Box
               p={{ base: '6px', md: '10px' }}
               borderRadius="full"
-              bg="purple.100"
-              color="purple.600"
+              bg={opencodeTokens.colors.background.glassLight}
+              color={opencodeTokens.colors.accent.sakura}
               fontSize={{ base: '12px', md: '14px' }}
             >
               <FaUsers />
@@ -397,10 +396,10 @@ export default function EventName() {
           <Box
             p="22px"
             borderRadius="full"
-            bg="purple.100"
-            color="purple.500"
+            bg={opencodeTokens.colors.background.glassLight}
+            color={opencodeTokens.colors.accent.sakura}
             mb="18px"
-            boxShadow="0 10px 30px rgba(117,95,255,0.25)"
+            boxShadow={`0 10px 30px ${opencodeTokens.colors.accent.sakura}40`}
           >
             <FaSearchMinus size={36} />
           </Box>
@@ -430,7 +429,7 @@ export default function EventName() {
           <Text
             mt="14px"
             fontSize="13px"
-            color="purple.500"
+            color={opencodeTokens.colors.accent.sakura}
             fontWeight="600"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}

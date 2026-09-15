@@ -2,12 +2,13 @@
 'use client';
 
 // chakra imports
-import { Box, Flex, HStack, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, HStack, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import { IRoute } from 'types/navigation';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { opencodeTokens } from '../../../theme/opencode-tokens';
 
 interface SidebarLinksProps {
   routes: IRoute[];
@@ -16,19 +17,9 @@ interface SidebarLinksProps {
 export function SidebarLinks(props: SidebarLinksProps) {
   const { routes } = props;
 
-  //   Chakra color mode
   const pathname = usePathname();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  let activeColor = useColorModeValue('gray.700', 'white');
-  let inactiveColor = useColorModeValue(
-    'secondaryGray.600',
-    'secondaryGray.600',
-  );
-  let activeIcon = useColorModeValue('brand.500', 'white');
-  let textColor = useColorModeValue('secondaryGray.500', 'white');
-  let brandColor = useColorModeValue('brand.500', 'brand.400');
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = useCallback(
@@ -47,6 +38,8 @@ export function SidebarLinks(props: SidebarLinksProps) {
         route.layout === '/auth' ||
         route.layout === '/user'
       ) {
+        const isActive = activeRoute(route.path.toLowerCase());
+
         return (
           <Link
             key={index}
@@ -64,76 +57,74 @@ export function SidebarLinks(props: SidebarLinksProps) {
             {route.icon ? (
               <Box>
                 <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? '22px' : '26px'
-                  }
-                  py="5px"
-                  ps="10px"
+                  spacing={isActive ? '22px' : '26px'}
+                  py="12px"
+                  ps="16px"
                   data-nav-item
+                  borderRadius="12px"
+                  mb="8px"
+                  transition="all 0.3s ease"
+                  bg={isActive ? opencodeTokens.colors.background.glassLight : 'transparent'}
+                  _hover={{ bg: opencodeTokens.colors.background.glassLight }}
                 >
                   <Flex w="100%" alignItems="center" justifyContent="center">
                     <Box
-                      color={
-                        activeRoute(route.path.toLowerCase())
-                          ? activeIcon
-                          : textColor
-                      }
+                      color={isActive ? opencodeTokens.colors.accent.sakura : opencodeTokens.colors.text.secondary}
                       me="18px"
+                      transition="color 0.3s ease"
                     >
                       {route.icon}
                     </Box>
                     <Text
                       me="auto"
-                      color={
-                        activeRoute(route.path.toLowerCase())
-                          ? activeColor
-                          : textColor
-                      }
-                      fontWeight={
-                        activeRoute(route.path.toLowerCase())
-                          ? 'bold'
-                          : 'normal'
-                      }
+                      color={isActive ? opencodeTokens.colors.text.primary : opencodeTokens.colors.text.secondary}
+                      fontWeight={isActive ? '600' : '500'}
+                      fontSize="15px"
+                      transition="color 0.3s ease"
                     >
                       {route.name}
                     </Text>
                   </Flex>
                   <Box
-                    h="36px"
+                    h="24px"
                     w="4px"
-                    bg={
-                      activeRoute(route.path.toLowerCase())
-                        ? brandColor
-                        : 'transparent'
-                    }
-                    borderRadius="5px"
+                    bg={isActive ? opencodeTokens.colors.accent.sakura : 'transparent'}
+                    borderRadius="full"
+                    boxShadow={isActive ? `0 0 10px ${opencodeTokens.colors.accent.sakura}` : 'none'}
+                    transition="all 0.3s ease"
                   />
                 </HStack>
               </Box>
             ) : (
               <Box>
                 <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? '22px' : '26px'
-                  }
-                  py="5px"
-                  ps="10px"
+                  spacing={isActive ? '22px' : '26px'}
+                  py="12px"
+                  ps="16px"
                   data-nav-item
+                  borderRadius="12px"
+                  mb="8px"
+                  transition="all 0.3s ease"
+                  bg={isActive ? opencodeTokens.colors.background.glassLight : 'transparent'}
+                  _hover={{ bg: opencodeTokens.colors.background.glassLight }}
                 >
                   <Text
                     me="auto"
-                    color={
-                      activeRoute(route.path.toLowerCase())
-                        ? activeColor
-                        : inactiveColor
-                    }
-                    fontWeight={
-                      activeRoute(route.path.toLowerCase()) ? 'bold' : 'normal'
-                    }
+                    color={isActive ? opencodeTokens.colors.text.primary : opencodeTokens.colors.text.secondary}
+                    fontWeight={isActive ? '600' : '500'}
+                    fontSize="15px"
+                    transition="color 0.3s ease"
                   >
                     {route.name}
                   </Text>
-                  <Box h="36px" w="4px" bg="brand.400" borderRadius="5px" />
+                  <Box
+                    h="24px"
+                    w="4px"
+                    bg={isActive ? opencodeTokens.colors.accent.sakura : 'transparent'}
+                    borderRadius="full"
+                    boxShadow={isActive ? `0 0 10px ${opencodeTokens.colors.accent.sakura}` : 'none'}
+                    transition="all 0.3s ease"
+                  />
                 </HStack>
               </Box>
             )}

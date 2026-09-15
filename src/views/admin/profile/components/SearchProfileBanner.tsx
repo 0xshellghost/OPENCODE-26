@@ -4,9 +4,9 @@ import {
   Box,
   Flex,
   Input,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { Search } from 'lucide-react';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 interface Props {
   value: string;
@@ -14,40 +14,26 @@ interface Props {
 }
 
 export default function SearchProfileBanner({ value, onChange }: Props) {
-  const glassBg = useColorModeValue(
-    'rgba(255,255,255,0.7)',
-    'rgba(15,23,42,0.7)'
-  );
-
-  const borderColor = useColorModeValue(
-    'whiteAlpha.700',
-    'whiteAlpha.200'
-  );
-
-  const textColor = useColorModeValue('gray.800', 'gray.100');
-  const placeholderColor = useColorModeValue('gray.500', 'gray.400');
-
   return (
     <Flex
       align="center"
       gap="10px"
       px={{ base: '14px', md: '18px' }}
       py={{ base: '10px', md: '12px' }}
-      bg={glassBg}
+      bg={opencodeTokens.colors.background.glassDark}
       borderRadius="16px"
-      border="1px solid"
-      borderColor={borderColor}
-      backdropFilter="blur(16px)"
-      boxShadow="0 10px 30px rgba(0,0,0,0.08)"
+      border={`1px solid ${opencodeTokens.colors.border.light}`}
+      backdropFilter="blur(20px)"
+      boxShadow={opencodeTokens.shadows.glass}
       w={{ base: '65%', sm: '260px', md: '340px' }}
-      transition="all 0.2s ease"
+      transition="all 0.3s ease"
       _focusWithin={{
-        borderColor: 'purple.600',
-        
+        borderColor: opencodeTokens.colors.accent.sakura,
+        boxShadow: `0 0 15px ${opencodeTokens.colors.accent.sakuraHover}`
       }}
     >
       <Box
-        color="purple.500"
+        color={opencodeTokens.colors.accent.sakura}
         display="flex"
         alignItems="center"
       >
@@ -61,8 +47,8 @@ export default function SearchProfileBanner({ value, onChange }: Props) {
         variant="unstyled"
         fontSize="14px"
         fontWeight="500"
-        color={textColor}
-        _placeholder={{ color: placeholderColor }}
+        color={opencodeTokens.colors.text.primary}
+        _placeholder={{ color: opencodeTokens.colors.text.secondary }}
       />
     </Flex>
   );

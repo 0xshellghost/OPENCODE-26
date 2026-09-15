@@ -1,25 +1,21 @@
 'use client';
-/* eslint-disable */
 
 import {
   Avatar,
   Box,
   Flex,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Text,
-  useColorMode,
-  useColorModeValue,
 } from '@chakra-ui/react';
 
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { useAuth } from 'contexts/AuthContext';
 import { gsap } from 'gsap';
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { opencodeTokens } from '../../theme/opencode-tokens';
 
 interface AdminNavbarProps {
   brandText: string;
@@ -32,13 +28,6 @@ interface AdminNavbarProps {
 }
 
 export default function AdminNavbar(props: AdminNavbarProps) {
-  const { colorMode, toggleColorMode } = useColorMode();
-  const subtitleColor = useColorModeValue('gray.600', 'gray.400');
-  const navbarBg = useColorModeValue(
-    'linear(to-b, #f6f7ff 0%, #edeaff 70%, rgba(237,234,255,0) 100%)',
-    'linear(to-b, #211d27 0%, #2d2737 60%, rgba(45,39,55,0) 100%)',
-  );
-
   const auth = useAuth();
   const router = useRouter();
 
@@ -87,46 +76,64 @@ export default function AdminNavbar(props: AdminNavbarProps) {
       pt={{ base: '14px', md: '22px' }}
       pb={{base:"16px", md:"20px"}}
       zIndex="20"
-      bgGradient={navbarBg}
+      bgGradient="linear(to-b, rgba(26,22,37,0.9) 0%, rgba(26,22,37,0.4) 60%, rgba(26,22,37,0) 100%)"
     >
       <Flex justify="space-between" align="center">
         <Text
-  fontSize={{ base: '22px', md: '28px' }}
-  fontWeight="800"
-  lineHeight="1.2"
-  pt="16px"
->
-  Hi {name},
-  <Text
-    as="span"
-    display={{ base: 'block', md: 'inline' }}
-    color="purple.500"
-    ml={{ base: 0, md: 1 }}
-  >
-    Welcome to OPENCODE
-  </Text>
-</Text>
+          fontSize={{ base: '20px', md: '24px' }}
+          fontWeight="400"
+          lineHeight="1.2"
+          pt="16px"
+          color={opencodeTokens.colors.text.primary}
+        >
+          Welcome back,{' '}
+          <Text
+            as="span"
+            display={{ base: 'inline-block', md: 'inline' }}
+            fontWeight="600"
+            className="text-sakura-gradient"
+          >
+            {name}
+          </Text>
+        </Text>
 
-
-
-        <Flex align="center" gap="12px">
-          <IconButton
-            aria-label="Toggle theme"
-            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-            onClick={toggleColorMode}
-            borderRadius="full"
-          />
-
+        <Flex align="center" gap="16px" pt="16px">
           <Menu>
-            <MenuButton>
-              <Avatar size="sm" name={name} src={avatarUrl} bg="purple.500" />
+            <MenuButton
+              transition="all 0.3s"
+              _focus={{ boxShadow: 'none' }}
+              _hover={{ transform: 'scale(1.05)' }}
+            >
+              <Avatar 
+                size="sm" 
+                name={name} 
+                src={avatarUrl} 
+                bg={opencodeTokens.colors.background.glassDark}
+                border={`2px solid ${opencodeTokens.colors.accent.sakura}`}
+              />
             </MenuButton>
 
-            <MenuList>
-              <MenuItem onClick={() => router.push('/user/profile')}>
+            <MenuList 
+              bg={opencodeTokens.colors.background.glassDark}
+              backdropFilter="blur(20px)"
+              border={`1px solid ${opencodeTokens.colors.border.light}`}
+              boxShadow={opencodeTokens.shadows.glass}
+              borderRadius={opencodeTokens.borders.radius.lg}
+            >
+              <MenuItem 
+                onClick={() => router.push('/user/profile')}
+                bg="transparent"
+                _hover={{ bg: opencodeTokens.colors.background.glassLight }}
+                color="white"
+              >
                 Profile Settings
               </MenuItem>
-              <MenuItem color="red.400" onClick={handleLogout}>
+              <MenuItem 
+                color={opencodeTokens.colors.accent.sakura} 
+                onClick={handleLogout}
+                bg="transparent"
+                _hover={{ bg: opencodeTokens.colors.background.glassLight }}
+              >
                 Log out
               </MenuItem>
             </MenuList>

@@ -1,21 +1,20 @@
 import {
   Text,
-  useColorModeValue,
   Stack,
   Box,
   Icon,
 } from '@chakra-ui/react';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import Card from 'components/card/Card';
 import Project from 'views/admin/profile/components/Project';
 import { PullRequest } from 'app/user/profile/page';
 import { FaInbox } from 'react-icons/fa';
 
 export default function Projects(props: { PRs: PullRequest[] }) {
-  const textPrimary = useColorModeValue('gray.800', 'white');
-  const textSecondary = useColorModeValue('gray.500', 'gray.400');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const mutedBg = useColorModeValue('gray.50', 'gray.700');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const textPrimary = opencodeTokens.colors.text.primary;
+  const textSecondary = opencodeTokens.colors.text.secondary;
+  const cardBg = 'transparent';
+  const borderColor = 'transparent';
 
   return (
     <Card
@@ -54,11 +53,10 @@ export default function Projects(props: { PRs: PullRequest[] }) {
       ) : (
         <Box
           p="40px"
-        
           borderRadius="16px"
           textAlign="center"
-          border="1px dashed"
-          borderColor={borderColor}
+          border={`1px dashed ${opencodeTokens.colors.border.medium}`}
+          borderColor={opencodeTokens.colors.border.medium}
         >
           <Icon
             as={FaInbox}

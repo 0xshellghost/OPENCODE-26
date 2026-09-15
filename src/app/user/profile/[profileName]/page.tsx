@@ -25,6 +25,7 @@ import General from 'views/admin/profile/components/General';
 import Projects from 'views/admin/profile/components/Projects';
 import { getRoleTags, RoleBadgesGroup } from 'views/admin/profile/components/RoleBadge';
 import { ProfileData } from '../page';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 export default function ProfileOverviewOther() {
   const { profileName } = useParams<{ profileName: string }>();
@@ -88,23 +89,17 @@ export default function ProfileOverviewOther() {
 
   const isDesktop = useBreakpointValue({ base: false, lg: true });
 
-  const pageBg = useColorModeValue('gray.50', 'gray.900');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const muted = useColorModeValue('gray.500', 'gray.400');
+  const pageBg = 'transparent';
+  const cardBg = opencodeTokens.colors.background.glassDark;
+  const muted = opencodeTokens.colors.text.secondary;
 
-  const shadowHero = useColorModeValue(
-    '0 18px 40px rgba(0,0,0,0.12)',
-    '0 18px 40px rgba(0,0,0,0.45)',
-  );
-  const shadowSoft = useColorModeValue(
-    '0 10px 24px rgba(0,0,0,0.08)',
-    '0 10px 24px rgba(0,0,0,0.35)',
-  );
+  const shadowHero = opencodeTokens.shadows.glass;
+  const shadowSoft = opencodeTokens.shadows.glass;
 
   if (isLoading) {
     return (
       <Flex minH="100vh" align="center" justify="center" bg={pageBg}>
-        <RingLoader color="#755FFF" size={52} />
+        <RingLoader color={opencodeTokens.colors.accent.sakura} size={52} />
       </Flex>
     );
   }
@@ -128,7 +123,7 @@ export default function ProfileOverviewOther() {
       {!isDesktop && (
         <>
           <Box
-            bg={cardBg}
+            className="glass-panel"
             borderRadius="22px"
             p="18px"
             boxShadow={shadowHero}
@@ -170,13 +165,13 @@ export default function ProfileOverviewOther() {
           </Box>
 
           <Box
-            bg={cardBg}
+            className="glass-panel"
             borderRadius="20px"
             p="16px"
             boxShadow={shadowSoft}
             mb="22px"
           >
-            <Text fontWeight="800" mb="14px">
+            <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
               General Information
             </Text>
 
@@ -205,8 +200,8 @@ export default function ProfileOverviewOther() {
           </Box>
 
           {getBadges(profile?.prMerged || 0).length > 0 && (
-            <Box bg={cardBg} borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
-              <Text fontWeight="800" mb="14px">
+            <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
+              <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
                 Badges
               </Text>
               <Flex gap="8px" wrap="wrap">
@@ -219,7 +214,7 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box bg={cardBg} borderRadius="20px" p="16px" boxShadow={shadowSoft}>
+          <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -229,7 +224,7 @@ export default function ProfileOverviewOther() {
         <>
           <Grid templateColumns="1.3fr 1fr" gap="24px" mb="24px">
             <Box
-              bg={cardBg}
+              className="glass-panel"
               borderRadius="20px"
               p="24px"
               boxShadow={shadowHero}
@@ -249,7 +244,7 @@ export default function ProfileOverviewOther() {
             </Box>
 
             <Box
-              bg={cardBg}
+              className="glass-panel"
               borderRadius="20px"
               p="24px"
               boxShadow={shadowSoft}
@@ -268,8 +263,8 @@ export default function ProfileOverviewOther() {
           </Grid>
 
           {getBadges(profile?.prMerged || 0).length > 0 && (
-            <Box bg={cardBg} borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
-              <Text fontSize="18px" fontWeight="800" mb="16px">
+            <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
+              <Text fontSize="18px" fontWeight="800" mb="16px" color={opencodeTokens.colors.text.primary}>
                 Unlocked Badges
               </Text>
               <Flex gap="12px" wrap="wrap">
@@ -282,7 +277,7 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box bg={cardBg} borderRadius="20px" p="24px" boxShadow={shadowSoft}>
+          <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -309,10 +304,10 @@ export default function ProfileOverviewOther() {
 }
 
 function StatPill({ label, value }: { label: string; value: number }) {
-  const bg = useColorModeValue('gray.50', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const valueColor = useColorModeValue('purple.600', 'white');
-  const labelColor = useColorModeValue('gray.600', 'gray.400');
+  const bg = opencodeTokens.colors.background.glassDark;
+  const borderColor = opencodeTokens.colors.border.light;
+  const valueColor = opencodeTokens.colors.accent.sakura;
+  const labelColor = opencodeTokens.colors.text.secondary;
 
   return (
     <Box
@@ -324,11 +319,11 @@ function StatPill({ label, value }: { label: string; value: number }) {
       bg={bg}
       border="1px solid"
       borderColor={borderColor}
-      transition="all 0.2s ease"
+      transition="all 0.3s ease"
       _hover={{
-        transform: 'translateY(-1px)',
-        borderColor: 'purple.300',
-        boxShadow: '0 6px 14px rgba(0,0,0,0.08)',
+        transform: 'translateY(-2px)',
+        borderColor: opencodeTokens.colors.accent.sakura,
+        boxShadow: `0 6px 14px ${opencodeTokens.colors.accent.sakura}40`,
       }}
     >
       <Text fontSize="18px" fontWeight="900" lineHeight="1" color={valueColor}>
@@ -344,10 +339,10 @@ function StatPill({ label, value }: { label: string; value: number }) {
 
 
 function Info({ label, value }: { label: string; value?: string }) {
-  const bg = useColorModeValue('gray.50', 'transparent');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  const labelColor = useColorModeValue('gray.500', 'gray.400');
-  const valueColor = useColorModeValue('gray.800', 'white');
+  const bg = opencodeTokens.colors.background.glassDark;
+  const borderColor = opencodeTokens.colors.border.light;
+  const labelColor = opencodeTokens.colors.text.secondary;
+  const valueColor = opencodeTokens.colors.text.primary;
 
   return (
     <Box
@@ -356,10 +351,10 @@ function Info({ label, value }: { label: string; value?: string }) {
       bg={bg}
       border="1px solid"
       borderColor={borderColor}
-      transition="all 0.2s ease"
+      transition="all 0.3s ease"
       _hover={{
-        borderColor: 'purple.300',
-        bg: useColorModeValue('white', 'transparent'),
+        borderColor: opencodeTokens.colors.accent.sakura,
+        bg: opencodeTokens.colors.background.glassLight,
       }}
     >
       <Text

@@ -11,6 +11,7 @@ import Card from 'components/card/Card';
 import { NextAvatar } from 'components/image/Avatar';
 import { Pencil } from 'lucide-react';
 import { RoleBadgesGroup, RoleTag } from './RoleBadge';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 export default function Banner(props: {
   banner?: string;
@@ -37,20 +38,17 @@ export default function Banner(props: {
     ...rest
   } = props;
 
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const cardBg = 'transparent';
+  const borderColor = 'transparent';
 
-  const textPrimary = useColorModeValue('gray.800', 'white');
-  const textSecondary = useColorModeValue('gray.600', 'gray.400');
-  const hintColor = useColorModeValue('gray.500', 'gray.400');
+  const textPrimary = opencodeTokens.colors.text.primary;
+  const textSecondary = opencodeTokens.colors.text.secondary;
+  const hintColor = opencodeTokens.colors.text.secondary;
 
-  const avatarBorder = useColorModeValue('white', 'gray.700');
-  const avatarShadow = useColorModeValue(
-    '0 12px 28px rgba(0,0,0,0.12)',
-    '0 16px 40px rgba(0,0,0,0.35)',
-  );
+  const avatarBorder = opencodeTokens.colors.accent.sakura;
+  const avatarShadow = `0 0 20px ${opencodeTokens.colors.accent.sakuraHover}`;
 
-  const statBg = useColorModeValue('gray.50', 'gray.900');
+  const statBg = opencodeTokens.colors.background.glassDark;
 
   return (
     <Card
@@ -66,8 +64,12 @@ export default function Banner(props: {
     >
       {/* Accent bar */}
       <Box
+        position="absolute"
+        top="0"
+        left="0"
+        w="100%"
         h="4px"
-        bg="purple.400"
+        bg={opencodeTokens.colors.accent.sakura}
         borderTopRadius="22px"
         mb="18px"
       />
@@ -137,8 +139,7 @@ export default function Banner(props: {
           bg={statBg}
           borderRadius="14px"
           p="14px"
-          border="1px solid"
-          borderColor={borderColor}
+          border={`1px solid ${opencodeTokens.colors.border.light}`}
         >
           <Text
             color={textPrimary}
@@ -162,8 +163,7 @@ export default function Banner(props: {
           bg={statBg}
           borderRadius="14px"
           p="14px"
-          border="1px solid"
-          borderColor={borderColor}
+          border={`1px solid ${opencodeTokens.colors.border.light}`}
         >
           <Text
             color={textPrimary}

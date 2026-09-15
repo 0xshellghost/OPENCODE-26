@@ -75,7 +75,7 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GlobalSakuraBackground />
+      {pathname === '/' && <GlobalSakuraBackground />}
       <AuthProvider>
         <SidebarProvider>
           <ChakraProvider theme={theme}>{children}</ChakraProvider>

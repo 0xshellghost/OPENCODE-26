@@ -1,29 +1,32 @@
 'use client';
 
-import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Icon, Text } from '@chakra-ui/react';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import Link from 'next/link';
 import { FaDiscord } from 'react-icons/fa';
 
 export default function DiscordBanner() {
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const textColor = useColorModeValue('navy.700', 'white');
-  const subtitleColor = useColorModeValue('gray.500', 'gray.400');
+  const bgColor = opencodeTokens.colors.background.glassDark;
+  const textColor = opencodeTokens.colors.text.primary;
+  const subtitleColor = opencodeTokens.colors.text.secondary;
 
   return (
     <Link href="https://discord.gg/SxBATvUPnC" target="_blank">
       <Flex
-        bg={bgColor}
+        className="glass-panel"
         direction="row"
         justify="space-between"
         align="center"
         borderRadius="20px"
         p={{ base: '16px', md: '24px' }}
         mb="24px"
-        boxShadow="lg"
+        boxShadow={opencodeTokens.shadows.glass}
         transition="all 0.3s ease"
+        border={`1px solid ${opencodeTokens.colors.border.light}`}
         _hover={{
           transform: 'translateY(-2px)',
-          boxShadow: 'xl',
+          boxShadow: `0 15px 30px ${opencodeTokens.colors.accent.sakura}40`,
+          borderColor: opencodeTokens.colors.accent.sakura
         }}
         gap={{ base: '12px', md: '0px' }}
       >
