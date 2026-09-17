@@ -16,6 +16,7 @@ import {
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 import { MdFolder } from 'react-icons/md';
 import Card from 'components/card/Card';
+import PageHeading from 'components/japanese/PageHeading';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useState } from 'react';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
@@ -62,21 +63,13 @@ export default function ReposPage() {
   }
 
   return (
-    <Box pt={{ base: '110px', md: '90px' }} px={{ base: '16px', md: '32px' }} maxW="1400px" mx="auto">
+    <Box pt="0" px="0" maxW="1400px" mx="auto">
       <Flex direction="column" mb={{ base: '20px', md: '40px' }}>
-        <Box position="relative" w="fit-content" mb="24px">
-          <Text fontSize={{ base: '30px', sm: '36px', md: '44px' }} fontWeight="900" letterSpacing="-1.4px" color={textColor} lineHeight="1">
-            REPOSITORIES
-          </Text>
-          <Flex position="absolute" right="-20px" bottom={{ base: '-4px', md: '-6px' }} align="center" gap="6px">
-            <Box w={{ base: '22px', md: '28px' }} h="3px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
-            <Box w="6px" h="6px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
-          </Flex>
-        </Box>
+        <PageHeading eyebrow="IDEAS INTO IMPACT" title="Built in the open." description="Explore this season’s repositories. Find a project that sparks your curiosity, meet its maintainers, and make your first contribution." />
         
         <Flex justify="space-between" align="center" flexWrap="wrap" gap="16px">
           <Text color={mutedText} fontSize="16px" maxW="600px">
-            Explore the active projects for this year's event. Find an interesting repository, reach out to the maintainers on Discord, and start contributing!
+            {filteredRepos.length} repositories to explore
           </Text>
           <Box w={{ base: "100%", md: "300px" }}>
             <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} />
@@ -114,7 +107,7 @@ export default function ReposPage() {
                     {repo.name}
                   </Text>
                 </Flex>
-                <Link href={repo.githubLink} isExternal>
+                <Link href={repo.githubLink} isExternal aria-label={`View ${repo.name} on GitHub`}>
                   <Box p="8px" bg={opencodeTokens.colors.background.glassDark} borderRadius="full" transition="all 0.2s" _hover={{ bg: opencodeTokens.colors.accent.sakura, color: 'white' }}>
                     <Icon as={FaGithub} w="18px" h="18px" />
                   </Box>
@@ -147,7 +140,7 @@ export default function ReposPage() {
                   </AvatarGroup>
                   <Flex align="center" gap="6px" color={opencodeTokens.colors.accent.sakura} fontSize="13px" fontWeight="600">
                     <Icon as={FaDiscord} />
-                    <Text>Ask on Discord</Text>
+                    <Link href="https://discord.com/channels/885149696249708635/885151791329722448" isExternal>Ask on Discord</Link>
                   </Flex>
                 </Flex>
               </Box>

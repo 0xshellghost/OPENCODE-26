@@ -4,6 +4,7 @@ import { ArrowRight, Github, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import OpenCodeExperience from '../opencode/OpenCodeExperience';
+import ThemeToggle from 'components/japanese/ThemeToggle';
 
 const GITHUB_LOGIN_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
 
@@ -25,14 +26,16 @@ export default function LandingPage() {
         navigation={navigation}
       />
 
+      <div className="oc-landing-theme"><ThemeToggle /></div>
+
       {/* Content section below the cinematic hero */}
       <section
         id="opencode-content"
         tabIndex={-1}
         className="relative z-10 flex justify-center w-full px-5 sm:px-8 md:px-20 py-20"
-        style={{ background: '#211d27' }}
+        style={{ background: 'var(--bg)' }}
       >
-        <aside className="flex flex-col w-full max-w-[420px] p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-lg text-white">
+        <aside className="glass-panel flex flex-col w-full max-w-[420px] p-6" style={{ color: 'var(--text)' }}>
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#e9a7b2] to-[#fff4ed] flex items-center justify-center">
               <Image
@@ -45,7 +48,7 @@ export default function LandingPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold">OpenCode</h3>
-              <p className="text-xs text-white/70">
+              <p className="text-xs text-[var(--muted)]">
                 Join projects, earn stars, and grow.
               </p>
             </div>
@@ -53,13 +56,13 @@ export default function LandingPage() {
 
           <div className="mt-4 flex gap-3 text-sm">
             <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
-              <div className="text-xs text-white/70">Participants</div>
+              <div className="text-xs text-[var(--muted)]">Participants</div>
               <div className="mt-1 font-semibold flex items-center justify-center gap-2">
                 <Users className="w-4 h-4" /> 1.2k
               </div>
             </div>
             <div className="flex-1 p-3 rounded-lg bg-white/5 text-center">
-              <div className="text-xs text-white/70">Repos</div>
+              <div className="text-xs text-[var(--muted)]">Repos</div>
               <div className="mt-1 font-semibold flex items-center justify-center gap-2">
                 <Github className="w-4 h-4" /> 165
               </div>
@@ -68,7 +71,7 @@ export default function LandingPage() {
 
           {/* <div className="mt-4 p-3 rounded-lg bg-white/3">
             <div className="flex items-center justify-between">
-              <div className="text-xs text-white/70">Top Projects</div>
+              <div className="text-xs text-[var(--muted)]">Top Projects</div>
               <div className="text-xs text-white/60">Updated</div>
             </div>
             <ul className="mt-3 space-y-2">
@@ -77,14 +80,14 @@ export default function LandingPage() {
                   <span className="w-6 h-6 rounded bg-white/6 flex items-center justify-center text-xs">#</span>
                   <span>Web Starter</span>
                 </div>
-                <div className="text-white/70 flex items-center gap-1"><Star className="w-4 h-4 text-yellow-300"/> 1.5k</div>
+                <div className="text-[var(--muted)] flex items-center gap-1"><Star className="w-4 h-4 text-yellow-300"/> 1.5k</div>
               </li>
               <li className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded bg-white/6 flex items-center justify-center text-xs">#</span>
                   <span>Design System</span>
                 </div>
-                <div className="text-white/70 flex items-center gap-1"><Star className="w-4 h-4 text-yellow-300"/> 980</div>
+                <div className="text-[var(--muted)] flex items-center gap-1"><Star className="w-4 h-4 text-yellow-300"/> 980</div>
               </li>
             </ul>
           </div> */}

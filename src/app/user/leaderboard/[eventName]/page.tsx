@@ -21,6 +21,7 @@ import { useParams } from 'next/navigation';
 import {FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
 import {MdClear} from 'react-icons/md'
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
+import PageHeading from 'components/japanese/PageHeading';
 import ColumnsTable, {
   type RowObj,
 } from 'views/admin/dataTables/components/ColumnsTable';
@@ -111,8 +112,8 @@ export default function EventName() {
 
   return (
     <Box
-      pt={{ base: '110px', md: '90px' }}
-      px={{ base: '16px', md: '32px' }}
+      pt="0"
+      px="0"
       maxW="1400px"
       mx="auto"
     >
@@ -122,32 +123,7 @@ export default function EventName() {
         mb={{ base: '20px', md: '28px' }}
       >
 
-        <Box position="relative" w="fit-content">
-          <Text
-            fontSize={{ base: '30px', sm: '36px', md: '44px' }}
-            fontWeight="400"
-            lineHeight="1"
-            className="text-sakura-gradient"
-          >
-            OPENCODE
-          </Text>
-
-          <Flex
-            position="absolute"
-            right="0"
-            bottom={{ base: '-4px', md: '-6px' }}
-            align="center"
-            gap="6px"
-          >
-            <Box
-              w={{ base: '22px', md: '28px' }}
-              h="3px"
-              bg={opencodeTokens.colors.accent.sakura}
-              borderRadius="full"
-            />
-            <Box w="6px" h="6px" bg={opencodeTokens.colors.accent.sakura} borderRadius="full" />
-          </Flex>
-        </Box>
+        <PageHeading eyebrow={`${decodeURIComponent(eventName)} · THE ARENA OF CREATORS`} title="Leaderboard" description="Compete with curiosity. Contribute with purpose. Every step forward earns its place here." />
 
 
         <Flex

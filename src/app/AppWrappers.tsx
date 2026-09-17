@@ -5,7 +5,7 @@ import 'styles/App.css';
 import 'styles/Contact.css';
 import 'styles/MiniCalendar.css';
 
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, cookieStorageManager } from '@chakra-ui/react';
 import { AuthProvider } from 'contexts/AuthContext';
 import { SidebarProvider } from 'contexts/SidebarContext';
 import theme from 'theme/theme';
@@ -78,11 +78,11 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
       {pathname === '/' && <GlobalSakuraBackground />}
       <AuthProvider>
         <SidebarProvider>
-          <ChakraProvider theme={theme}>{children}</ChakraProvider>
+          <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>{children}</ChakraProvider>
         </SidebarProvider>
       </AuthProvider>
 
-      {isLoading && (
+      {isLoading && pathname === '/' && (
         <InitialLoader
           isExiting={isExiting}
           onComplete={() => setAnimationDone(true)}

@@ -1,135 +1,39 @@
 'use client';
 
-import { Box, Icon, Portal } from '@chakra-ui/react';
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-
-import Footer from 'components/footer/FooterAdmin';
-import Navbar from 'components/navbar/NavbarAdmin';
-import MobileMenuBar from 'components/sidebar/MobileMenuBar';
-import Sidebar from 'components/sidebar/Sidebar';
-import JapaneseBackground from '../../components/japanese/JapaneseBackground';
-
+import Link from 'next/link';
+import { CalendarDays, Trophy, Flag, FolderGit2, UserRound, ArrowUpRight } from 'lucide-react';
+import JapaneseBackground from 'components/japanese/JapaneseBackground';
+import SiteNavbar from 'components/navbar/SiteNavbar';
 import { useAuth } from 'contexts/AuthContext';
-import { MdBarChart, MdEmojiEvents, MdHome, MdPerson, MdWorkspacePremium } from 'react-icons/md';
-import routes from 'routes';
-import { IRoute } from 'types/navigation';
-import {
-  getActiveNavbar,
-  getActiveNavbarText,
-  getActiveRoute,
-} from 'utils/navigation';
 
-interface DashboardLayoutProps extends PropsWithChildren {
-  [x: string]: any;
-}
+const sections = [
+  { label: 'Events', href: '/user/home', icon: CalendarDays },
+  { label: 'Leaderboard', href: '/user/leaderboard', icon: Trophy },
+  { label: 'Winners', href: '/user/winners', icon: Trophy },
+  { label: 'Milestones', href: '/user/milestones', icon: Flag },
+  { label: 'Repositories', href: '/user/repos', icon: FolderGit2 },
+  { label: 'Profile', href: '/user/profile', icon: UserRound },
+];
 
-export default function AdminLayout(props: DashboardLayoutProps) {
-  const { children, ...rest } = props;
-  const auth = useAuth();
+export default function UserLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
-  const [fixed] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.dir = 'ltr';
-  }, []);
-
-  useEffect(() => {
-    auth.check_login();
-  }, [auth]);
-
-  const Droutes: IRoute[] = useMemo(() => {
-    const baseRoutes: IRoute[] = [
-      {
-        name: 'Events',
-        layout: '/user',
-        path: '/home',
-        icon: <Icon as={MdHome} w="20px" h="20px" />,
-      },
-    ];
-
-    if (auth.isLoggedIn) {
-      baseRoutes.push(
-        {
-          name: 'Leaderboard',
-          layout: '/user',
-          path: '/leaderboard',
-          icon: <Icon as={MdBarChart} w="20px" h="20px" />,
-        },
-        {
-          name: 'Winners',
-          layout: '/user',
-          path: '/winners',
-          icon: <Icon as={MdWorkspacePremium} w="20px" h="20px" />,
-        },
-        {
-          name: 'Milestones',
-          layout: '/user',
-          path: '/milestones',
-          icon: <Icon as={MdEmojiEvents} w="20px" h="20px" />,
-        },
-        {
-          name: 'Profile',
-          layout: '/user',
-          path: '/profile',
-          icon: <Icon as={MdPerson} w="20px" h="20px" />,
-        },
-      );
-    }
-    return baseRoutes;
-  }, [auth.isLoggedIn]);
-
-  // Determine variant based on pathname
-  const variant = useMemo(() => {
-    if (pathname.includes('/leaderboard')) return 'leaderboard';
-    if (pathname.includes('/winners')) return 'winners';
-    if (pathname.includes('/milestones')) return 'milestones';
-    if (pathname.includes('/profile')) return 'profile';
-    return 'home'; // default to events/home
-  }, [pathname]);
+  const auth = useAuth();
+  useEffect(() => { auth.check_login(); }, [auth]);
+  const variant = pathname.includes('/profile') ? 'profile' : pathname.includes('/milestones') ? 'milestones' : pathname.includes('/winners') ? 'winners' : pathname.includes('/leaderboard') ? 'leaderboard' : 'events';
 
   return (
-    <JapaneseBackground variant={variant as any}>
-      <Box minH="100vh" w="100%">
-        <Sidebar routes={Droutes} {...rest} />
-
-        <MobileMenuBar routes={Droutes} />
-
-        <Box
-          float="right"
-          minHeight="100vh"
-          height="100%"
-          position="relative"
-          w={{ base: '100%', xl: 'calc(100% - 300px)' }}
-          maxWidth={{ base: '100%', xl: 'calc(100% - 300px)' }}
-          transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-          pb={{ base: '80px', xl: '0px' }}
-        >
-          <Portal>
-            <Box>
-              <Navbar
-                logoText="Geekhaven"
-                brandText={getActiveRoute(routes)}
-                secondary={getActiveNavbar(routes)}
-                message={getActiveNavbarText(routes)}
-                fixed={fixed}
-                routes={Droutes}
-                {...rest}
-              />
-            </Box>
-          </Portal>
-
-          <Box
-            mx="auto"
-            p={{ base: '16px', md: '40px' }}
-            minH="100vh"
-            pt={{ base: '100px', md: '100px' }}
-          >
-            {children}
-          </Box>
-          <Footer />
-        </Box>
-      </Box>
+    <JapaneseBackground variant={variant}>
+      <SiteNavbar />
+      <div className="oc-community-nav">
+        <nav aria-label="Community navigation">
+          {sections.map(({ label, href, icon: Icon }) => <Link key={href} href={href} aria-current={pathname.startsWith(href) ? 'page' : undefined}><Icon size={15} />{label}</Link>)}
+        </nav>
+        <span className="oc-community-label">A SEASON OF POSSIBILITIES</span>
+      </div>
+      <main className="oc-main" id="main-content">{children}</main>
+      <footer className="oc-footer"><span>OPENCODE 2026 <span className="oc-footer-dot">/</span> Built together. Open to everyone.</span><Link href="/faq">A little guidance <ArrowUpRight size={14} /></Link></footer>
     </JapaneseBackground>
   );
 }

@@ -1,104 +1,46 @@
 'use client';
 
-import { Flex, Text, useColorModeValue } from '@chakra-ui/react';
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Flower2 } from 'lucide-react';
-import { opencodeTokens } from '../../theme/opencode-tokens';
+import { ArrowUpRight, Menu, X, UserRound } from 'lucide-react';
+import { useAuth } from 'contexts/AuthContext';
+import ThemeToggle from 'components/japanese/ThemeToggle';
 
-const NAV_ITEMS = [
-  { label: 'Events', href: '/user/leaderboard' },
-  { label: 'Leaderboard', href: '/user/leaderboard' }, // Need to route to actual event later, or just general leaderboard route
+const navigation = [
+  { label: 'Home', href: '/' },
+  { label: 'Events', href: '/user/home' },
+  { label: 'Leaderboard', href: '/user/leaderboard' },
   { label: 'FAQ', href: '/faq' },
 ];
 
 export default function SiteNavbar() {
   const pathname = usePathname();
-  const glassBg = opencodeTokens.colors.background.glassLight;
-
+  const { isLoggedIn } = useAuth();
+  const [open, setOpen] = useState(false);
   return (
-    <Flex
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
-      h="80px"
-      px={{ base: '20px', md: '40px' }}
-      align="center"
-      justify="space-between"
-      bg="transparent"
-      zIndex={100}
-    >
-      <Link href="/">
-        <Flex align="center" gap="10px" color="white" _hover={{ color: opencodeTokens.colors.accent.sakura }} transition="all 0.3s">
-          <Flower2 size={24} strokeWidth={1.5} />
-          <Text fontSize="20px" fontWeight="700" letterSpacing="0.05em">
-            OPENCODE
-          </Text>
-        </Flex>
-      </Link>
-
-      <Flex
-        display={{ base: 'none', md: 'flex' }}
-        align="center"
-        gap="32px"
-        bg={glassBg}
-        px="32px"
-        py="12px"
-        borderRadius="full"
-        backdropFilter="blur(20px)"
-        border={`1px solid ${opencodeTokens.colors.border.light}`}
-      >
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link key={item.label} href={item.href}>
-              <Text
-                fontSize="14px"
-                fontWeight="500"
-                color={isActive ? opencodeTokens.colors.text.primary : opencodeTokens.colors.text.secondary}
-                position="relative"
-                transition="all 0.3s"
-                _hover={{ color: opencodeTokens.colors.text.primary }}
-              >
-                {item.label}
-                {isActive && (
-                  <Flex
-                    position="absolute"
-                    bottom="-6px"
-                    left="50%"
-                    transform="translateX(-50%)"
-                    w="16px"
-                    h="2px"
-                    bg={opencodeTokens.colors.accent.sakura}
-                    borderRadius="full"
-                    boxShadow={`0 0 8px ${opencodeTokens.colors.accent.sakura}`}
-                  />
-                )}
-              </Text>
-            </Link>
-          );
-        })}
-      </Flex>
-
-      <Link href="/auth/sign-in">
-        <Flex
-          px="24px"
-          py="10px"
-          borderRadius="full"
-          bg={opencodeTokens.colors.accent.sakura}
-          color={opencodeTokens.colors.background.base}
-          fontSize="14px"
-          fontWeight="600"
-          transition="all 0.3s"
-          _hover={{
-            bg: opencodeTokens.colors.accent.sakuraHover,
-            boxShadow: `0 0 15px rgba(233, 167, 178, 0.4)`,
-          }}
-        >
-          Sign In
-        </Flex>
-      </Link>
-    </Flex>
+    <header className="oc-navbar">
+      <div className="oc-navbar-inner">
+        <Link href="/" className="oc-brand" aria-label="OpenCode home">
+          <Image src="/Logo/OpenCode-White.png" alt="" width={30} height={30} className="oc-brand-mark" />
+          <span>OPENCODE <small>2026</small></span>
+        </Link>
+        <nav className="oc-desktop-nav" aria-label="Main navigation">
+          {navigation.map(({ label, href }) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname.startsWith(href)) ? 'page' : undefined}>{label}</Link>)}
+        </nav>
+        <div className="oc-nav-actions">
+          <ThemeToggle />
+          <span className="oc-nav-divider" />
+          <Link className="oc-nav-signin" href={isLoggedIn ? '/user/profile' : '/auth/sign-in'}>
+            {isLoggedIn ? <><UserRound size={16} /> Profile</> : <>Sign in <ArrowUpRight size={15} /></>}
+          </Link>
+          <button type="button" className="oc-icon-button oc-mobile-toggle" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>{open ? <X size={20} /> : <Menu size={20} />}</button>
+        </div>
+      </div>
+      {open && <nav id="mobile-navigation" className="oc-mobile-nav" aria-label="Mobile navigation">
+        {[...navigation, { label: 'Winners', href: '/user/winners' }, { label: 'Milestones', href: '/user/milestones' }, { label: 'Repositories', href: '/user/repos' }].map(({ label, href }) => <Link key={href} href={href} onClick={() => setOpen(false)} aria-current={pathname === href ? 'page' : undefined}>{label}<ArrowUpRight size={14} /></Link>)}
+      </nav>}
+    </header>
   );
 }

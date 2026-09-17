@@ -24,6 +24,7 @@ import { RingLoader } from 'react-spinners';
 import { EventWinnersCard } from './components/EventWinnerCard';
 import { WeeklyLeaderboardCard } from './components/WeeklyLeaderboard';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
+import PageHeading from 'components/japanese/PageHeading';
 
 interface EventWinner {
   name: string;
@@ -117,7 +118,7 @@ export default function Milestones() {
           )}
         </TabPanel>
       ),
-      visible: weeklyData.length > 0,
+      visible: true,
     },
     {
       key: 'events',
@@ -148,45 +149,11 @@ export default function Milestones() {
   const safeTabIndex = Math.min(selectedTab, tabs.length - 1);
 
   return (
-    <Box minH="100vh" bg={bgColor} pt={{ base: '100px', md: '100px' }} pb={{ base: '95px', md: '80px' }}>
+    <Box bg={bgColor} pt="0" pb="24px">
       
-      <Box position="relative" zIndex={1} maxW="1200px" mx="auto" px="20px">
+      <Box position="relative" zIndex={1} maxW="1200px" mx="auto" px="0">
         
-        <Flex direction="column" align="center" mb="48px">
-          <Flex
-            w="64px"
-            h="64px"
-            align="center"
-            justify="center"
-            borderRadius="full"
-            bg={opencodeTokens.colors.background.glassLight}
-            color={opencodeTokens.colors.accent.sakura}
-            boxShadow={`0 10px 30px ${opencodeTokens.colors.accent.sakura}40`}
-            mb="16px"
-          >
-            <Icon as={FaTrophy} w="28px" h="28px" />
-          </Flex>
-
-          <Text
-            fontSize={{ base: '32px', md: '48px' }}
-            fontWeight="400"
-            lineHeight="1.1"
-            className="text-sakura-gradient"
-          >
-            Milestones
-          </Text>
-
-          <Text
-            fontSize={{ base: '14px', md: '16px' }}
-            color={mutedColor}
-            textAlign="center"
-            maxW="560px"
-            mt="6px"
-          >
-            A living record of standout contributions, weekly excellence,
-            and event victories across the community.
-          </Text>
-        </Flex>
+        <PageHeading eyebrow="EVERY STEP TELLS A STORY" title="Moments that matter." description="A living record of standout contributions, weekly excellence, and the little victories that bring us together." />
 
       
         <Flex justify="center" gap="24px" mb="40px" wrap="wrap">

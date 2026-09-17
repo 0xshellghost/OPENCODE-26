@@ -26,6 +26,7 @@ import Projects from 'views/admin/profile/components/Projects';
 import { getRoleTags, RoleBadgesGroup } from 'views/admin/profile/components/RoleBadge';
 import { ProfileData } from '../page';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
+import PageHeading from 'components/japanese/PageHeading';
 
 export default function ProfileOverviewOther() {
   const { profileName } = useParams<{ profileName: string }>();
@@ -108,14 +109,16 @@ export default function ProfileOverviewOther() {
     <Box
       minH="100vh"
       bg={pageBg}
-      pt={{ base: '62px', md: '74px' }}
-      px={{ base: '14px', md: '28px' }}
+      pt="0"
+      px="0"
       pb="40px"
       maxW="1400px"
       mx="auto"
     >
 
     
+
+      <PageHeading eyebrow="THE PEOPLE BEHIND THE PROGRESS" title="Contributor profile" description="A story of curiosity, collaboration, and contributions. Get to know the person behind the pull requests." />
 
       {/* 2. Use the Component here */}
       <DiscordBanner />

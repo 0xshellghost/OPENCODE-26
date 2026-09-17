@@ -2,11 +2,11 @@ export const opencodeTokens = {
   colors: {
     // Backgrounds
     background: {
-      base: '#1a1625', // Deeper midnight navy
-      surface: '#211d27',
-      glass: 'rgba(33, 29, 39, 0.4)',
-      glassLight: 'rgba(255, 255, 255, 0.05)',
-      glassDark: 'rgba(15, 23, 42, 0.4)',
+      base: 'var(--bg)',
+      surface: 'var(--card-strong)',
+      glass: 'var(--card-bg)',
+      glassLight: 'var(--card-soft)',
+      glassDark: 'var(--card-bg)',
     },
     // Primary Accents
     accent: {
@@ -25,16 +25,16 @@ export const opencodeTokens = {
     },
     // Text
     text: {
-      primary: '#ffffff',
-      secondary: 'rgba(255, 255, 255, 0.7)',
-      muted: 'rgba(255, 255, 255, 0.5)',
-      inverse: '#0f172a',
+      primary: 'var(--text)',
+      secondary: 'var(--muted)',
+      muted: 'var(--subtle)',
+      inverse: 'var(--accent-ink)',
     },
     // Borders
     border: {
-      light: 'rgba(255, 255, 255, 0.1)',
-      medium: 'rgba(255, 255, 255, 0.2)',
-      primary: 'rgba(233, 167, 178, 0.4)', // sakura tinted
+      light: 'var(--border)',
+      medium: 'var(--border-strong)',
+      primary: 'var(--border-strong)',
     },
   },
   typography: {
@@ -60,7 +60,7 @@ export const opencodeTokens = {
   },
   glass: {
     backdropFilter: 'blur(16px)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid var(--border)',
+    background: 'var(--card-bg)',
   },
 };

@@ -9,7 +9,11 @@ const Card = {
     borderRadius: "20px",
     minWidth: "0px",
     wordWrap: "break-word",
-    bg: mode("#ffffff", "navy.800")(props),
+    bg: 'var(--card-bg)',
+    color: 'var(--text)',
+    backdropFilter: 'blur(22px)',
+    border: '1px solid var(--border)',
+    boxShadow: 'var(--shadow)',
     backgroundClip: "border-box",
   }),
 };
