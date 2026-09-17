@@ -50,9 +50,9 @@ export default function Dashboard() {
     queryKey: ['profileInfo', profileName, repoName],
     queryFn: () =>
       getUserIssueDetails(
-        profileName,
-        process.env.NEXT_PUBLIC_EVENT_NAME,
-        repoName,
+        profileName || '',
+        process.env.NEXT_PUBLIC_EVENT_NAME || '',
+        repoName || '',
       ),
     enabled: Boolean(profileName && repoName),
   });

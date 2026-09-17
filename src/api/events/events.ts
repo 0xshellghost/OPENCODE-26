@@ -44,7 +44,7 @@ export async function getUserIssueDetails(
   }
 
   const issueDetails = await response.json();
-  console.log(issueDetails);
+  // console.log(issueDetails);
 
   const issuesAll: any[] = issueDetails.data;
 

@@ -21,7 +21,7 @@
 }
 
 .mini-calendar .react-calendar__navigation button:hover {
-  background: rgba(117, 81, 255, 0.12);
+  background: var(--accent-soft);
 }
 
 /* Month label */
@@ -34,7 +34,7 @@
 .mini-calendar .react-calendar__month-view__weekdays {
   font-size: 11px;
   text-transform: uppercase;
-  color: #8f9bba;
+  color: var(--subtle);
   margin-bottom: 6px;
 }
 
@@ -52,35 +52,35 @@
 
 /* Hover */
 .mini-calendar .react-calendar__tile:hover {
-  background: rgba(117, 81, 255, 0.12);
+  background: var(--accent-soft);
 }
 
 /* Today */
 .mini-calendar .react-calendar__tile--now {
-  background: rgba(117, 81, 255, 0.15);
+  background: var(--accent-soft);
   font-weight: 700;
 }
 
 /* Active / selected */
 .mini-calendar .react-calendar__tile--active {
-  background: #7551ff !important;
-  color: white;
+  background: var(--accent) !important;
+  color: var(--accent-ink);
   font-weight: 700;
 }
 
 /* Range selection */
 .mini-calendar .react-calendar__tile--range {
-  background: rgba(117, 81, 255, 0.18);
+  background: var(--accent-soft);
 }
 
 .mini-calendar .react-calendar__tile--rangeStart,
 .mini-calendar .react-calendar__tile--rangeEnd {
-  background: #7551ff;
-  color: white;
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* Disabled days */
 .mini-calendar .react-calendar__tile:disabled {
-  color: #cbd5e0;
+  color: var(--border-strong);
   background: transparent;
 }

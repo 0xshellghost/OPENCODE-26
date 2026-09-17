@@ -13,7 +13,7 @@ type RowObj = {
 
 export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> => {
   try {
-    const response = await fetch(`${LEADERBOARD_API_URL}/${eventName}/leaderboard`);
+    const response = await fetch(`${LEADERBOARD_API_URL}${eventName}/leaderboard`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch leaderboard data: ${response.statusText}`);
@@ -21,16 +21,9 @@ export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> =
 
     const Leaddata = await response.json();
   
-    // console.log(Leaddata.data);
-    // Assuming the API returns an array of leaderboard data
     return Leaddata.data as RowObj[];
-
-  
   } catch (error) {
     console.error('Error fetching leaderboard data:', error);
     throw error; 
   }
 };
-
-
-

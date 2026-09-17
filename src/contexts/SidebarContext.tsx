@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 // Define the shape of our context
 interface SidebarContextType {
@@ -15,8 +15,10 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [toggleSidebar, setToggleSidebar] = useState(false);
 
+  const value = useMemo(() => ({ toggleSidebar, setToggleSidebar }), [toggleSidebar, setToggleSidebar]);
+
   return (
-    <SidebarContext.Provider value={{ toggleSidebar, setToggleSidebar }}>
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

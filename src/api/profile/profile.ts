@@ -4,7 +4,7 @@ export async function fetchLoggedInBasicDetails() {
   const token = localStorage.getItem('token');
 
   if (token === null) {
-    console.log('No token found, redirecting to login.');
+    console.warn('No token found, redirecting to login.');
     return null;
   } else {
     const response = await fetch(
@@ -43,7 +43,7 @@ export async function sendRegData(formData: any) {
     );
 
     if (response.status === 200) {
-      console.log('Success!');
+      // console.log('Success!');
     } else {
       console.error('Registration failed:', response.statusText);
     }

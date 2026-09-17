@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import 'styles/App.css';
-import 'styles/Contact.css';
 import 'styles/MiniCalendar.css';
 
 import { ChakraProvider, cookieStorageManager } from '@chakra-ui/react';
@@ -10,23 +9,25 @@ import { AuthProvider } from 'contexts/AuthContext';
 import { SidebarProvider } from 'contexts/SidebarContext';
 import theme from 'theme/theme';
 
-import InitialLoader from 'components/common/InitialLoader';
+import dynamic from 'next/dynamic';
+
+const InitialLoader = dynamic(() => import('components/common/InitialLoader'), { ssr: false });
+const GlobalSakuraBackground = dynamic(() => import('components/common/GlobalSakuraBackground'), { ssr: false });
 import PageTransition from 'components/common/PageTransition';
-import GlobalSakuraBackground from 'components/common/GlobalSakuraBackground';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: false,
-    },
-  },
-});
-
 export default function AppWrappers({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: false,
+      },
+    },
+  }));
+  
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -46,21 +47,20 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const MIN_DURATION_MS = 3000;
 
-    if (document.readyState === 'complete') {
-      setHasLoaded(true);
-      timer = setTimeout(() => setMinTimeReached(true), MIN_DURATION_MS);
-      return () => timer && clearTimeout(timer);
-    }
-
     const handleLoad = () => {
       setHasLoaded(true);
       timer = setTimeout(() => setMinTimeReached(true), MIN_DURATION_MS);
     };
 
-    window.addEventListener('load', handleLoad);
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
+
     return () => {
       window.removeEventListener('load', handleLoad);
-      timer && clearTimeout(timer);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 

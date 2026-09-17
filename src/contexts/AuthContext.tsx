@@ -3,8 +3,10 @@
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
@@ -23,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setLoggedIn] = useState(false);
 
-  const check_login = () => {
+  const check_login = useCallback(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       if (token) {
@@ -32,21 +34,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoggedIn(false);
       }
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
       setLoggedIn(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     check_login();
   }, []);
 
+  const value = useMemo(() => ({ isLoggedIn, check_login, logout }), [isLoggedIn, check_login, logout]);
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, check_login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

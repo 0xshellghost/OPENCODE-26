@@ -46,7 +46,7 @@ export default function Dashboard() {
   const toast = useToast();
   const [githubId, setGithubId] = useState('');
   const [eventName, setEventName] = useState('');
-  const [selectedPrDetails, setSelectedPrDetails] = useState(null);
+  const [selectedPrDetails, setSelectedPrDetails] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [incrementPoints, setIncrementPoints] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -92,7 +92,7 @@ export default function Dashboard() {
     setIsModalOpen(false);
   };
 
-  const [userPrDetails, setuserPrDetails] = useState([]);
+  const [userPrDetails, setuserPrDetails] = useState<any[]>([]);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const auth = useAuth();
 
@@ -127,7 +127,7 @@ export default function Dashboard() {
   const pointUpdate = useMutation({
     mutationFn: EditPRPoints,
     onSuccess: () => {
-      console.log('Success');
+      // console.log('Success');
 
       toast({
         title: 'Points Updated',
@@ -140,7 +140,7 @@ export default function Dashboard() {
       setIsModalOpen(false);
     },
     onError: () => {
-      console.log('Error');
+      // console.log('Error');
       toast({
         title: 'Points not Updated',
         description: 'PR points were successfully updated.',

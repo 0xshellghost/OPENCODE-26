@@ -46,7 +46,7 @@ export async function EditPRPoints(prUpdateData: any) {
     );
 
     const data = await response.json();
-    console.log(data);
+  // console.log(data);
     return data;
   } catch (error: any) {
     console.error('Error sending registration data:', error.message);

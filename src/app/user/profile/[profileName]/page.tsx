@@ -9,7 +9,6 @@ import {
   Grid,
   Text,
   useBreakpointValue,
-  useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -65,7 +64,6 @@ export default function ProfileOverviewOther() {
   });
 
   const profile = data?.data;
-  console.log(profile);
 
   const isOwnProfile = Boolean(
     loggedInGithubId &&
@@ -133,7 +131,7 @@ export default function ProfileOverviewOther() {
             mb="22px"
           >
             <Flex direction="column" align="center">
-              <Avatar src={profile?.avatarUrl} size="xl" mb="10px" />
+              <Avatar src={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`} size="xl" mb="10px" />
 
               <Text fontSize="20px" fontWeight="800">
                 {profile?.name || profileName}
@@ -234,7 +232,7 @@ export default function ProfileOverviewOther() {
             >
               <Banner
                 banner={profile?.avatarUrl}
-                avatar={profile?.avatarUrl}
+                avatar={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
                 name={profile?.name || profileName}
                 githubUrl={profile?.githubId || profileName}
                 prMerged={profile?.prMerged || 0}

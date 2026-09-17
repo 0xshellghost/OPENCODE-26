@@ -137,8 +137,11 @@ export function SidebarLinks(props: SidebarLinksProps) {
   useLayoutEffect(() => {
     if (!containerRef.current) return;
     const ctx = gsap.context(() => {
+      const links = containerRef.current
+        ? containerRef.current.querySelectorAll('[data-nav-item]')
+        : [];
       gsap.fromTo(
-        containerRef.current.querySelectorAll('[data-nav-item]'),
+        links,
         { x: -8, opacity: 0 },
         { x: 0, opacity: 1, duration: 0.35, ease: 'power2.out', stagger: 0.05 }
       );

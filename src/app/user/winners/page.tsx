@@ -12,7 +12,6 @@ import {
   TabPanel,
   TabPanels,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
@@ -589,20 +588,22 @@ export default function WinnersPodiumComparisonPage() {
             </TabPanels>
           </Tabs>
 
-          <Box h="380px">
-            {query.isLoading && <Skeleton h="100%" />}
-            {!query.isLoading && chartData && (
-              <Line
-                data={chartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { legend: { position: 'bottom' } },
-                  scales: { x: { ticks: { maxTicksLimit: 8 } } },
-                }}
-              />
-            )}
-          </Box>
+          {(query.isLoading || (chartData && !query.isError)) && (
+            <Box h="380px">
+              {query.isLoading && <Skeleton h="100%" />}
+              {!query.isLoading && chartData && (
+                <Line
+                  data={chartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { x: { ticks: { maxTicksLimit: 8 } } },
+                  }}
+                />
+              )}
+            </Box>
+          )}
         </Stack>
       </Box>
     </Box>

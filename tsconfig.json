@@ -26,12 +26,12 @@
     "jsx": "react-jsx",
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "downlevelIteration": true,
     "baseUrl": "src",
     "paths": {
       "@assets/*": [
-        "./src/assetsassets/*"
+        "./assets/*"
       ]
     },
     "incremental": true,
@@ -51,8 +51,6 @@
     "**/*.tsx",
     "next.config.js",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    ".next\\dev/types/**/*.ts",
-    ".next\\dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts"
   ]
 }

@@ -5,7 +5,6 @@ import {
   Flex,
   Text,
   SimpleGrid,
-  useColorModeValue,
   Badge,
   Icon,
   Avatar,
@@ -18,7 +17,7 @@ import { MdFolder } from 'react-icons/md';
 import Card from 'components/card/Card';
 import PageHeading from 'components/japanese/PageHeading';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { FetchedRepos, FetchedEvents } from 'api/events/events';
 import { useQuery } from '@tanstack/react-query';
@@ -48,11 +47,11 @@ export default function ReposPage() {
 
   const repositories = data?.data || [];
 
-  const filteredRepos = repositories.filter((repo: any) => 
+  const filteredRepos = useMemo(() => repositories.filter((repo: any) => 
     (repo.name && repo.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
     (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (repo.tags && repo.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())))
-  );
+  ), [repositories, searchQuery]);
 
   if (isLoading || isLoadingEvents) {
     return (

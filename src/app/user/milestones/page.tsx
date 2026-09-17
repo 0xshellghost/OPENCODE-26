@@ -10,7 +10,6 @@ import {
   TabPanels,
   Tabs,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import {

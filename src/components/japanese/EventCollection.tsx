@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Search, Trophy, RefreshCw } from 'lucide-react';
@@ -11,7 +11,7 @@ type Event = { name: string; description?: string };
 
 export default function EventCollection({ events, loading, error, retry, leaderboard = false }: { events: Event[]; loading: boolean; error: boolean; retry: () => void; leaderboard?: boolean }) {
   const [search, setSearch] = useState('');
-  const filtered = events.filter(event => `${event.name} ${event.description || ''}`.toLowerCase().includes(search.toLowerCase()));
+  const filtered = useMemo(() => events.filter(event => `${event.name} ${event.description || ''}`.toLowerCase().includes(search.toLowerCase())), [events, search]);
   const scenes = ['kyoto-evening', 'kyoto-garden', 'kyoto-torii'];
   const Icon = leaderboard ? Trophy : CalendarDays;
   return (

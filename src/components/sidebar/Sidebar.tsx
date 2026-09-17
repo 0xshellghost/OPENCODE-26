@@ -31,8 +31,12 @@ function Sidebar({ routes }: SidebarProps) {
         { x: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
       );
 
+      const links = sidebarRef.current
+        ? sidebarRef.current.querySelectorAll('[data-nav-item]')
+        : [];
+
       gsap.fromTo(
-        sidebarRef.current.querySelectorAll('[data-nav-item]'),
+        links,
         { x: -12, opacity: 0 },
         {
           x: 0,

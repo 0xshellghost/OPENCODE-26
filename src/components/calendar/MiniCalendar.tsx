@@ -33,7 +33,7 @@ export default function MiniCalendar(props: {
         view="month"
         prevLabel={<Icon as={MdChevronLeft} w="20px" h="20px" />}
         nextLabel={<Icon as={MdChevronRight} w="20px" h="20px" />}
-        tileContent={null}
+        tileContent={undefined}
         className="mini-calendar"
       />
 

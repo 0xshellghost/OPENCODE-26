@@ -11,7 +11,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  useColorModeValue,
   Switch,
 } from '@chakra-ui/react';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
@@ -50,7 +49,7 @@ export default function EventName() {
     enabled: !!eventName,
   });
 
-  const tableDataColumns: RowObj[] = (LeadData || []).map((item) => ({
+  const tableDataColumns: RowObj[] = useMemo(() => (LeadData || []).map((item) => ({
     position: String(item.position),
     name: item.name,
     prmerged: Number(item.prmerged),
@@ -60,7 +59,7 @@ export default function EventName() {
     prDetailsURL: item.prDetailsURL,
     college: item.collegeName ?? '',
     graduationYear: item.graduationYear ?? '',
-  }));
+  })), [LeadData]);
 
   // Extract unique filter options from the data
   const collegeOptions = useMemo(() => {

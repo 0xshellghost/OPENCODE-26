@@ -277,7 +277,7 @@ export default function LeaderboardGraph({ eventName, topN = 10, startDate, endD
   if (isLoading) return <div className="flex justify-center items-center h-64"><RingLoader color="#36d7b7" /></div>;
   if (isError) return <div>Error: {(error as Error).message}</div>;
 
-  console.log(data) 
+  // console.log(data) 
   if (!data || data.length === 0) return <div>No data available</div>;
 
   return (
