@@ -165,7 +165,7 @@ function MobileLeaderboard({
 
 
 
-export default function ColumnTable({
+function ColumnTable({
   tableData,
   eventName,
 }: {
@@ -199,7 +199,7 @@ export default function ColumnTable({
 
 
 
-  const columns = [
+  const columns = React.useMemo(() => [
 
     columnHelper.accessor("position", {
       header: "RANK",
@@ -385,7 +385,7 @@ export default function ColumnTable({
       ),
     }),
 
-  ];
+  ], []);
 
   const tbodyRef = React.useRef<HTMLTableSectionElement | null>(null);
   const prevFlipStateRef = React.useRef<Flip.FlipState | null>(null);
@@ -561,4 +561,5 @@ export default function ColumnTable({
 
     </>
   );
-} 
+}
+export default React.memo(ColumnTable);
