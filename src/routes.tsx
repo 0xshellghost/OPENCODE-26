@@ -1,6 +1,6 @@
 'use client';
 import { Icon } from '@chakra-ui/react';
-import { MdBarChart, MdPerson, MdHome , MdLock, MdWorkspacePremium } from 'react-icons/md';
+import { MdBarChart, MdPerson, MdHome , MdLock, MdWorkspacePremium, MdEvent, MdViewList, MdSettings, MdRule } from 'react-icons/md';
 
 import { IRoute } from 'types/navigation';
 
@@ -12,28 +12,28 @@ const routes: IRoute[] = [
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
   },
   {
-    name: 'Add Events',
+    name: 'Add Event',
     layout: '/admin',
     path: '/addevent',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdEvent} width="20px" height="20px" color="inherit" />,
   },
   {
     name: 'View Events',
     layout: '/admin',
     path: '/viewevents',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdViewList} width="20px" height="20px" color="inherit" />,
   },
   {
     name: 'Change Points',
     layout: '/admin',
     path: '/home',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdRule} width="20px" height="20px" color="inherit" />,
   },
   {
     name: 'Management',
     layout: '/admin',
     path: '/managements',
-    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    icon: <Icon as={MdSettings} width="20px" height="20px" color="inherit" />,
   },
 
   {

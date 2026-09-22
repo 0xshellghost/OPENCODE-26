@@ -1,10 +1,11 @@
 'use client';
 
-import { Box, Button, SimpleGrid } from '@chakra-ui/react';
+import { Box, Button, SimpleGrid, useToast, Text, Flex } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import NFT from '../../../components/card/NFT';
+import { RingLoader } from 'react-spinners';
 
 // 1. Define Types
 interface EventItem {
@@ -22,11 +23,11 @@ interface JWTPayload {
 }
 
 export default function Viewevents() {
-  // 2. Use State for data, not global variables
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const toast = useToast();
 
   // Helper to decode JWT
   const parseJwt = (token: string | null): JWTPayload | null => {
@@ -38,7 +39,7 @@ export default function Viewevents() {
         atob(base64)
           .split('')
           .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join(''),
+          .join('')
       );
       return JSON.parse(jsonPayload);
     } catch {
@@ -50,7 +51,7 @@ export default function Viewevents() {
     setIsMounted(true);
   }, []);
 
-  // 3. Admin Check & Data Fetching
+  // Admin Check & Data Fetching
   useEffect(() => {
     if (!isMounted) return;
 
@@ -59,7 +60,7 @@ export default function Viewevents() {
 
     // Redirect if not admin
     if (!payload?.roles?.isAdmin) {
-      console.error('Only admin can view events');
+      toast({ title: 'Only admin can view events', status: 'error', isClosable: true });
       router.push('/user/home');
       return;
     }
@@ -68,22 +69,22 @@ export default function Viewevents() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`
         );
-        // Assuming API returns { data: [...] } based on your original code
         setEvents(response.data.data || []);
       } catch (error) {
         console.error('Error fetching events:', error);
+        toast({ title: 'Failed to fetch events', status: 'error', isClosable: true });
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [isMounted, router]);
+  }, [isMounted, router, toast]);
 
   const deleteHandler = async (eventName: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return;
+    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
 
     const token = localStorage.getItem('token');
 
@@ -94,31 +95,31 @@ export default function Viewevents() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
-      alert('Event Deleted Successfully');
-
-      // 4. Update UI instantly without reloading page
+      toast({ title: 'Event Deleted Successfully', status: 'success', isClosable: true });
       setEvents((prev) => prev.filter((e) => e.name !== eventName));
     } catch (error) {
       console.error(error);
-      alert('Failed to delete event');
+      toast({ title: 'Failed to delete event', status: 'error', isClosable: true });
     }
   };
 
   if (!isMounted) return null;
   if (isLoading)
     return (
-      <Box pt="100px" pl="40px">
-        Loading...
-      </Box>
+      <Flex minH="100vh" align="center" justify="center">
+        <RingLoader color="#755FFF" size={52} />
+      </Flex>
     );
 
   if (events.length === 0) {
     return (
       <Box pt={{ base: '130px', md: '80px', xl: '80px' }} textAlign="center">
-        <h1>NO DATA FOUND</h1>
+        <Text fontSize="2xl" fontWeight="700" color="gray.500">
+          No Events Found
+        </Text>
       </Box>
     );
   }

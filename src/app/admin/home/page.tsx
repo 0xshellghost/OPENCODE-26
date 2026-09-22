@@ -29,13 +29,6 @@ import { RingLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation';
 
 import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
 import { EditPRPoints } from 'api/admin/admin';
@@ -294,65 +287,85 @@ export default function Dashboard() {
               ))}
             </Tbody>
           </Table>
+        </TableContainer>
 
-          <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>PR Details</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>
-                <form>
-                  <FormControl mb={4}>
-                    <FormLabel>PR Title</FormLabel>
-                    <Input
-                      type="text"
-                      value={selectedPrDetails?.prTitle || ''}
-                      color={textColor}
-                      isReadOnly
-                    />
-                  </FormControl>
-                  <FormControl mb={4}>
-                    <FormLabel>PR Number</FormLabel>
-                    <Input
-                      type="text"
-                      value={selectedPrDetails?.prNumber || ''}
-                      color={textColor}
-                      isReadOnly
-                    />
-                  </FormControl>
-                  <FormControl mb={4}>
-                    <FormLabel>Increment Points</FormLabel>
-                    <Input
-                      type="number"
-                      placeholder="Enter Point to Increment"
-                      color={textColor}
-                      onChange={handleIncrementPointsChange}
-                      required
-                    />
-                  </FormControl>
-                </form>
-              </ModalBody>
-              <ModalFooter>
+        {isModalOpen && (
+          <Box
+            position="fixed"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            bg="blackAlpha.600"
+            zIndex={9999}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            onClick={handleCloseModal}
+          >
+            <Box
+              bg="gray.800"
+              borderRadius="md"
+              p={6}
+              maxW="500px"
+              w="90%"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Flex justify="space-between" align="center" mb={4}>
+                <Text fontSize="lg" fontWeight="bold" color={textColor}>
+                  PR Details
+                </Text>
+                <Button size="sm" variant="ghost" onClick={handleCloseModal}>
+                  ✕
+                </Button>
+              </Flex>
+              <form>
+                <FormControl mb={4}>
+                  <FormLabel>PR Title</FormLabel>
+                  <Input
+                    type="text"
+                    value={selectedPrDetails?.prTitle || ''}
+                    color={textColor}
+                    isReadOnly
+                  />
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>PR Number</FormLabel>
+                  <Input
+                    type="text"
+                    value={selectedPrDetails?.prNumber || ''}
+                    color={textColor}
+                    isReadOnly
+                  />
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Increment Points</FormLabel>
+                  <Input
+                    type="number"
+                    placeholder="Enter Point to Increment"
+                    color={textColor}
+                    onChange={handleIncrementPointsChange}
+                    required
+                  />
+                </FormControl>
+              </form>
+              <Flex justify="flex-end" gap={3}>
                 <Button
                   colorScheme="blue"
-                  mr={3}
-                  type="submit"
                   onClick={handleCloseModal}
                 >
                   Close
                 </Button>
                 <Button
                   colorScheme="blue"
-                  mr={3}
-                  type="submit"
                   onClick={handleChangePoints}
                 >
                   Change Points
                 </Button>
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </TableContainer>
+              </Flex>
+            </Box>
+          </Box>
+        )}
       </Box>
     </>
   );

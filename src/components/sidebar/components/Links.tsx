@@ -33,10 +33,11 @@ export function SidebarLinks(props: SidebarLinksProps) {
   const createLinks = (routes: IRoute[]) => {
     return routes.map((route, index: number) => {
       const href = route.layout + route.path;
+      const isCurrentAdmin = pathname?.includes('/admin');
+      
       if (
-        
-        route.layout === '/auth' ||
-        route.layout === '/user'
+        (isCurrentAdmin && route.layout === '/admin') ||
+        (!isCurrentAdmin && (route.layout === '/auth' || route.layout === '/user'))
       ) {
         const isActive = activeRoute(route.path.toLowerCase());
 

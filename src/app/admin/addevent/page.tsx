@@ -1,8 +1,20 @@
 'use client';
 
-import { Box } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Text,
+  useColorModeValue,
+  useToast,
+  VStack,
+  Heading,
+  Grid,
+} from '@chakra-ui/react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation'; // Use useRouter instead of redirect for client-side logic
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 // Define the shape of the JWT payload
@@ -15,13 +27,25 @@ interface JWTPayload {
 
 export default function Addevent() {
   const router = useRouter();
+  const toast = useToast();
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const shadowSoft = useColorModeValue(
+    '0 10px 24px rgba(0,0,0,0.08)',
+    '0 10px 24px rgba(0,0,0,0.35)'
+  );
+  const calendarIconFilter = useColorModeValue('none', 'invert(1)');
+
   const [eventData, setEventData] = useState({
-    Fullname: '',
-    Description: '',
+    title: '',
+    description: '',
+    startDate: '',
+    endDate: '',
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [coverFiles, setCoverFiles] = useState<File[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -37,7 +61,7 @@ export default function Addevent() {
         atob(base64)
           .split('')
           .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join(''),
+          .join('')
       );
       return JSON.parse(jsonPayload);
     } catch {
@@ -84,33 +108,37 @@ export default function Addevent() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (!eventData.title || !eventData.description || !eventData.startDate || !eventData.endDate) {
+      toast({ title: 'Please fill all fields', status: 'warning', isClosable: true });
+      return;
+    }
+
+    if (!logoFile) {
+      toast({ title: 'Logo image is required', status: 'warning', isClosable: true });
+      return;
+    }
+
     const token = localStorage.getItem('token');
     const payload = parseJwt(token);
 
     if (!payload?.roles?.isAdmin) {
-      alert('Only admin can create events');
+      toast({ title: 'Only admin can create events', status: 'error', isClosable: true });
       return;
     }
 
+    setIsSubmitting(true);
     const formData = new FormData();
-    formData.append('title', eventData.Fullname);
-    formData.append('description', eventData.Description);
-    // Hardcoded dates from your original code
-    formData.append('startDate', '2023-12-01T00:00:00Z');
-    formData.append('endDate', '2023-12-02T00:00:00Z');
+    formData.append('title', eventData.title);
+    formData.append('description', eventData.description);
+    formData.append('startDate', new Date(eventData.startDate).toISOString());
+    formData.append('endDate', new Date(eventData.endDate).toISOString());
 
+    if (logoFile) {
+      formData.append('logoImage', logoFile);
+    }
+    
     if (coverFiles && coverFiles.length > 0) {
-      // Logic from your code: first file is logo, rest are covers?
-      // Note: This logic seems specific to your backend requirement.
-      // If you meant "logoFile" to be the logo, use that variable.
-      // Below preserves your original logic:
-      formData.append('logoImage', coverFiles[0]);
-      coverFiles.slice(1).forEach((f) => formData.append('coverImages', f));
-
-      // If there is also a separate logoFile uploaded
-      if (logoFile) formData.append('coverImages', logoFile);
-    } else {
-      if (logoFile) formData.append('logoImage', logoFile);
+      coverFiles.forEach((f) => formData.append('coverImages', f));
     }
 
     try {
@@ -122,99 +150,154 @@ export default function Addevent() {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
-      alert('Event Created Successfully');
-      // Use router.push instead of redirect() to prevent try/catch errors
+      toast({ title: 'Event Created Successfully', status: 'success', isClosable: true });
       router.push('/admin/viewevents');
     } catch (error: any) {
       console.error(
         'Error creating event:',
-        error?.response?.data || error.message,
+        error?.response?.data || error.message
       );
-      alert('Failed to create event');
+      toast({ 
+        title: 'Failed to create event', 
+        description: error?.response?.data?.message || error.message,
+        status: 'error', 
+        isClosable: true 
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
-      <div className="min-h-screen flex items-center justify-center pt-12">
-        <div className="container max-w-screen-lg mx-auto">
-          <div>
-            <div className=" rounded shadow-lg p-4 px-4 md:p-8 mb-6">
-              <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 lg:grid-cols-3">
-                <div className="">
-                  <p className="font-medium text-lg">Event Details</p>
-                </div>
+    <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px="20px">
+      <Text color={textColor} fontSize="2xl" mb="24px" fontWeight="700">
+        Add New Event
+      </Text>
 
-                <div className="lg:col-span-2">
-                  <div className="grid gap-4 gap-y-2 text-sm grid-cols-1 md:grid-cols-5">
-                    <div className="md:col-span-5">
-                      <label htmlFor="full_name">Full Name</label>
-                      <input
-                        type="text"
-                        name="Fullname"
-                        id="full_name"
-                        className="h-10 border mt-1 rounded px-4 w-full text-black"
-                        value={eventData.Fullname}
-                        placeholder="Om Buddhadev"
-                        onChange={handleChange}
-                      />
-                    </div>
+      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px" maxW="800px" mx="auto">
+        <Heading size="md" mb="16px" color={textColor}>
+          Event Details
+        </Heading>
+        <Text fontSize="sm" mb="24px" color="gray.500">
+          Create a new event by filling out the information below.
+        </Text>
 
-                    <div className="md:col-span-5">
-                      <label htmlFor="email">Event Description</label>
-                      <input
-                        type="text"
-                        name="Description"
-                        id="email"
-                        className="h-10 border mt-1 rounded px-4 w-full text-black"
-                        value={eventData.Description}
-                        onChange={handleChange}
-                      />
-                    </div>
+        <form onSubmit={handleSubmit}>
+          <VStack align="stretch" spacing="24px">
+            <FormControl isRequired>
+              <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                Event Title
+              </FormLabel>
+              <Input
+                type="text"
+                name="title"
+                variant="auth"
+                placeholder="e.g. OpenCode 2026"
+                value={eventData.title}
+                onChange={handleChange}
+              />
+            </FormControl>
 
-                    <div className="md:col-span-3">
-                      <label htmlFor="cover_image">
-                        Cover Image (only one)
-                      </label>
-                      <input
-                        id="cover_image"
-                        type="file"
-                        accept="image/*"
-                        className="h-10 border mt-1 rounded px-4 w-full text-black"
-                        onChange={coverUpload}
-                      />
-                    </div>
+            <FormControl isRequired>
+              <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                Event Description
+              </FormLabel>
+              <Input
+                type="text"
+                name="description"
+                variant="auth"
+                placeholder="Enter event description"
+                value={eventData.description}
+                onChange={handleChange}
+              />
+            </FormControl>
 
-                    <div className="md:col-span-3">
-                      <label htmlFor="logo_image">Logo Image</label>
-                      <input
-                        id="logo_image"
-                        type="file"
-                        accept="image/*"
-                        className="h-10 border mt-1 rounded px-4 w-full text-black"
-                        onChange={logoUpload}
-                      />
-                    </div>
+            <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="24px">
+              <FormControl isRequired>
+                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                  Start Date
+                </FormLabel>
+                <Input
+                  type="date"
+                  name="startDate"
+                  variant="auth"
+                  value={eventData.startDate}
+                  onChange={handleChange}
+                  css={{
+                    '::-webkit-calendar-picker-indicator': {
+                      filter: calendarIconFilter,
+                    },
+                  }}
+                />
+              </FormControl>
 
-                    <div className="md:col-span-5 text-right">
-                      <div className="inline-flex items-end">
-                        <button
-                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                          onClick={handleSubmit}
-                        >
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              <FormControl isRequired>
+                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                  End Date
+                </FormLabel>
+                <Input
+                  type="date"
+                  name="endDate"
+                  variant="auth"
+                  value={eventData.endDate}
+                  onChange={handleChange}
+                  css={{
+                    '::-webkit-calendar-picker-indicator': {
+                      filter: calendarIconFilter,
+                    },
+                  }}
+                />
+              </FormControl>
+            </Grid>
+
+            <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="24px">
+              <FormControl isRequired>
+                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                  Logo Image
+                </FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  variant="auth"
+                  p="1"
+                  onChange={logoUpload}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                  Cover Images
+                </FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  variant="auth"
+                  p="1"
+                  onChange={coverUpload}
+                />
+                {coverFiles.length > 0 && (
+                  <Text fontSize="xs" color="gray.500" mt="2">
+                    {coverFiles.length} file(s) selected
+                  </Text>
+                )}
+              </FormControl>
+            </Grid>
+
+            <Box textAlign="right" mt="16px">
+              <Button
+                colorScheme="blue"
+                type="submit"
+                isLoading={isSubmitting}
+                loadingText="Creating..."
+              >
+                Create Event
+              </Button>
+            </Box>
+          </VStack>
+        </form>
+      </Box>
     </Box>
   );
 }
