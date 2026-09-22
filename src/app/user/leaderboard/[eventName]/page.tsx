@@ -97,7 +97,8 @@ export default function EventName() {
     }
     return data;
   }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
-
+  const deferredTableData = useDeferredValue(filteredTableData);
+  const isStale = deferredTableData !== filteredTableData;
   const participantCount = filteredTableData.length;
 
   const clearAllFilters = () => {
@@ -419,11 +420,16 @@ export default function EventName() {
       )}
 
 
-
-      <ColumnsTable
-        tableData={filteredTableData}
-        eventName={decodeURIComponent(eventName ?? '')}
-      />
+      <Box
+        opacity={isStale ? 0.6 : 1}
+        transition="opacity 0.2s ease"
+        pointerEvents={isStale ? 'none' : 'auto'}
+      >
+        <ColumnsTable
+          tableData={filteredTableData}
+          eventName={decodeURIComponent(eventName ?? '')}
+        />
+      </Box>
     </Box>
   );
 }
