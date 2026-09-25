@@ -13,16 +13,17 @@ export default function DiscordBanner() {
   return (
     <Link href="https://discord.gg/SxBATvUPnC" target="_blank">
       <Flex
-        className="glass-panel"
+        bg="linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))"
+        backdropFilter="blur(20px)"
+        border="1px solid rgba(233, 167, 178, 0.3)"
         direction="row"
         justify="space-between"
         align="center"
         borderRadius="20px"
         p={{ base: '16px', md: '24px' }}
         mb="24px"
-        boxShadow={opencodeTokens.shadows.glass}
+        boxShadow="0 8px 32px 0 rgba(233, 167, 178, 0.2)"
         transition="all 0.3s ease"
-        border={`1px solid ${opencodeTokens.colors.border.light}`}
         _hover={{
           transform: 'translateY(-2px)',
           boxShadow: `0 15px 30px ${opencodeTokens.colors.accent.sakura}40`,

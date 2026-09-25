@@ -27,6 +27,7 @@ export default function Banner(props: {
   [x: string]: any;
 }) {
   const {
+    banner,
     avatar,
     name,
     githubUrl,
@@ -54,26 +55,17 @@ export default function Banner(props: {
     <Card
       p="28px"
       textAlign="center"
-      bg={cardBg}
-    
-      borderColor={borderColor}
+      bg="linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))"
+      backdropFilter="blur(20px)"
+      borderColor="rgba(233, 167, 178, 0.3)"
+      borderWidth="1px"
+      borderStyle="solid"
+      boxShadow="0 8px 32px 0 rgba(233, 167, 178, 0.2)"
       borderRadius="22px"
       {...rest}
       minH="410px"
       height="auto"
     >
-      {/* Accent bar */}
-      <Box
-        position="absolute"
-        top="0"
-        left="0"
-        w="100%"
-        h="4px"
-        bg={opencodeTokens.colors.accent.sakura}
-        borderTopRadius="22px"
-        mb="18px"
-      />
-
       <Flex justify="center" mb="14px">
   <NextAvatar
     src={avatar}

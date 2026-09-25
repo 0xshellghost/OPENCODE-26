@@ -105,6 +105,13 @@ export default function ProfileOverviewOther() {
   const shadowHero = opencodeTokens.shadows.glass;
   const shadowSoft = opencodeTokens.shadows.glass;
 
+  const pinkGlassPanelProps = {
+    bg: "linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(233, 167, 178, 0.3)",
+    boxShadow: "0 8px 32px 0 rgba(233, 167, 178, 0.2)"
+  };
+
   if (isLoading) {
     return (
       <Flex minH="100vh" align="center" justify="center" bg={pageBg}>
@@ -134,7 +141,7 @@ export default function ProfileOverviewOther() {
       {!isDesktop && (
         <>
           <Box
-            className="glass-panel"
+            {...pinkGlassPanelProps}
             borderRadius="22px"
             p="18px"
             boxShadow={shadowHero}
@@ -176,7 +183,7 @@ export default function ProfileOverviewOther() {
           </Box>
 
           <Box
-            className="glass-panel"
+            {...pinkGlassPanelProps}
             borderRadius="20px"
             p="16px"
             boxShadow={shadowSoft}
@@ -211,7 +218,7 @@ export default function ProfileOverviewOther() {
           </Box>
 
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
+            <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
               <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
                 Badges
               </Text>
@@ -223,7 +230,7 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft}>
+          <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -233,7 +240,7 @@ export default function ProfileOverviewOther() {
         <>
           <Grid templateColumns="1.3fr 1fr" gap="24px" mb="24px">
             <Box
-              className="glass-panel"
+              {...pinkGlassPanelProps}
               borderRadius="20px"
               p="24px"
               boxShadow={shadowHero}
@@ -253,7 +260,7 @@ export default function ProfileOverviewOther() {
             </Box>
 
             <Box
-              className="glass-panel"
+              {...pinkGlassPanelProps}
               borderRadius="20px"
               p="24px"
               boxShadow={shadowSoft}
@@ -272,7 +279,7 @@ export default function ProfileOverviewOther() {
           </Grid>
 
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
+            <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
               <Text fontSize="18px" fontWeight="800" mb="16px" color={opencodeTokens.colors.text.primary}>
                 Unlocked Badges
               </Text>
@@ -284,7 +291,7 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft}>
+          <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>

@@ -32,16 +32,18 @@ export default function Project({ pr }: { pr: PullRequest }) {
 
   return (
     <Card
-      className="glass-panel"
+      bg="linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))"
+      backdropFilter="blur(20px)"
       p="16px"
       borderRadius="16px"
-      border={`1px solid ${borderColor}`}
+      border="1px solid rgba(233, 167, 178, 0.3)"
       transition="all 0.3s ease"
+      boxShadow="0 4px 15px 0 rgba(233, 167, 178, 0.1)"
       _hover={{
         transform: 'translateY(-2px)',
-        boxShadow: opencodeTokens.shadows.glass,
+        boxShadow: "0 8px 32px 0 rgba(233, 167, 178, 0.2)",
         borderColor: opencodeTokens.colors.accent.sakura,
-        bg: opencodeTokens.colors.background.glassLight,
+        bg: "linear-gradient(135deg, rgba(233, 167, 178, 0.2), rgba(233, 167, 178, 0.1))",
       }}
     >
       <Flex gap="14px" align="flex-start">
