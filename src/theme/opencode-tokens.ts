@@ -13,9 +13,9 @@ export const opencodeTokens = {
       sakura: '#e9a7b2',
       sakuraHover: '#f0b8c2',
       ivory: '#fff4ed',
-      purple: '#7c3aed',
-      purpleHover: '#8b5cf6',
-      purpleMuted: 'rgba(124, 58, 237, 0.15)',
+      purple: '#9D767E', // Dusty Rose
+      purpleHover: '#CF9690', // Soft Peach
+      purpleMuted: 'rgba(157, 118, 126, 0.15)',
     },
     // Leaderboard Ranks
     rank: {

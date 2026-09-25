@@ -72,7 +72,7 @@ function MobileLeaderboard({
 }) {
   if(!table) return null;
   const rows = table.getPaginationRowModel().rows;
-  const rowBorder = useColorModeValue("purple.100", "whiteAlpha.200");
+  const rowBorder = useColorModeValue("#E8C0BB", "whiteAlpha.200");
 
   return (
     <Flex direction="column" gap="16px">
@@ -119,7 +119,7 @@ function MobileLeaderboard({
             </Link>
 
             <Flex align="center" gap="6px">
-              <Text fontWeight="800" color="purple.400">
+              <Text fontWeight="800" color="#CF9690">
                 {user.points}
               </Text>
               <FaTrophy color="#FFB547" />
@@ -191,11 +191,11 @@ function ColumnTable({
     "rgba(15,23,42,0.7)"
   );
   const rowHover = useColorModeValue(
-    "rgba(117,81,255,0.08)",
-    "rgba(117,81,255,0.15)"
+    "rgba(157, 118, 126, 0.08)",
+    "rgba(157, 118, 126, 0.15)"
   );
-  const prsBorder = useColorModeValue("purple.300", "purple.400");
-  const rowBorder = useColorModeValue("purple.100", "whiteAlpha.200");
+  const prsBorder = useColorModeValue("#B88784", "#CF9690");
+  const rowBorder = useColorModeValue("#E8C0BB", "whiteAlpha.200");
 
 
 
@@ -288,7 +288,7 @@ function ColumnTable({
                           fontSize="10px"
                           fontWeight="800"
                           borderRadius="full"
-                          bg="purple.500"
+                          bg="#9D767E"
                           color="white"
                         >
                           YOU
@@ -320,7 +320,7 @@ function ColumnTable({
                 
                 <Flex justify="space-between" align="center" mb="2">
                   <Text fontSize="sm" color="gray.500" fontWeight="500">Points</Text>
-                  <Text fontSize="sm" fontWeight="700" color="purple.500">{rowData.points}</Text>
+                  <Text fontSize="sm" fontWeight="700" color="#9D767E">{rowData.points}</Text>
                 </Flex>
                 
                 <Flex justify="space-between" align="center" mb="4">
@@ -328,7 +328,7 @@ function ColumnTable({
                   <Text fontSize="sm" fontWeight="700">{rowData.prmerged}</Text>
                 </Flex>
                 
-                <Text fontSize="xs" color="purple.400" fontWeight="600" align="center">
+                <Text fontSize="xs" color="#CF9690" fontWeight="600" align="center">
                   Click to view profile &rarr;
                 </Text>
               </PopoverBody>
@@ -356,10 +356,10 @@ function ColumnTable({
             alignItems="center"
             justifyContent="center"
             border="2px solid"
-            borderColor="purple.400"
+            borderColor="#CF9690"
             borderRadius="full"
             fontWeight="800"
-            color="purple.400"
+            color="#CF9690"
           >
             {info.getValue()}
           </Box>
@@ -377,7 +377,7 @@ function ColumnTable({
       ),
       cell: (info) => (
         <Flex justify="flex-end" gap="6px">
-          <Text fontWeight="800" color="purple.500">
+          <Text fontWeight="800" color="#9D767E">
             {info.getValue()}
           </Text>
           <FaTrophy color="#FFB547" />
@@ -498,11 +498,11 @@ function ColumnTable({
                     <Tr
                       key={row.id}
                       data-row-id={row.id}
-                      bg={isCurrentUser(row) ? "purple.800" : "transparent"}
+                      bg={isCurrentUser(row) ? "#3E3843" : "transparent"}
                       color={isCurrentUser(row) ? "white" : "inherit"}
-                      boxShadow={isCurrentUser(row) ? "0 0 0 2px rgba(183,148,244,0.6)" : "none"}
+                      boxShadow={isCurrentUser(row) ? "0 0 0 2px rgba(207,150,144,0.6)" : "none"}
                       _hover={{
-                        bg: isCurrentUser(row) ? "purple.600" : rowHover,
+                        bg: isCurrentUser(row) ? "#665B6D" : rowHover,
                       }}
                       borderBottom="1px solid"
                       borderColor={rowBorder}

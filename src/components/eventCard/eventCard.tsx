@@ -81,14 +81,14 @@ const EventCard = ({
               onClick={() => onLeaderboardClick(name)}
               className="
                 rounded-full
-                bg-purple-600
+                bg-[#9D767E]
                 px-4
                 py-2
                 text-sm
                 font-medium
                 text-white
                 transition
-                hover:bg-purple-700
+                hover:bg-[#785255]
               "
             >
               Leaderboard

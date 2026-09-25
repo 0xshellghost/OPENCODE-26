@@ -7,7 +7,7 @@ import { HSeparator } from 'components/separator/Separator';
 export function SidebarBrand() {
   const textColor = useColorModeValue('gray.800', 'white');
   const mutedText = useColorModeValue('gray.500', 'gray.400');
-  const accentColor = 'purple.500';
+  const accentColor = '#9D767E';
 
   return (
     <Flex align="center" direction="column" py="24px" px="16px">

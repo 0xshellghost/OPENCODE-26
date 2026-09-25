@@ -51,7 +51,7 @@ export default function MobileMenuBar(props: MobileMenuBarProps) {
   const activeColor = 'purple.500';
   const inactiveColor = useColorModeValue('gray.500', 'gray.400');
   const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
-  const activeBg = useColorModeValue('purple.50', 'rgba(159, 122, 234, 0.1)');
+  const activeBg = useColorModeValue('purple.50', 'rgba(157, 118, 126, 0.1)');
   const shadow = useColorModeValue(
     '0px -4px 20px rgba(0, 0, 0, 0.08)',
     '0px -4px 20px rgba(0, 0, 0, 0.3)',
