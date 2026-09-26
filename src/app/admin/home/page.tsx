@@ -351,13 +351,13 @@ export default function Dashboard() {
               </form>
               <Flex justify="flex-end" gap={3}>
                 <Button
-                  colorScheme="blue"
+                  bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED"
                   onClick={handleCloseModal}
                 >
                   Close
                 </Button>
                 <Button
-                  colorScheme="blue"
+                  bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED"
                   onClick={handleChangePoints}
                 >
                   Change Points

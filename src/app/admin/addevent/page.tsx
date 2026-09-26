@@ -287,7 +287,7 @@ export default function Addevent() {
 
             <Box textAlign="right" mt="16px">
               <Button
-                colorScheme="blue"
+                bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED"
                 type="submit"
                 isLoading={isSubmitting}
                 loadingText="Creating..."

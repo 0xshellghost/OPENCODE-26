@@ -86,13 +86,18 @@ export default function Milestones() {
     {
       key: 'weekly',
       label: (
-        <Tab fontWeight="700" borderRadius="full" px={{ base: 5, md: 8 }}>
+        <Tab 
+          fontWeight="700" 
+          borderRadius="full" 
+          px={{ base: 5, md: 8 }}
+          _focus={{ outline: 'none', boxShadow: 'none' }}
+          _focusVisible={{ outline: 'none', boxShadow: 'none' }}
+        >
           <Icon as={MdLeaderboard} mr="8px" /> Weekly Leaders
         </Tab>
       ),
       panel: (
-        <TabPanel p="0" >
-          
+        <Box w="full">
           {weeklyData.length ? (
             <Box className="glass-panel" borderRadius="24px" p="20px" boxShadow={opencodeTokens.shadows.glass} >
               <WeeklyLeaderboardCard
@@ -115,19 +120,25 @@ export default function Milestones() {
               subtitle="The leaderboard is warming up"
             />
           )}
-        </TabPanel>
+        </Box>
       ),
       visible: true,
     },
     {
       key: 'events',
       label: (
-        <Tab fontWeight="700" borderRadius="full" px={{ base: 5, md: 8 }}>
+        <Tab 
+          fontWeight="700" 
+          borderRadius="full" 
+          px={{ base: 5, md: 8 }}
+          _focus={{ outline: 'none', boxShadow: 'none' }}
+          _focusVisible={{ outline: 'none', boxShadow: 'none' }}
+        >
           <Icon as={MdEmojiEvents} mr="8px" /> Event Winners
         </Tab>
       ),
       panel: (
-        <TabPanel p="0">
+        <Box w="full">
           {events.length ? (
             <Box className="glass-panel" borderRadius="24px" p="20px" boxShadow={opencodeTokens.shadows.glass}>
               <EventWinnersCard events={events} />
@@ -139,7 +150,7 @@ export default function Milestones() {
               subtitle="Victories will appear here"
             />
           )}
-        </TabPanel>
+        </Box>
       ),
       visible: SHOW_EVENTS,
     },
@@ -168,6 +179,7 @@ export default function Milestones() {
   colorScheme="purple"
   align="center"
   isLazy
+  lazyBehavior="unmount"
 >
   <TabList
     p={{ base: '1', md: '2' }}
@@ -192,11 +204,11 @@ export default function Milestones() {
       }),
     )}
   </TabList>
-
-  <TabPanels>
-    {tabs.map((t) => React.cloneElement(t.panel, { key: t.key }))}
-  </TabPanels>
 </Tabs>
+
+        <Box w="100%" mt="10px">
+          {tabs[safeTabIndex]?.panel}
+        </Box>
 
       </Box>
     </Box>

@@ -24,12 +24,12 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
   const router = useRouter();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.100', 'gray.700');
+  const cardBg = useColorModeValue('white', '#312C34'); // Dark Plum
+  const borderColor = useColorModeValue('gray.100', '#3E3843'); // Charcoal Plum
   const surfaceBg = useColorModeValue('white', 'whiteAlpha.50');
   const surfaceBorder = useColorModeValue('gray.100', 'whiteAlpha.200');
   const mutedText = useColorModeValue('gray.600', 'gray.400');
-  const labelText = useColorModeValue('purple.600', 'purple.300');
+  const labelText = useColorModeValue('#9D767E', '#CF9690'); // Dusty Rose / Soft Peach
   const headerBorder = useColorModeValue('gray.200', 'whiteAlpha.300');
 
   const cardShadow = useColorModeValue(
@@ -60,11 +60,11 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
       badgeBg: useColorModeValue('orange.100', 'rgba(237,137,54,0.2)'),
     },
     default: {
-      bg: useColorModeValue('purple.50', 'rgba(128,90,213,0.12)'),
-      border: useColorModeValue('purple.100', 'rgba(128,90,213,0.35)'),
-      icon: 'purple.400',
+      bg: useColorModeValue('#FEF3ED', 'rgba(157, 118, 126, 0.12)'),
+      border: useColorModeValue('#E8C0BB', 'rgba(157, 118, 126, 0.35)'),
+      icon: '#CF9690',
       label: 'Winner',
-      badgeBg: useColorModeValue('purple.100', 'rgba(128,90,213,0.2)'),
+      badgeBg: useColorModeValue('#E8C0BB', 'rgba(157, 118, 126, 0.2)'),
     },
   };
 
@@ -98,7 +98,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
         <Flex
           w="42px"
           h="42px"
-          bg={useColorModeValue('purple.100', 'whiteAlpha.200')}
+          bg={useColorModeValue('#E8C0BB', 'whiteAlpha.200')}
           borderRadius="14px"
           align="center"
           justify="center"

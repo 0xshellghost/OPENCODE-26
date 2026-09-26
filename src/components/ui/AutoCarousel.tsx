@@ -25,8 +25,25 @@ const swiperStyles = `
     padding: 48px 0;
     overflow: visible;
   }
+  
+  /* Before Swiper initializes: Show only the first slide, centered */
+  .swiper:not(.swiper-initialized) .swiper-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+  }
+  
+  .swiper:not(.swiper-initialized) .swiper-slide {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+  
+  .swiper:not(.swiper-initialized) .swiper-slide:first-child {
+    opacity: 1 !important;
+  }
 
   .swiper-wrapper {
+    display: flex !important;
     align-items: center;
     overflow: visible;
   }
@@ -98,6 +115,8 @@ export function AutoCarousel({ children }: AutoCarouselProps) {
         isRound
         colorScheme="purple"
         boxShadow="lg"
+        _focus={{ boxShadow: '0 0 0 3px #9D767E' }}
+        _focusVisible={{ boxShadow: '0 0 0 3px #9D767E', outline: 'none' }}
       />
 
       <IconButton
@@ -113,6 +132,8 @@ export function AutoCarousel({ children }: AutoCarouselProps) {
         isRound
         colorScheme="purple"
         boxShadow="lg"
+        _focus={{ boxShadow: '0 0 0 3px #9D767E' }}
+        _focusVisible={{ boxShadow: '0 0 0 3px #9D767E', outline: 'none' }}
       />
 
       <Swiper

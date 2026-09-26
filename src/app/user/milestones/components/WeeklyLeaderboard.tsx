@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { FaCrown, FaTrophy } from 'react-icons/fa';
 import { AutoCarousel } from '../../../../components/ui/AutoCarousel';
+import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 const MotionBox = motion(Box);
 
@@ -45,10 +46,10 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
   const isSingleWeek = sortedWeeks.length === 1;
 
   const podiumStyle = (rank: number) => {
-    if (rank === 1) return { bg: '#EAC94B', h: '110px' };
-    if (rank === 2) return { bg: '#A0AEC0', h: '82px' };
-    if (rank === 3) return { bg: '#ED8936', h: '68px' };
-    return { bg: 'purple.500', h: '60px' };
+    if (rank === 1) return { bg: opencodeTokens.colors.rank.gold, h: '110px' };
+    if (rank === 2) return { bg: opencodeTokens.colors.rank.silver, h: '82px' };
+    if (rank === 3) return { bg: opencodeTokens.colors.rank.bronze, h: '68px' };
+    return { bg: opencodeTokens.colors.accent.sakura, h: '60px' };
   };
 
   return (
@@ -81,12 +82,12 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
           >
             {/* Header */}
             <Flex
-              bgGradient="linear(to-r, #4c51bf, #667eea)"
+              bg={opencodeTokens.colors.accent.sakura}
               px="22px"
               py="14px"
               align="center"
               justify="space-between"
-              color="white"
+              color="gray.900"
             >
               <Box>
                 <Text fontSize="10px" letterSpacing="0.14em" opacity={0.85} fontWeight="700">
@@ -174,7 +175,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                         {users.map((user) => (
                           <Text
                             key={user.username}
-                            color="white"
+                            color="gray.900"
                             fontWeight="800"
                             fontSize="13px"
                             noOfLines={1}
@@ -183,7 +184,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                           </Text>
                         ))}
                         {users.length > 3 && (
-                          <Text fontSize="11px" color="whiteAlpha.800">
+                          <Text fontSize="11px" color="gray.800">
                             +{users.length - 3} more
                           </Text>
                         )}
@@ -218,7 +219,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                     p="10px"
                     borderRadius="12px"
                     bg={useColorModeValue('gray.50', 'whiteAlpha.100')}
-                    _hover={{ bg: 'purple.500', color: 'white' }}
+                    _hover={{ bg: opencodeTokens.colors.accent.sakura, color: 'gray.900' }}
                   >
                     <Text w="26px" fontWeight="800" fontSize="12px" color={muted}>
                       #{user.rank}

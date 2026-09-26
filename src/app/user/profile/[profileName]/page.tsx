@@ -26,6 +26,8 @@ import { getRoleTags, RoleBadgesGroup } from 'views/admin/profile/components/Rol
 import { ProfileData } from '../page';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import PageHeading from 'components/japanese/PageHeading';
+import { getEligibleBadges, BadgeDefinition } from 'constants/badges';
+import { Icon } from '@chakra-ui/react';
 
 export default function ProfileOverviewOther() {
   const { profileName } = useParams<{ profileName: string }>();
@@ -65,12 +67,7 @@ export default function ProfileOverviewOther() {
 
   const profile = data?.data;
 
-  const isOwnProfile = Boolean(
-    loggedInGithubId &&
-      (loggedInGithubId.toLowerCase() === String(profileName || '').toLowerCase() ||
-        loggedInGithubId.toLowerCase() ===
-          String(profile?.githubId || '').toLowerCase()),
-  );
+  const isOwnProfile = loggedInGithubId != null && loggedInGithubId === profileName;
 
   const handleSaveProfile = async (updated: {
     name: string;
@@ -80,6 +77,19 @@ export default function ProfileOverviewOther() {
     year: string;
   }) => {
     await updateUserProfile(updated);
+    
+    // Optimistically update the UI to instantly reflect the saved changes
+    queryClient.setQueryData(['profileInfo', profileName], (old: any) => {
+      if (!old || !old.data) return old;
+      return {
+        ...old,
+        data: {
+          ...old.data,
+          ...updated,
+        },
+      };
+    });
+
     await queryClient.invalidateQueries({ queryKey: ['profileInfo', profileName] });
   };
 
@@ -94,6 +104,13 @@ export default function ProfileOverviewOther() {
 
   const shadowHero = opencodeTokens.shadows.glass;
   const shadowSoft = opencodeTokens.shadows.glass;
+
+  const pinkGlassPanelProps = {
+    bg: "linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(233, 167, 178, 0.3)",
+    boxShadow: "0 8px 32px 0 rgba(233, 167, 178, 0.2)"
+  };
 
   if (isLoading) {
     return (
@@ -124,7 +141,7 @@ export default function ProfileOverviewOther() {
       {!isDesktop && (
         <>
           <Box
-            className="glass-panel"
+            {...pinkGlassPanelProps}
             borderRadius="22px"
             p="18px"
             boxShadow={shadowHero}
@@ -166,7 +183,7 @@ export default function ProfileOverviewOther() {
           </Box>
 
           <Box
-            className="glass-panel"
+            {...pinkGlassPanelProps}
             borderRadius="20px"
             p="16px"
             boxShadow={shadowSoft}
@@ -200,22 +217,20 @@ export default function ProfileOverviewOther() {
             </Grid>
           </Box>
 
-          {getBadges(profile?.prMerged || 0).length > 0 && (
-            <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
+          {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
+            <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
               <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
                 Badges
               </Text>
-              <Flex gap="8px" wrap="wrap">
-                {getBadges(profile?.prMerged || 0).map((badge, idx) => (
-                  <Badge key={idx} colorScheme={badge.color} px="10px" py="4px" borderRadius="8px" textTransform="capitalize">
-                    {badge.label}
-                  </Badge>
+              <Grid templateColumns="1fr" gap="12px">
+                {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
+                  <BadgeCard key={idx} badge={badge} />
                 ))}
-              </Flex>
+              </Grid>
             </Box>
           )}
 
-          <Box className="glass-panel" borderRadius="20px" p="16px" boxShadow={shadowSoft}>
+          <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -225,7 +240,7 @@ export default function ProfileOverviewOther() {
         <>
           <Grid templateColumns="1.3fr 1fr" gap="24px" mb="24px">
             <Box
-              className="glass-panel"
+              {...pinkGlassPanelProps}
               borderRadius="20px"
               p="24px"
               boxShadow={shadowHero}
@@ -245,7 +260,7 @@ export default function ProfileOverviewOther() {
             </Box>
 
             <Box
-              className="glass-panel"
+              {...pinkGlassPanelProps}
               borderRadius="20px"
               p="24px"
               boxShadow={shadowSoft}
@@ -263,22 +278,20 @@ export default function ProfileOverviewOther() {
             </Box>
           </Grid>
 
-          {getBadges(profile?.prMerged || 0).length > 0 && (
-            <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
+          {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
+            <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
               <Text fontSize="18px" fontWeight="800" mb="16px" color={opencodeTokens.colors.text.primary}>
                 Unlocked Badges
               </Text>
-              <Flex gap="12px" wrap="wrap">
-                {getBadges(profile?.prMerged || 0).map((badge, idx) => (
-                  <Badge key={idx} colorScheme={badge.color} px="12px" py="6px" borderRadius="10px" fontSize="14px" textTransform="capitalize">
-                    {badge.label}
-                  </Badge>
+              <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="16px">
+                {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
+                  <BadgeCard key={idx} badge={badge} />
                 ))}
-              </Flex>
+              </Grid>
             </Box>
           )}
 
-          <Box className="glass-panel" borderRadius="20px" p="24px" boxShadow={shadowSoft}>
+          <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft}>
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -380,16 +393,51 @@ function Info({ label, value }: { label: string; value?: string }) {
   );
 }
 
-function getBadges(prMerged: number) {
-  const allBadges = [
-    { threshold: 1, label: 'First PR Merge', color: 'blue' },
-    { threshold: 10, label: '10 Merges', color: 'cyan' },
-    { threshold: 50, label: '50 Merges', color: 'teal' },
-    { threshold: 75, label: '75 Merges', color: 'green' },
-    { threshold: 100, label: '100 Merges', color: 'yellow' },
-    { threshold: 150, label: '150 Merges', color: 'orange' },
-    { threshold: 175, label: '175 Merges', color: 'red' },
-    { threshold: 200, label: '200 Merges', color: 'purple' },
-  ];
-  return allBadges.filter(b => prMerged >= b.threshold);
+function BadgeCard({ badge }: { badge: BadgeDefinition }) {
+  const bg = opencodeTokens.colors.background.glassDark;
+  const borderColor = opencodeTokens.colors.border.light;
+  const textColor = opencodeTokens.colors.text.primary;
+  const descColor = opencodeTokens.colors.text.secondary;
+
+  return (
+    <Flex
+      direction="row"
+      align="center"
+      bg={bg}
+      border="1px solid"
+      borderColor={borderColor}
+      borderRadius="12px"
+      p="12px"
+      gap="16px"
+      transition="all 0.3s ease"
+      _hover={{
+        borderColor: opencodeTokens.colors.accent.sakura,
+        transform: 'translateY(-2px)'
+      }}
+    >
+      <Flex
+        align="center"
+        justify="center"
+        w="44px"
+        h="44px"
+        borderRadius="full"
+        bg={`${badge.color}.900`}
+        color={`${badge.color}.300`}
+        border="1px solid"
+        borderColor={`${badge.color}.600`}
+        boxShadow={`0 0 10px var(--chakra-colors-${badge.color}-800)`}
+      >
+        <Icon as={badge.icon} boxSize={5} />
+      </Flex>
+      <Box>
+        <Text fontSize="15px" fontWeight="800" color={textColor}>
+          {badge.title}
+        </Text>
+        <Text fontSize="13px" color={descColor} mt="2px">
+          {badge.description}
+        </Text>
+      </Box>
+    </Flex>
+  );
 }
+

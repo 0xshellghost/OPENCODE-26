@@ -197,8 +197,8 @@ export default function EditProfileModal({
             </Box>
           </Flex>
         </ModalHeader>
-        <ModalCloseButton mt="8px" mr="8px" borderRadius="full" />
-
+        <ModalCloseButton mt="8px" mr="8px" borderRadius="full" type="button" onClick={onClose} />
+        
         <ModalBody>
           <Grid
             templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
@@ -456,7 +456,7 @@ export default function EditProfileModal({
         </ModalBody>
 
         <ModalFooter mt="8px">
-          <Button variant="ghost" mr={3} onClick={onClose} borderRadius="12px" size="sm">
+          <Button variant="ghost" mr={3} onClick={onClose} borderRadius="12px" size="sm" type="button">
             Cancel
           </Button>
           <Button

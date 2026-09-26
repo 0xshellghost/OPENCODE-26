@@ -191,7 +191,7 @@ export default function ManagementPage() {
             <Grid templateColumns={{ base: '1fr', md: '1.5fr 1.5fr 1fr' }} gap="15px">
               <Input placeholder="Current Name" variant="auth" value={renameTargetRepo} onChange={(e) => setRenameTargetRepo(e.target.value)} />
               <Input placeholder="New Name" variant="auth" value={renameNewRepo} onChange={(e) => setRenameNewRepo(e.target.value)} />
-              <Button colorScheme="blue" w="100%" leftIcon={<Icon as={MdEdit} />} onClick={handleRenameRepo}>Rename</Button>
+              <Button bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED" w="100%" leftIcon={<Icon as={MdEdit} />} onClick={handleRenameRepo}>Rename</Button>
             </Grid>
           </Box>
         </VStack>
