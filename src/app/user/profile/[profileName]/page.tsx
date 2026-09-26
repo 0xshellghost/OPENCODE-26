@@ -67,7 +67,7 @@ export default function ProfileOverviewOther() {
 
   const profile = data?.data;
 
-  const isOwnProfile = true; // FORCED TRUE FOR LOCAL UI TESTING
+  const isOwnProfile = loggedInGithubId != null && loggedInGithubId === profileName;
 
   const handleSaveProfile = async (updated: {
     name: string;
