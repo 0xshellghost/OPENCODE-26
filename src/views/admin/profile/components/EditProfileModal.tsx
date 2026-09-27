@@ -12,19 +12,13 @@ import {
   GridItem,
   Icon,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
   Text,
   useColorModeValue,
   useToast,
+  IconButton
 } from '@chakra-ui/react';
-import { Lock } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface EditProfileModalProps {
@@ -64,13 +58,13 @@ export default function EditProfileModal({
 
   const toast = useToast();
 
-  const modalBg = useColorModeValue('white', 'gray.800');
-  const titleColor = useColorModeValue('gray.800', 'white');
-  const labelColor = useColorModeValue('gray.600', 'gray.300');
-  const lockedBg = useColorModeValue('gray.100', 'whiteAlpha.100');
-  const lockedBorder = useColorModeValue('gray.300', 'whiteAlpha.200');
-  const lockedText = useColorModeValue('gray.500', 'gray.400');
-  const brandStars = useColorModeValue('purple.500', 'purple.300');
+  const modalBg = useColorModeValue('white', '#2A2430');
+  const titleColor = useColorModeValue('#2d242a', '#FEF3ED');
+  const labelColor = useColorModeValue('#7a6a75', '#C9BCC4');
+  const lockedBg = useColorModeValue('#f5f0f2', 'rgba(255,255,255,0.06)');
+  const lockedBorder = useColorModeValue('#d8cdd3', 'rgba(255,255,255,0.12)');
+  const lockedText = useColorModeValue('#8E8391', '#8E8391');
+  const brandStars = useColorModeValue('#9D767E', '#B88784');
 
   useEffect(() => {
     if (isOpen && profile) {
@@ -174,35 +168,69 @@ export default function EditProfileModal({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
-      <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.600" />
-      <ModalContent
+    <Box
+      position="fixed"
+      top={0}
+      left={0}
+      w="100vw"
+      h="100vh"
+      zIndex={9999}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
+      {/* Overlay */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        w="100%"
+        h="100%"
+        bg="blackAlpha.600"
+        backdropFilter="blur(4px)"
+        onClick={onClose}
+      />
+      
+      {/* Modal Content */}
+      <Box
+        position="relative"
         bg={modalBg}
         borderRadius="20px"
-        p={{ base: '12px', md: '16px' }}
-        boxShadow="0 20px 40px rgba(0,0,0,0.2)"
-        as="form"
-        onSubmit={handleSubmit}
+        p={{ base: '20px', md: '24px' }}
+        boxShadow="0 20px 40px rgba(0,0,0,0.4)"
+        w="90%"
+        maxW="600px"
+        maxH="90vh"
+        overflowY="auto"
+        zIndex={10000}
       >
-        <ModalHeader>
-          <Flex justify="space-between" align="center" pr="24px">
-            <Box>
-              <Text fontSize="xl" fontWeight="800" color={titleColor}>
-                Edit Profile
-              </Text>
-              <Text fontSize="xs" color={labelColor} fontWeight="400" mt="2px">
-                Update your personal and academic details
-              </Text>
-            </Box>
-          </Flex>
-        </ModalHeader>
-        <ModalCloseButton mt="8px" mr="8px" borderRadius="full" type="button" onClick={onClose} />
-        
-        <ModalBody>
+        <Flex justify="space-between" align="center" mb="20px">
+          <Box>
+            <Text fontSize="xl" fontWeight="800" color={titleColor}>
+              Edit Profile
+            </Text>
+            <Text fontSize="xs" color={labelColor} fontWeight="400" mt="2px">
+              Update your personal and academic details
+            </Text>
+          </Box>
+          <IconButton
+            aria-label="Close modal"
+            icon={<X size={20} />}
+            variant="ghost"
+            borderRadius="full"
+            onClick={onClose}
+            size="sm"
+          />
+        </Flex>
+
+        <form onSubmit={handleSubmit}>
           <Grid
             templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }}
             gap={{ base: 4, md: 5 }}
+            mb="24px"
           >
             {/* Name */}
             <GridItem colSpan={{ base: 1, md: 2 }}>
@@ -453,24 +481,32 @@ export default function EditProfileModal({
               </FormControl>
             </GridItem>
           </Grid>
-        </ModalBody>
 
-        <ModalFooter mt="8px">
-          <Button variant="ghost" mr={3} onClick={onClose} borderRadius="12px" size="sm" type="button">
-            Cancel
-          </Button>
-          <Button
-            colorScheme="purple"
-            type="submit"
-            isLoading={isSubmitting}
-            borderRadius="12px"
-            size="sm"
-            px="20px"
-          >
-            Save Changes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <Flex justify="flex-end" gap="12px">
+            <Button
+              variant="ghost"
+              onClick={onClose}
+              borderRadius="12px"
+              size="sm"
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button
+              bg="#B88784"
+              color="#FEF3ED"
+              _hover={{ bg: '#CF9690' }}
+              type="submit"
+              isLoading={isSubmitting}
+              borderRadius="12px"
+              size="sm"
+              px="20px"
+            >
+              Save Changes
+            </Button>
+          </Flex>
+        </form>
+      </Box>
+    </Box>
   );
 }
