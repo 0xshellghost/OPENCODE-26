@@ -2,11 +2,14 @@
 
 import {
   Box,
+  Flex,
   Grid,
+  Icon,
   Text,
 } from '@chakra-ui/react';
-import Card from 'components/card/Card';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
+import { User, Globe } from 'lucide-react';
+import { FaGithub } from 'react-icons/fa';
 
 export default function GeneralInformation(props: {
   name: string;
@@ -26,18 +29,17 @@ export default function GeneralInformation(props: {
   const labelColor = opencodeTokens.colors.text.secondary;
   const valueColor = opencodeTokens.colors.text.primary;
 
-  const cardBg = 'transparent';
-  const cardBorder = 'transparent';
-
   const itemBg = opencodeTokens.colors.background.glassDark;
   const itemBorder = opencodeTokens.colors.border.light;
 
   const Item = ({
     label,
     value,
+    icon,
   }: {
     label: string;
     value?: string;
+    icon?: any;
   }) => (
     <Box
       bg={itemBg}
@@ -46,43 +48,60 @@ export default function GeneralInformation(props: {
       borderRadius="14px"
       px="14px"
       py="12px"
+      transition="all 0.3s ease"
+      _hover={{
+        borderColor: '#785255',
+        bg: opencodeTokens.colors.background.glassLight,
+      }}
     >
-      <Text
-        fontSize="10px"
-        fontWeight="700"
-        color={labelColor}
-        textTransform="uppercase"
-        letterSpacing="0.8px"
-        mb="4px"
-      >
-        {label}
-      </Text>
-      <Text
-        fontSize="sm"
-        fontWeight="600"
-        color={valueColor}
-        noOfLines={2}
-      >
-        {value || '—'}
-      </Text>
+      <Flex align="center" justify="space-between">
+        <Box>
+          <Text
+            fontSize="10px"
+            fontWeight="700"
+            color={labelColor}
+            textTransform="uppercase"
+            letterSpacing="0.8px"
+            mb="4px"
+          >
+            {label}
+          </Text>
+          <Text
+            fontSize="14px"
+            fontWeight="600"
+            color={valueColor}
+            noOfLines={2}
+          >
+            {value || '—'}
+          </Text>
+        </Box>
+        {icon && (
+          <Flex
+            align="center"
+            justify="center"
+            w="32px"
+            h="32px"
+            borderRadius="10px"
+            bg="rgba(120, 82, 85, 0.12)"
+            border="1px solid rgba(120, 82, 85, 0.25)"
+            flexShrink={0}
+            ml="10px"
+          >
+            <Icon as={icon} w="16px" h="16px" color="#B88784" />
+          </Flex>
+        )}
+      </Flex>
     </Box>
   );
 
   return (
-    <Card
-      p="20px"
-      bg={cardBg}
-    
-      borderColor={cardBorder}
-      borderRadius="20px"
-      {...rest}
-    >
+    <Box h="100%" {...rest}>
       {/* Header */}
       <Text
-        fontSize="lg"
-        fontWeight="800"
+        fontSize="15px"
+        fontWeight="700"
         color={titleColor}
-        mb="18px"
+        mb="20px"
       >
         General Information
       </Text>
@@ -95,9 +114,9 @@ export default function GeneralInformation(props: {
         }}
         gap="14px"
       >
-        <Item label="Name" value={name} />
-        <Item label="GitHub" value={`@${githubId}`} />
-        {role && <Item label="Role & Affiliation" value={role} />}
+        <Item label="Name" value={name} icon={User} />
+        <Item label="GitHub" value={`@${githubId}`} icon={FaGithub} />
+        {role && <Item label="Role & Affiliation" value={role} icon={Globe} />}
         {college && <Item label="College" value={college} />}
         {gender && (
           <Item
@@ -117,6 +136,6 @@ export default function GeneralInformation(props: {
         {discordId && <Item label="Discord ID" value={discordId} />}
         {email && <Item label="Email" value={email} />}
       </Grid>
-    </Card>
+    </Box>
   );
 }
