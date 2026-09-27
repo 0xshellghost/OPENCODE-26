@@ -1,41 +1,36 @@
+'use client';
+
 import {
   Text,
   Stack,
   Box,
+  Flex,
   Icon,
 } from '@chakra-ui/react';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
-import Card from 'components/card/Card';
 import Project from 'views/admin/profile/components/Project';
 import { PullRequest } from 'app/user/profile/page';
 import { FaInbox } from 'react-icons/fa';
+import { Star } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Projects(props: { PRs: PullRequest[] }) {
   const textPrimary = opencodeTokens.colors.text.primary;
   const textSecondary = opencodeTokens.colors.text.secondary;
-  const cardBg = 'transparent';
-  const borderColor = 'transparent';
 
   return (
-    <Card
-      mb={{ base: '0px', '2xl': '20px' }}
-      p="20px"
-      borderRadius="20px"
-      bg={cardBg}
-    
-      borderColor={borderColor}
-    >
+    <Box>
       {/* Header */}
-      <Box mb="28px">
+      <Box mb="24px">
         <Text
           color={textPrimary}
           fontWeight="800"
-          fontSize="2xl"
+          fontSize="22px"
           mb="4px"
         >
           Recent Contributions
         </Text>
-        <Text color={textSecondary} fontSize="md">
+        <Text color={textSecondary} fontSize="14px">
           Pull requests created by this user
         </Text>
       </Box>
@@ -52,27 +47,33 @@ export default function Projects(props: { PRs: PullRequest[] }) {
         </Stack>
       ) : (
         <Box
-          p="40px"
+          p="44px"
           borderRadius="16px"
           textAlign="center"
           border={`1px dashed ${opencodeTokens.colors.border.medium}`}
           borderColor={opencodeTokens.colors.border.medium}
+          position="relative"
+          overflow="hidden"
         >
+          
+
           <Icon
             as={FaInbox}
-            boxSize="32px"
+            boxSize="36px"
             color={textSecondary}
-            mb="12px"
+            mb="14px"
           />
           <Text fontSize="lg" fontWeight="700" color={textPrimary}>
-            No contributions yet
+            No contributions yet. Ready to make an impact?
           </Text>
-          <Text fontSize="sm" color={textSecondary} mt="4px">
-            This user hasn’t opened any pull requests.
+          <Text fontSize="sm" color={textSecondary} mt="6px">
+            Start contributing to see your history here.{' '}
+            <Link href="/user/repos" style={{ color: '#B88784', textDecoration: 'underline', fontWeight: 600 }}>
+              Explore Issues
+            </Link>
           </Text>
         </Box>
       )}
-    </Card>
+    </Box>
   );
 }
-

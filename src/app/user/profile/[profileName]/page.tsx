@@ -2,11 +2,11 @@
 
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Flex,
   Grid,
+  Icon,
   Text,
   useBreakpointValue,
   useDisclosure,
@@ -18,6 +18,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RingLoader } from 'react-spinners';
 import Banner from 'views/admin/profile/components/Banner';
+import CommunityMetrics from 'views/admin/profile/components/CommunityMetrics';
 import DiscordBanner from 'views/admin/profile/components/DiscordBanner';
 import EditProfileModal from 'views/admin/profile/components/EditProfileModal';
 import General from 'views/admin/profile/components/General';
@@ -27,7 +28,6 @@ import { ProfileData } from '../page';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import PageHeading from 'components/japanese/PageHeading';
 import { getEligibleBadges, BadgeDefinition } from 'constants/badges';
-import { Icon } from '@chakra-ui/react';
 
 export default function ProfileOverviewOther() {
   const { profileName } = useParams<{ profileName: string }>();
@@ -98,23 +98,17 @@ export default function ProfileOverviewOther() {
 
   const isDesktop = useBreakpointValue({ base: false, lg: true });
 
-  const pageBg = 'transparent';
-  const cardBg = opencodeTokens.colors.background.glassDark;
-  const muted = opencodeTokens.colors.text.secondary;
-
-  const shadowHero = opencodeTokens.shadows.glass;
-  const shadowSoft = opencodeTokens.shadows.glass;
-
-  const pinkGlassPanelProps = {
-    bg: "linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))",
+  // Panel styling matching the Opencode 2026 color palette
+  const glassPanel = {
+    bg: "linear-gradient(135deg, rgba(184, 135, 132, 0.13), rgba(62, 56, 67, 0.22))",
     backdropFilter: "blur(20px)",
-    border: "1px solid rgba(233, 167, 178, 0.3)",
-    boxShadow: "0 8px 32px 0 rgba(233, 167, 178, 0.2)"
+    border: "1px solid rgba(184, 135, 132, 0.28)",
+    boxShadow: "0 8px 32px 0 rgba(41, 25, 32, 0.30)",
   };
 
   if (isLoading) {
     return (
-      <Flex minH="100vh" align="center" justify="center" bg={pageBg}>
+      <Flex minH="100vh" align="center" justify="center" bg="transparent">
         <RingLoader color={opencodeTokens.colors.accent.sakura} size={52} />
       </Flex>
     );
@@ -123,7 +117,7 @@ export default function ProfileOverviewOther() {
   return (
     <Box
       minH="100vh"
-      bg={pageBg}
+      bg="transparent"
       pt="0"
       px="0"
       pb="40px"
@@ -131,29 +125,35 @@ export default function ProfileOverviewOther() {
       mx="auto"
     >
 
-    
+      <PageHeading
+        eyebrow="THE PEOPLE BEHIND THE PROGRESS"
+        title="Contributor Profile"
+        description="Track your progress and community contributions"
+      />
 
-      <PageHeading eyebrow="THE PEOPLE BEHIND THE PROGRESS" title="Contributor profile" description="A story of curiosity, collaboration, and contributions. Get to know the person behind the pull requests." />
-
-      {/* 2. Use the Component here */}
+      {/* Discord Banner */}
       <DiscordBanner />
 
+      {/* ─── MOBILE LAYOUT ─── */}
       {!isDesktop && (
         <>
+          {/* User Identity Card */}
           <Box
-            {...pinkGlassPanelProps}
+            {...glassPanel}
             borderRadius="22px"
-            p="18px"
-            boxShadow={shadowHero}
-            mb="22px"
+            p="24px"
+            mb="20px"
           >
             <Flex direction="column" align="center">
-              <Avatar src={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`} size="xl" mb="10px" />
-
+              <Avatar
+                src={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
+                size="xl"
+                mb="12px"
+              />
               <Text fontSize="20px" fontWeight="800">
                 {profile?.name || profileName}
               </Text>
-              <Text fontSize="13px" color={muted}>
+              <Text fontSize="13px" color={opencodeTokens.colors.text.secondary}>
                 @{profile?.githubId || profileName}
               </Text>
 
@@ -165,62 +165,67 @@ export default function ProfileOverviewOther() {
                 <Button
                   leftIcon={<Pencil size={14} />}
                   size="sm"
-                  colorScheme="purple"
-                  variant="outline"
-                  borderRadius="12px"
-                  mt="12px"
+                  w="100%"
+                  maxW="260px"
+                  bg="linear-gradient(135deg, #3E3843, #60434A)"
+                  color="#FEF3ED"
+                  border="1px solid rgba(120, 82, 85, 0.5)"
+                  borderRadius="14px"
+                  fontWeight="700"
+                  fontSize="13px"
+                  py="18px"
+                  mt="14px"
+                  _hover={{
+                    bg: 'linear-gradient(135deg, #60434A, #785255)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 6px 20px rgba(120, 82, 85, 0.35)',
+                  }}
+                  transition="all 0.3s ease"
                   onClick={onOpen}
                 >
                   Edit Profile
                 </Button>
               )}
-
-              <Flex gap="12px" mt="16px">
-                <StatPill label="PRs Merged" value={profile?.prMerged ?? 0} />
-                <StatPill label="Points" value={profile?.points ?? 0} />
-              </Flex>
             </Flex>
           </Box>
 
+          {/* Community Metrics */}
           <Box
-            {...pinkGlassPanelProps}
+            {...glassPanel}
             borderRadius="20px"
-            p="16px"
-            boxShadow={shadowSoft}
-            mb="22px"
+            p="20px"
+            mb="20px"
           >
-            <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
-              General Information
-            </Text>
-
-            <Grid templateColumns="1fr" gap="12px">
-              <Info label="College" value={profile?.college} />
-              {roleLabel && (
-                <Info label="Role & Affiliation" value={roleLabel} />
-              )}
-              <Info label="Email" value={profile?.email} />
-              <Info label="Discord ID" value={profile?.discordId} />
-              <Info label="GitHub" value={`@${profile?.githubId || profileName}`} />
-              <Info
-                label="Gender"
-                value={
-                  profile?.gender?.toLowerCase() === 'male'
-                    ? 'Male'
-                    : profile?.gender?.toLowerCase() === 'female'
-                      ? 'Female'
-                      : profile?.gender?.toLowerCase() === 'other'
-                        ? 'Other'
-                        : profile?.gender
-                }
-              />
-              <Info label="Year" value={profile?.year} />
-            </Grid>
+            <CommunityMetrics
+              prMerged={profile?.prMerged || 0}
+              pointsEarned={profile?.points || 0}
+            />
           </Box>
 
+          {/* General Information */}
+          <Box
+            {...glassPanel}
+            borderRadius="20px"
+            p="20px"
+            mb="20px"
+          >
+            <General
+              name={profile?.name || profileName}
+              githubId={profile?.githubId || profileName}
+              college={profile?.college}
+              discordId={profile?.discordId}
+              email={profile?.email}
+              gender={profile?.gender}
+              year={profile?.year}
+              role={roleLabel}
+            />
+          </Box>
+
+          {/* Badges */}
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft} mb="22px">
+            <Box {...glassPanel} borderRadius="20px" p="20px" mb="20px">
               <Text fontWeight="800" mb="14px" color={opencodeTokens.colors.text.primary}>
-                Badges
+                Unlocked Badges
               </Text>
               <Grid templateColumns="1fr" gap="12px">
                 {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
@@ -230,40 +235,55 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box {...pinkGlassPanelProps} borderRadius="20px" p="16px" boxShadow={shadowSoft}>
+          {/* Recent Contributions */}
+          <Box {...glassPanel} borderRadius="20px" p="20px">
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
       )}
 
+      {/* ─── DESKTOP LAYOUT ─── */}
       {isDesktop && (
         <>
-          <Grid templateColumns="1.3fr 1fr" gap="24px" mb="24px">
+          {/* Row 1: 3-column grid */}
+          <Grid
+            templateColumns="1fr 1.2fr 1.3fr"
+            gap="20px"
+            mb="20px"
+          >
+            {/* User Identity */}
             <Box
-              {...pinkGlassPanelProps}
-              borderRadius="20px"
+              {...glassPanel}
+              borderRadius="22px"
               p="24px"
-              boxShadow={shadowHero}
             >
               <Banner
-                banner={profile?.avatarUrl}
                 avatar={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
                 name={profile?.name || profileName}
                 githubUrl={profile?.githubId || profileName}
-                prMerged={profile?.prMerged || 0}
-                prContributed={profile?.PR?.length || 0}
-                pointsEarned={profile?.points || 0}
                 tags={roleTags}
                 showEdit={isOwnProfile}
                 onEdit={onOpen}
               />
             </Box>
 
+            {/* Community Metrics */}
             <Box
-              {...pinkGlassPanelProps}
-              borderRadius="20px"
+              {...glassPanel}
+              borderRadius="22px"
               p="24px"
-              boxShadow={shadowSoft}
+            >
+              <CommunityMetrics
+                prMerged={profile?.prMerged || 0}
+                pointsEarned={profile?.points || 0}
+              />
+            </Box>
+
+            {/* General Information */}
+            <Box
+              {...glassPanel}
+              borderRadius="22px"
+              p="24px"
             >
               <General
                 name={profile?.name || profileName}
@@ -278,8 +298,9 @@ export default function ProfileOverviewOther() {
             </Box>
           </Grid>
 
+          {/* Badges Row (if any) */}
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft} mb="24px">
+            <Box {...glassPanel} borderRadius="22px" p="24px" mb="20px">
               <Text fontSize="18px" fontWeight="800" mb="16px" color={opencodeTokens.colors.text.primary}>
                 Unlocked Badges
               </Text>
@@ -291,7 +312,12 @@ export default function ProfileOverviewOther() {
             </Box>
           )}
 
-          <Box {...pinkGlassPanelProps} borderRadius="20px" p="24px" boxShadow={shadowSoft}>
+          {/* Row 2: Recent Contributions - Full width */}
+          <Box
+            {...glassPanel}
+            borderRadius="22px"
+            p="24px"
+          >
             <Projects PRs={profile?.PR || []} />
           </Box>
         </>
@@ -317,82 +343,6 @@ export default function ProfileOverviewOther() {
   );
 }
 
-function StatPill({ label, value }: { label: string; value: number }) {
-  const bg = opencodeTokens.colors.background.glassDark;
-  const borderColor = opencodeTokens.colors.border.light;
-  const valueColor = opencodeTokens.colors.accent.sakura;
-  const labelColor = opencodeTokens.colors.text.secondary;
-
-  return (
-    <Box
-      px="16px"
-      py="10px"
-      borderRadius="16px"
-      minW="110px"
-      textAlign="center"
-      bg={bg}
-      border="1px solid"
-      borderColor={borderColor}
-      transition="all 0.3s ease"
-      _hover={{
-        transform: 'translateY(-2px)',
-        borderColor: opencodeTokens.colors.accent.sakura,
-        boxShadow: `0 6px 14px ${opencodeTokens.colors.accent.sakura}40`,
-      }}
-    >
-      <Text fontSize="18px" fontWeight="900" lineHeight="1" color={valueColor}>
-        {value}
-      </Text>
-      <Text fontSize="11px" mt="4px" color={labelColor}>
-        {label}
-      </Text>
-    </Box>
-  );
-}
-
-
-
-function Info({ label, value }: { label: string; value?: string }) {
-  const bg = opencodeTokens.colors.background.glassDark;
-  const borderColor = opencodeTokens.colors.border.light;
-  const labelColor = opencodeTokens.colors.text.secondary;
-  const valueColor = opencodeTokens.colors.text.primary;
-
-  return (
-    <Box
-      borderRadius="12px"
-      p="12px"
-      bg={bg}
-      border="1px solid"
-      borderColor={borderColor}
-      transition="all 0.3s ease"
-      _hover={{
-        borderColor: opencodeTokens.colors.accent.sakura,
-        bg: opencodeTokens.colors.background.glassLight,
-      }}
-    >
-      <Text
-        fontSize="10px"
-        fontWeight="700"
-        color={labelColor}
-        mb="4px"
-        textTransform="uppercase"
-        letterSpacing="0.6px"
-      >
-        {label}
-      </Text>
-      <Text
-        fontSize="14px"
-        fontWeight="600"
-        color={valueColor}
-        noOfLines={2}
-      >
-        {value || '—'}
-      </Text>
-    </Box>
-  );
-}
-
 function BadgeCard({ badge }: { badge: BadgeDefinition }) {
   const bg = opencodeTokens.colors.background.glassDark;
   const borderColor = opencodeTokens.colors.border.light;
@@ -411,7 +361,7 @@ function BadgeCard({ badge }: { badge: BadgeDefinition }) {
       gap="16px"
       transition="all 0.3s ease"
       _hover={{
-        borderColor: opencodeTokens.colors.accent.sakura,
+        borderColor: '#785255',
         transform: 'translateY(-2px)'
       }}
     >
@@ -440,4 +390,3 @@ function BadgeCard({ badge }: { badge: BadgeDefinition }) {
     </Flex>
   );
 }
-

@@ -5,186 +5,119 @@ import {
   Button,
   Flex,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
-import Card from 'components/card/Card';
 import { NextAvatar } from 'components/image/Avatar';
 import { Pencil } from 'lucide-react';
 import { RoleBadgesGroup, RoleTag } from './RoleBadge';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
 
 export default function Banner(props: {
-  banner?: string;
   avatar: string;
   name: string;
   githubUrl: string;
-  prMerged: number;
-  prContributed?: number;
-  pointsEarned: number;
   tags?: RoleTag[];
   showEdit?: boolean;
   onEdit?: () => void;
   [x: string]: any;
 }) {
   const {
-    banner,
     avatar,
     name,
     githubUrl,
-    prMerged,
-    pointsEarned,
     tags,
     showEdit,
     onEdit,
     ...rest
   } = props;
 
-  const cardBg = 'transparent';
-  const borderColor = 'transparent';
-
   const textPrimary = opencodeTokens.colors.text.primary;
   const textSecondary = opencodeTokens.colors.text.secondary;
-  const hintColor = opencodeTokens.colors.text.secondary;
-
-  const avatarBorder = opencodeTokens.colors.accent.sakura;
-  const avatarShadow = `0 0 20px ${opencodeTokens.colors.accent.sakuraHover}`;
-
-  const statBg = opencodeTokens.colors.background.glassDark;
+  const avatarBorder = '#785255'; // Sakura from palette
+  const avatarShadow = '0 0 24px rgba(120, 82, 85, 0.45)';
 
   return (
-    <Card
-      p="28px"
+    <Box
       textAlign="center"
-      bg="linear-gradient(135deg, rgba(233, 167, 178, 0.15), rgba(233, 167, 178, 0.05))"
-      backdropFilter="blur(20px)"
-      borderColor="rgba(233, 167, 178, 0.3)"
-      borderWidth="1px"
-      borderStyle="solid"
-      boxShadow="0 8px 32px 0 rgba(233, 167, 178, 0.2)"
-      borderRadius="22px"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      h="100%"
       {...rest}
-      minH="410px"
-      height="auto"
     >
-      <Flex justify="center" mb="14px">
-  <NextAvatar
-    src={avatar}
-    name={name}
-    h="130px"
-    w="130px"
-    border="4px solid"
-    borderColor={avatarBorder}
-    boxShadow={avatarShadow}
-  />
-</Flex>
+      {/* Title */}
+      <Text
+        fontSize="15px"
+        fontWeight="700"
+        color={textPrimary}
+        mb="20px"
+        alignSelf="flex-start"
+      >
+        User Identity
+      </Text>
 
+      {/* Avatar */}
+      <Flex justify="center" mb="16px">
+        <NextAvatar
+          src={avatar}
+          name={name}
+          h="130px"
+          w="130px"
+          border="4px solid"
+          borderColor={avatarBorder}
+          boxShadow={avatarShadow}
+        />
+      </Flex>
 
       {/* Name */}
       <Text
         color={textPrimary}
         fontWeight="800"
-        fontSize="xl"
+        fontSize="20px"
         lineHeight="1.2"
       >
         {name}
       </Text>
 
-      {/* GitHub */}
+      {/* GitHub handle */}
       <Text
         color={textSecondary}
-        fontSize="sm"
-        mb={tags && tags.length > 0 ? '8px' : '22px'}
+        fontSize="14px"
+        mb={tags && tags.length > 0 ? '10px' : '16px'}
       >
         @{githubUrl}
       </Text>
 
       {/* Role Tags */}
       {tags && tags.length > 0 && (
-        <RoleBadgesGroup tags={tags} mb="18px" />
+        <RoleBadgesGroup tags={tags} mb="16px" />
       )}
 
+      {/* Edit Profile Button */}
       {showEdit && (
         <Button
           leftIcon={<Pencil size={14} />}
           size="sm"
-          colorScheme="purple"
-          variant="outline"
-          borderRadius="12px"
-          mb="18px"
+          w="100%"
+          maxW="260px"
+          bg="linear-gradient(135deg, #3E3843, #60434A)"
+          color="#FEF3ED"
+          border="1px solid rgba(120, 82, 85, 0.5)"
+          borderRadius="14px"
+          fontWeight="700"
+          fontSize="13px"
+          py="18px"
+          _hover={{
+            bg: 'linear-gradient(135deg, #60434A, #785255)',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 6px 20px rgba(120, 82, 85, 0.35)',
+          }}
+          transition="all 0.3s ease"
           onClick={onEdit}
         >
           Edit Profile
         </Button>
       )}
-
-      {/* Stats */}
-      <Flex
-        w="100%"
-        maxW="360px"
-        mx="auto"
-        justify="space-between"
-        mb="10px"
-        gap="12px"
-      >
-        <Box
-          flex="1"
-          bg={statBg}
-          borderRadius="14px"
-          p="14px"
-          border={`1px solid ${opencodeTokens.colors.border.light}`}
-        >
-          <Text
-            color={textPrimary}
-            fontSize="26px"
-            fontWeight="900"
-            lineHeight="1"
-          >
-            {prMerged}
-          </Text>
-          <Text
-            color={textSecondary}
-            fontSize="sm"
-            mt="4px"
-          >
-            PRs Merged
-          </Text>
-        </Box>
-
-        <Box
-          flex="1"
-          bg={statBg}
-          borderRadius="14px"
-          p="14px"
-          border={`1px solid ${opencodeTokens.colors.border.light}`}
-        >
-          <Text
-            color={textPrimary}
-            fontSize="26px"
-            fontWeight="900"
-            lineHeight="1"
-          >
-            {pointsEarned}
-          </Text>
-          <Text
-            color={textSecondary}
-            fontSize="sm"
-            mt="4px"
-          >
-            Points Earned
-          </Text>
-        </Box>
-      </Flex>
-
-      {/* Empty state hint */}
-      {prMerged === 0 && pointsEarned === 0 && (
-        <Text
-          mt="14px"
-          fontSize="sm"
-          color={hintColor}
-        >
-          Start contributing to see your stats grow
-        </Text>
-      )}
-    </Card>
+    </Box>
   );
 }
