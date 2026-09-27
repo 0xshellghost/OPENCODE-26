@@ -20,6 +20,8 @@ import {
 } from '@chakra-ui/react';
 import { Lock, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchColleges } from 'api/profile/profile';
 
 export interface EditProfileModalProps {
   isOpen: boolean;
@@ -57,6 +59,11 @@ export default function EditProfileModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toast = useToast();
+
+  const { data: colleges = [] } = useQuery({
+    queryKey: ['colleges'],
+    queryFn: fetchColleges,
+  });
 
   const modalBg = useColorModeValue('white', '#2A2430');
   const titleColor = useColorModeValue('#2d242a', '#FEF3ED');
@@ -303,7 +310,11 @@ export default function EditProfileModal({
                     size="md"
                     fontSize="sm"
                     fontWeight="500"
+                    list="colleges-list"
                   />
+                  <datalist id="colleges-list">
+                    {colleges.map((c: string) => <option key={c} value={c} />)}
+                  </datalist>
                 </FormControl>
               )}
             </GridItem>

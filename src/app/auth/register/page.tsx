@@ -1,12 +1,12 @@
 'use client';
 
 import { Button, useToast } from '@chakra-ui/react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { ArrowRight, Code2, Users, Sprout } from 'lucide-react';
-import { sendRegData } from 'api/profile/profile';
+import { sendRegData, fetchColleges } from 'api/profile/profile';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
 import RegistrationField from 'components/japanese/RegistrationField';
@@ -17,6 +17,11 @@ export default function Register() {
   const [otherCollege, setOtherCollege] = useState('');
   const toast = useToast();
   const router = useRouter();
+
+  const { data: colleges = [] } = useQuery({
+    queryKey: ['colleges'],
+    queryFn: fetchColleges,
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -64,7 +69,14 @@ export default function Register() {
         </div></section>
         <section className="oc-form-section"><h2><span>02</span>Your academic chapter</h2><div className="oc-form-grid">
           <RegistrationField name="collegeType" label="College" value={collegeType} onChange={handleCollegeChange} options={['IIIT Allahabad', 'Other']} full />
-          {collegeType === 'Other' && <RegistrationField name="college" label="College name" value={otherCollege} onChange={handleOtherCollegeChange} placeholder="Your institution" full />}
+          {collegeType === 'Other' && (
+            <>
+              <RegistrationField name="college" label="College name" value={otherCollege} onChange={handleOtherCollegeChange} placeholder="Your institution" full list="colleges-list" />
+              <datalist id="colleges-list">
+                {colleges.map((c: string) => <option key={c} value={c} />)}
+              </datalist>
+            </>
+          )}
           <RegistrationField name="degree" label="Degree" value={formData.degree} onChange={handleChange} options={['BTECH', 'MTECH', 'PHD', 'Other']} />
           <RegistrationField name="branch" label="Branch" value={formData.branch} onChange={handleChange} placeholder="Your field of study" />
           <RegistrationField name="year" label="Current year" value={formData.year} onChange={handleChange} options={['School', '1st Year', '2nd Year', '3rd Year', '4th Year', 'Passout']} />

@@ -153,3 +153,17 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
 
   return data;
 }
+
+export async function fetchColleges() {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/colleges`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch colleges');
+    }
+    const data = await response.json();
+    return data.data; // Assuming response_200 wraps in { data: ... }
+  } catch (error) {
+    console.error('Error fetching colleges:', error);
+    return [];
+  }
+}
