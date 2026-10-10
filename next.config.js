@@ -17,11 +17,15 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'i.ibb.co' },
       { protocol: 'https', hostname: 'scontent.fotp8-1.fna.fbcdn.net' },
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
     ],
     // Make ENV
-    unoptimized: true,
+    // unoptimized: true,
   },
 };
 
-// module.exports = withTM(nextConfig);
-module.exports = nextConfig;
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer(nextConfig);
