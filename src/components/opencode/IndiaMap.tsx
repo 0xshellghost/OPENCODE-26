@@ -1,14 +1,31 @@
-import { useId } from 'react'
+import { useId, useEffect, useState } from 'react'
 import { geoMercator, geoPath, type GeoPermissibleObjects } from 'd3-geo'
-import india from './india.geo.json'
 import styles from './opencode-experience.module.css'
-
-const geometry = india as unknown as GeoPermissibleObjects
-const projection = geoMercator().fitExtent([[28, 25], [492, 495]], geometry)
-const outline = geoPath(projection)(geometry) || ''
 
 export default function IndiaMap() {
   const id = useId().replace(/:/g, '')
+  const [outline, setOutline] = useState<string>('')
+
+  useEffect(() => {
+    // Lazy load the 6.6MB geojson data
+    let mounted = true
+    const loadMap = async () => {
+      try {
+        const res = await fetch('/data/india.geo.json')
+        if (!res.ok) throw new Error('Failed to load map data')
+        const geometry = await res.json() as unknown as GeoPermissibleObjects
+        const projection = geoMercator().fitExtent([[28, 25], [492, 495]], geometry)
+        if (mounted) {
+          setOutline(geoPath(projection)(geometry) || '')
+        }
+      } catch (err) {
+        console.error('Map loading failed', err)
+      }
+    }
+    loadMap()
+    return () => { mounted = false }
+  }, [])
+
   return (
     <figure className={styles.mapFigure}>
       <svg viewBox="0 0 520 520" className={styles.mapSvg} role="img" aria-labelledby={`${id}-title ${id}-description`}>
@@ -23,8 +40,12 @@ export default function IndiaMap() {
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.03" />
           </linearGradient>
         </defs>
-        <path d={outline} fill={`url(#${id}-fill)`} stroke="currentColor" strokeWidth="1.4" />
-        <path d={outline} fill={`url(#${id}-dots)`} />
+        {outline && (
+          <>
+            <path d={outline} fill={`url(#${id}-fill)`} stroke="currentColor" strokeWidth="1.4" />
+            <path d={outline} fill={`url(#${id}-dots)`} />
+          </>
+        )}
       </svg>
       <figcaption className={styles.mapCaption}>Many perspectives. One community.</figcaption>
     </figure>

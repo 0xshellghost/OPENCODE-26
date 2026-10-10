@@ -242,14 +242,21 @@ export default function InitialLoader({
             animation={`${spinReverse} 18s linear infinite`}
           />
 
-          <Image
-            src="/Logo/opencodelogo.png"
-            alt="OpenCode Logo"
+          <Box
             w={{ base: '70px', md: '90px' }}
-            h="auto"
+            h={{ base: '70px', md: '90px' }}
+            bg={opencodeTokens.colors.accent.sakura}
+            style={{
+              maskImage: "url('/Logo/opencodelogo.png')",
+              WebkitMaskImage: "url('/Logo/opencodelogo.png')",
+              maskSize: 'contain',
+              WebkitMaskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              WebkitMaskPosition: 'center',
+            }}
             filter="drop-shadow(0 0 16px rgba(255,255,255,0.6))"
-            borderRadius="full"
-            objectFit="contain"
           />
         </Box>
 
@@ -354,13 +361,34 @@ export default function InitialLoader({
         <Text
           fontSize="11px"
           color="whiteAlpha.600"
-          mb={7}
+          mb={2}
           letterSpacing="0.15em"
           fontFamily="'Inter', sans-serif"
           animation={`${fadeFloat} 1s ease 0.6s forwards`}
           opacity={0}
         >
           Loading the experience...
+        </Text>
+
+        {/* ── Yuzuki welcome (Phase 1.3) ── */}
+        <Text
+          fontSize="12px"
+          letterSpacing="0.25em"
+          fontFamily="Georgia, 'Times New Roman', serif"
+          mb={7}
+          textAlign="center"
+          animation={`${fadeFloat} 1.2s ease 2.6s forwards`}
+          opacity={0}
+          sx={{
+            background: `linear-gradient(90deg, #e9a7b2, #fff4ed, #e9a7b2)`,
+            backgroundSize: '200% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: `${fadeFloat} 1.2s ease 2.6s forwards, ${shimmer} 4s linear 3.8s infinite`,
+          }}
+        >
+          ゆづき welcomes you
         </Text>
 
         {/* ── Sakura icon separator ── */}
