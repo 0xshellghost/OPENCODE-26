@@ -16,6 +16,7 @@ import { gsap } from 'gsap';
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { opencodeTokens } from '../../theme/opencode-tokens';
+import SakuraToggle from 'components/common/SakuraToggle';
 
 interface AdminNavbarProps {
   brandText: string;
@@ -98,6 +99,7 @@ export default function AdminNavbar(props: AdminNavbarProps) {
         </Text>
 
         <Flex align="center" gap="16px" pt="16px">
+          <SakuraToggle />
           <Menu>
             <MenuButton
               transition="all 0.3s"

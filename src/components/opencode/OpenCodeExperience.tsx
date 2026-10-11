@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { ArrowDown, ArrowRight, Flower2, Menu, Pause, Play, RotateCcw, X } from 'lucide-react'
 import IndiaMap from './IndiaMap'
 import YuzukiPresence from '../landing/YuzukiPresence'
+import { useSakura } from 'contexts/SakuraContext'
 import { chapters, defaultAssets, defaultNavigation, selfHostedAssets, type OpenCodeExperienceProps, type SceneParameters } from './experience-config'
 import styles from './opencode-experience.module.css'
 
@@ -59,13 +60,21 @@ export default function OpenCodeExperience({
     if (finale.current) finale.current.inert = !reduced && chapter < 4
   }, [reduced, chapter])
 
-  useEffect(() => {
-    parameters.current.paused = paused || reduced
-    scene.current?.invalidate()
-  }, [paused, reduced])
+  const { enabled: sakuraEnabled } = useSakura()
 
   useEffect(() => {
-    if (!ready || reduced || !canvasHost.current) return
+    parameters.current.paused = paused || reduced || !sakuraEnabled
+    scene.current?.invalidate()
+  }, [paused, reduced, sakuraEnabled])
+
+  useEffect(() => {
+    if (!ready || reduced || !canvasHost.current || !sakuraEnabled) {
+      if (scene.current) {
+        scene.current.dispose()
+        scene.current = null
+      }
+      return
+    }
     let cancelled = false
     let controller: SceneController | null = null
     const host = canvasHost.current
@@ -80,7 +89,7 @@ export default function OpenCodeExperience({
       }
     }).catch(() => { if (!cancelled) setGraphicsUnavailable(true) })
     return () => { cancelled = true; controller?.dispose(); scene.current = null }
-  }, [ready, reduced, quality])
+  }, [ready, reduced, quality, sakuraEnabled])
 
   useEffect(() => {
     if (!ready || !root.current) return

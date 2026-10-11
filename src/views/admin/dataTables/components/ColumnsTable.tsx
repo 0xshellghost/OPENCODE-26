@@ -38,7 +38,6 @@ import {
 import Card from "components/card/Card";
 import LeaderboardGraph from "./LeadearboardGraph";
 import { NextAvatar } from "components/image/Avatar";
-import Snowfall from 'react-snowfall';
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 
@@ -555,9 +554,7 @@ function ColumnTable({
       </Card>
 
 
-      <Box position="fixed" inset={0} pointerEvents="none" zIndex={1}>
-        <Snowfall snowflakeCount={110} />
-      </Box>
+      {/* Sakura petals are now handled globally via GlobalSakuraBackground */}
 
     </>
   );

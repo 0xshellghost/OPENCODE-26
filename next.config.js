@@ -12,17 +12,18 @@ const nextConfig = {
       { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
     ] }];
   },
-  images: {
     remotePatterns: [
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'i.ibb.co' },
       { protocol: 'https', hostname: 'scontent.fotp8-1.fna.fbcdn.net' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
     ],
-    // Make ENV
-    // unoptimized: true,
-  },
-};
+    unoptimized: process.env.NODE_ENV === 'development',
+  };
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',

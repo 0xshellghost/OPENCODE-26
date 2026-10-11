@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { ArrowUpRight, Menu, X, UserRound, Flower2 } from 'lucide-react';
 import { useAuth } from 'contexts/AuthContext';
 import ThemeToggle from 'components/japanese/ThemeToggle';
+import SakuraToggle from 'components/common/SakuraToggle';
 import OpenCodeLogo from 'components/common/OpenCodeLogo';
 
 const navigation = [
@@ -40,6 +41,7 @@ export default function SiteNavbar() {
           {navigation.map(({ label, href }) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname.startsWith(href)) ? 'page' : undefined}>{label}</Link>)}
         </nav>
         <div className="oc-nav-actions">
+          <SakuraToggle />
           <ThemeToggle />
           <span className="oc-nav-divider" />
           <Link className="oc-nav-signin" href={isLoggedIn ? '/user/profile' : '/auth/sign-in'}>

@@ -111,16 +111,19 @@ export default function InitialLoader({
     }
   }, [onComplete]);
 
-  // Generate petal configs once
+  // Generate deterministic petal configs (avoids SSR hydration mismatch)
   const petals = useMemo(
     () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        id: i,
-        delay: Math.random() * 10,
-        left: `${Math.random() * 100}%`,
-        size: 8 + Math.random() * 10,
-        duration: 4 + Math.random() * 9,
-      })),
+      Array.from({ length: 18 }, (_, i) => {
+        const seed = (i * 137.5) % 100;
+        return {
+          id: i,
+          delay: (i * 0.7) % 5,
+          left: `${seed.toFixed(1)}%`,
+          size: 8 + (i % 6) * 2,
+          duration: 5 + (i % 5) * 1.5,
+        };
+      }),
     [],
   );
 
@@ -128,17 +131,19 @@ export default function InitialLoader({
     <Box
       position="fixed"
       inset={0}
-      zIndex={2000}
+      zIndex={99999}
+      bg="#0a0514"
       backgroundImage="url('/images/loading-bg.png')"
       backgroundSize="cover"
       backgroundPosition="center"
       opacity={isExiting ? 0 : 1}
-      transform={isExiting ? 'scale(1.05)' : 'scale(1)'}
+      transform={isExiting ? 'scale(1.04)' : 'scale(1)'}
       transition="opacity 700ms ease-out, transform 700ms ease-out"
       overflow="hidden"
       display="flex"
       alignItems="center"
       justifyContent="center"
+      pointerEvents={isExiting ? 'none' : 'auto'}
     >
       {/* ── Cinematic vignette overlay ── */}
       <Box

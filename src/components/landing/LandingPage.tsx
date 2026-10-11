@@ -6,6 +6,7 @@ import Link from 'next/link';
 import OpenCodeExperience from '../opencode/OpenCodeExperience';
 import LandingContent from './LandingContent';
 import ThemeToggle from 'components/japanese/ThemeToggle';
+import SakuraToggle from 'components/common/SakuraToggle';
 
 const GITHUB_LOGIN_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
 
@@ -47,7 +48,10 @@ export default function LandingPage() {
         navigation={navigation}
       />
 
-      <div className="oc-landing-theme"><ThemeToggle /></div>
+      <div className="oc-landing-theme flex items-center gap-2">
+        <SakuraToggle />
+        <ThemeToggle />
+      </div>
 
       {/* Content section below the cinematic hero */}
       <LandingContent />

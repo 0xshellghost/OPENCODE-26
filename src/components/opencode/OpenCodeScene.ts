@@ -23,13 +23,13 @@ export function createPetalScene(host: HTMLElement, parameters: SceneParameters,
     positions.setXYZ(i, x * Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.65), y, 0.28 * x * x + 0.2 * Math.sin(t * Math.PI))
   }
   geometry.computeVertexNormals()
-  const material = new THREE.MeshStandardMaterial({ color: '#e9a7b2', roughness: 0.85, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
+  const material = new THREE.MeshStandardMaterial({ color: '#f59dae', roughness: 0.7, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
   const petals = new THREE.InstancedMesh(geometry, material, count)
   petals.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
   petals.frustumCulled = false
   scene.add(petals)
-  scene.add(new THREE.AmbientLight('#fff4ed', 2.1))
-  const sun = new THREE.DirectionalLight('#e9a7b2', 3)
+  scene.add(new THREE.AmbientLight('#fff4ed', 2.3))
+  const sun = new THREE.DirectionalLight('#ffb3c1', 3.2)
   sun.position.set(-3, 5, 8)
   scene.add(sun)
   const dummy = new THREE.Object3D()
@@ -37,7 +37,7 @@ export function createPetalScene(host: HTMLElement, parameters: SceneParameters,
   const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
   const particles = Array.from({ length: count }, () => ({
     x: random() * 36 - 18, y: random() * 22 - 11, z: random() * 22 - 12,
-    size: 0.055 + random() * 0.15, speed: 0.3 + random() * 0.5, phase: random() * Math.PI * 2,
+    size: 0.085 + random() * 0.16, speed: 0.3 + random() * 0.5, phase: random() * Math.PI * 2,
   }))
   let frame = 0
   let lastTime = 0

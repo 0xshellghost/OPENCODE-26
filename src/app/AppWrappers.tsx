@@ -7,11 +7,12 @@ import 'styles/MiniCalendar.css';
 import { ChakraProvider, cookieStorageManager } from '@chakra-ui/react';
 import { AuthProvider } from 'contexts/AuthContext';
 import { SidebarProvider } from 'contexts/SidebarContext';
+import { SakuraProvider } from 'contexts/SakuraContext';
 import theme from 'theme/theme';
 
 import dynamic from 'next/dynamic';
 
-const InitialLoader = dynamic(() => import('components/common/InitialLoader'), { ssr: false });
+import InitialLoader from 'components/common/InitialLoader';
 const GlobalSakuraBackground = dynamic(() => import('components/common/GlobalSakuraBackground'), { ssr: false });
 import PageTransition from 'components/common/PageTransition';
 
@@ -67,30 +68,53 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasLoaded || !minTimeReached || !animationDone) return;
     setIsExiting(true);
-    const timer = setTimeout(() => setIsLoading(false), 350);
+    const timer = setTimeout(() => setIsLoading(false), 700);
     return () => clearTimeout(timer);
   }, [hasLoaded, minTimeReached, animationDone]);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    if (pathname === '/') {
+      return (
+        <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
+          <InitialLoader isExiting={false} variant={initialVariant} />
+        </ChakraProvider>
+      );
+    }
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
-      {pathname === '/' && <GlobalSakuraBackground />}
-      <AuthProvider>
-        <SidebarProvider>
-          <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>{children}</ChakraProvider>
-        </SidebarProvider>
-      </AuthProvider>
+      <SakuraProvider>
+        {/* Global sakura petals on every page */}
+        <GlobalSakuraBackground />
 
-      {isLoading && pathname === '/' && (
-        <InitialLoader
-          isExiting={isExiting}
-          onComplete={() => setAnimationDone(true)}
-          variant={initialVariant}
-        />
-      )}
+        <AuthProvider>
+          <SidebarProvider>
+            <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
+              <div
+                style={{
+                  opacity: isLoading && pathname === '/' && !isExiting ? 0 : 1,
+                  visibility: isLoading && pathname === '/' && !isExiting ? 'hidden' : 'visible',
+                  transition: 'opacity 0.7s ease-out',
+                }}
+              >
+                {children}
+              </div>
+            </ChakraProvider>
+          </SidebarProvider>
+        </AuthProvider>
 
-      <PageTransition />
+        {isLoading && pathname === '/' && (
+          <InitialLoader
+            isExiting={isExiting}
+            onComplete={() => setAnimationDone(true)}
+            variant={initialVariant}
+          />
+        )}
+
+        <PageTransition />
+      </SakuraProvider>
     </QueryClientProvider>
   );
 }
