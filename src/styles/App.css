@@ -142,13 +142,25 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 }
 
 .text-sakura-gradient {
-  color: transparent;
+  color: var(--accent);
   font-family: var(--f-display);
-  font-weight: 300;
-  letter-spacing: .08em;
-  background: linear-gradient(90deg, #ffd9c2, var(--scene-pink));
+  font-weight: 400;
+  letter-spacing: .03em;
+  background: linear-gradient(135deg, #fff1ec 15%, var(--accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.7));
+}
+.chakra-ui-light .text-sakura-gradient,
+[data-theme="light"] .text-sakura-gradient,
+.light .text-sakura-gradient {
+  color: var(--accent);
+  background: linear-gradient(135deg, #2a1a24 10%, #c04a67 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.6));
 }
 .page-transition-overlay { left: 0; width: 100%; --transition-bg: var(--bg); }
 .japanese-page { position: relative; min-height: 100vh; isolation: isolate; color: var(--fg); background: var(--bg); font-family: var(--f-body); line-height: 1.6; }

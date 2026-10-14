@@ -473,42 +473,28 @@ function Podium({ winners, colors }: { winners: Winner[]; colors: string[] }) {
 
 
 function WinnersHeader() {
-  const titleColor = opencodeTokens.colors.text.primary;
-  const subtitleColor = opencodeTokens.colors.text.secondary;
-  const dividerColor = opencodeTokens.colors.accent.sakura;
-
   return (
-    <Stack spacing="12px" align="center" mt="20px">
-
-
-
-      <Text
-        fontSize={{ base: '32px', md: '48px' }}
-        fontWeight="400"
-        lineHeight="1.1"
-        className="text-sakura-gradient"
-        textAlign="center"
-      >
-        Legacy of Legends
-      </Text>
-
-
-      <Text
-        fontSize="14px"
-        color={subtitleColor}
-        textAlign="center"
-        maxW="420px"
-      >
-        Top Performers and their Journey through Opencode
-      </Text>
-      <Box
-        h="2px"
-        w="120px"
-        bg={dividerColor}
-        borderRadius="full"
-        mt="6px"
-      />
-    </Stack>
+    <header className="oc-page-heading" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px' }}>
+          <span />HALL OF FAME<span />
+        </p>
+        <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)' }}>
+          Legacy of Legends
+        </h1>
+        <p className="oc-description" style={{ textAlign: 'center', maxWidth: '540px', margin: 0 }}>
+          Top Performers and their Journey through Opencode
+        </p>
+        <Box
+          h="2px"
+          w="80px"
+          bg="var(--accent)"
+          borderRadius="full"
+          mt="16px"
+          opacity={0.8}
+        />
+      </div>
+    </header>
   );
 }
 
