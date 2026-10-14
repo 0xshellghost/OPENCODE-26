@@ -12,6 +12,7 @@ const nextConfig = {
       { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
     ] }];
   },
+  images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -23,7 +24,8 @@ const nextConfig = {
       { protocol: 'http', hostname: '**' },
     ],
     unoptimized: process.env.NODE_ENV === 'development',
-  };
+  },
+};
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
