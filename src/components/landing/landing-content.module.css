@@ -16,9 +16,10 @@
   gap: 9px;
   align-items: center;
   color: var(--accent);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.19em;
+  font-family: var(--f-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   margin-bottom: 14px;
 }
@@ -31,18 +32,19 @@
 }
 
 .sectionHeading {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 400;
-  font-size: clamp(28px, 3.5vw, 44px);
-  line-height: 1.18;
-  letter-spacing: -0.035em;
-  color: var(--text);
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(32px, 4vw, 54px);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--fg);
   margin-bottom: 16px;
 }
 
 .sectionDescription {
   color: var(--muted);
-  font-size: 14px;
+  font-family: var(--f-body);
+  font-size: 15px;
   line-height: 1.8;
   max-width: 560px;
   margin-bottom: 48px;
@@ -56,11 +58,11 @@
   justify-content: center;
   gap: 0;
   padding: 36px 24px;
-  background: var(--card-bg);
+  background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .statItem {
@@ -81,24 +83,26 @@
   transform: translateY(-50%);
   width: 1px;
   height: 40px;
-  background: var(--border);
+  background: var(--line);
 }
 
 .statNumber {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(28px, 3vw, 42px);
-  font-weight: 400;
-  letter-spacing: -0.03em;
-  color: var(--text);
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(32px, 3.8vw, 52px);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--fg);
   line-height: 1;
 }
 
 .statLabel {
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* ═══════════════════════════════════════════════
@@ -113,20 +117,20 @@
 .featureCard {
   position: relative;
   padding: 32px 28px;
-  background: var(--card-bg);
+  background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
   box-shadow: var(--shadow);
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.25s ease-out, border-color 0.25s ease, box-shadow 0.25s ease;
   overflow: hidden;
 }
 
 .featureCard:hover {
   transform: translateY(-4px);
   border-color: var(--border-strong);
-  box-shadow: var(--shadow), 0 0 30px rgba(233, 167, 178, 0.06);
+  box-shadow: var(--shadow), 0 12px 36px -10px var(--accent);
 }
 
 .featureIcon {
@@ -142,30 +146,31 @@
 }
 
 .featureTitle {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--fg);
   margin-bottom: 10px;
   letter-spacing: -0.01em;
 }
 
 .featureDescription {
-  font-size: 13px;
+  font-family: var(--f-body);
+  font-size: 14px;
   line-height: 1.75;
   color: var(--muted);
 }
 
-/* sakura accent bar on hover */
+/* radial light catch on hover */
 .featureCard::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 24px;
-  right: 24px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(260px circle at 50% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
+  border-radius: inherit;
 }
 .featureCard:hover::after {
   opacity: 1;
@@ -211,33 +216,36 @@
   border-radius: 50%;
   background: var(--bg);
   border: 2px solid var(--accent);
-  box-shadow: 0 0 0 4px var(--bg), 0 0 12px rgba(233, 167, 178, 0.3);
+  box-shadow: 0 0 0 4px var(--bg), 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
   z-index: 1;
 }
 
 .timelineItem[data-active='true'] .timelineDot {
   background: var(--accent);
-  box-shadow: 0 0 0 4px var(--bg), 0 0 18px rgba(233, 167, 178, 0.5);
+  box-shadow: 0 0 0 4px var(--bg), 0 0 18px var(--accent);
 }
 
 .timelineDate {
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 6px;
 }
 
 .timelineTitle {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--fg);
   margin-bottom: 6px;
 }
 
 .timelineDescription {
-  font-size: 13px;
+  font-family: var(--f-body);
+  font-size: 14px;
   line-height: 1.7;
   color: var(--muted);
   max-width: 480px;
@@ -250,8 +258,9 @@
   position: relative;
   padding: 80px 32px;
   text-align: center;
-  background: linear-gradient(180deg, var(--bg) 0%, rgba(233, 167, 178, 0.06) 50%, var(--bg) 100%);
+  background: linear-gradient(180deg, var(--bg) 0%, rgba(240, 168, 184, 0.06) 50%, var(--bg-2) 100%);
   overflow: hidden;
+  border-top: 1px solid var(--line);
 }
 
 .joinCta::before {
@@ -263,27 +272,29 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(233, 167, 178, 0.08), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 15%, transparent), transparent 70%);
   pointer-events: none;
 }
 
 .joinHeading {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 400;
-  font-size: clamp(32px, 4vw, 52px);
-  line-height: 1.15;
-  letter-spacing: -0.04em;
-  color: var(--text);
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(34px, 4.5vw, 56px);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  color: var(--fg);
   margin-bottom: 16px;
   position: relative;
 }
 
 .joinHeading span {
   color: var(--accent);
+  font-weight: 300;
 }
 
 .joinDescription {
   color: var(--muted);
+  font-family: var(--f-body);
   font-size: 15px;
   line-height: 1.8;
   max-width: 520px;
@@ -297,7 +308,8 @@
   gap: 10px;
   padding: 14px 36px;
   font-size: 14px;
-  font-weight: 600;
+  font-family: var(--f-body);
+  font-weight: 500;
   color: var(--accent-ink);
   background: var(--accent);
   border-radius: 999px;
@@ -306,12 +318,13 @@
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   text-decoration: none;
+  box-shadow: 0 12px 36px -10px var(--accent);
 }
 
 .joinButton:hover {
-  background: var(--accent-hover);
+  background: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(233, 167, 178, 0.25);
+  box-shadow: 0 16px 40px -8px var(--accent);
 }
 
 /* ═══════════════════════════════════════════════

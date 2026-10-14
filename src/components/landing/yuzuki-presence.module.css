@@ -57,13 +57,14 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 16px 22px 16px 18px;
-  background: linear-gradient(135deg, rgba(30, 22, 35, 0.72), rgba(45, 30, 48, 0.55));
-  border: 1px solid rgba(233, 167, 178, 0.22);
-  border-radius: 16px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  gap: 16px;
+  padding: 14px 20px 14px 14px;
+  background: rgba(27, 20, 32, 0.6);
+  border: 1px solid rgba(255, 241, 236, 0.18);
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px -15px rgba(0, 0, 0, 0.6);
   animation: sakuraGlow 4s ease-in-out infinite, floatGentle 6s ease-in-out infinite;
   pointer-events: auto;
   cursor: default;
@@ -71,28 +72,28 @@
 }
 
 .nameplate:hover {
-  border-color: rgba(233, 167, 178, 0.45);
+  border-color: rgba(240, 168, 184, 0.45);
   transform: translateY(-2px);
 }
 
 /* ─── sakura crest icon ─── */
 .crest {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(233, 167, 178, 0.18), rgba(255, 244, 237, 0.08));
-  border: 1px solid rgba(233, 167, 178, 0.3);
+  background: rgba(240, 168, 184, 0.18);
+  border: 1px solid rgba(240, 168, 184, 0.28);
   flex-shrink: 0;
   animation: crestPulse 3.5s ease-in-out infinite;
 }
 
 .crest svg {
-  color: #e9a7b2;
-  filter: drop-shadow(0 0 6px rgba(233, 167, 178, 0.5));
+  color: #f0a8b8;
+  filter: drop-shadow(0 0 6px rgba(240, 168, 184, 0.5));
 }
 
 /* ─── text block ─── */
@@ -103,18 +104,19 @@
 }
 
 .nameJp {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--f-jp), 'Shippori Mincho', serif;
   font-size: 11px;
   letter-spacing: 0.35em;
-  color: #e9a7b2;
-  opacity: 0.8;
+  color: #f0a8b8;
+  opacity: 0.85;
 }
 
 .nameEn {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  color: #fff4ed;
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  color: #fff1ec;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -128,17 +130,18 @@
 .titleLine {
   width: 18px;
   height: 1px;
-  background: linear-gradient(90deg, #e9a7b2, transparent);
+  background: linear-gradient(90deg, #f0a8b8, transparent);
   transform-origin: left;
   animation: lineReveal 0.8s ease-out 1.6s both;
 }
 
 .titleText {
-  font-size: 10px;
+  font-family: var(--f-body);
+  font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  font-weight: 300;
-  background: linear-gradient(90deg, #e9a7b2, #fff4ed, #e9a7b2);
+  font-weight: 400;
+  background: linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -150,10 +153,11 @@
 .lore {
   margin-top: 10px;
   padding-right: 4px;
-  font-size: 11px;
+  font-family: var(--f-body);
+  font-size: 12px;
   font-weight: 300;
   font-style: italic;
-  color: rgba(255, 244, 237, 0.5);
+  color: rgba(255, 241, 236, 0.65);
   text-align: right;
   max-width: 260px;
   line-height: 1.6;
@@ -167,10 +171,10 @@
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--f-jp), 'Shippori Mincho', serif;
   font-size: 13px;
-  letter-spacing: 0.3em;
-  color: #e9a7b2;
+  letter-spacing: 0.35em;
+  color: #f0a8b8;
   animation: verticalSlide 1s ease 2.2s both;
 }
 
