@@ -267,9 +267,9 @@ export default function InitialLoader({
 
         {/* ── OPENCODE 2026 ── */}
         <Text
-          fontFamily="'Cinzel', 'Georgia', serif"
+          fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
           fontSize={{ base: '28px', md: '46px' }}
-          letterSpacing="0.28em"
+          letterSpacing="0.22em"
           fontWeight="300"
           color="white"
           mb={2}
@@ -283,10 +283,10 @@ export default function InitialLoader({
 
         {/* ── Tagline ── */}
         <Text
-          fontFamily="'Inter', sans-serif"
-          fontSize={{ base: '8px', md: '11px' }}
-          letterSpacing="0.5em"
-          color="whiteAlpha.600"
+          fontFamily="var(--f-body), 'DM Sans', sans-serif"
+          fontSize={{ base: '9px', md: '12px' }}
+          letterSpacing="0.35em"
+          color="whiteAlpha.700"
           mb="72px"
           textAlign="center"
           animation={`${fadeFloat} 1s ease 0.3s forwards`}
@@ -367,8 +367,8 @@ export default function InitialLoader({
           fontSize="11px"
           color="whiteAlpha.600"
           mb={2}
-          letterSpacing="0.15em"
-          fontFamily="'Inter', sans-serif"
+          letterSpacing="0.18em"
+          fontFamily="var(--f-mono), 'DM Mono', monospace"
           animation={`${fadeFloat} 1s ease 0.6s forwards`}
           opacity={0}
         >
@@ -377,15 +377,15 @@ export default function InitialLoader({
 
         {/* ── Yuzuki welcome (Phase 1.3) ── */}
         <Text
-          fontSize="12px"
-          letterSpacing="0.25em"
-          fontFamily="Georgia, 'Times New Roman', serif"
+          fontSize="13px"
+          letterSpacing="0.28em"
+          fontFamily="var(--f-jp), 'Shippori Mincho', serif"
           mb={7}
           textAlign="center"
           animation={`${fadeFloat} 1.2s ease 2.6s forwards`}
           opacity={0}
           sx={{
-            background: `linear-gradient(90deg, #e9a7b2, #fff4ed, #e9a7b2)`,
+            background: `linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8)`,
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',

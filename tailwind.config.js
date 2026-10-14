@@ -9,7 +9,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        serif: ['var(--f-display)', 'Cormorant Garamond', 'Georgia', 'serif'],
+        sans: ['var(--f-body)', 'DM Sans', 'sans-serif'],
+        mono: ['var(--f-mono)', 'DM Mono', 'monospace'],
+        jp: ['var(--f-jp)', 'Shippori Mincho', 'serif'],
+      },
       colors: {
+        accent: {
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          ink: 'var(--accent-ink)',
+          soft: 'var(--accent-soft)',
+        },
+        ember: 'var(--ember)',
         navy: {
           50: 'var(--navy-50)',
           100: 'var(--navy-100)',

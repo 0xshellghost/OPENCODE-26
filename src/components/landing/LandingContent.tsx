@@ -23,6 +23,34 @@ export default function LandingContent() {
     if (contentRef.current) {
       const elements = contentRef.current.querySelectorAll(`.${styles.fadeInUp}`);
       elements.forEach((el) => observer.observe(el));
+
+      const cards = contentRef.current.querySelectorAll(`.${styles.featureCard}`);
+      const handlePointerMove = (e: PointerEvent) => {
+        if (e.pointerType === 'touch') return;
+        const target = e.currentTarget as HTMLElement;
+        const rect = target.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        target.style.transform = `perspective(900px) rotateX(${((0.5 - y) * 10).toFixed(1)}deg) rotateY(${((x - 0.5) * 12).toFixed(1)}deg) translateY(-4px)`;
+        target.style.setProperty('--gx', `${(x * 100).toFixed(1)}%`);
+        target.style.setProperty('--gy', `${(y * 100).toFixed(1)}%`);
+      };
+      const handlePointerLeave = (e: PointerEvent) => {
+        const target = e.currentTarget as HTMLElement;
+        target.style.transform = '';
+      };
+      cards.forEach((card) => {
+        card.addEventListener('pointermove', handlePointerMove as EventListener);
+        card.addEventListener('pointerleave', handlePointerLeave as EventListener);
+      });
+
+      return () => {
+        observer.disconnect();
+        cards.forEach((card) => {
+          card.removeEventListener('pointermove', handlePointerMove as EventListener);
+          card.removeEventListener('pointerleave', handlePointerLeave as EventListener);
+        });
+      };
     }
 
     return () => observer.disconnect();

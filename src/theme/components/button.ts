@@ -3,9 +3,10 @@ export const buttonStyles = {
   components: {
     Button: {
       baseStyle: {
-        borderRadius: "16px",
-        boxShadow: "45px 76px 113px 7px rgba(112, 144, 176, 0.08)",
-        transition: ".25s all ease",
+        borderRadius: "9999px",
+        fontFamily: "var(--f-body), sans-serif",
+        fontWeight: "500",
+        transition: "transform .2s ease, background .2s ease, box-shadow .2s ease",
         boxSizing: "border-box",
         _focus: {
           boxShadow: "none",
@@ -16,24 +17,34 @@ export const buttonStyles = {
       },
       variants: {
         outline: () => ({
-          borderRadius: "16px",
+          borderRadius: "9999px",
+          borderColor: "var(--line)",
+          color: "var(--fg)",
+          _hover: {
+            bg: "var(--surface-2)",
+            transform: "translateY(-1px)",
+          },
         }),
         brand: (props: StyleFunctionProps) => ({
-          bg: mode("brand.500", "brand.400")(props),
-          color: "white",
+          bg: mode("brand.500", "brand.200")(props),
+          color: mode("white", "#2a1420")(props),
+          borderRadius: "9999px",
+          boxShadow: mode("0 12px 36px -10px rgba(192, 74, 103, 0.4)", "0 12px 36px -10px rgba(240, 168, 184, 0.4)")(props),
           _focus: {
-            bg: mode("brand.500", "brand.400")(props),
+            bg: mode("brand.500", "brand.200")(props),
           },
           _active: {
-            bg: mode("brand.500", "brand.400")(props),
+            bg: mode("brand.500", "brand.200")(props),
           },
           _hover: {
-            bg: mode("brand.600", "brand.400")(props),
+            bg: mode("brand.600", "brand.100")(props),
+            transform: "translateY(-2px)",
           },
         }),
         darkBrand: (props: StyleFunctionProps) => ({
           bg: mode("brand.900", "brand.400")(props),
           color: "white",
+          borderRadius: "9999px",
           _focus: {
             bg: mode("brand.900", "brand.400")(props),
           },
@@ -41,7 +52,8 @@ export const buttonStyles = {
             bg: mode("brand.900", "brand.400")(props),
           },
           _hover: {
-            bg: mode("brand.800", "brand.400")(props),
+            bg: mode("brand.800", "brand.300")(props),
+            transform: "translateY(-1px)",
           },
         }),
         lightBrand: (props: StyleFunctionProps) => ({

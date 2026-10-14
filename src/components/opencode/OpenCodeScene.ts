@@ -23,13 +23,13 @@ export function createPetalScene(host: HTMLElement, parameters: SceneParameters,
     positions.setXYZ(i, x * Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.65), y, 0.28 * x * x + 0.2 * Math.sin(t * Math.PI))
   }
   geometry.computeVertexNormals()
-  const material = new THREE.MeshStandardMaterial({ color: '#f59dae', roughness: 0.7, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+  const material = new THREE.MeshStandardMaterial({ color: '#f0a8b8', roughness: 0.7, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
   const petals = new THREE.InstancedMesh(geometry, material, count)
   petals.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
   petals.frustumCulled = false
   scene.add(petals)
-  scene.add(new THREE.AmbientLight('#fff4ed', 2.3))
-  const sun = new THREE.DirectionalLight('#ffb3c1', 3.2)
+  scene.add(new THREE.AmbientLight('#fff1ec', 2.3))
+  const sun = new THREE.DirectionalLight('#ffd2a0', 3.2)
   sun.position.set(-3, 5, 8)
   scene.add(sun)
   const dummy = new THREE.Object3D()

@@ -49,18 +49,38 @@ export default extendTheme(
 				}
 			},
 			Button: {
+				baseStyle: {
+					borderRadius: '9999px',
+					fontFamily: 'var(--f-body), sans-serif',
+					fontWeight: '500',
+					transition: 'transform 0.2s, background 0.2s, box-shadow 0.2s',
+				},
 				variants: {
 					solid: {
-						bg: opencodeTokens.colors.accent.sakura,
-						color: opencodeTokens.colors.background.base,
+						bg: 'var(--accent)',
+						color: 'var(--accent-ink)',
+						borderRadius: '9999px',
+						boxShadow: '0 12px 36px -10px var(--accent)',
 						_hover: {
-							bg: opencodeTokens.colors.accent.sakuraHover,
-							boxShadow: opencodeTokens.shadows.glow,
+							bg: 'var(--accent)',
+							transform: 'translateY(-2px)',
+							boxShadow: '0 16px 40px -8px var(--accent)',
 						}
 					},
 					ghost: {
+						borderRadius: '9999px',
 						_hover: {
-							bg: opencodeTokens.colors.background.glassLight,
+							bg: 'var(--surface-2)',
+							transform: 'translateY(-1px)',
+						}
+					},
+					outline: {
+						borderRadius: '9999px',
+						borderColor: 'var(--line)',
+						color: 'var(--fg)',
+						_hover: {
+							bg: 'var(--surface-2)',
+							transform: 'translateY(-1px)',
 						}
 					}
 				}
