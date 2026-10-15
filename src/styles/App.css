@@ -374,6 +374,15 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
   .oc-winner p { font-size: 12px; }
   .oc-winner-score span { display: inline; margin-left: 6px; }
 }
+@keyframes shiny-text {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }

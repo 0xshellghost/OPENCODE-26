@@ -1,8 +1,5 @@
 'use client';
 
-import { ArrowRight, Github, Users } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 import OpenCodeExperience from '../opencode/OpenCodeExperience';
 import LandingContent from './LandingContent';
 import ThemeToggle from 'components/japanese/ThemeToggle';
@@ -21,14 +18,14 @@ export default function LandingPage() {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: 'OpenCode 2026',
-    description: 'A season of ideas, collaboration, and open-source possibilities — guided by Yuzuki, Queen of Sakura.',
+    description: 'A season of ideas, collaboration, and open-source possibilities — guided by Yuzuki.',
     organizer: { '@type': 'Organization', name: 'GeekHaven, IIIT Allahabad' },
     character: {
       '@type': 'Thing',
       name: 'Yuzuki',
       alternateName: 'ゆづき',
-      description: 'The guardian spirit of OpenCode, guiding creators through the cherry blossom season.',
-      additionalProperty: { '@type': 'PropertyValue', name: 'title', value: 'Queen of Sakura' },
+      description: 'An original character created for Opencode 2026, inspired by Japanese cherry blossom folklore.',
+      additionalProperty: { '@type': 'PropertyValue', name: 'role', value: 'Guide of the season' },
     },
   };
 

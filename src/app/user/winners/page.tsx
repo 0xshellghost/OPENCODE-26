@@ -17,6 +17,9 @@ import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import BlurText from '../../../components/reactbits/BlurText';
+import ShinyText from '../../../components/reactbits/ShinyText';
+import ClickSpark from '../../../components/reactbits/ClickSpark';
 import {
   FaCrown,
   FaTrophy,
@@ -477,10 +480,12 @@ function WinnersHeader() {
     <header className="oc-page-heading" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: '12px' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px' }}>
-          <span />HALL OF FAME<span />
+          <span />
+          <ShinyText text="HALL OF FAME" speed={5} shineColor="#ffded2" />
+          <span />
         </p>
         <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)' }}>
-          Legacy of Legends
+          <BlurText text="Legacy of Legends" delay={50} animateBy="words" direction="top" />
         </h1>
         <p className="oc-description" style={{ textAlign: 'center', maxWidth: '540px', margin: 0 }}>
           Top Performers and their Journey through Opencode
@@ -535,63 +540,63 @@ export default function WinnersPodiumComparisonPage() {
   }, [query.data, users, labels]);
 
   return (
-    <Box minH="100vh" position="relative" overflow="hidden">
-      <Box position="relative" zIndex={1}>
+    <ClickSpark sparkColor="rgba(245, 197, 66, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
+      <Box minH="100vh" position="relative" overflow="hidden">
+        <Box position="relative" zIndex={1}>
 
-        <Stack spacing="36px">
-          <WinnersHeader />
+          <Stack spacing="36px">
+            <WinnersHeader />
 
-          <TopThreeCards
-            winners={tab === 0 ? OVERALL_WINNERS : COLLEGE_WINNERS}
-          />
+            <TopThreeCards
+              winners={tab === 0 ? OVERALL_WINNERS : COLLEGE_WINNERS}
+            />
 
-          <Tabs index={tab} onChange={setTab} variant="soft-rounded" colorScheme="purple">
-            <TabList>
-              <Tab>Overall</Tab>
-              <Tab>IIIT A</Tab>
-            </TabList>
+            <Tabs index={tab} onChange={setTab} variant="soft-rounded" colorScheme="purple">
+              <TabList>
+                <Tab>Overall</Tab>
+                <Tab>IIIT A</Tab>
+              </TabList>
 
+              <TabPanels>
+                <TabPanel>
+                  <Box position="relative">
+                    <OverallSideStats />
+                    <Podium
+                      winners={OVERALL_WINNERS.slice(0, 3)}
+                      colors={OVERALL_COLORS}
+                    />
+                  </Box>
+                </TabPanel>
 
+                <TabPanel>
+                  <Box position="relative">
+                    <OverallSideStats />
+                    <Podium winners={COLLEGE_WINNERS.slice(0, 5)} colors={COLLEGE_COLORS} />
+                  </Box>
 
-            <TabPanels>
-              <TabPanel>
-                <Box position="relative">
-                  <OverallSideStats />
-                  <Podium
-                    winners={OVERALL_WINNERS.slice(0, 3)}
-                    colors={OVERALL_COLORS}
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+
+            {(query.isLoading || (chartData && !query.isError)) && (
+              <Box h="380px">
+                {query.isLoading && <Skeleton h="100%" />}
+                {!query.isLoading && chartData && (
+                  <Line
+                    data={chartData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: { legend: { position: 'bottom' } },
+                      scales: { x: { ticks: { maxTicksLimit: 8 } } },
+                    }}
                   />
-                </Box>
-              </TabPanel>
-
-              <TabPanel>
-                <Box position="relative">
-                  <OverallSideStats />
-                  <Podium winners={COLLEGE_WINNERS.slice(0, 5)} colors={COLLEGE_COLORS} />
-                </Box>
-
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
-
-          {(query.isLoading || (chartData && !query.isError)) && (
-            <Box h="380px">
-              {query.isLoading && <Skeleton h="100%" />}
-              {!query.isLoading && chartData && (
-                <Line
-                  data={chartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    scales: { x: { ticks: { maxTicksLimit: 8 } } },
-                  }}
-                />
-              )}
-            </Box>
-          )}
-        </Stack>
+                )}
+              </Box>
+            )}
+          </Stack>
+        </Box>
       </Box>
-    </Box>
+    </ClickSpark>
   );
 }

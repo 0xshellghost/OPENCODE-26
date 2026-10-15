@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Code2, Users, Trophy, GitPullRequest, Globe, Zap, Heart } from 'lucide-react';
+import { FaCode, FaUsers, FaTrophy, FaArrowRight } from 'react-icons/fa';
 import styles from './landing-content.module.css';
 
 export default function LandingContent() {
@@ -86,21 +86,21 @@ export default function LandingContent() {
 
         <div className={`${styles.featuresGrid} ${styles.fadeInUp}`}>
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}><Code2 size={22} strokeWidth={1.5} /></div>
+            <div className={styles.featureIcon}><FaCode size={20} /></div>
             <h3 className={styles.featureTitle}>Real-World Coding</h3>
             <p className={styles.featureDescription}>
               Step out of the classroom and dive into production codebases. Fix bugs, add features, and learn best practices.
             </p>
           </div>
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}><Users size={22} strokeWidth={1.5} /></div>
+            <div className={styles.featureIcon}><FaUsers size={20} /></div>
             <h3 className={styles.featureTitle}>Vibrant Community</h3>
             <p className={styles.featureDescription}>
               Join a network of passionate developers. Get mentored by experienced maintainers and collaborate with peers.
             </p>
           </div>
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}><Trophy size={22} strokeWidth={1.5} /></div>
+            <div className={styles.featureIcon}><FaTrophy size={19} /></div>
             <h3 className={styles.featureTitle}>Earn Rewards</h3>
             <p className={styles.featureDescription}>
               Every merged PR earns you points. Climb the leaderboard, unlock exclusive badges, and win exciting prizes.
@@ -164,7 +164,7 @@ export default function LandingContent() {
           Join thousands of developers in the largest open-source celebration. Your first contribution is just a click away.
         </p>
         <Link href="/auth/register" className={styles.joinButton}>
-          Join OpenCode 2026 <ArrowRight size={18} />
+          Join OpenCode 2026 <FaArrowRight size={14} />
         </Link>
       </section>
     </div>
