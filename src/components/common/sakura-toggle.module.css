@@ -2,16 +2,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid var(--border);
-  background: var(--card-bg);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: var(--muted);
+  color: var(--fg);
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   flex-shrink: 0;
 }
 

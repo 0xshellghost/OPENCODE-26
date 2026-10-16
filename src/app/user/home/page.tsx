@@ -27,5 +27,6 @@ export default function Dashboard() {
     }
   }, [auth]);
 
+
   return <EventCollection events={eventData?.data || []} loading={isLoading} error={isError} retry={() => refetch()} />;
 }

@@ -13,6 +13,7 @@ const navigation = [
   { label: 'Sign In with GitHub', href: GITHUB_LOGIN_URL },
 ];
 
+
 export default function LandingPage() {
   const yuzukiJsonLd = {
     '@context': 'https://schema.org',

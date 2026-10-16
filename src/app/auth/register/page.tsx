@@ -12,7 +12,7 @@ import SiteNavbar from 'components/navbar/SiteNavbar';
 import RegistrationField from 'components/japanese/RegistrationField';
 
 export default function Register() {
-  const [formData, setFormData] = useState({ name: '', email: '', gender: '', degree: 'BTECH', branch: 'IT', college: 'IIIT Allahabad', discordId: '', githubId: '', graduationYear: '', avatarUrl: '', year: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', gender: '', degree: '', branch: '', college: 'IIIT Allahabad', discordId: '', githubId: '', graduationYear: '', avatarUrl: '', year: '' });
   const [collegeType, setCollegeType] = useState('IIIT Allahabad');
   const [otherCollege, setOtherCollege] = useState('');
   const toast = useToast();
@@ -80,7 +80,7 @@ export default function Register() {
           <RegistrationField name="degree" label="Degree" value={formData.degree} onChange={handleChange} options={['BTECH', 'MTECH', 'PHD', 'Other']} />
           <RegistrationField name="branch" label="Branch" value={formData.branch} onChange={handleChange} placeholder="Your field of study" />
           <RegistrationField name="year" label="Current year" value={formData.year} onChange={handleChange} options={['School', '1st Year', '2nd Year', '3rd Year', '4th Year', 'Passout']} />
-          <RegistrationField name="graduationYear" label="Graduation year" value={formData.graduationYear} onChange={handleChange} placeholder="2028" type="number" />
+          <RegistrationField name="graduationYear" label="Graduation year" value={formData.graduationYear} onChange={handleChange} placeholder="Graduation year" type="number" />
         </div></section>
         <Button type="submit" width="100%" height="48px" bg="var(--accent)" color="var(--accent-ink)" borderRadius="10px" fontSize="13px" _hover={{ bg: 'var(--accent-hover)' }} isLoading={registerMutation.isPending} loadingText="Creating your profile" rightIcon={<ArrowRight size={16} />}>Begin your journey</Button>
         <p className="oc-auth-fineprint">All fields are required. Let&apos;s make your profile feel like you.</p>

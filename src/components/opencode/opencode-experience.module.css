@@ -2,7 +2,7 @@
   --oc-ink: #1b1420;
   --oc-paper: #fff1ec;
   --oc-rose: #f0a8b8;
-  --oc-muted: #c7b0b9;
+  --oc-muted: #f0d6d9;
   --oc-surface: #241a2b;
   --oc-ember: #ff8f6b;
   position: relative;
@@ -26,55 +26,75 @@
 .heroArt img, .passageArt img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 58% center; }
 .passageArt { opacity: 0; }
 .passageArt img { object-position: 48% center; }
-.readability { background: linear-gradient(90deg, color-mix(in srgb, var(--oc-ink) 48%, transparent), transparent 75%), linear-gradient(0deg, color-mix(in srgb, var(--oc-ink) 65%, transparent), transparent 25%, transparent 78%, color-mix(in srgb, var(--oc-ink) 22%, transparent)); }
+.readability {
+  background:
+    linear-gradient(90deg,
+      rgba(20, 14, 25, 0.90) 0%,
+      rgba(20, 14, 25, 0.78) 32%,
+      rgba(20, 14, 25, 0.45) 58%,
+      rgba(20, 14, 25, 0.12) 80%,
+      transparent 100%
+    ),
+    linear-gradient(180deg,
+      rgba(20, 14, 25, 0.85) 0%,
+      rgba(20, 14, 25, 0.50) 12%,
+      transparent 24%
+    ),
+    linear-gradient(0deg,
+      rgba(20, 14, 25, 0.92) 0%,
+      rgba(20, 14, 25, 0.55) 14%,
+      transparent 28%
+    );
+}
 .mist { opacity: 0; background: linear-gradient(135deg, var(--oc-muted), var(--oc-paper) 54%, var(--oc-muted)); }
 .night { opacity: 0; background: var(--oc-ink); }
 .canvas { z-index: -1; }
 .canvas canvas { display: block; width: 100%; height: 100%; }
 .header { position: absolute; inset: 0 0 auto; z-index: 5; padding: 38px 4.2%; display: flex; align-items: center; gap: 48px; }
-.wordmark { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; }
-.wordmark span { font-size: 24px; font-weight: 300; letter-spacing: .25em; text-transform: uppercase; }
-.wordmark svg { fill: color-mix(in srgb, var(--oc-paper) 35%, transparent); }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.9); }
+.wordmark span { font-size: 24px; font-weight: 400; letter-spacing: .25em; text-transform: uppercase; color: var(--oc-paper); }
+.wordmark svg { color: var(--oc-rose); fill: rgba(240, 168, 184, 0.25); filter: drop-shadow(0 0 6px rgba(240, 168, 184, 0.45)); }
 .desktopNav { display: flex; align-items: center; gap: 31px; }
-.desktopNav a { font-size: 14px; font-family: var(--f-body); letter-spacing: .025em; transition: opacity 180ms; }
-.desktopNav a:hover { opacity: .65; }
-.experience .enterButton { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; padding: 9px 20px; border: 1px solid color-mix(in srgb, var(--oc-paper) 40%, transparent); border-radius: 999px; font-size: 13px; font-family: var(--f-body); font-weight: 400; text-transform: uppercase; letter-spacing: .09em; white-space: nowrap; transition: background .2s, transform .2s; }
-.experience .enterButton:hover { background: color-mix(in srgb, var(--oc-paper) 12%, transparent); transform: translateY(-1px); }
+.desktopNav a { font-size: 14px; font-family: var(--f-body); font-weight: 500; letter-spacing: .025em; color: rgba(255, 241, 236, 0.94); text-shadow: 0 2px 10px rgba(10, 6, 14, 0.9); transition: opacity 180ms, color 180ms; }
+.desktopNav a:hover { opacity: 1; color: #ffd0dc; text-shadow: 0 0 12px rgba(240, 168, 184, 0.6); }
+.experience .enterButton { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; padding: 10px 22px; background: rgba(36, 26, 43, 0.78); border: 1px solid rgba(240, 168, 184, 0.45); border-radius: 999px; font-size: 13px; font-family: var(--f-body); font-weight: 600; text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; color: #fff1ec; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(240, 168, 184, 0.12); transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
+.experience .enterButton:hover { background: rgba(192, 74, 103, 0.38); border-color: var(--oc-rose); color: #ffffff; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(240, 168, 184, 0.4); }
 .enterButton svg, .finalCta svg { transition: transform 200ms; }
 .enterButton:hover svg, .finalCta:hover svg { transform: translateX(4px); }
 .experience .menuButton { display: none; }
 .intro { position: absolute; top: 31%; left: 3%; right: 8%; display: flex; align-items: flex-start; gap: 34px; }
-.japanese { font-family: var(--f-jp), 'Shippori Mincho', serif; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 5px 29px 4px 0; border-right: 1px solid color-mix(in srgb, var(--oc-paper) 28%, transparent); }
-.japanese > span:first-child { writing-mode: vertical-rl; font-size: 18px; letter-spacing: .5em; }
-.seal { color: var(--oc-rose); border: 1px solid var(--oc-rose); border-radius: 4px; font-size: 18px; line-height: 1; padding: 2px; opacity: .9; }
+.japanese { font-family: var(--f-jp), 'Shippori Mincho', serif; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 5px 29px 4px 0; border-right: 1px solid rgba(240, 168, 184, 0.4); }
+.japanese > span:first-child { writing-mode: vertical-rl; font-size: 18px; letter-spacing: .5em; color: #fff1ec; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.seal { color: #ffd0dc; background: rgba(192, 74, 103, 0.35); border: 1px solid var(--oc-rose); border-radius: 4px; font-size: 18px; font-weight: 700; line-height: 1; padding: 3px; box-shadow: 0 0 14px rgba(240, 168, 184, 0.4); }
 .heroCopy { display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
-.eyebrow { text-transform: uppercase; font-family: var(--f-body); font-size: 12px; letter-spacing: .28em; font-weight: 400; line-height: 1.6; color: var(--oc-muted); }
-.title { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(64px, 7.5vw, 126px); letter-spacing: .14em; font-weight: 300; line-height: 1.05; padding-top: 8px; text-wrap: balance; text-shadow: 0 4px 40px rgba(27, 20, 32, .6); }
+.eyebrow { text-transform: uppercase; font-family: var(--f-body); font-size: 12px; letter-spacing: .3em; font-weight: 600; line-height: 1.6; color: #ffd0dc; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.title { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(64px, 7.5vw, 126px); letter-spacing: .14em; font-weight: 300; line-height: 1.05; padding-top: 8px; text-wrap: balance; color: #fff1ec; text-shadow: 0 4px 24px rgba(10, 6, 14, 0.95), 0 1px 4px rgba(0, 0, 0, 0.8); }
 .title:focus { outline: none; }
-.title span { display: block; font-style: normal; font-weight: 300; letter-spacing: .28em; font-size: .62em; margin-top: .12em; background: linear-gradient(90deg, #ffd9c2, var(--scene-pink, #f0a8b8)); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.1; }
-.mantra { display: flex; gap: 20px; text-transform: uppercase; letter-spacing: .3em; font-size: 13px; font-weight: 400; padding-top: 36px; font-family: var(--f-body); }
-.mantra span { opacity: .6; }
-.heroDescription { font-size: 15px; font-family: var(--f-body); font-weight: 400; line-height: 1.6; max-width: 320px; padding-top: 23px; color: var(--oc-muted); }
-.experience .meetGuideBtn { margin-top: 22px; display: inline-flex; align-items: center; gap: 9px; padding: 8px 18px; border: 1px solid color-mix(in srgb, var(--oc-paper) 24%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--oc-paper) 6%, transparent); color: var(--oc-paper); font-size: 13px; font-family: var(--f-body); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
-.experience .meetGuideBtn:hover { background: color-mix(in srgb, var(--oc-rose) 18%, transparent); border-color: var(--oc-rose); transform: translateY(-1px); }
-.experience .meetGuideBtn svg { color: var(--oc-rose); }
+.title span { display: block; font-style: normal; font-weight: 300; letter-spacing: .28em; font-size: .62em; margin-top: .12em; background: linear-gradient(90deg, #ffe0d0, #f0a8b8); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1.1; filter: drop-shadow(0 4px 18px rgba(10, 6, 14, 0.9)); }
+.mantra { display: flex; gap: 20px; text-transform: uppercase; letter-spacing: .32em; font-size: 13px; font-weight: 600; padding-top: 36px; font-family: var(--f-body); color: #fff1ec; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.mantra span { color: var(--oc-rose); opacity: 1; font-weight: 700; }
+.heroDescription { font-size: 15px; font-family: var(--f-body); font-weight: 400; line-height: 1.7; max-width: 340px; padding-top: 23px; color: rgba(255, 241, 236, 0.94); text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.experience .meetGuideBtn { margin-top: 24px; display: inline-flex; align-items: center; gap: 10px; padding: 10px 22px; border: 1px solid rgba(240, 168, 184, 0.5); border-radius: 999px; background: rgba(36, 26, 43, 0.82); color: #fff1ec; font-size: 13px; font-family: var(--f-body); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(240, 168, 184, 0.15); transition: background .25s ease, border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
+.experience .meetGuideBtn:hover { background: rgba(192, 74, 103, 0.38); border-color: var(--oc-rose); box-shadow: 0 10px 30px rgba(240, 168, 184, 0.4); transform: translateY(-2px); color: #ffffff; }
+.experience .meetGuideBtn svg { color: var(--oc-rose); filter: drop-shadow(0 0 4px var(--oc-rose)); }
 .passageCopy { position: absolute; inset: 42% 10% auto; text-align: center; opacity: 0; display: flex; flex-direction: column; gap: 16px; }
-.passageCopy h2 { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(34px, 5.2vw, 76px); font-weight: 300; letter-spacing: .02em; text-wrap: balance; }
-.passageCopy > p:last-child { font-size: 16px; font-family: var(--f-body); font-weight: 400; }
+.passageCopy .eyebrow { color: #ffd0dc; font-weight: 600; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.passageCopy h2 { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(34px, 5.2vw, 76px); font-weight: 300; letter-spacing: .02em; text-wrap: balance; color: #fff1ec; text-shadow: 0 4px 30px rgba(10, 6, 14, 0.95); }
+.passageCopy > p:last-child { font-size: 16px; font-family: var(--f-body); font-weight: 500; color: rgba(255, 241, 236, 0.92); text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
 .chapters { position: absolute; top: 44%; right: 4.4%; display: flex; flex-direction: column; align-items: center; gap: 22px; }
-.chapterLabel { position: absolute; right: 38px; top: -40px; transform: rotate(-90deg); transform-origin: right center; text-transform: uppercase; font-family: var(--f-mono); font-size: 12px; font-weight: 400; letter-spacing: .14em; opacity: .75; }
-.chapterTrack { position: absolute; top: 7px; bottom: 7px; right: -13px; width: 1px; background: color-mix(in srgb, var(--oc-paper) 22%, transparent); }
-.chapterTrack span { display: block; width: 1px; height: 100%; background: var(--oc-paper); transform: scaleY(0); transform-origin: top; }
-.experience .chapters button { font-family: var(--f-mono); font-size: 13px; font-weight: 400; letter-spacing: .12em; opacity: .45; transition: opacity 250ms; min-width: 26px; min-height: 24px; }
-.experience .chapters button:hover, .experience .chapters .activeChapter { opacity: 1; }
+.chapterLabel { position: absolute; right: 38px; top: -40px; transform: rotate(-90deg); transform-origin: right center; text-transform: uppercase; font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: .16em; color: var(--oc-rose); text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+.chapterTrack { position: absolute; top: 7px; bottom: 7px; right: -13px; width: 2px; background: rgba(240, 168, 184, 0.3); border-radius: 2px; }
+.chapterTrack span { display: block; width: 2px; height: 100%; background: var(--oc-rose); box-shadow: 0 0 10px var(--oc-rose); transform: scaleY(0); transform-origin: top; }
+.experience .chapters button { font-family: var(--f-mono); font-size: 13px; font-weight: 600; letter-spacing: .12em; color: #fff1ec; opacity: .75; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); transition: opacity 250ms, color 250ms, transform 200ms; min-width: 26px; min-height: 24px; }
+.experience .chapters button:hover, .experience .chapters .activeChapter { opacity: 1; color: #ffd0dc; transform: scale(1.15); text-shadow: 0 0 14px rgba(240, 168, 184, 0.8); }
 .bottomBar { position: absolute; inset: auto 4.2% 35px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.experience .scrollCue { display: inline-flex; align-items: center; gap: 17px; font-size: 13px; font-family: var(--f-body); letter-spacing: .16em; text-transform: uppercase; font-weight: 400; }
-.scrollCircle { position: relative; width: 39px; height: 39px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--oc-paper) 60%, transparent); border-radius: 50%; }
-.scrollCircle::before, .scrollCircle::after { content: ''; position: absolute; width: 8px; height: 1px; background: var(--oc-paper); opacity: .55; }
+.experience .scrollCue { display: inline-flex; align-items: center; gap: 17px; font-size: 13px; font-family: var(--f-body); letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: #fff1ec; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95); }
+.scrollCircle { position: relative; width: 39px; height: 39px; display: inline-flex; align-items: center; justify-content: center; background: rgba(36, 26, 43, 0.78); border: 1px solid rgba(240, 168, 184, 0.5); border-radius: 50%; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); }
+.scrollCircle::before, .scrollCircle::after { content: ''; position: absolute; width: 8px; height: 1px; background: var(--oc-rose); opacity: .8; }
 .scrollCircle::before { left: -5px; }
 .scrollCircle::after { right: -5px; }
 .scrollCue:hover .scrollCircle svg { transform: translateY(3px); }
-.scrollCircle svg { transition: transform 200ms; }
+.scrollCircle svg { color: var(--oc-rose); transition: transform 200ms; }
 .journeyCaption {
   text-align: center;
   display: flex;
@@ -93,35 +113,37 @@
 }
 .captionTitle {
   font-size: 11px;
-  letter-spacing: .22em;
+  letter-spacing: .24em;
   text-transform: uppercase;
-  color: var(--oc-rose);
-  font-weight: 500;
+  color: #ffd0dc;
+  font-weight: 700;
   line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
 }
 .captionSubtitle {
   font-size: 12px;
-  font-weight: 300;
-  color: var(--oc-muted);
-  letter-spacing: .02em;
+  font-weight: 400;
+  color: rgba(255, 241, 236, 0.94);
+  letter-spacing: .03em;
   line-height: 1.3;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
 }
-.motionControls { display: flex; gap: 26px; align-items: center; }
-.experience .motionButton, .experience .skipButton { display: flex; align-items: center; gap: 8px; font-size: 13px; font-family: var(--f-body); font-weight: 400; opacity: .8; }
-.experience .motionButton:hover, .experience .skipButton:hover { opacity: 1; }
+.motionControls { display: flex; gap: 16px; align-items: center; }
+.experience .motionButton, .experience .skipButton { display: flex; align-items: center; gap: 8px; font-size: 13px; font-family: var(--f-body); font-weight: 600; color: #fff1ec; padding: 8px 16px; background: rgba(36, 26, 43, 0.78); border: 1px solid rgba(240, 168, 184, 0.38); border-radius: 999px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45); transition: background .2s, border-color .2s, box-shadow .2s; opacity: 1; }
+.experience .motionButton:hover, .experience .skipButton:hover { background: rgba(192, 74, 103, 0.35); border-color: var(--oc-rose); box-shadow: 0 6px 20px rgba(240, 168, 184, 0.35); color: #ffffff; }
 .finale { position: absolute; inset: 15% 11% 16% 9%; display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 48px; opacity: 0; perspective: 1100px; }
 .map { transform-style: preserve-3d; }
 .mapFigure { color: var(--oc-rose); }
 .mapSvg { display: block; width: 100%; max-height: 57svh; overflow: visible; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--oc-rose) 45%, transparent)); }
 .mapCaption { text-align: center; font-size: 13px; font-family: var(--f-mono); font-weight: 400; letter-spacing: .06em; color: var(--oc-muted); padding-top: 12px; }
 .finaleCopy { display: flex; flex-direction: column; align-items: flex-start; gap: 26px; }
-.finaleCopy .eyebrow { font-size: 12px; font-family: var(--f-body); letter-spacing: .28em; color: var(--oc-rose); }
-.finaleCopy h2 { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(32px, 3.5vw, 58px); font-weight: 300; letter-spacing: .01em; line-height: 1.15; text-wrap: balance; }
-.finaleCopy h2 span { color: var(--oc-rose); font-weight: 300; }
-.finaleCopy > p:not(.eyebrow) { color: var(--oc-muted); font-family: var(--f-body); font-weight: 400; font-size: 16px; line-height: 1.65; max-width: 360px; }
-.experience .finalCta { display: inline-flex; align-items: center; gap: 24px; padding: 14px 28px; background: var(--oc-rose); color: var(--oc-ink); font-size: 14px; font-family: var(--f-body); font-weight: 500; border-radius: 999px; box-shadow: 0 12px 36px -10px var(--oc-rose); transition: transform .2s, box-shadow .2s; }
-.experience .finalCta:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -8px var(--oc-rose); }
-.experience .replay { color: var(--oc-muted); font-size: 14px; font-family: var(--f-body); display: inline-flex; align-items: center; gap: 9px; }
+.finaleCopy .eyebrow { font-size: 12px; font-family: var(--f-body); letter-spacing: .28em; color: #ffd0dc; font-weight: 600; text-shadow: 0 2px 12px rgba(10, 6, 14, 0.95); }
+.finaleCopy h2 { font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif; font-size: clamp(32px, 3.5vw, 58px); font-weight: 300; letter-spacing: .01em; line-height: 1.15; text-wrap: balance; color: #fff1ec; text-shadow: 0 4px 30px rgba(10, 6, 14, 0.95); }
+.finaleCopy h2 span { color: var(--oc-rose); font-weight: 400; text-shadow: 0 0 24px rgba(240, 168, 184, 0.5); }
+.finaleCopy > p:not(.eyebrow) { color: rgba(255, 241, 236, 0.92); font-family: var(--f-body); font-weight: 400; font-size: 16px; line-height: 1.7; max-width: 360px; text-shadow: 0 2px 14px rgba(10, 6, 14, 0.95); }
+.experience .finalCta { display: inline-flex; align-items: center; gap: 24px; padding: 14px 32px; background: linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%); color: #1f0f18; font-size: 14px; font-family: var(--f-body); font-weight: 700; border-radius: 999px; box-shadow: 0 12px 36px -10px rgba(240, 168, 184, 0.6); transition: transform .2s, box-shadow .2s, background .2s; }
+.experience .finalCta:hover { background: linear-gradient(135deg, #ffd0dc 0%, #f0a8b8 100%); color: #1f0f18; transform: translateY(-2px); box-shadow: 0 16px 40px -8px rgba(240, 168, 184, 0.8); }
+.experience .replay { color: #ffd0dc; font-size: 14px; font-family: var(--f-body); font-weight: 500; display: inline-flex; align-items: center; gap: 9px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 .mobileNav { position: absolute; top: 82px; right: 5%; left: 5%; display: flex; flex-direction: column; background: var(--oc-ink); color: var(--oc-paper); border: 1px solid color-mix(in srgb, var(--oc-paper) 20%, transparent); padding: 16px 24px; border-radius: var(--r); }
 .mobileNav a, .experience .mobileNav button { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; font-size: 16px; font-family: var(--f-body); }
 

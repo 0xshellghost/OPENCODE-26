@@ -76,3 +76,4 @@ export async function FetchedRepos(eventName: string) {
   const reposData = await response.json();
   return reposData;
 }
+

@@ -12,6 +12,7 @@ type RowObj = {
 };
 
 export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> => {
+
   try {
     const response = await fetch(`${LEADERBOARD_API_URL}${eventName}/leaderboard`);
     
@@ -27,3 +28,4 @@ export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> =
     throw error; 
   }
 };
+

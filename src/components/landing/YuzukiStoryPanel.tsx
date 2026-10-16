@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { ArrowRight, FastForward, RotateCcw, X } from 'lucide-react';
 import { YUZUKI_CHARACTER, YUZUKI_STORY_LINES } from '../../content/yuzuki-story';
 import styles from './yuzuki-guide.module.css';
@@ -170,10 +171,10 @@ export default function YuzukiStoryPanel({
           {/* Ending Actions (after last line appears) */}
           {isComplete && (
             <div className={styles.endingSection}>
-              <a href={YUZUKI_CHARACTER.ctaHref} className={styles.contributeButton}>
+              <Link href={YUZUKI_CHARACTER.ctaHref} className={styles.contributeButton}>
                 <span>{YUZUKI_CHARACTER.ctaText}</span>
-                <ArrowRight size={16} aria-hidden="true" />
-              </a>
+                <ArrowRight size={16} aria-hidden="true" strokeWidth={2.5} />
+              </Link>
               <p className={styles.endingNote}>{YUZUKI_CHARACTER.endingNote}</p>
             </div>
           )}

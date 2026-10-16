@@ -70,8 +70,13 @@ export default function ReposPage() {
           <Text color={mutedText} fontSize="16px" maxW="600px">
             {filteredRepos.length} repositories to explore
           </Text>
-          <Box w={{ base: "100%", md: "300px" }}>
-            <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} />
+          <Box w={{ base: "100%", md: "340px" }}>
+            <SearchProfileBanner
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search by Repo name or Keywords"
+              w="100%"
+            />
           </Box>
         </Flex>
       </Flex>

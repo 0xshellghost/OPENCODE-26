@@ -30,14 +30,11 @@ export interface ProfileData {
 }
 
 export default function ProfileSelf() {
-
   useEffect(() => {
-    const githubID = JSON.parse(localStorage.getItem('user') ?? '{}')?.githubId;
- 
-    // console.log('GitHub ID from localStorage:', githubID);
-
+    const cached = JSON.parse(localStorage.getItem('user') ?? '{}');
+    const githubID = cached?.githubId;
     if (githubID) redirect(`/user/profile/${githubID}`);
-    
     else redirect('/auth/sign-in');
   }, []);
 }
+
