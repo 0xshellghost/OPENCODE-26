@@ -29,7 +29,7 @@ export async function fetchLoggedInBasicDetails() {
 
 export async function sendRegData(formData: any) {
   try {
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/register`,
       {
@@ -57,7 +57,8 @@ export async function sendRegData(formData: any) {
 }
 
 export async function getUserProfileByName(profileName: string) {
-  const token = localStorage.getItem('token');
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${profileName}/${process.env.NEXT_PUBLIC_EVENT_NAME}`,

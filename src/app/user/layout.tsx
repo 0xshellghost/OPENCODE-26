@@ -3,7 +3,7 @@
 import { PropsWithChildren, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { CalendarDays, Trophy, Flag, FolderGit2, UserRound, ArrowUpRight } from 'lucide-react';
+import { CalendarDays, Trophy, Flag, FolderGit2, UserRound, ArrowUpRight, Palette } from 'lucide-react';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
 import { useAuth } from 'contexts/AuthContext';
@@ -11,6 +11,7 @@ import { useAuth } from 'contexts/AuthContext';
 const sections = [
   { label: 'Events', href: '/user/home', icon: CalendarDays },
   { label: 'Leaderboard', href: '/user/leaderboard', icon: Trophy },
+  { label: 'RPlace Canvas', href: '/user/rplace', icon: Palette },
   { label: 'Winners', href: '/user/winners', icon: Trophy },
   { label: 'Milestones', href: '/user/milestones', icon: Flag },
   { label: 'Repositories', href: '/user/repos', icon: FolderGit2 },

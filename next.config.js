@@ -25,6 +25,9 @@ const nextConfig = {
     ],
     unoptimized: process.env.NODE_ENV === 'development',
   },
+  experimental: {
+    optimizePackageImports: ['@chakra-ui/react', 'lucide-react', 'react-icons'],
+  },
 };
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({

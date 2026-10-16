@@ -1,7 +1,7 @@
 'use client';
 
 
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState, useCallback } from 'react';
 import { FaSearchMinus } from 'react-icons/fa';
 
 import {
@@ -101,11 +101,11 @@ export default function EventName() {
   const isStale = deferredTableData !== filteredTableData;
   const participantCount = filteredTableData.length;
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     setSelectedCollege('All');
     setFirstYearOnly(false);
     setSearchQuery('');
-  };
+  }, []);
 
   if (isLoading) {
     return <LeaderboardLoader />;
@@ -426,7 +426,7 @@ export default function EventName() {
         pointerEvents={isStale ? 'none' : 'auto'}
       >
         <ColumnsTable
-          tableData={filteredTableData}
+          tableData={deferredTableData}
           eventName={decodeURIComponent(eventName ?? '')}
         />
       </Box>
