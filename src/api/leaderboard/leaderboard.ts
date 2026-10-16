@@ -1,21 +1,23 @@
 import { USE_SEED_DATA, seedLeaderboard } from 'constants/seedData';
 
 const LEADERBOARD_API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`;
-type RowObj = {
-	position:number;
+export type LeaderboardEntry = {
+	position: number;
 	name: string;
-	prmerged: string;
+	prmerged: string | number;
 	githubid: string;
-	points: string;
-  avatarUrl: string,
-  prDetailsURL: string,
-  collegeName?: string,
-  graduationYear?: string | number,
+	points: string | number;
+  avatarUrl: string;
+  prDetailsURL: string;
+  collegeName?: string;
+  graduationYear?: string | number;
 };
 
-export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> => {
+export type RowObj = LeaderboardEntry;
+
+export const FetchedLeaderboard = async (eventName: string): Promise<LeaderboardEntry[]> => {
   if (USE_SEED_DATA) {
-    return Promise.resolve(seedLeaderboard as RowObj[]);
+    return Promise.resolve(seedLeaderboard as LeaderboardEntry[]);
   }
 
   try {

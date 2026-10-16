@@ -24,7 +24,7 @@ import ColumnsTable, {
   type RowObj,
 } from 'views/admin/dataTables/components/ColumnsTable';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
-import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
+import { FetchedLeaderboard, type LeaderboardEntry } from 'api/leaderboard/leaderboard';
 import { FetchedEvents } from 'api/events/events';
 
 interface LeaderboardViewProps {
@@ -78,12 +78,14 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
   const menuHover = opencodeTokens.colors.background.glassLight;
   const menuBorder = opencodeTokens.colors.border.light;
 
-  const { data: LeadData, isLoading } = useQuery({
+  const leaderboardQuery = useQuery<LeaderboardEntry[]>({
     queryKey: ['LeadInfo', activeEvent],
     queryFn: () => FetchedLeaderboard(activeEvent),
     refetchInterval: 10000,
     enabled: !!activeEvent,
   });
+  const LeadData = leaderboardQuery.data;
+  const isLoading = leaderboardQuery.isLoading;
 
   const handleEventChange = (newEvent: string) => {
     setSelectedEvent(newEvent);
