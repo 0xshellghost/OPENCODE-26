@@ -56,7 +56,15 @@ export type RowObj = {
 };
 
 const columnHelper = createColumnHelper<RowObj>();
-const currentGithubID = JSON.parse(localStorage.getItem('user') ?? '{}')?.githubId;
+
+function getCurrentGithubID(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    return JSON.parse(localStorage.getItem('user') ?? '{}')?.githubId;
+  } catch {
+    return undefined;
+  }
+}
 
 const trophyColors: Record<number, string> = {
   1: "#FFB547",
@@ -172,17 +180,21 @@ function ColumnTable({
   tableData: RowObj[];
   eventName: string;
 }) {
+  const [currentGithubID, setCurrentGithubID] = React.useState<string | undefined>(undefined);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [showProgress, setShowProgress] = React.useState(true);
+
+  React.useEffect(() => {
+    setCurrentGithubID(getCurrentGithubID());
+  }, []);
 
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 50,
   });
 
-
   const isCurrentUser = (row: any) =>
-    row.original.githubid === currentGithubID;
+    Boolean(currentGithubID && row.original.githubid === currentGithubID);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -385,7 +397,7 @@ function ColumnTable({
       ),
     }),
 
-  ], []);
+  ], [currentGithubID]);
 
   const tbodyRef = React.useRef<HTMLTableSectionElement | null>(null);
   const prevFlipStateRef = React.useRef<Flip.FlipState | null>(null);

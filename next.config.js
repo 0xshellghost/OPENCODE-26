@@ -22,6 +22,9 @@ const nextConfig = {
     // Make ENV
     // unoptimized: true,
   },
+  experimental: {
+    optimizePackageImports: ['@chakra-ui/react', 'lucide-react', 'react-icons'],
+  },
 };
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({

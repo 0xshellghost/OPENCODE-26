@@ -13,6 +13,7 @@ const navigation = [
   { label: 'Home', href: '/' },
   { label: 'Events', href: '/user/home' },
   { label: 'Leaderboard', href: '/user/leaderboard' },
+  { label: 'RPlace Canvas', href: '/user/rplace' },
   { label: 'FAQ', href: '/faq' },
 ];
 

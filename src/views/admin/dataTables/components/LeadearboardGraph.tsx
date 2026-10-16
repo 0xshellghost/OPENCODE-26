@@ -24,9 +24,11 @@ type ParticipantSeries = {
 };
 
 async function fetchProgress(eventName: string) {
-  const token = localStorage.getItem('token');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}`;
-  const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const r = await fetch(url, { headers });
   if (!r.ok) throw new Error('Failed to fetch leaderboard progress');
   const json = await r.json();
   // console.log('Res: ', json)
