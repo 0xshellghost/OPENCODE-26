@@ -72,6 +72,94 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [hasLoaded, minTimeReached, animationDone]);
 
+  // Disable scrolling during initial-loader on '/' before reaching page 1
+  useEffect(() => {
+    if (isLoading && pathname === '/') {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
+      let originalScrollRestoration: ScrollRestoration | null = null;
+
+      if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+        originalScrollRestoration = history.scrollRestoration;
+        history.scrollRestoration = 'manual';
+      }
+
+      document.documentElement.classList.add('oc-initial-loading');
+      document.body.classList.add('oc-initial-loading');
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+
+      const preventDefault = (e: Event) => {
+        e.preventDefault();
+      };
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        const scrollKeys = [
+          'ArrowUp',
+          'ArrowDown',
+          'PageUp',
+          'PageDown',
+          'Home',
+          'End',
+          ' ',
+          'Space',
+        ];
+        if (scrollKeys.includes(e.key)) {
+          const target = e.target as HTMLElement | null;
+          if (
+            target &&
+            (target.tagName === 'INPUT' ||
+              target.tagName === 'TEXTAREA' ||
+              target.isContentEditable)
+          ) {
+            return;
+          }
+          e.preventDefault();
+        }
+      };
+
+      const handleScroll = () => {
+        if (window.scrollY !== 0 || window.scrollX !== 0) {
+          window.scrollTo(0, 0);
+        }
+      };
+
+      window.addEventListener('wheel', preventDefault, { passive: false });
+      window.addEventListener('touchmove', preventDefault, { passive: false });
+      window.addEventListener('keydown', handleKeyDown, { passive: false });
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      return () => {
+        document.documentElement.classList.remove('oc-initial-loading');
+        document.body.classList.remove('oc-initial-loading');
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+
+        window.removeEventListener('wheel', preventDefault);
+        window.removeEventListener('touchmove', preventDefault);
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('scroll', handleScroll);
+
+        if (
+          typeof window !== 'undefined' &&
+          originalScrollRestoration &&
+          'scrollRestoration' in history
+        ) {
+          history.scrollRestoration = originalScrollRestoration;
+        }
+
+        window.scrollTo(0, 0);
+        window.dispatchEvent(new Event('resize'));
+      };
+    } else {
+      document.documentElement.classList.remove('oc-initial-loading');
+      document.body.classList.remove('oc-initial-loading');
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    }
+  }, [isLoading, pathname]);
+
   if (!mounted) {
     if (pathname === '/') {
       return (

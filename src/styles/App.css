@@ -396,3 +396,13 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* Disable scrolling during initial loader before reaching page 1 */
+html.oc-initial-loading,
+body.oc-initial-loading {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
+
