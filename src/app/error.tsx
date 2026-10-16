@@ -35,9 +35,16 @@ export default function ErrorBoundary({
           A glitch in the experience
         </h2>
         
-        <p className="text-[var(--muted)] mb-8 leading-relaxed">
+        <p className="text-[var(--muted)] mb-4 leading-relaxed">
           Something unexpected happened while rendering this page. We apologize for the interruption.
         </p>
+
+        {error?.message && (
+          <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs font-mono text-left text-red-300 max-h-32 overflow-auto break-all">
+            <span className="font-semibold block text-red-400 mb-1">Error Details:</span>
+            {error.message}
+          </div>
+        )}
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button 

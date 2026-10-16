@@ -59,6 +59,7 @@ export async function getUserIssueDetails(
 }
 
 export async function FetchedRepos(eventName: string) {
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/${eventName}/repos`,
     {
@@ -76,3 +77,4 @@ export async function FetchedRepos(eventName: string) {
   const reposData = await response.json();
   return reposData;
 }
+

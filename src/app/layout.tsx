@@ -1,28 +1,8 @@
-import { Poppins, Cinzel, Noto_Serif_JP } from 'next/font/google';
+
+
 import { ReactNode } from 'react';
 import type { Metadata, Viewport } from 'next';
 import AppWrappers from './AppWrappers';
-
-const poppins = Poppins({
-  weight: ['300', '400', '500', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-poppins',
-});
-
-const cinzel = Cinzel({
-  weight: ['400', '500', '600', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-cinzel',
-});
-
-const notoSerifJp = Noto_Serif_JP({
-  weight: ['300', '400', '500', '600', '700', '900'],
-  subsets: ['latin'], // Next.js supports subsetting this for latin, kanji/kana need specific configuration but default subset handles the basics well for Next.js 13+
-  display: 'swap',
-  variable: '--font-noto-serif-jp',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://opencode.iiita.ac.in'),
@@ -57,12 +37,20 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#15151e' }, { media: '(prefers-color-scheme: light)', color: '#eee6e7' }],
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#1b1420' }, { media: '(prefers-color-scheme: light)', color: '#fbf1f1' }],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${poppins.variable} ${cinzel.variable} ${notoSerifJp.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Shippori+Mincho:wght@500;600&display=swap"
+        />
+      </head>
       <body id="root"><AppWrappers>{children}</AppWrappers></body>
     </html>
   );

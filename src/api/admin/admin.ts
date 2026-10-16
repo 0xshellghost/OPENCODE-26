@@ -1,4 +1,4 @@
-// src/api/events/pr.ts (or your specific filename)
+// src/api/admin/admin.ts
 
 export async function getUserPRDetails(githubId: string, eventName: string) {
   const response = await fetch(
@@ -22,7 +22,6 @@ export async function getUserPRDetails(githubId: string, eventName: string) {
 }
 
 export async function EditPRPoints(prUpdateData: any) {
-  // Safety check for browser environment
   if (typeof window === 'undefined') return;
 
   try {
@@ -46,7 +45,6 @@ export async function EditPRPoints(prUpdateData: any) {
     );
 
     const data = await response.json();
-  // console.log(data);
     return data;
   } catch (error: any) {
     console.error('Error sending registration data:', error.message);

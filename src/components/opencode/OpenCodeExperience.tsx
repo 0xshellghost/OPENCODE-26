@@ -3,7 +3,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { ArrowDown, ArrowRight, Flower2, Menu, Pause, Play, RotateCcw, X } from 'lucide-react'
 import IndiaMap from './IndiaMap'
-import YuzukiPresence from '../landing/YuzukiPresence'
+import YuzukiGuide from '../landing/YuzukiGuide'
+import { useSakura } from 'contexts/SakuraContext'
 import { chapters, defaultAssets, defaultNavigation, selfHostedAssets, type OpenCodeExperienceProps, type SceneParameters } from './experience-config'
 import styles from './opencode-experience.module.css'
 
@@ -45,6 +46,7 @@ export default function OpenCodeExperience({
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [pointerState, setPointerState] = useState({ x: 0, y: 0 })
+  const [storyOpen, setStoryOpen] = useState(false)
   completionCallback.current = onComplete
 
   useEffect(() => {
@@ -59,13 +61,21 @@ export default function OpenCodeExperience({
     if (finale.current) finale.current.inert = !reduced && chapter < 4
   }, [reduced, chapter])
 
-  useEffect(() => {
-    parameters.current.paused = paused || reduced
-    scene.current?.invalidate()
-  }, [paused, reduced])
+  const { enabled: sakuraEnabled } = useSakura()
 
   useEffect(() => {
-    if (!ready || reduced || !canvasHost.current) return
+    parameters.current.paused = paused || reduced || !sakuraEnabled
+    scene.current?.invalidate()
+  }, [paused, reduced, sakuraEnabled])
+
+  useEffect(() => {
+    if (!ready || reduced || !canvasHost.current || !sakuraEnabled) {
+      if (scene.current) {
+        scene.current.dispose()
+        scene.current = null
+      }
+      return
+    }
     let cancelled = false
     let controller: SceneController | null = null
     const host = canvasHost.current
@@ -80,7 +90,7 @@ export default function OpenCodeExperience({
       }
     }).catch(() => { if (!cancelled) setGraphicsUnavailable(true) })
     return () => { cancelled = true; controller?.dispose(); scene.current = null }
-  }, [ready, reduced, quality])
+  }, [ready, reduced, quality, sakuraEnabled])
 
   useEffect(() => {
     if (!ready || !root.current) return
@@ -171,7 +181,20 @@ export default function OpenCodeExperience({
         setPointerState({ x: px, y: py })
       }} onPointerLeave={() => { parameters.current.pointerX = 0; parameters.current.pointerY = 0; setPointerState({ x: 0, y: 0 }) }}>
         <div className={styles.scenery} aria-hidden="true">
-          <div ref={heroArt} className={styles.heroArt}>
+          <div
+            ref={heroArt}
+            className={styles.heroArt}
+            style={
+              storyOpen
+                ? {
+                    transform: 'scale(1.025) translateX(-18px)',
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }
+                : {
+                    transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }
+            }
+          >
             {/* Plain images keep this component independent of the host framework and image configuration. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={assets?.hero || defaultAssets.hero} alt="" width="1568" height="875" fetchPriority="high" onError={(e) => handleImageFailure(e.currentTarget, selfHostedAssets.hero)} />
@@ -186,13 +209,14 @@ export default function OpenCodeExperience({
         </div>
         <div ref={canvasHost} className={styles.canvas} aria-hidden="true" />
 
-        {/* Yuzuki — Queen of Sakura character presence */}
-        <YuzukiPresence
+        {/* Guide character presence & interactive story */}
+        <YuzukiGuide
           chapter={chapter}
           pointerX={pointerState.x}
           pointerY={pointerState.y}
           progress={scrollProgress}
           reducedMotion={reduced}
+          onOpenChange={setStoryOpen}
         />
 
         <header className={styles.header}>
@@ -212,13 +236,32 @@ export default function OpenCodeExperience({
           </nav>}
         </header>
 
-        <div ref={intro} className={styles.intro} aria-hidden={!reduced && chapter > 1}>
+        <div
+          ref={intro}
+          className={styles.intro}
+          style={{
+            opacity: storyOpen ? 0.3 : undefined,
+            transition: 'opacity 0.4s ease',
+          }}
+          aria-hidden={!reduced && chapter > 1}
+        >
           <div className={styles.japanese} aria-hidden="true"><span>桜と創造</span><span className={styles.seal}>創</span></div>
           <div className={styles.heroCopy}>
             <p className={styles.eyebrow}>{eyebrow}</p>
             <h1 ref={titleRef} tabIndex={-1} className={styles.title}>{title}<span>{year}</span></h1>
             <p className={styles.mantra}>Ideate <span>/</span> Build <span>/</span> Create</p>
             <p className={styles.heroDescription}>{description}</p>
+            <button
+              type="button"
+              className={styles.meetGuideBtn}
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('opencode:open-yuzuki'));
+              }}
+              aria-label="Meet Yuzuki, your guide"
+            >
+              <Flower2 size={14} strokeWidth={1.6} aria-hidden="true" />
+              <span>Meet your guide</span>
+            </button>
           </div>
         </div>
 
@@ -254,7 +297,24 @@ export default function OpenCodeExperience({
             <span className={styles.scrollCircle}><ArrowDown size={17} strokeWidth={1.2} aria-hidden="true" /></span>
             <span>{chapter === 4 ? 'Discover OpenCode' : 'Scroll to explore'}</span>
           </button>
-          <p className={styles.journeyCaption}>A new season of creation</p>
+          <div className={styles.journeyCaption}>
+            {chapter <= 1 ? (
+              <div
+                className={styles.honestCaption}
+                style={{
+                  opacity: storyOpen ? 0.3 : 1,
+                  transition: 'opacity 0.4s ease',
+                }}
+              >
+                <span className={styles.captionTitle}>Yuzuki · Guide of the season</span>
+                <span className={styles.captionSubtitle}>
+                  An original character, inspired by Japanese cherry blossom folklore.
+                </span>
+              </div>
+            ) : (
+              <span>A new season of creation</span>
+            )}
+          </div>
           <div className={styles.motionControls}>
             {!reduced && !graphicsUnavailable && <button className={styles.motionButton} aria-pressed={paused} aria-label={paused ? 'Resume ambient motion' : 'Pause ambient motion'} title="Pauses ambient petals. Scroll still changes chapters." onClick={() => setPaused(!paused)}>{paused ? <Play size={15} aria-hidden="true" /> : <Pause size={15} aria-hidden="true" />}<span>Motion {paused ? 'off' : 'on'}</span></button>}
             <button className={styles.skipButton} onClick={skip}>Skip intro <ArrowRight size={14} aria-hidden="true" /></button>

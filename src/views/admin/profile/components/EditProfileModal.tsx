@@ -65,13 +65,13 @@ export default function EditProfileModal({
     queryFn: fetchColleges,
   });
 
-  const modalBg = useColorModeValue('white', '#2A2430');
-  const titleColor = useColorModeValue('#2d242a', '#FEF3ED');
-  const labelColor = useColorModeValue('#7a6a75', '#C9BCC4');
-  const lockedBg = useColorModeValue('#f5f0f2', 'rgba(255,255,255,0.06)');
-  const lockedBorder = useColorModeValue('#d8cdd3', 'rgba(255,255,255,0.12)');
-  const lockedText = useColorModeValue('#8E8391', '#8E8391');
-  const brandStars = useColorModeValue('#9D767E', '#B88784');
+  const modalBg = 'linear-gradient(135deg, rgba(28, 16, 36, 0.98) 0%, rgba(38, 22, 46, 0.98) 100%)';
+  const titleColor = '#fff1ec';
+  const labelColor = '#dfced5';
+  const lockedBg = 'rgba(255, 255, 255, 0.04)';
+  const lockedBorder = 'rgba(240, 168, 184, 0.12)';
+  const lockedText = '#a89aa2';
+  const brandStars = '#f0a8b8';
 
   useEffect(() => {
     if (isOpen && profile) {
@@ -205,9 +205,11 @@ export default function EditProfileModal({
       <Box
         position="relative"
         bg={modalBg}
-        borderRadius="20px"
-        p={{ base: '20px', md: '24px' }}
-        boxShadow="0 20px 40px rgba(0,0,0,0.4)"
+        borderRadius="22px"
+        border="1px solid rgba(240, 168, 184, 0.25)"
+        backdropFilter="blur(24px)"
+        p={{ base: '20px', md: '26px' }}
+        boxShadow="0 20px 45px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(240, 168, 184, 0.08)"
         w="90%"
         maxW="600px"
         maxH="90vh"
@@ -497,21 +499,29 @@ export default function EditProfileModal({
             <Button
               variant="ghost"
               onClick={onClose}
-              borderRadius="12px"
+              borderRadius="full"
               size="sm"
               type="button"
+              color="#dfced5"
+              _hover={{ bg: 'rgba(240, 168, 184, 0.1)', color: '#fff1ec' }}
             >
               Cancel
             </Button>
             <Button
-              bg="#B88784"
-              color="#FEF3ED"
-              _hover={{ bg: '#CF9690' }}
+              bg="linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)"
+              color="#1f0f18"
+              _hover={{
+                bg: 'linear-gradient(135deg, #ffd0dc 0%, #f0a8b8 100%)',
+                transform: 'scale(1.02)',
+                boxShadow: '0 6px 20px rgba(240, 168, 184, 0.4)',
+              }}
               type="submit"
               isLoading={isSubmitting}
-              borderRadius="12px"
+              borderRadius="full"
               size="sm"
-              px="20px"
+              px="24px"
+              fontWeight="700"
+              transition="all 0.2s ease"
             >
               Save Changes
             </Button>

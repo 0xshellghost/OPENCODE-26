@@ -14,13 +14,16 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'i.ibb.co' },
       { protocol: 'https', hostname: 'scontent.fotp8-1.fna.fbcdn.net' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
     ],
-    // Make ENV
-    // unoptimized: true,
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   experimental: {
     optimizePackageImports: ['@chakra-ui/react', 'lucide-react', 'react-icons'],

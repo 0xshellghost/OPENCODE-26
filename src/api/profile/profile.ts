@@ -89,12 +89,7 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   if (!token) {
-    console.warn('No token found, using mock update for local dev');
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ success: true, data: updatedData });
-      }, 500);
-    });
+    throw new Error('No authentication token found. Please sign in again.');
   }
 
   // Never send GitHub ID or email — those fields are immutable.
@@ -167,3 +162,4 @@ export async function fetchColleges() {
     return [];
   }
 }
+

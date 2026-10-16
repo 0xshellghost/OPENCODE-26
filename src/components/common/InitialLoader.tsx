@@ -111,16 +111,19 @@ export default function InitialLoader({
     }
   }, [onComplete]);
 
-  // Generate petal configs once
+  // Generate deterministic petal configs (avoids SSR hydration mismatch)
   const petals = useMemo(
     () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        id: i,
-        delay: Math.random() * 10,
-        left: `${Math.random() * 100}%`,
-        size: 8 + Math.random() * 10,
-        duration: 4 + Math.random() * 9,
-      })),
+      Array.from({ length: 18 }, (_, i) => {
+        const seed = (i * 137.5) % 100;
+        return {
+          id: i,
+          delay: (i * 0.7) % 5,
+          left: `${seed.toFixed(1)}%`,
+          size: 8 + (i % 6) * 2,
+          duration: 5 + (i % 5) * 1.5,
+        };
+      }),
     [],
   );
 
@@ -128,17 +131,20 @@ export default function InitialLoader({
     <Box
       position="fixed"
       inset={0}
-      zIndex={2000}
+      zIndex={99999}
+      bg="#0a0514"
       backgroundImage="url('/images/loading-bg.png')"
       backgroundSize="cover"
       backgroundPosition="center"
       opacity={isExiting ? 0 : 1}
-      transform={isExiting ? 'scale(1.05)' : 'scale(1)'}
+      transform={isExiting ? 'scale(1.04)' : 'scale(1)'}
       transition="opacity 700ms ease-out, transform 700ms ease-out"
       overflow="hidden"
       display="flex"
       alignItems="center"
       justifyContent="center"
+      pointerEvents={isExiting ? 'none' : 'auto'}
+      style={{ touchAction: 'none', overscrollBehavior: 'none' }}
     >
       {/* ── Cinematic vignette overlay ── */}
       <Box
@@ -262,9 +268,9 @@ export default function InitialLoader({
 
         {/* ── OPENCODE 2026 ── */}
         <Text
-          fontFamily="'Cinzel', 'Georgia', serif"
+          fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
           fontSize={{ base: '28px', md: '46px' }}
-          letterSpacing="0.28em"
+          letterSpacing="0.22em"
           fontWeight="300"
           color="white"
           mb={2}
@@ -278,10 +284,10 @@ export default function InitialLoader({
 
         {/* ── Tagline ── */}
         <Text
-          fontFamily="'Inter', sans-serif"
-          fontSize={{ base: '8px', md: '11px' }}
-          letterSpacing="0.5em"
-          color="whiteAlpha.600"
+          fontFamily="var(--f-body), 'DM Sans', sans-serif"
+          fontSize={{ base: '9px', md: '12px' }}
+          letterSpacing="0.35em"
+          color="whiteAlpha.700"
           mb="72px"
           textAlign="center"
           animation={`${fadeFloat} 1s ease 0.3s forwards`}
@@ -362,8 +368,8 @@ export default function InitialLoader({
           fontSize="11px"
           color="whiteAlpha.600"
           mb={2}
-          letterSpacing="0.15em"
-          fontFamily="'Inter', sans-serif"
+          letterSpacing="0.18em"
+          fontFamily="var(--f-mono), 'DM Mono', monospace"
           animation={`${fadeFloat} 1s ease 0.6s forwards`}
           opacity={0}
         >
@@ -372,15 +378,15 @@ export default function InitialLoader({
 
         {/* ── Yuzuki welcome (Phase 1.3) ── */}
         <Text
-          fontSize="12px"
-          letterSpacing="0.25em"
-          fontFamily="Georgia, 'Times New Roman', serif"
+          fontSize="13px"
+          letterSpacing="0.28em"
+          fontFamily="var(--f-jp), 'Shippori Mincho', serif"
           mb={7}
           textAlign="center"
           animation={`${fadeFloat} 1.2s ease 2.6s forwards`}
           opacity={0}
           sx={{
-            background: `linear-gradient(90deg, #e9a7b2, #fff4ed, #e9a7b2)`,
+            background: `linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8)`,
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',

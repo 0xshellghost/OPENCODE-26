@@ -1,0 +1,794 @@
+/* ────────────────────────────────────────────────────────────
+   YuzukiGuide · Opencode 2026
+   Design language: sakura pink on dusk plum, DM Sans body,
+   Cormorant Garamond headings, rounded glass, paper scroll panel.
+   ──────────────────────────────────────────────────────────── */
+
+/* ─── CSS Variables ─── */
+.root {
+  --yuzuki-banner-top: 94px;
+  --yuzuki-banner-right: 26px;
+  --yuzuki-hotspot-top: 36%;
+  --yuzuki-hotspot-left: 64%;
+  --yuzuki-caption-bottom: 30px;
+  --yuzuki-panel-top: 50%;
+  --yuzuki-panel-left: 47%;
+  --yuzuki-art-nudge: 0px;
+
+  /* Dark theme defaults (dusk plum & sakura pink) */
+  --yuzuki-bg: rgba(36, 26, 43, 0.78);
+  --yuzuki-border: rgba(240, 168, 184, 0.25);
+  --yuzuki-border-hover: rgba(240, 168, 184, 0.55);
+  --yuzuki-rose: #f0a8b8;
+  --yuzuki-rose-ink: #1b1420;
+  --yuzuki-rose-glow: rgba(240, 168, 184, 0.4);
+  --yuzuki-char-stroke: #f0a8b8;
+  --yuzuki-char-fill: #fff1ec;
+  --yuzuki-seal-bg: rgba(240, 168, 184, 0.16);
+  --yuzuki-seal-border: #f0a8b8;
+  --yuzuki-seal-color: #f0a8b8;
+  --yuzuki-muted: #dfced5;
+  --yuzuki-heading: #fff1ec;
+  --yuzuki-body: #e6d6dc;
+  --yuzuki-scroll-bg: #231628;
+  --yuzuki-scroll-gradient: linear-gradient(180deg, #2a1b30 0%, #1d1122 100%);
+  --yuzuki-scroll-border: rgba(240, 168, 184, 0.32);
+  --yuzuki-scroll-inset: rgba(240, 168, 184, 0.12);
+  --yuzuki-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.75);
+}
+
+/* Light theme overrides */
+:global([data-theme="light"]) .root,
+:global(.chakra-ui-light) .root,
+:global(.light) .root {
+  --yuzuki-bg: rgba(255, 255, 255, 0.88);
+  --yuzuki-border: rgba(192, 74, 103, 0.25);
+  --yuzuki-border-hover: rgba(192, 74, 103, 0.55);
+  --yuzuki-rose: #c04a67;
+  --yuzuki-rose-ink: #ffffff;
+  --yuzuki-rose-glow: rgba(192, 74, 103, 0.3);
+  --yuzuki-char-stroke: #c04a67;
+  --yuzuki-char-fill: #2a1a24;
+  --yuzuki-seal-bg: rgba(192, 74, 103, 0.14);
+  --yuzuki-seal-border: #c04a67;
+  --yuzuki-seal-color: #c04a67;
+  --yuzuki-muted: #523c47;
+  --yuzuki-heading: #2a1a24;
+  --yuzuki-body: #4a3843;
+  --yuzuki-scroll-bg: #fcf6f0;
+  --yuzuki-scroll-gradient: linear-gradient(180deg, #fdf8f4 0%, #f6ebe1 100%);
+  --yuzuki-scroll-border: rgba(192, 74, 103, 0.35);
+  --yuzuki-scroll-inset: rgba(192, 74, 103, 0.12);
+  --yuzuki-shadow: 0 24px 60px -15px rgba(60, 30, 45, 0.2);
+}
+
+/* ─── Name Banner (slim vertical glass banner, top-right) ─── */
+.banner {
+  position: absolute;
+  top: var(--yuzuki-banner-top);
+  right: var(--yuzuki-banner-right);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px 14px;
+  background: rgba(36, 26, 43, 0.86);
+  border: 1px solid rgba(240, 168, 184, 0.45);
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(240, 168, 184, 0.12);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: transform 0.3s ease, border-color 0.3s ease, opacity 0.4s ease, box-shadow 0.3s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.banner:hover {
+  transform: translateY(-2px);
+  border-color: var(--yuzuki-border-hover);
+  box-shadow: 0 18px 40px -10px var(--yuzuki-rose-glow);
+}
+
+.banner:focus-visible {
+  outline: 2px solid var(--yuzuki-rose);
+  outline-offset: 4px;
+}
+
+/* Clean, solid Japanese typography: ゆづき */
+.bannerChars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--f-jp), 'Shippori Mincho', 'Hiragino Mincho ProN', serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: #fff1ec;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.04em;
+}
+
+/* Hanko Seal (桜守) - clean, traditional, crisp */
+.hankoSeal {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--yuzuki-seal-border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--yuzuki-seal-bg);
+}
+
+.hankoText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-family: var(--f-jp), 'Shippori Mincho', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--yuzuki-seal-color);
+  letter-spacing: -0.05em;
+}
+
+.bannerEn {
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 9.5px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #ffd0dc;
+  font-weight: 700;
+  margin-top: 2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ─── Petal Hotspot (pulsing dot with expanding ping ring + pill) ─── */
+.hotspot {
+  position: absolute;
+  top: var(--yuzuki-hotspot-top);
+  left: var(--yuzuki-hotspot-left);
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  transition: opacity 0.35s ease, transform 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hotspot:hover {
+  transform: translate(-50%, -50%) scale(1.04);
+}
+
+.hotspot:focus-visible {
+  outline: 2px solid var(--yuzuki-rose);
+  outline-offset: 6px;
+  border-radius: 999px;
+}
+
+.hotspotDotWrap {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hotspotPing {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--yuzuki-rose);
+  animation: hotspotPingAnimation 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes hotspotPingAnimation {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.95;
+  }
+  70%, 100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.hotspotDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--yuzuki-rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 14px var(--yuzuki-rose);
+  transition: transform 0.2s;
+}
+
+.hotspotDot svg {
+  color: #fff;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+}
+
+.hotspotPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(36, 26, 43, 0.88);
+  border: 1px solid rgba(240, 168, 184, 0.5);
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(240, 168, 184, 0.15);
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff1ec;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, transform 0.25s;
+}
+
+.hotspot:hover .hotspotPill {
+  border-color: #ffd0dc;
+  box-shadow: 0 12px 32px rgba(240, 168, 184, 0.45);
+  background: rgba(56, 36, 62, 0.94);
+}
+
+.hotspotArrow {
+  font-size: 13px;
+  color: var(--yuzuki-rose);
+  font-weight: 700;
+  filter: drop-shadow(0 0 4px var(--yuzuki-rose));
+  transition: transform 0.2s ease;
+}
+
+.hotspot:hover .hotspotArrow {
+  transform: translateX(3px);
+}
+
+/* ─── Honest Caption (centered at bottom of hero) ─── */
+.honestCaption {
+  position: absolute;
+  bottom: var(--yuzuki-caption-bottom);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  text-align: center;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  max-width: 90vw;
+  transition: opacity 0.4s ease;
+}
+
+.captionTitle {
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--yuzuki-rose);
+}
+
+.captionSubtitle {
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 300;
+  color: var(--yuzuki-muted);
+  line-height: 1.4;
+}
+
+/* ─── Interactive Artwork Click Region ─── */
+.artworkTrigger {
+  position: absolute;
+  top: 15%;
+  right: 8%;
+  width: 32%;
+  height: 70%;
+  z-index: 3;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.artworkTrigger:focus-visible {
+  outline: 2px dashed var(--yuzuki-rose);
+  outline-offset: 4px;
+  border-radius: 18px;
+}
+
+/* ─── Backdrop (blurred and dimmed hero scene) ─── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(18, 12, 22, 0.55);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  animation: backdropFade 0.4s ease forwards;
+}
+
+@keyframes backdropFade {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ─── Paper Scroll Story Panel ─── */
+.scrollPanel {
+  position: fixed;
+  top: var(--yuzuki-panel-top);
+  left: var(--yuzuki-panel-left);
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  width: min(520px, 92vw);
+  max-height: 84svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--yuzuki-scroll-bg);
+  background-image: var(--yuzuki-scroll-gradient);
+  border: 1px solid var(--yuzuki-scroll-border);
+  box-shadow: inset 0 0 0 1px var(--yuzuki-scroll-inset), var(--yuzuki-shadow);
+  border-radius: 16px;
+  color: var(--yuzuki-body);
+  animation: scrollUnroll 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: clip-path, transform, opacity;
+  overflow: hidden;
+}
+
+/* Clip-path downward unroll animation (~600ms) */
+@keyframes scrollUnroll {
+  0% {
+    clip-path: inset(0 0 100% 0 round 16px);
+    transform: translate(-50%, -52%);
+    opacity: 0.5;
+  }
+  100% {
+    clip-path: inset(0 0 0 0 round 16px);
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+/* Panel Header */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--yuzuki-border);
+  flex-shrink: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.headerHanko {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--yuzuki-seal-border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--yuzuki-seal-bg);
+  color: var(--yuzuki-seal-color);
+  font-family: var(--f-jp), 'Shippori Mincho', serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 12px var(--yuzuki-rose-glow);
+}
+
+.headerName {
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--yuzuki-heading);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.headerSubtitle {
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--yuzuki-rose);
+  margin: 3px 0 0;
+}
+
+.closeButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--yuzuki-bg);
+  border: 1px solid var(--yuzuki-border);
+  color: var(--yuzuki-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font: inherit;
+  padding: 0;
+}
+
+.closeButton:hover {
+  color: var(--yuzuki-heading);
+  border-color: var(--yuzuki-rose);
+  background: rgba(240, 168, 184, 0.15);
+  transform: rotate(90deg);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid var(--yuzuki-rose);
+  outline-offset: 3px;
+}
+
+/* Panel Body & Story Lines */
+.panelBody {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 14px;
+}
+
+.storyLine {
+  margin: 0;
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--yuzuki-body);
+  animation: lineFadeRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes lineFadeRise {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.firstStoryLine {
+  font-family: var(--f-display), 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(23px, 3.4vw, 27px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  color: var(--yuzuki-heading);
+  margin-bottom: 4px;
+}
+
+/* Soft blinking pink dot following current line */
+.blinkingDot {
+  display: inline-block;
+  width: 7.5px;
+  height: 7.5px;
+  margin-left: 9px;
+  background: var(--yuzuki-rose);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--yuzuki-rose);
+  animation: dotPulse 1.1s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Footer / Controls */
+.panelFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 22px;
+  border-top: 1px solid var(--yuzuki-border);
+  flex-shrink: 0;
+  gap: 14px;
+}
+
+.controlButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--yuzuki-bg);
+  border: 1px solid var(--yuzuki-border);
+  color: var(--yuzuki-muted);
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.controlButton:hover {
+  color: var(--yuzuki-heading);
+  border-color: var(--yuzuki-rose);
+}
+
+.controlButton:focus-visible {
+  outline: 2px solid var(--yuzuki-rose);
+  outline-offset: 3px;
+}
+
+.endingSection {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--yuzuki-border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: lineFadeRise 0.6s ease forwards;
+}
+
+.contributeButton,
+.contributeButton:link,
+.contributeButton:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  background: var(--yuzuki-rose);
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: 0 10px 28px -6px var(--yuzuki-rose-glow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.contributeButton span {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.contributeButton svg {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+  stroke: var(--yuzuki-rose-ink, #1b1420) !important;
+  stroke-width: 2.25px;
+  transition: transform 0.2s ease;
+}
+
+.contributeButton:hover,
+.contributeButton:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -4px var(--yuzuki-rose-glow);
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+}
+
+.contributeButton:hover span,
+.contributeButton:focus-visible span {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+}
+
+.contributeButton:hover svg {
+  transform: translateX(3px);
+  stroke: var(--yuzuki-rose-ink, #1b1420) !important;
+}
+
+.contributeButton:focus-visible {
+  outline: 2px solid var(--yuzuki-rose);
+  outline-offset: 4px;
+}
+
+.endingNote {
+  margin: 0;
+  font-family: var(--f-body), 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  color: var(--yuzuki-muted);
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* ─── Responsive Adjustments (360px to 1920px) ─── */
+@media (max-width: 1200px) {
+  .root {
+    --yuzuki-hotspot-left: 61%;
+    --yuzuki-panel-left: 44%;
+  }
+}
+
+/* Screens under 900px: Panel becomes a Bottom Sheet */
+@media (max-width: 900px) {
+  .root {
+    --yuzuki-banner-top: 84px;
+    --yuzuki-banner-right: 20px;
+    --yuzuki-hotspot-top: 34%;
+    --yuzuki-hotspot-left: 56%;
+  }
+
+  .scrollPanel {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: translateY(0) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 82svh !important;
+    animation: sheetSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  @keyframes sheetSlideUp {
+    0% {
+      transform: translateY(100%);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .artworkTrigger {
+    width: 44%;
+    right: 4%;
+  }
+}
+
+@media (max-width: 600px) {
+  .root {
+    --yuzuki-banner-top: 76px;
+    --yuzuki-banner-right: 14px;
+    --yuzuki-hotspot-top: 30%;
+    --yuzuki-hotspot-left: 50%;
+    --yuzuki-caption-bottom: 78px;
+  }
+
+  .banner {
+    padding: 12px 10px 10px;
+  }
+
+  .brushSvg {
+    width: 24px;
+    height: 84px;
+  }
+
+  .brushChar1,
+  .brushChar2,
+  .brushChar3 {
+    font-size: 21px;
+  }
+
+  .hankoSeal {
+    width: 22px;
+    height: 22px;
+  }
+
+  .hankoText {
+    font-size: 8px;
+  }
+
+  .hotspotPill {
+    font-size: 11.5px;
+    padding: 6px 12px;
+  }
+
+  .captionTitle {
+    font-size: 10px;
+  }
+
+  .captionSubtitle {
+    font-size: 11px;
+  }
+
+  .panelHeader {
+    padding: 18px 20px 14px;
+  }
+
+  .panelBody {
+    padding: 18px 20px;
+    gap: 12px;
+  }
+
+  .storyLine {
+    font-size: 14.5px;
+  }
+
+  .firstStoryLine {
+    font-size: 21px;
+  }
+
+  .panelFooter {
+    padding: 14px 20px 18px;
+  }
+}
+
+/* ─── Accessibility & Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .brushChar1,
+  .brushChar2,
+  .brushChar3 {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+    fill: var(--yuzuki-char-fill) !important;
+  }
+
+  .hankoSeal {
+    animation: none !important;
+    transform: rotate(-3deg) !important;
+    opacity: 1 !important;
+  }
+
+  .hotspotPing {
+    animation: none !important;
+    display: none;
+  }
+
+  .scrollPanel {
+    animation: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .storyLine {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .blinkingDot {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .backdrop {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

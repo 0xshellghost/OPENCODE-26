@@ -43,9 +43,10 @@ export default function LeaderboardLoader() {
           </Box>
         </Box>
         <Text
-          fontFamily="'Cinzel', 'Georgia', serif"
-          fontSize="16px"
-          letterSpacing="0.2em"
+          fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
+          fontSize="18px"
+          fontWeight="300"
+          letterSpacing="0.25em"
           color={opencodeTokens.colors.accent.sakura}
           opacity={0.9}
         >
