@@ -42,7 +42,7 @@
 }
 
 .sectionDescription {
-  color: var(--muted);
+  color: rgba(255, 241, 236, 0.88);
   font-family: var(--f-body);
   font-size: 15px;
   line-height: 1.8;
@@ -101,8 +101,8 @@
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--muted);
-  font-weight: 400;
+  color: rgba(255, 241, 236, 0.82);
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════════════
@@ -158,7 +158,7 @@
   font-family: var(--f-body);
   font-size: 14px;
   line-height: 1.75;
-  color: var(--muted);
+  color: rgba(255, 241, 236, 0.88);
 }
 
 /* radial light catch on hover */
@@ -247,7 +247,7 @@
   font-family: var(--f-body);
   font-size: 14px;
   line-height: 1.7;
-  color: var(--muted);
+  color: rgba(255, 241, 236, 0.88);
   max-width: 480px;
 }
 
@@ -293,7 +293,7 @@
 }
 
 .joinDescription {
-  color: var(--muted);
+  color: rgba(255, 241, 236, 0.92);
   font-family: var(--f-body);
   font-size: 15px;
   line-height: 1.8;
@@ -309,22 +309,23 @@
   padding: 14px 36px;
   font-size: 14px;
   font-family: var(--f-body);
-  font-weight: 500;
-  color: var(--accent-ink);
-  background: var(--accent);
+  font-weight: 700;
+  color: #1f0f18;
+  background: linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%);
   border-radius: 999px;
   border: none;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   text-decoration: none;
-  box-shadow: 0 12px 36px -10px var(--accent);
+  box-shadow: 0 12px 36px -10px rgba(240, 168, 184, 0.6);
 }
 
 .joinButton:hover {
-  background: var(--accent);
+  background: linear-gradient(135deg, #ffd0dc 0%, #f0a8b8 100%);
+  color: #1f0f18;
   transform: translateY(-2px);
-  box-shadow: 0 16px 40px -8px var(--accent);
+  box-shadow: 0 16px 40px -8px rgba(240, 168, 184, 0.8);
 }
 
 /* ═══════════════════════════════════════════════

@@ -144,6 +144,7 @@ export default function InitialLoader({
       alignItems="center"
       justifyContent="center"
       pointerEvents={isExiting ? 'none' : 'auto'}
+      style={{ touchAction: 'none', overscrollBehavior: 'none' }}
     >
       {/* ── Cinematic vignette overlay ── */}
       <Box

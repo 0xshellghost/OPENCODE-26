@@ -18,10 +18,15 @@ export const buttonStyles = {
       variants: {
         outline: () => ({
           borderRadius: "9999px",
-          borderColor: "var(--line)",
+          border: "1px solid",
+          borderColor: "var(--border)",
+          bg: "var(--surface)",
           color: "var(--fg)",
+          backdropFilter: "blur(14px)",
           _hover: {
-            bg: "var(--surface-2)",
+            bg: "var(--accent-soft)",
+            borderColor: "var(--accent)",
+            color: "var(--accent)",
             transform: "translateY(-1px)",
           },
         }),

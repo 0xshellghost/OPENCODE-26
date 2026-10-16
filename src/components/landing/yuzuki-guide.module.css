@@ -16,17 +16,18 @@
   --yuzuki-art-nudge: 0px;
 
   /* Dark theme defaults (dusk plum & sakura pink) */
-  --yuzuki-bg: rgba(27, 20, 32, 0.58);
-  --yuzuki-border: rgba(255, 241, 236, 0.16);
-  --yuzuki-border-hover: rgba(240, 168, 184, 0.5);
+  --yuzuki-bg: rgba(36, 26, 43, 0.78);
+  --yuzuki-border: rgba(240, 168, 184, 0.25);
+  --yuzuki-border-hover: rgba(240, 168, 184, 0.55);
   --yuzuki-rose: #f0a8b8;
+  --yuzuki-rose-ink: #1b1420;
   --yuzuki-rose-glow: rgba(240, 168, 184, 0.4);
   --yuzuki-char-stroke: #f0a8b8;
   --yuzuki-char-fill: #fff1ec;
-  --yuzuki-seal-bg: rgba(240, 168, 184, 0.14);
+  --yuzuki-seal-bg: rgba(240, 168, 184, 0.16);
   --yuzuki-seal-border: #f0a8b8;
   --yuzuki-seal-color: #f0a8b8;
-  --yuzuki-muted: #c7b0b9;
+  --yuzuki-muted: #dfced5;
   --yuzuki-heading: #fff1ec;
   --yuzuki-body: #e6d6dc;
   --yuzuki-scroll-bg: #231628;
@@ -40,17 +41,18 @@
 :global([data-theme="light"]) .root,
 :global(.chakra-ui-light) .root,
 :global(.light) .root {
-  --yuzuki-bg: rgba(255, 255, 255, 0.72);
-  --yuzuki-border: rgba(60, 30, 45, 0.15);
-  --yuzuki-border-hover: rgba(192, 74, 103, 0.5);
+  --yuzuki-bg: rgba(255, 255, 255, 0.88);
+  --yuzuki-border: rgba(192, 74, 103, 0.25);
+  --yuzuki-border-hover: rgba(192, 74, 103, 0.55);
   --yuzuki-rose: #c04a67;
+  --yuzuki-rose-ink: #ffffff;
   --yuzuki-rose-glow: rgba(192, 74, 103, 0.3);
   --yuzuki-char-stroke: #c04a67;
   --yuzuki-char-fill: #2a1a24;
-  --yuzuki-seal-bg: rgba(192, 74, 103, 0.12);
+  --yuzuki-seal-bg: rgba(192, 74, 103, 0.14);
   --yuzuki-seal-border: #c04a67;
   --yuzuki-seal-color: #c04a67;
-  --yuzuki-muted: #6b5560;
+  --yuzuki-muted: #523c47;
   --yuzuki-heading: #2a1a24;
   --yuzuki-body: #4a3843;
   --yuzuki-scroll-bg: #fcf6f0;
@@ -71,12 +73,12 @@
   align-items: center;
   gap: 8px;
   padding: 16px 12px 14px;
-  background: var(--yuzuki-bg);
-  border: 1px solid var(--yuzuki-border);
+  background: rgba(36, 26, 43, 0.86);
+  border: 1px solid rgba(240, 168, 184, 0.45);
   border-radius: 14px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(240, 168, 184, 0.12);
   cursor: pointer;
   color: inherit;
   font: inherit;
@@ -104,9 +106,10 @@
   gap: 4px;
   font-family: var(--f-jp), 'Shippori Mincho', 'Hiragino Mincho ProN', serif;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.15;
-  color: var(--yuzuki-char-fill);
+  color: #fff1ec;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
   letter-spacing: 0.04em;
 }
 
@@ -138,10 +141,12 @@
 .bannerEn {
   font-family: var(--f-body), 'DM Sans', sans-serif;
   font-size: 9.5px;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--yuzuki-muted);
+  color: #ffd0dc;
+  font-weight: 700;
   margin-top: 2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
 
 /* ─── Petal Hotspot (pulsing dot with expanding ping ring + pill) ─── */
@@ -227,30 +232,34 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background: var(--yuzuki-bg);
-  border: 1px solid var(--yuzuki-border);
+  padding: 8px 18px;
+  background: rgba(36, 26, 43, 0.88);
+  border: 1px solid rgba(240, 168, 184, 0.5);
   border-radius: 999px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(240, 168, 184, 0.15);
   font-family: var(--f-body), 'DM Sans', sans-serif;
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  color: var(--yuzuki-char-fill);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff1ec;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
   white-space: nowrap;
-  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, transform 0.25s;
 }
 
 .hotspot:hover .hotspotPill {
-  border-color: var(--yuzuki-border-hover);
-  box-shadow: 0 10px 28px var(--yuzuki-rose-glow);
+  border-color: #ffd0dc;
+  box-shadow: 0 12px 32px rgba(240, 168, 184, 0.45);
+  background: rgba(56, 36, 62, 0.94);
 }
 
 .hotspotArrow {
   font-size: 13px;
   color: var(--yuzuki-rose);
+  font-weight: 700;
+  filter: drop-shadow(0 0 4px var(--yuzuki-rose));
   transition: transform 0.2s ease;
 }
 
@@ -558,26 +567,55 @@
   animation: lineFadeRise 0.6s ease forwards;
 }
 
-.contributeButton {
+.contributeButton,
+.contributeButton:link,
+.contributeButton:visited {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 12px 24px;
+  padding: 13px 26px;
   border-radius: 999px;
   background: var(--yuzuki-rose);
-  color: #1b1420;
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
   font-family: var(--f-body), 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-decoration: none;
   box-shadow: 0 10px 28px -6px var(--yuzuki-rose-glow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
 }
 
-.contributeButton:hover {
+.contributeButton span {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.contributeButton svg {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+  stroke: var(--yuzuki-rose-ink, #1b1420) !important;
+  stroke-width: 2.25px;
+  transition: transform 0.2s ease;
+}
+
+.contributeButton:hover,
+.contributeButton:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 14px 34px -4px var(--yuzuki-rose-glow);
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+}
+
+.contributeButton:hover span,
+.contributeButton:focus-visible span {
+  color: var(--yuzuki-rose-ink, #1b1420) !important;
+}
+
+.contributeButton:hover svg {
+  transform: translateX(3px);
+  stroke: var(--yuzuki-rose-ink, #1b1420) !important;
 }
 
 .contributeButton:focus-visible {

@@ -6,7 +6,7 @@ export const opencodeTokens = {
       surface: 'var(--surface)',
       glass: 'var(--surface)',
       glassLight: 'var(--surface-2)',
-      glassDark: 'var(--bg-2)',
+      glassDark: 'var(--surface-2)',
     },
     // Primary Accents
     accent: {
@@ -15,7 +15,7 @@ export const opencodeTokens = {
       ivory: '#fff1ec',
       purple: '#c04a67',
       purpleHover: '#a83853',
-      purpleMuted: 'rgba(240, 168, 184, 0.14)',
+      purpleMuted: 'rgba(240, 168, 184, 0.16)',
       ember: '#ff8f6b',
       emberLight: '#c9532b',
     },
@@ -36,7 +36,7 @@ export const opencodeTokens = {
     border: {
       light: 'var(--line)',
       medium: 'var(--border-strong)',
-      primary: 'var(--border-strong)',
+      primary: 'var(--border)',
     },
   },
   typography: {
@@ -64,8 +64,8 @@ export const opencodeTokens = {
     },
   },
   glass: {
-    backdropFilter: 'blur(16px)',
-    border: '1px solid var(--line)',
+    backdropFilter: 'blur(20px)',
+    border: '1px solid var(--border)',
     background: 'var(--surface)',
   },
 };

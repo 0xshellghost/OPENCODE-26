@@ -10,6 +10,7 @@ export default function SignIn() {
     window.location.assign(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`);
   };
 
+
   return (
     <JapaneseBackground variant="auth">
       <SiteNavbar />
