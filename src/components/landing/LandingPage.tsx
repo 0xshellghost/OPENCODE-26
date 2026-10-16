@@ -5,7 +5,11 @@ import LandingContent from './LandingContent';
 import ThemeToggle from 'components/japanese/ThemeToggle';
 import SakuraToggle from 'components/common/SakuraToggle';
 
-const GITHUB_LOGIN_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
+import { USE_SEED_DATA } from 'constants/seedData';
+
+const GITHUB_LOGIN_URL = USE_SEED_DATA
+  ? '/auth/sign-in'
+  : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
 
 const navigation = [
   { label: 'Leaderboard', href: '/user/leaderboard' },

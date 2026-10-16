@@ -4,9 +4,16 @@ import { Github, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
+import { USE_SEED_DATA, seedDefaultUser } from 'constants/seedData';
 
 export default function SignIn() {
   const handleLoginWithGitHub = () => {
+    if (USE_SEED_DATA) {
+      localStorage.setItem('token', 'seed-mock-jwt-token');
+      localStorage.setItem('user', JSON.stringify(seedDefaultUser));
+      window.location.href = `/user/profile/${seedDefaultUser.githubId}`;
+      return;
+    }
     window.location.assign(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`);
   };
 

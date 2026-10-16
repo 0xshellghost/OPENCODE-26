@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import RingLoader from 'react-spinners/RingLoader';
+import { USE_SEED_DATA, seedProgressData } from 'constants/seedData';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, ChartTooltip, ChartLegend, Filler);
 
@@ -24,6 +25,10 @@ type ParticipantSeries = {
 };
 
 async function fetchProgress(eventName: string) {
+  if (USE_SEED_DATA) {
+    return Promise.resolve(seedProgressData as ParticipantSeries[]);
+  }
+
   const token = localStorage.getItem('token');
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}`;
   const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });

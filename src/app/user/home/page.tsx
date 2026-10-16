@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useAuth } from 'contexts/AuthContext';
 import { useEffect } from 'react';
 import EventCollection from 'components/japanese/EventCollection';
+import { USE_SEED_DATA } from 'constants/seedData';
 
 export default function Dashboard() {
   const auth = useAuth();
@@ -19,11 +20,13 @@ export default function Dashboard() {
     else localStorage.setItem('token', tokenParam);
     if (localStorage.getItem('token')) {
       fetchLoggedInBasicDetails();
-      axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/register?eventName=${encodeURIComponent(`${process.env.NEXT_PUBLIC_EVENT_NAME}`)}`,
-        {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
-      );
+      if (!USE_SEED_DATA) {
+        axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/register?eventName=${encodeURIComponent(`${process.env.NEXT_PUBLIC_EVENT_NAME}`)}`,
+          {},
+          { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
+        );
+      }
     }
   }, [auth]);
 

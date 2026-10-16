@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { USE_SEED_DATA, seedDefaultUser } from 'constants/seedData';
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -27,6 +28,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const check_login = useCallback(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
+      if (USE_SEED_DATA && !localStorage.getItem('token')) {
+        localStorage.setItem('token', 'seed-mock-jwt-token');
+        localStorage.setItem('user', JSON.stringify(seedDefaultUser));
+        setLoggedIn(true);
+        return;
+      }
       const token = localStorage.getItem('token');
       if (token) {
         setLoggedIn(true);

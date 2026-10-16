@@ -29,9 +29,16 @@ export interface ProfileData {
   rank: number;
 }
 
+import { USE_SEED_DATA, seedDefaultUser } from 'constants/seedData';
+
 export default function ProfileSelf() {
   useEffect(() => {
-    const cached = JSON.parse(localStorage.getItem('user') ?? '{}');
+    let cached = JSON.parse(localStorage.getItem('user') ?? '{}');
+    if (!cached?.githubId && USE_SEED_DATA) {
+      localStorage.setItem('token', 'seed-mock-jwt-token');
+      localStorage.setItem('user', JSON.stringify(seedDefaultUser));
+      cached = seedDefaultUser;
+    }
     const githubID = cached?.githubId;
     if (githubID) redirect(`/user/profile/${githubID}`);
     else redirect('/auth/sign-in');

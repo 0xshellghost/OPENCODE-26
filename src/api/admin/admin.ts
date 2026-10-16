@@ -1,6 +1,12 @@
 // src/api/admin/admin.ts
+import { USE_SEED_DATA, getSeedProfile } from 'constants/seedData';
 
 export async function getUserPRDetails(githubId: string, eventName: string) {
+  if (USE_SEED_DATA) {
+    const profile = getSeedProfile(githubId);
+    return Promise.resolve(profile.PR || []);
+  }
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${githubId}/${eventName}/pr`,
     {
@@ -23,6 +29,10 @@ export async function getUserPRDetails(githubId: string, eventName: string) {
 
 export async function EditPRPoints(prUpdateData: any) {
   if (typeof window === 'undefined') return;
+
+  if (USE_SEED_DATA) {
+    return Promise.resolve({ success: true, message: 'Points updated (Seeded)' });
+  }
 
   try {
     const token = localStorage.getItem('token');

@@ -19,6 +19,7 @@ import { useMemo, useState } from 'react';
 import BlurText from '../../../components/reactbits/BlurText';
 import ShinyText from '../../../components/reactbits/ShinyText';
 import ClickSpark from '../../../components/reactbits/ClickSpark';
+import CountUp from '../../../components/reactbits/CountUp';
 import {
   FaCodeBranch,
   FaUsers,
@@ -168,7 +169,7 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
                 POINTS
               </Text>
               <Text fontSize="22px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
-                {w.points.toLocaleString()}
+                <CountUp to={w.points} separator="," duration={1.2} />
               </Text>
             </Box>
 
@@ -177,7 +178,7 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
                 PRs MERGED
               </Text>
               <Text fontSize="22px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
-                {w.prmerged.toLocaleString()}
+                <CountUp to={w.prmerged} separator="," duration={1} />
               </Text>
             </Box>
           </Flex>

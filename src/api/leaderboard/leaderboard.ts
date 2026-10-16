@@ -1,3 +1,5 @@
+import { USE_SEED_DATA, seedLeaderboard } from 'constants/seedData';
+
 const LEADERBOARD_API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`;
 type RowObj = {
 	position:number;
@@ -12,6 +14,9 @@ type RowObj = {
 };
 
 export const FetchedLeaderboard = async (eventName: string): Promise<RowObj[]> => {
+  if (USE_SEED_DATA) {
+    return Promise.resolve(seedLeaderboard as RowObj[]);
+  }
 
   try {
     const response = await fetch(`${LEADERBOARD_API_URL}${eventName}/leaderboard`);

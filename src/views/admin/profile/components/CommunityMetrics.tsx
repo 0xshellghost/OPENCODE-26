@@ -9,6 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { GitMerge, Star, Award, Crown, Shield } from 'lucide-react';
+import CountUp from '../../../../components/reactbits/CountUp';
 
 interface CommunityMetricsProps {
   prMerged: number;
@@ -134,7 +135,7 @@ export default function CommunityMetrics({
             fontFamily="var(--f-mono)"
             mt="8px"
           >
-            {prMerged}
+            <CountUp to={prMerged} duration={1} />
           </Text>
           <Text
             fontSize="12px"
@@ -189,7 +190,7 @@ export default function CommunityMetrics({
             fontFamily="var(--f-mono)"
             mt="8px"
           >
-            {pointsEarned.toLocaleString()}
+            <CountUp to={pointsEarned} duration={1.2} separator="," />
           </Text>
           <Text
             fontSize="12px"
@@ -300,7 +301,7 @@ export default function CommunityMetrics({
             fontFamily="var(--f-mono)"
             mt="8px"
           >
-            #{rankNumber}
+            #<CountUp to={rankNumber} duration={1} />
           </Text>
           <Text
             fontSize="12px"
@@ -311,7 +312,7 @@ export default function CommunityMetrics({
             Standing
           </Text>
           <Text fontSize="11px" color="#f0a8b8" fontWeight="700" mt="1px">
-            Top {topPercentile}% Contributor
+            Top <CountUp to={topPercentile} duration={1.2} />% Contributor
           </Text>
         </Box>
       </Grid>
@@ -332,7 +333,7 @@ export default function CommunityMetrics({
           </Flex>
           {nextTier ? (
             <Text fontFamily="var(--f-mono)" fontWeight="700" color="#f0a8b8">
-              +{pointsToNextTier.toLocaleString()} pts to {nextTier.name}
+              +<CountUp to={pointsToNextTier} duration={1.2} separator="," /> pts to {nextTier.name}
             </Text>
           ) : (
             <Text fontWeight="700" color="#FFD700">

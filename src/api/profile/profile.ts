@@ -1,5 +1,27 @@
+import {
+  USE_SEED_DATA,
+  seedDefaultUser,
+  getSeedProfile,
+  seedColleges,
+} from 'constants/seedData';
+
 export async function fetchLoggedInBasicDetails() {
   if (typeof window === 'undefined') return null;
+
+  if (USE_SEED_DATA) {
+    const existing = localStorage.getItem('user');
+    if (existing) {
+      try {
+        const parsed = JSON.parse(existing);
+        if (parsed?.githubId) return parsed;
+      } catch {
+        // ignore
+      }
+    }
+    localStorage.setItem('token', 'seed-mock-jwt-token');
+    localStorage.setItem('user', JSON.stringify(seedDefaultUser));
+    return seedDefaultUser;
+  }
 
   const token = localStorage.getItem('token');
 
@@ -28,6 +50,14 @@ export async function fetchLoggedInBasicDetails() {
 }
 
 export async function sendRegData(formData: any) {
+  if (USE_SEED_DATA) {
+    return Promise.resolve({
+      success: true,
+      message: 'Registration successful (Seeded Mock)',
+      data: formData,
+    });
+  }
+
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(
@@ -57,6 +87,11 @@ export async function sendRegData(formData: any) {
 }
 
 export async function getUserProfileByName(profileName: string) {
+  if (USE_SEED_DATA) {
+    const profile = getSeedProfile(profileName);
+    return Promise.resolve({ success: true, data: profile });
+  }
+
   const token = localStorage.getItem('token');
 
   const response = await fetch(
@@ -87,8 +122,24 @@ export type ProfileUpdatePayload = {
 export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
-  if (!token) {
-    throw new Error('No authentication token found. Please sign in again.');
+  if (!token || USE_SEED_DATA) {
+    if (typeof window !== 'undefined') {
+      try {
+        const currentUser = JSON.parse(localStorage.getItem('user') ?? '{}');
+        const merged = {
+          ...currentUser,
+          ...updatedData,
+        };
+        localStorage.setItem('user', JSON.stringify(merged));
+      } catch (e) {
+        console.error('Error updating localStorage:', e);
+      }
+    }
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({ success: true, data: updatedData });
+      }, 300);
+    });
   }
 
   // Never send GitHub ID or email — those fields are immutable.
@@ -149,6 +200,10 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
 }
 
 export async function fetchColleges() {
+  if (USE_SEED_DATA) {
+    return Promise.resolve(seedColleges);
+  }
+
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/colleges`);
     if (!response.ok) {
