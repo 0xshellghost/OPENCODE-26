@@ -1,32 +1,62 @@
 'use client';
 
-
 import { useDeferredValue, useMemo, useState, useCallback } from 'react';
-import { FaSearchMinus } from 'react-icons/fa';
-
 import {
+  Avatar,
   Box,
   Flex,
-  Text,
+  HStack,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  Switch,
+  MenuList,
+  SimpleGrid,
+  Text,
+  chakra,
 } from '@chakra-ui/react';
-import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaSearch, FaFilter } from "react-icons/fa";
-import { MdClear } from 'react-icons/md'
+import { FaBuilding, FaCalendarAlt, FaCheck, FaCrown, FaSearchMinus } from 'react-icons/fa';
+import { MdClear } from 'react-icons/md';
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
-import PageHeading from 'components/japanese/PageHeading';
 import ColumnsTable, {
   type RowObj,
 } from 'views/admin/dataTables/components/ColumnsTable';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
+
+const SERIF = "Georgia, 'Times New Roman', serif";
+const CONTROL_H = '44px';
+
+const MEDALS = {
+  1: { bg: 'linear-gradient(180deg, #f7e7b4 0%, #ecd599 100%)', ring: 'rgba(212, 175, 55, 0.55)', ink: '#2a1420' },
+  2: { bg: 'linear-gradient(180deg, #e8ecf1 0%, #d5dbe3 100%)', ring: 'rgba(160, 174, 192, 0.55)', ink: '#2a1420' },
+  3: { bg: 'linear-gradient(180deg, #eddcd2 0%, #ddc4b5 100%)', ring: 'rgba(205, 127, 50, 0.45)', ink: '#2a1420' },
+} as const;
+
+function safeDecode(value: string | undefined): string {
+  try {
+    return decodeURIComponent(value ?? '');
+  } catch {
+    return value ?? '';
+  }
+}
+
+/* Shared look for every control in the toolbar so heights, borders and hover states match. */
+const controlStyle = {
+  h: CONTROL_H,
+  px: '14px',
+  bg: 'var(--card-soft)',
+  border: '1px solid',
+  borderRadius: '12px',
+  color: 'var(--text)',
+  fontSize: '13px',
+  fontWeight: '600',
+  transition: 'all 0.2s ease',
+  _hover: { borderColor: 'var(--border-strong)', bg: 'var(--accent-soft)' },
+  _focusVisible: { outline: '2px solid var(--accent)', outlineOffset: '2px' },
+} as const;
 
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
@@ -35,13 +65,7 @@ export default function EventName() {
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
 
-  const textColor = opencodeTokens.colors.text.primary;
-  const mutedText = opencodeTokens.colors.text.secondary;
-  const glassBg = opencodeTokens.colors.background.glassDark;
-  const filterBorder = opencodeTokens.colors.border.light;
-  const menuBg = opencodeTokens.colors.background.glassDark;
-  const menuHover = opencodeTokens.colors.background.glassLight;
-  const menuBorder = opencodeTokens.colors.border.light;
+  const eventLabel = safeDecode(eventName);
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -50,19 +74,22 @@ export default function EventName() {
     enabled: !!eventName,
   });
 
-  const tableDataColumns: RowObj[] = useMemo(() => (LeadData || []).map((item) => ({
-    position: String(item.position),
-    name: item.name,
-    prmerged: Number(item.prmerged),
-    githubid: item.githubid,
-    points: Number(item.points),
-    avatarUrl: item.avatarUrl,
-    prDetailsURL: item.prDetailsURL,
-    college: item.collegeName ?? '',
-    graduationYear: item.graduationYear ?? '',
-  })), [LeadData]);
+  const tableDataColumns: RowObj[] = useMemo(
+    () =>
+      (LeadData || []).map((item) => ({
+        position: String(item.position),
+        name: item.name,
+        prmerged: Number(item.prmerged),
+        githubid: item.githubid,
+        points: Number(item.points),
+        avatarUrl: item.avatarUrl,
+        prDetailsURL: item.prDetailsURL,
+        college: item.collegeName ?? '',
+        graduationYear: item.graduationYear ?? '',
+      })),
+    [LeadData],
+  );
 
-  // Extract unique filter options from the data
   const collegeOptions = useMemo(() => {
     const colleges = tableDataColumns
       .map((r) => (r.college as string)?.trim())
@@ -97,9 +124,25 @@ export default function EventName() {
     }
     return data;
   }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
+
   const deferredTableData = useDeferredValue(filteredTableData);
   const isStale = deferredTableData !== filteredTableData;
   const participantCount = filteredTableData.length;
+  const totalCount = tableDataColumns.length;
+
+  const topScore = useMemo(
+    () => tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0),
+    [tableDataColumns],
+  );
+
+  // Top 3 overall (not affected by filters) for the spotlight cards
+  const topThree = useMemo(
+    () =>
+      [...tableDataColumns]
+        .sort((a, b) => Number(a.position) - Number(b.position))
+        .slice(0, 3),
+    [tableDataColumns],
+  );
 
   const clearAllFilters = useCallback(() => {
     setSelectedCollege('All');
@@ -107,330 +150,451 @@ export default function EventName() {
     setSearchQuery('');
   }, []);
 
+  const showSpotlight = !hasActiveFilters && topThree.length === 3;
+
+  // When the spotlight cards are visible, don't repeat those three people in the table below.
+  // With any filter active the spotlight is hidden, so the table shows everyone who matches.
+  const tableRows = useMemo(() => {
+    if (!showSpotlight) return deferredTableData;
+    const spotlightIds = new Set(topThree.map((r) => r.githubid));
+    return deferredTableData.filter((r) => !spotlightIds.has(r.githubid));
+  }, [showSpotlight, deferredTableData, topThree]);
+
   if (isLoading) {
     return <LeaderboardLoader />;
   }
 
+  const showEmpty = hasActiveFilters && filteredTableData.length === 0;
+
   return (
-    <Box
-      pt="0"
-      px="0"
-      maxW="1400px"
-      mx="auto"
-    >
-      <Flex
-        direction="column"
-        gap={{ base: '18px', md: '24px' }}
-        mb={{ base: '20px', md: '28px' }}
+    <Flex direction="column" gap="24px" w="100%" maxW="1400px" mx="auto">
+      {/* ─── 1. HEADER ─── */}
+      <Box
+        as="header"
+        className="oc-page-heading"
+        display="flex"
+        flexDirection={{ base: 'column', lg: 'row' }}
+        alignItems={{ base: 'flex-start', lg: 'center' }}
+        justifyContent="space-between"
+        gap={{ base: '20px', md: '28px' }}
+        mb="0"
+        p={{ base: '22px 20px', sm: '28px 32px', md: '34px 44px' }}
       >
-
-        <PageHeading eyebrow={`${decodeURIComponent(eventName)} · THE ARENA OF CREATORS`} title="Leaderboard" description="Compete with curiosity. Contribute with purpose. Every step forward earns its place here." />
-
+        <Box flex="1" minW="0">
+          <p className="oc-eyebrow" style={{ marginBottom: '12px' }}>
+            <span />
+            {eventLabel} · The Arena of Creators
+          </p>
+          <h1 style={{ marginBottom: '12px' }}>Leaderboard</h1>
+          <p className="oc-description">
+            Compete with curiosity. Contribute with purpose. Every step forward earns its place here.
+          </p>
+        </Box>
 
         <Flex
-          w="100%"
-          align="center"
-          justify="space-between"
-          gap="12px"
-          flexWrap="wrap"
+          gap={{ base: '8px', sm: '12px', md: '14px' }}
+          wrap="wrap"
+          w={{ base: '100%', lg: 'auto' }}
+          justify={{ base: 'space-between', sm: 'flex-start', lg: 'flex-end' }}
+          flexShrink={0}
         >
-          <Flex
-            align="center"
-            gap={{ base: '8px', md: '12px' }}
-            flexWrap="wrap"
-            flex="1"
-          >
-            <SearchProfileBanner
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
+          <StatTile label="Participants" value={totalCount.toLocaleString()} />
+          <StatTile
+            label={hasActiveFilters ? 'Matching' : 'Showing'}
+            value={participantCount.toLocaleString()}
+          />
+          <StatTile label="Top score" value={topScore.toLocaleString()} />
+        </Flex>
+      </Box>
 
-            <Box
-              onMouseEnter={() => setIsCollegeHovered(true)}
-              onFocus={() => setIsCollegeHovered(true)}
+      {/* ─── 2. TOOLBAR ─── */}
+      {/* position + zIndex keep the college dropdown above the table card below it
+          (both cards use backdrop-filter, which creates stacking contexts) */}
+      <Flex
+        className="glass-panel"
+        position="relative"
+        zIndex={5}
+        p={{ base: '12px', md: '14px 16px' }}
+        gap="12px"
+        flexWrap="wrap"
+        align="center"
+      >
+        <Box flex="1 1 260px" minW="220px">
+          <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} />
+        </Box>
+
+        {/* College filter */}
+        <Box onMouseEnter={() => setIsCollegeHovered(true)} onFocus={() => setIsCollegeHovered(true)}>
+          <Menu isLazy={!isCollegeHovered}>
+            <MenuButton
+              {...controlStyle}
+              borderColor={selectedCollege !== 'All' ? 'var(--accent)' : 'var(--border)'}
+              position="relative"
+              aria-label="Filter by college"
             >
-              <Menu isLazy={!isCollegeHovered}>
-                <MenuButton
+              {/* Chakra wraps MenuButton children in ONE span, so the icon/text/chevron
+                  need their own flex row or they stack vertically. */}
+              <Flex align="center" gap="8px">
+                <Box
                   display="flex"
-                  alignItems="center"
-                  gap="8px"
-                  px={{ base: '10px', md: '14px' }}
-                  py={{ base: '8px', md: '10px' }}
-                  bg={glassBg}
-                  borderRadius="16px"
-                  border="1px solid"
-                  borderColor={selectedCollege !== 'All' ? opencodeTokens.colors.accent.sakura : filterBorder}
-                  backdropFilter="blur(20px)"
-                  boxShadow={opencodeTokens.shadows.glass}
-                  transition="all 0.3s ease"
-                  position="relative"
-                  cursor="pointer"
-                  _hover={{ borderColor: opencodeTokens.colors.accent.sakura }}
+                  color={selectedCollege !== 'All' ? 'var(--accent)' : 'var(--subtle)'}
                 >
-                  <Box
-                    color={selectedCollege !== 'All' ? opencodeTokens.colors.accent.sakura : opencodeTokens.colors.text.secondary}
-                    display="flex"
-                    alignItems="center"
-                    transition="color 0.2s ease"
-                  >
-                    <FaBuilding size={16} />
-                  </Box>
-                  <Text
-                    fontSize="13px"
-                    fontWeight="600"
-                    color={textColor}
-                    noOfLines={1}
-                    maxW={{ base: '100px', md: '140px' }}
-                  >
-                    {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
-                  </Text>
-                  <Box color={opencodeTokens.colors.text.secondary} display="flex" alignItems="center">
-                    <ChevronDown size={14} />
-                  </Box>
-                  {selectedCollege !== 'All' && (
-                    <Box
-                      position="absolute"
-                      top="-4px"
-                      right="-4px"
-                      w="10px"
-                      h="10px"
-                      bg={opencodeTokens.colors.accent.sakura}
-                      borderRadius="full"
-                      boxShadow={`0 0 10px ${opencodeTokens.colors.accent.sakura}`}
-                    />
-                  )}
-                </MenuButton>
-                <MenuList
-                  bg={menuBg}
-                  border="1px solid"
-                  borderColor={menuBorder}
-                  borderRadius="14px"
-                  boxShadow={opencodeTokens.shadows.glass}
-                  backdropFilter="blur(20px)"
-                  py="6px"
-                  maxH="280px"
-                  overflowY="auto"
-                  minW="200px"
-                  zIndex={20}
-                  sx={{
-                    '&::-webkit-scrollbar': { width: '4px' },
-                    '&::-webkit-scrollbar-track': { bg: 'transparent' },
-                    '&::-webkit-scrollbar-thumb': {
-                      bg: opencodeTokens.colors.border.medium,
-                      borderRadius: 'full',
-                    },
-                  }}
-                >
+                  <FaBuilding size={14} />
+                </Box>
+                <Text noOfLines={1} maxW={{ base: '110px', md: '170px' }} fontSize="13px" fontWeight="600">
+                  {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
+                </Text>
+                <Box display="flex" color="var(--subtle)">
+                  <ChevronDown size={14} />
+                </Box>
+              </Flex>
+              {selectedCollege !== 'All' && (
+                <Box
+                  position="absolute"
+                  top="-4px"
+                  right="-4px"
+                  w="10px"
+                  h="10px"
+                  bg="var(--accent)"
+                  borderRadius="full"
+                  boxShadow="0 0 10px var(--accent)"
+                />
+              )}
+            </MenuButton>
+            <MenuList
+              bg="var(--card-strong)"
+              color="var(--text)"
+              border="1px solid var(--border)"
+              borderRadius="14px"
+              boxShadow="var(--shadow)"
+              backdropFilter="blur(20px)"
+              py="6px"
+              maxH="300px"
+              overflowY="auto"
+              minW="220px"
+              zIndex={20}
+              sx={{
+                '&::-webkit-scrollbar': { width: '4px' },
+                '&::-webkit-scrollbar-track': { bg: 'transparent' },
+                '&::-webkit-scrollbar-thumb': { bg: 'var(--border)', borderRadius: 'full' },
+              }}
+            >
+              {['All', ...collegeOptions].map((college) => {
+                const selected = selectedCollege === college;
+                return (
                   <MenuItem
-                    onClick={() => setSelectedCollege('All')}
+                    key={college}
+                    onClick={() => setSelectedCollege(college)}
                     bg="transparent"
-                    _hover={{ bg: menuHover }}
+                    _hover={{ bg: 'var(--accent-soft)' }}
+                    _focus={{ bg: 'var(--accent-soft)' }}
                     borderRadius="8px"
                     mx="6px"
+                    w="calc(100% - 12px)"
                     px="12px"
                     py="8px"
                     fontSize="13px"
-                    fontWeight={selectedCollege === 'All' ? '700' : '500'}
-                    color={selectedCollege === 'All' ? opencodeTokens.colors.accent.sakura : textColor}
-                    icon={selectedCollege === 'All' ? <FaCheck size={14} /> : undefined}
+                    fontWeight={selected ? '700' : '500'}
+                    color={selected ? 'var(--accent)' : 'var(--text)'}
                   >
-                    All Colleges
+                    <Flex w="100%" justify="space-between" align="center" gap="10px">
+                      <Text noOfLines={1}>{college === 'All' ? 'All Colleges' : college}</Text>
+                      {selected && <FaCheck size={12} />}
+                    </Flex>
                   </MenuItem>
-                  {collegeOptions.map((college) => (
-                    <MenuItem
-                      key={college}
-                      onClick={() => setSelectedCollege(college)}
-                      bg="transparent"
-                      _hover={{ bg: menuHover }}
-                      borderRadius="8px"
-                      mx="6px"
-                      px="12px"
-                      py="8px"
-                      fontSize="13px"
-                      fontWeight={selectedCollege === college ? '700' : '500'}
-                      color={selectedCollege === college ? opencodeTokens.colors.accent.sakura : textColor}
-                      icon={selectedCollege === college ? <FaCheck size={14} /> : undefined}
-                    >
-                      {college}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            </Box>
+                );
+              })}
+            </MenuList>
+          </Menu>
+        </Box>
 
-            <Flex
-              align="center"
-              gap="10px"
-              px={{ base: '12px', md: '16px' }}
-              py={{ base: '8px', md: '10px' }}
-              bg={glassBg}
-              borderRadius="16px"
-              border="1px solid"
-              borderColor={firstYearOnly ? opencodeTokens.colors.accent.sakura : filterBorder}
-              backdropFilter="blur(20px)"
-              boxShadow={opencodeTokens.shadows.glass}
-              transition="all 0.3s ease"
-              cursor="pointer"
-              onClick={() => setFirstYearOnly((prev) => !prev)}
-              _hover={{ borderColor: opencodeTokens.colors.accent.sakura }}
-            >
-              <Box color={firstYearOnly ? opencodeTokens.colors.accent.sakura : opencodeTokens.colors.text.secondary} display="flex">
-                <FaCalendarAlt size={16} />
-              </Box>
-              <Text fontSize="13px" fontWeight="600" color={textColor}>
-                1st Years Only
-              </Text>
-              <Switch
-                isChecked={firstYearOnly}
-                isReadOnly
-                pointerEvents="none"
-                tabIndex={-1}
-                colorScheme="pink"
-                size="sm"
-              />
-            </Flex>
-
-            {hasActiveFilters && (
-              <Flex
-                align="center"
-                gap="4px"
-                px="10px"
-                py="6px"
-                borderRadius="full"
-                bg={opencodeTokens.colors.accent.sakura}
-                color={opencodeTokens.colors.background.base}
-                fontSize="12px"
-                fontWeight="700"
-                cursor="pointer"
-                transition="all 0.3s ease"
-                _hover={{
-                  bg: opencodeTokens.colors.accent.sakuraHover,
-                  transform: 'scale(1.05)',
-                  boxShadow: `0 0 10px ${opencodeTokens.colors.accent.sakura}`
-                }}
-                onClick={clearAllFilters}
-              >
-                <MdClear size={12} />
-                Clear
-              </Flex>
-            )}
-          </Flex>
-
-          <Flex
-            align="center"
-            gap={{ base: '6px', md: '12px' }}
-            px={{ base: '10px', md: '18px' }}
-            py={{ base: '8px', md: '12px' }}
-            bg={glassBg}
-            border={`1px solid ${filterBorder}`}
-            borderRadius="16px"
-            backdropFilter="blur(20px)"
-            boxShadow={opencodeTokens.shadows.glass}
-            minW={{ base: 'auto', md: '180px' }}
-            justify="center"
+        {/* 1st years toggle: real button with switch semantics (keyboard + screen reader friendly) */}
+        <chakra.button
+          type="button"
+          role="switch"
+          aria-checked={firstYearOnly}
+          aria-label="Show first years only"
+          onClick={() => setFirstYearOnly((prev) => !prev)}
+          display="flex"
+          alignItems="center"
+          gap="10px"
+          {...controlStyle}
+          borderColor={firstYearOnly ? 'var(--accent)' : 'var(--border)'}
+        >
+          <Box display="flex" color={firstYearOnly ? 'var(--accent)' : 'var(--subtle)'}>
+            <FaCalendarAlt size={14} />
+          </Box>
+          <span>1st Years Only</span>
+          <Box
+            position="relative"
+            w="34px"
+            h="20px"
+            borderRadius="full"
+            bg={firstYearOnly ? 'var(--accent)' : 'var(--accent-soft)'}
+            transition="background 0.2s ease"
+            flexShrink={0}
           >
             <Box
-              p={{ base: '6px', md: '10px' }}
+              position="absolute"
+              top="2px"
+              left={firstYearOnly ? '16px' : '2px'}
+              w="16px"
+              h="16px"
               borderRadius="full"
-              bg={opencodeTokens.colors.background.glassLight}
-              color={opencodeTokens.colors.accent.sakura}
-              fontSize={{ base: '12px', md: '14px' }}
-            >
-              <FaUsers />
-            </Box>
-
-
-            <Box display={{ base: 'none', md: 'block' }}>
-              <Text
-                fontSize="11px"
-                color={mutedText}
-                fontWeight="600"
-                letterSpacing="0.6px"
-              >
-                {hasActiveFilters ? 'FILTERED' : 'TOTAL'}
-              </Text>
-            </Box>
-
-            <Text
-              fontSize={{ base: '14px', md: '22px' }}
-              fontWeight="800"
-              color={textColor}
-            >
-              {participantCount}
-            </Text>
-          </Flex>
-
-        </Flex>
-      </Flex>
-      {(searchQuery || hasActiveFilters) && filteredTableData.length === 0 && (
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          py="80px"
-          px="20px"
-          textAlign="center"
-        >
-          {/* Icon */}
-          <Box
-            p="22px"
-            borderRadius="full"
-            bg={opencodeTokens.colors.background.glassLight}
-            color={opencodeTokens.colors.accent.sakura}
-            mb="18px"
-            boxShadow={`0 10px 30px ${opencodeTokens.colors.accent.sakura}40`}
-          >
-            <FaSearchMinus size={36} />
+              bg={firstYearOnly ? 'var(--accent-ink)' : 'var(--muted)'}
+              transition="left 0.2s ease, background 0.2s ease"
+            />
           </Box>
+        </chakra.button>
 
-
-          <Text
-            fontSize={{ base: '18px', md: '22px' }}
-            fontWeight="800"
-            color={textColor}
-            mb="6px"
-          >
-            No contributors found
-          </Text>
-
-
-          <Text
-            fontSize="14px"
-            color={mutedText}
-            maxW="360px"
-            lineHeight="1.6"
-          >
-            We searched the leaderboard thoroughly.
-            Either this legend hasn’t joined yet… or the spelling is plotting against you.
-          </Text>
-
-
-          <Text
-            mt="14px"
-            fontSize="13px"
-            color={opencodeTokens.colors.accent.sakura}
-            fontWeight="600"
-            cursor="pointer"
-            _hover={{ textDecoration: 'underline' }}
+        {hasActiveFilters && (
+          <chakra.button
+            type="button"
             onClick={clearAllFilters}
+            aria-label="Clear all filters"
+            display="flex"
+            alignItems="center"
+            gap="6px"
+            h={CONTROL_H}
+            px="14px"
+            borderRadius="12px"
+            bg="var(--accent)"
+            color="var(--accent-ink)"
+            fontSize="13px"
+            fontWeight="700"
+            transition="all 0.2s ease"
+            _hover={{ bg: 'var(--accent-hover)', transform: 'translateY(-1px)' }}
+            _focusVisible={{ outline: '2px solid var(--accent)', outlineOffset: '2px' }}
           >
-            Clear all filters & show all participants
+            <MdClear size={15} />
+            Clear
+          </chakra.button>
+        )}
+
+      </Flex>
+
+      {/* Active filter chips */}
+      {hasActiveFilters && (
+        <Flex gap="8px" flexWrap="wrap" align="center" mt="-8px">
+          <Text fontSize="12px" color="var(--subtle)" mr="4px">
+            Showing {participantCount.toLocaleString()} of {totalCount.toLocaleString()}
           </Text>
+          {searchQuery.trim() && (
+            <FilterChip label={`Search: ${searchQuery.trim()}`} onRemove={() => setSearchQuery('')} />
+          )}
+          {selectedCollege !== 'All' && (
+            <FilterChip label={selectedCollege} onRemove={() => setSelectedCollege('All')} />
+          )}
+          {firstYearOnly && (
+            <FilterChip label="1st years only" onRemove={() => setFirstYearOnly(false)} />
+          )}
         </Flex>
       )}
 
+      {/* ─── 3. TOP 3 SPOTLIGHT ─── */}
+      {showSpotlight && (
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
+          <SpotlightCard row={topThree[0]} rank={1} />
+          <SpotlightCard row={topThree[1]} rank={2} />
+          <SpotlightCard row={topThree[2]} rank={3} />
+        </SimpleGrid>
+      )}
 
-      <Box
-        opacity={isStale ? 0.6 : 1}
-        transition="opacity 0.2s ease"
-        pointerEvents={isStale ? 'none' : 'auto'}
+      {/* ─── 4. EMPTY STATE ─── */}
+      {showEmpty && (
+        <Flex
+          className="glass-panel"
+          direction="column"
+          align="center"
+          justify="center"
+          py="64px"
+          px="20px"
+          textAlign="center"
+        >
+          <Box
+            p="20px"
+            borderRadius="full"
+            bg="var(--accent-soft)"
+            color="var(--accent)"
+            mb="18px"
+            boxShadow="0 10px 30px var(--accent-soft)"
+          >
+            <FaSearchMinus size={32} />
+          </Box>
+          <Text fontFamily={SERIF} fontSize={{ base: '22px', md: '26px' }} color="var(--text)" mb="6px">
+            No contributors found
+          </Text>
+          <Text fontSize="14px" color="var(--muted)" maxW="380px" lineHeight="1.7">
+            We searched the leaderboard thoroughly. Either this legend hasn’t joined yet… or the spelling is
+            plotting against you.
+          </Text>
+          <chakra.button type="button" className="oc-button" onClick={clearAllFilters} mt="20px">
+            Clear all filters
+          </chakra.button>
+        </Flex>
+      )}
+
+      {/* ─── 5. TABLE ─── */}
+      {!showEmpty && (
+        <Box
+          opacity={isStale ? 0.6 : 1}
+          transition="opacity 0.2s ease"
+          pointerEvents={isStale ? 'none' : 'auto'}
+        >
+          <ColumnsTable tableData={tableRows} eventName={eventLabel} />
+        </Box>
+      )}
+    </Flex>
+  );
+}
+
+/* ------------------ Helpers ------------------ */
+
+function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <Box
+      px={{ base: '12px', sm: '16px', md: '20px' }}
+      py={{ base: '10px', md: '14px' }}
+      borderRadius="16px"
+      bg="var(--card-soft)"
+      border="1px solid var(--border)"
+      textAlign="center"
+      minW={{ base: '86px', sm: '104px', md: '124px' }}
+      flex={{ base: '1', sm: 'initial' }}
+    >
+      <Text
+        fontFamily={SERIF}
+        fontSize={{ base: '20px', sm: '24px', md: '28px' }}
+        color="var(--text)"
+        lineHeight="1"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
       >
-        <ColumnsTable
-          tableData={deferredTableData}
-          eventName={decodeURIComponent(eventName ?? '')}
-        />
-      </Box>
+        {value}
+      </Text>
+      <Text fontSize={{ base: '10.5px', sm: '11.5px', md: '12px' }} color="var(--muted)" mt="4px" fontWeight="500" noOfLines={1}>
+        {label}
+      </Text>
     </Box>
   );
 }
 
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <HStack
+      spacing="4px"
+      pl="12px"
+      pr="5px"
+      py="4px"
+      borderRadius="full"
+      bg="var(--accent-soft)"
+      border="1px solid var(--border-strong)"
+      color="var(--accent)"
+      fontSize="12px"
+      fontWeight="600"
+    >
+      <Text noOfLines={1} maxW="220px">
+        {label}
+      </Text>
+      <chakra.button
+        type="button"
+        aria-label={`Remove filter ${label}`}
+        onClick={onRemove}
+        display="flex"
+        p="3px"
+        borderRadius="full"
+        transition="background 0.2s ease"
+        _hover={{ bg: 'var(--accent-soft)' }}
+        _focusVisible={{ outline: '2px solid var(--accent)' }}
+      >
+        <MdClear size={13} />
+      </chakra.button>
+    </HStack>
+  );
+}
+
+function SpotlightCard({ row, rank }: { row: RowObj; rank: 1 | 2 | 3 }) {
+  const medal = MEDALS[rank];
+  const isFirst = rank === 1;
+  const college = String(row.college ?? '').trim();
+
+  return (
+    <Box
+      className="glass-panel"
+      position="relative"
+      textAlign="center"
+      p={{ base: '20px 16px', md: isFirst ? '30px 20px 26px' : '22px 18px' }}
+      // 1st place sits in the middle on desktop, but first on mobile
+      order={{ base: rank, md: rank === 1 ? 2 : rank === 2 ? 1 : 3 }}
+      boxShadow={`0 0 0 1px ${medal.ring}, 0 18px 40px -20px ${medal.ring}`}
+      transition="transform 0.25s ease"
+      _hover={{ transform: 'translateY(-4px)' }}
+    >
+      {isFirst && (
+        <Box display="flex" justifyContent="center" color="#f6c445" mb="8px">
+          <FaCrown size={22} />
+        </Box>
+      )}
+
+      <Box position="relative" display="inline-block">
+        <Avatar
+          src={row.avatarUrl as string}
+          name={row.name}
+          size={isFirst ? 'xl' : 'lg'}
+          border="3px solid"
+          borderColor={medal.ring}
+        />
+        <Box
+          position="absolute"
+          bottom="-6px"
+          left="50%"
+          transform="translateX(-50%)"
+          px="9px"
+          py="1px"
+          borderRadius="full"
+          fontSize="11px"
+          fontWeight="800"
+          bg={medal.bg}
+          color={medal.ink}
+          boxShadow="0 2px 8px rgba(0,0,0,0.25)"
+        >
+          #{rank}
+        </Box>
+      </Box>
+
+      <Text
+        fontFamily={SERIF}
+        fontSize={{ base: '19px', md: isFirst ? '23px' : '19px' }}
+        color="var(--text)"
+        noOfLines={1}
+        mt="16px"
+      >
+        {row.name}
+      </Text>
+      <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
+        @{row.githubid}
+      </Text>
+      {college && (
+        <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="2px">
+          {college}
+        </Text>
+      )}
+
+      <Text
+        fontFamily={SERIF}
+        fontSize={{ base: '30px', md: isFirst ? '40px' : '32px' }}
+        color="var(--text)"
+        lineHeight="1.1"
+        mt="14px"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
+      >
+        {Number(row.points).toLocaleString()}{' '}
+        <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
+          pts
+        </Text>
+      </Text>
+      <Text fontSize="12px" color="var(--muted)" mt="2px">
+        {Number(row.prmerged).toLocaleString()} PRs merged
+      </Text>
+    </Box>
+  );
+}
