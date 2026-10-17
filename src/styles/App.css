@@ -394,8 +394,16 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
   100% { background-position: -200% 0; }
 }
 
+.oc-skeleton-shimmer {
+  background: linear-gradient(90deg, var(--card-soft) 25%, var(--border) 50%, var(--card-soft) 75%) !important;
+  background-size: 200% 100% !important;
+  animation: skeleton-shimmer 1.8s infinite !important;
+}
+
 .pulse-live-dot {
   animation: live-pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 @keyframes shiny-text {
   0% {
     background-position: 100% 0;
@@ -404,7 +412,6 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
     background-position: -100% 0;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
