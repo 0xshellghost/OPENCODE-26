@@ -1,50 +1,74 @@
 'use client';
 
-import { Box, Flex, Text, keyframes, Image } from '@chakra-ui/react';
+import { Box, Flex, Text, VisuallyHidden, keyframes } from '@chakra-ui/react';
 import { opencodeTokens } from 'theme/opencode-tokens';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+/*
+ * THEME-INDEPENDENT ON PURPOSE.
+ * This loader mounts before / outside Chakra's theme context, so Chakra tokens and responsive
+ * objects don't resolve here: `{ base, md }` sizes, `borderRadius="full"`, `mb={2}`, `gap={4}`
+ * and `whiteAlpha.700` all silently turn into nothing. That is why the ensō ring and logo
+ * collapsed to a 0px box (only a tiny dot and a small dashed ring were visible) and the text
+ * spacing was cramped. Use ONLY raw CSS values in this file: px/rem strings, `clamp()` for
+ * responsive sizes, and rgba()/hex colours.
+ */
+const SAKURA = opencodeTokens.colors.accent.sakura;
+/** Sakura pink with alpha. Avoids the `${hex}40` suffix trick, which breaks if the token is not a 6-digit hex. */
+const rose = (alpha: number) => `rgba(233, 167, 178, ${alpha})`;
+
+/** Short, on-theme status lines. They advance on a timer and stop on the last one. */
+const MESSAGES = ['Lighting the lanterns', 'Gathering petals', 'Opening the gate', 'Almost there'];
+const MESSAGE_MS = 1400;
+/** The bar creeps toward this and only reaches 100% when the loader is told to exit. */
+const PROGRESS_CEILING = 92;
 
 /* ───────────── keyframes ───────────── */
 
 const fadeFloat = keyframes`
-  0% { opacity: 0; transform: translateY(18px); }
+  0%   { opacity: 0; transform: translateY(18px); }
   100% { opacity: 1; transform: translateY(0); }
 `;
 
-const progressAnim = keyframes`
-  0% { width: 0%; }
-  30% { width: 45%; }
-  60% { width: 75%; }
-  100% { width: 100%; }
+const messageIn = keyframes`
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+
+const dots = keyframes`
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
 `;
 
 const spin = keyframes`
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 `;
 
 const spinReverse = keyframes`
   from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  to   { transform: rotate(0deg); }
 `;
 
+/* Petals: the OUTER element falls, the INNER element sways and turns.
+   (Before, the sway was attached to an empty ::before, so it never did anything visible.) */
 const petalFall = keyframes`
-  0%   { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { transform: translate(80px, 110vh) rotate(720deg); opacity: 0; }
+  0%   { transform: translate3d(0, -10vh, 0); opacity: 0; }
+  10%  { opacity: 0.95; }
+  90%  { opacity: 0.95; }
+  100% { transform: translate3d(var(--drift, 60px), 110vh, 0); opacity: 0; }
 `;
 
 const petalSway = keyframes`
-  0%, 100% { transform: translateX(0); }
-  25%  { transform: translateX(30px); }
-  50%  { transform: translateX(-20px); }
-  75%  { transform: translateX(15px); }
+  0%, 100% { transform: translateX(-14px) rotate(-20deg); }
+  50%      { transform: translateX(14px) rotate(160deg); }
 `;
 
 const glowPulse = keyframes`
   0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.08); }
+  50%      { opacity: 1;   transform: scale(1.08); }
 `;
 
 const shimmer = keyframes`
@@ -62,32 +86,36 @@ const diamondPulse = keyframes`
   50%      { box-shadow: 0 0 12px rgba(233, 167, 178, 0.8); }
 `;
 
-/* ───────────── sakura petal component ───────────── */
+/* ───────────── sakura petal ───────────── */
 
-function SakuraPetal({ delay, left, size, duration }: { delay: number; left: string; size: number; duration: number }) {
+interface PetalProps {
+  delay: number;
+  left: string;
+  size: number;
+  duration: number;
+  drift: number;
+}
+
+function SakuraPetal({ delay, left, size, duration, drift }: PetalProps) {
   return (
     <Box
       position="absolute"
       left={left}
-      top="-20px"
-      w={`${size}px`}
-      h={`${size * 0.7}px`}
-      borderRadius="50% 0 50% 50%"
-      bg="linear-gradient(135deg, rgba(233, 167, 178, 0.9), rgba(255, 200, 210, 0.6))"
-      boxShadow="0 0 6px rgba(233, 167, 178, 0.4)"
-      animation={`${petalFall} ${duration}s ease-in-out ${delay}s infinite`}
+      top="-24px"
       opacity={0}
       pointerEvents="none"
-      sx={{
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          borderRadius: 'inherit',
-          animation: `${petalSway} ${duration * 0.4}s ease-in-out ${delay}s infinite`,
-        },
-      }}
-    />
+      aria-hidden="true"
+      style={{ '--drift': `${drift}px`, willChange: 'transform, opacity' } as React.CSSProperties}
+      animation={`${petalFall} ${duration}s ease-in-out ${delay}s infinite`}
+    >
+      <Box
+        w={`${size}px`}
+        h={`${size * 0.7}px`}
+        borderRadius="50% 0 50% 50%"
+        bg={`linear-gradient(135deg, ${rose(0.9)}, rgba(255, 200, 210, 0.6))`}
+        animation={`${petalSway} ${duration * 0.45}s ease-in-out ${delay}s infinite`}
+      />
+    </Box>
   );
 }
 
@@ -99,36 +127,63 @@ type InitialLoaderProps = {
   variant?: 'seo' | 'trophy';
 };
 
-export default function InitialLoader({
-  isExiting = false,
-  onComplete,
-  variant = 'seo',
-}: InitialLoaderProps) {
+export default function InitialLoader({ isExiting = false, onComplete }: InitialLoaderProps) {
+  const [progress, setProgress] = useState(6);
+  const [messageIndex, setMessageIndex] = useState(0);
 
+  /* onComplete: keep the original behaviour (called as soon as the loader mounts),
+     but only ONCE. Previously `[onComplete]` as the dependency meant an inline callback
+     in the parent re-fired it on every parent render. */
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
-    if (onComplete) {
-      onComplete();
-    }
-  }, [onComplete]);
+    onCompleteRef.current = onComplete;
+  });
+  useEffect(() => {
+    onCompleteRef.current?.();
+  }, []);
 
-  // Generate deterministic petal configs (avoids SSR hydration mismatch)
+  /* Progress: ease toward the ceiling, never stall at a fake "100%", then fill on exit. */
+  useEffect(() => {
+    if (isExiting) {
+      setProgress(100);
+      return undefined;
+    }
+    const id = setInterval(() => {
+      setProgress((p) => p + (PROGRESS_CEILING - p) * 0.07);
+    }, 140);
+    return () => clearInterval(id);
+  }, [isExiting]);
+
+  /* Status text: advance, then stay on the last message. */
+  useEffect(() => {
+    if (isExiting) return undefined;
+    const id = setInterval(() => {
+      setMessageIndex((i) => Math.min(i + 1, MESSAGES.length - 1));
+    }, MESSAGE_MS);
+    return () => clearInterval(id);
+  }, [isExiting]);
+
+  // Deterministic petal configs (avoids SSR hydration mismatch). Fewer, slower, calmer than before.
   const petals = useMemo(
     () =>
-      Array.from({ length: 18 }, (_, i) => {
-        const seed = (i * 137.5) % 100;
-        return {
-          id: i,
-          delay: (i * 0.7) % 5,
-          left: `${seed.toFixed(1)}%`,
-          size: 8 + (i % 6) * 2,
-          duration: 5 + (i % 5) * 1.5,
-        };
-      }),
+      Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        delay: (i * 0.9) % 6,
+        left: `${((i * 137.5) % 100).toFixed(1)}%`,
+        size: 9 + (i % 5) * 2,
+        duration: 7 + (i % 4) * 1.6,
+        drift: 40 + (i % 5) * 18,
+      })),
     [],
   );
 
+  const statusText = isExiting ? 'Welcome' : MESSAGES[messageIndex];
+
   return (
     <Box
+      role="status"
+      aria-live="polite"
+      aria-busy={!isExiting}
       position="fixed"
       inset={0}
       zIndex={99999}
@@ -137,8 +192,10 @@ export default function InitialLoader({
       backgroundSize="cover"
       backgroundPosition="center"
       opacity={isExiting ? 0 : 1}
-      transform={isExiting ? 'scale(1.04)' : 'scale(1)'}
-      transition="opacity 700ms ease-out, transform 700ms ease-out"
+      // Staged exit: the content fades first (250ms, see the content wrapper below), THEN the backdrop
+      // dissolves into the page. Before, everything faded together, so the loader's title, bar and
+      // "welcomes you" sat on top of the hero's own text for most of the 700ms.
+      transition={isExiting ? 'opacity 600ms ease-out 250ms' : 'none'}
       overflow="hidden"
       display="flex"
       alignItems="center"
@@ -146,12 +203,29 @@ export default function InitialLoader({
       pointerEvents={isExiting ? 'none' : 'auto'}
       style={{ touchAction: 'none', overscrollBehavior: 'none' }}
     >
-      {/* ── Cinematic vignette overlay ── */}
+      <VisuallyHidden>Loading OpenCode 2026</VisuallyHidden>
+
+      {/* ── Cinematic vignette ── */}
       <Box
         position="absolute"
         inset={0}
         bg="radial-gradient(ellipse 70% 60% at center 45%, rgba(15, 8, 25, 0.15) 0%, rgba(10, 5, 20, 0.55) 50%, rgba(5, 2, 12, 0.85) 100%)"
         pointerEvents="none"
+        aria-hidden="true"
+      />
+
+      {/* ── Text scrim: the vignette is LIGHTEST in the centre, which is exactly where the text
+             sits over the bright torii gate. This darkens only the area behind the text. ── */}
+      <Box
+        position="absolute"
+        top="50%"
+        left="50%"
+        w="min(760px, 96vw)"
+        h="min(560px, 80vh)"
+        transform="translate(-50%, -50%)"
+        bg="radial-gradient(ellipse at center, rgba(8, 4, 16, 0.72) 0%, rgba(8, 4, 16, 0.45) 45%, transparent 72%)"
+        pointerEvents="none"
+        aria-hidden="true"
       />
 
       {/* ── Ambient sakura glow spots ── */}
@@ -161,11 +235,12 @@ export default function InitialLoader({
         left="30%"
         w="300px"
         h="300px"
-        borderRadius="full"
-        bg={`radial-gradient(circle, ${opencodeTokens.colors.accent.sakura}18, transparent 70%)`}
+        borderRadius="9999px"
+        bg={`radial-gradient(circle, ${rose(0.1)}, transparent 70%)`}
         filter="blur(60px)"
         animation={`${breathe} 6s ease-in-out infinite`}
         pointerEvents="none"
+        aria-hidden="true"
       />
       <Box
         position="absolute"
@@ -173,16 +248,17 @@ export default function InitialLoader({
         right="25%"
         w="250px"
         h="250px"
-        borderRadius="full"
-        bg={`radial-gradient(circle, ${opencodeTokens.colors.accent.sakura}12, transparent 70%)`}
+        borderRadius="9999px"
+        bg={`radial-gradient(circle, ${rose(0.07)}, transparent 70%)`}
         filter="blur(50px)"
         animation={`${breathe} 8s ease-in-out 2s infinite`}
         pointerEvents="none"
+        aria-hidden="true"
       />
 
-      {/* ── Falling sakura petals ── */}
+      {/* ── Falling petals ── */}
       {petals.map((p) => (
-        <SakuraPetal key={p.id} delay={p.delay} left={p.left} size={p.size} duration={p.duration} />
+        <SakuraPetal key={p.id} delay={p.delay} left={p.left} size={p.size} duration={p.duration} drift={p.drift} />
       ))}
 
       {/* ── Main content ── */}
@@ -193,103 +269,104 @@ export default function InitialLoader({
         position="relative"
         zIndex={1}
         w="100%"
-        px={6}
+        px="24px"
+        opacity={isExiting ? 0 : 1}
+        transform={isExiting ? 'translateY(-10px) scale(0.98)' : 'none'}
+        transition="opacity 250ms ease-out, transform 250ms ease-out"
       >
-        {/* ── Glowing Enso Circle with Logo ── */}
+        {/* Ensō ring with logo */}
         <Box
           position="relative"
-          w={{ base: '150px', md: '190px' }}
-          h={{ base: '150px', md: '190px' }}
+          w="clamp(132px, 16vw, 172px)"
+          h="clamp(132px, 16vw, 172px)"
           display="flex"
           alignItems="center"
           justifyContent="center"
-          mb="44px"
+          mb="clamp(26px, 3vw, 32px)"
           animation={`${fadeFloat} 1s ease forwards`}
         >
-          {/* Large ambient glow behind the circle */}
           <Box
             position="absolute"
             inset="-40px"
-            borderRadius="full"
-            bg={`radial-gradient(circle, ${opencodeTokens.colors.accent.sakura}30, transparent 65%)`}
+            borderRadius="9999px"
+            bg={`radial-gradient(circle, ${rose(0.19)}, transparent 65%)`}
             animation={`${glowPulse} 4s ease-in-out infinite`}
             pointerEvents="none"
           />
 
-          {/* Enso brush‑stroke ring */}
           <Box
             position="absolute"
             inset={0}
-            borderRadius="full"
-            border={`3.5px solid ${opencodeTokens.colors.accent.sakura}`}
-            boxShadow={`
-              0 0 30px ${opencodeTokens.colors.accent.sakura}90,
-              0 0 60px ${opencodeTokens.colors.accent.sakura}40,
-              inset 0 0 25px ${opencodeTokens.colors.accent.sakura}50
-            `}
+            borderRadius="9999px"
+            border={`3px solid ${SAKURA}`}
+            boxShadow={`0 0 28px ${rose(0.55)}, 0 0 56px ${rose(0.25)}, inset 0 0 22px ${rose(0.3)}`}
             opacity={0.85}
           />
 
-          {/* Outer dashed ring — slow spin */}
           <Box
             position="absolute"
             inset="-14px"
-            borderRadius="full"
-            border={`1.5px dashed ${opencodeTokens.colors.accent.sakura}50`}
+            borderRadius="9999px"
+            border={`1.5px dashed ${rose(0.31)}`}
             animation={`${spin} 25s linear infinite`}
           />
 
-          {/* Inner dotted ring — reverse spin */}
           <Box
             position="absolute"
             inset="12px"
-            borderRadius="full"
-            border={`1px dotted ${opencodeTokens.colors.accent.sakura}70`}
+            borderRadius="9999px"
+            border={`1px dotted ${rose(0.44)}`}
             animation={`${spinReverse} 18s linear infinite`}
           />
 
-          <Box
-            w={{ base: '70px', md: '90px' }}
-            h={{ base: '70px', md: '90px' }}
-            bg={opencodeTokens.colors.accent.sakura}
-            style={{
-              maskImage: "url('/Logo/opencodelogo.png')",
-              WebkitMaskImage: "url('/Logo/opencodelogo.png')",
-              maskSize: 'contain',
-              WebkitMaskSize: 'contain',
-              maskRepeat: 'no-repeat',
-              WebkitMaskRepeat: 'no-repeat',
-              maskPosition: 'center',
-              WebkitMaskPosition: 'center',
-            }}
-            filter="drop-shadow(0 0 16px rgba(255,255,255,0.6))"
-          />
+          {/* The glow lives on a PARENT: `filter` on the masked element itself is applied before
+              the mask, so its drop-shadow got masked away and never showed. */}
+          <Box filter={`drop-shadow(0 0 14px ${rose(0.55)})`}>
+            <Box
+              w="clamp(62px, 7.5vw, 82px)"
+              h="clamp(62px, 7.5vw, 82px)"
+              bg={SAKURA}
+              style={{
+                maskImage: "url('/Logo/opencodelogo.png')",
+                WebkitMaskImage: "url('/Logo/opencodelogo.png')",
+                maskSize: 'contain',
+                WebkitMaskSize: 'contain',
+                maskRepeat: 'no-repeat',
+                WebkitMaskRepeat: 'no-repeat',
+                maskPosition: 'center',
+                WebkitMaskPosition: 'center',
+              }}
+            />
+          </Box>
         </Box>
 
-        {/* ── OPENCODE 2026 ── */}
+        {/* Title */}
         <Text
+          as="h1"
           fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
-          fontSize={{ base: '28px', md: '46px' }}
+          fontSize="clamp(28px, 4.2vw, 46px)"
           letterSpacing="0.22em"
           fontWeight="300"
-          color="white"
-          mb={2}
+          color="#ffffff"
+          lineHeight="1.25"
+          mb="8px"
           textAlign="center"
-          textShadow={`0 2px 16px rgba(0,0,0,0.6), 0 0 40px ${opencodeTokens.colors.accent.sakura}25`}
+          textShadow={`0 2px 18px rgba(0,0,0,0.85), 0 0 42px ${rose(0.2)}`}
           animation={`${fadeFloat} 1s ease 0.15s forwards`}
           opacity={0}
         >
           OPENCODE 2026
         </Text>
 
-        {/* ── Tagline ── */}
+        {/* Tagline: was whiteAlpha.700 with no shadow, which sank into the artwork */}
         <Text
           fontFamily="var(--f-body), 'DM Sans', sans-serif"
-          fontSize={{ base: '9px', md: '12px' }}
+          fontSize="clamp(10px, 1.1vw, 12px)"
           letterSpacing="0.35em"
-          color="whiteAlpha.700"
-          mb="72px"
+          color="rgba(255, 255, 255, 0.92)"
+          mb="clamp(34px, 3.4vw, 44px)"
           textAlign="center"
+          textShadow="0 1px 10px rgba(0,0,0,0.9)"
           animation={`${fadeFloat} 1s ease 0.3s forwards`}
           opacity={0}
           textTransform="uppercase"
@@ -297,130 +374,133 @@ export default function InitialLoader({
           Where Tradition Meets Creation
         </Text>
 
-        {/* ── Progress Bar ── */}
+        {/* Progress bar */}
         <Flex
           align="center"
           w="100%"
           maxW="480px"
-          mb={5}
+          mb="16px"
+          aria-hidden="true"
           animation={`${fadeFloat} 1s ease 0.45s forwards`}
           opacity={0}
         >
-          {/* Left Diamond */}
           <Box
             w="10px"
             h="10px"
             transform="rotate(45deg)"
-            bg="transparent"
-            border={`2px solid ${opencodeTokens.colors.accent.sakura}`}
-            boxShadow={`0 0 8px ${opencodeTokens.colors.accent.sakura}80`}
+            border={`2px solid ${SAKURA}`}
+            boxShadow={`0 0 8px ${rose(0.5)}`}
             animation={`${diamondPulse} 2.5s ease-in-out infinite`}
+            flexShrink={0}
           />
 
-          {/* Bar */}
           <Box
             flex={1}
             h="5px"
             mx="14px"
             position="relative"
-            bg={`${opencodeTokens.colors.accent.sakura}20`}
-            borderRadius="full"
+            bg={rose(0.14)}
+            borderRadius="9999px"
             overflow="hidden"
-            border={`1px solid ${opencodeTokens.colors.accent.sakura}30`}
+            border={`1px solid ${rose(0.22)}`}
           >
+            {/* `style` (not a Chakra prop) so a changing width doesn't generate a new CSS class every tick */}
             <Box
               position="absolute"
               left={0}
               top={0}
               bottom={0}
-              w="100%"
-              bg={`linear-gradient(90deg, ${opencodeTokens.colors.accent.sakura}40, ${opencodeTokens.colors.accent.sakura}dd, ${opencodeTokens.colors.accent.sakura})`}
-              animation={`${progressAnim} 2.8s ease-in-out forwards`}
-              borderRadius="full"
-              boxShadow={`0 0 18px ${opencodeTokens.colors.accent.sakura}cc, 0 0 6px ${opencodeTokens.colors.accent.sakura}, 0 0 40px ${opencodeTokens.colors.accent.sakura}50`}
-            />
-            {/* Shimmer highlight */}
-            <Box
-              position="absolute"
-              inset={0}
-              bg={`linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)`}
-              backgroundSize="200% 100%"
-              animation={`${shimmer} 2s linear infinite`}
-              borderRadius="full"
-              pointerEvents="none"
-            />
+              borderRadius="9999px"
+              overflow="hidden"
+              bg={`linear-gradient(90deg, ${rose(0.35)}, ${rose(0.87)}, ${SAKURA})`}
+              boxShadow={`0 0 14px ${rose(0.7)}, 0 0 4px ${SAKURA}`}
+              style={{
+                width: `${progress}%`,
+                transition: isExiting ? 'width 350ms ease-out' : 'width 160ms linear',
+              }}
+            >
+              {/* Shimmer is clipped to the FILLED part only (it used to sweep the empty track too) */}
+              <Box
+                position="absolute"
+                inset={0}
+                bg="linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)"
+                backgroundSize="200% 100%"
+                animation={`${shimmer} 2s linear infinite`}
+                pointerEvents="none"
+              />
+            </Box>
           </Box>
 
-          {/* Right Diamond */}
           <Box
             w="10px"
             h="10px"
             transform="rotate(45deg)"
-            bg="transparent"
-            border={`2px solid ${opencodeTokens.colors.accent.sakura}`}
-            boxShadow={`0 0 8px ${opencodeTokens.colors.accent.sakura}80`}
+            border={`2px solid ${SAKURA}`}
+            boxShadow={`0 0 8px ${rose(0.5)}`}
             animation={`${diamondPulse} 2.5s ease-in-out 0.5s infinite`}
+            flexShrink={0}
           />
         </Flex>
 
-        {/* ── Loading text ── */}
+        {/* Status line (visual only; the VisuallyHidden text above is what screen readers get) */}
         <Text
+          key={statusText}
+          aria-hidden="true"
           fontSize="11px"
-          color="whiteAlpha.600"
-          mb={2}
+          color="rgba(255, 255, 255, 0.82)"
+          mb="24px"
+          minH="16px"
+          textAlign="center"
           letterSpacing="0.18em"
+          textShadow="0 1px 8px rgba(0,0,0,0.9)"
           fontFamily="var(--f-mono), 'DM Mono', monospace"
-          animation={`${fadeFloat} 1s ease 0.6s forwards`}
-          opacity={0}
+          animation={`${messageIn} 0.45s ease ${messageIndex === 0 && !isExiting ? '0.6s' : '0s'} both`}
+          sx={
+            isExiting
+              ? undefined
+              : {
+                  '&::after': {
+                    content: '""',
+                    display: 'inline-block',
+                    width: '1.6em',
+                    textAlign: 'left',
+                    animation: `${dots} 1.4s steps(1) infinite`,
+                  },
+                }
+          }
         >
-          Loading the experience...
+          {statusText}
         </Text>
 
-        {/* ── Yuzuki welcome (Phase 1.3) ── */}
+        {/* Yuzuki welcome */}
         <Text
           fontSize="13px"
           letterSpacing="0.28em"
           fontFamily="var(--f-jp), 'Shippori Mincho', serif"
-          mb={7}
+          mb="24px"
           textAlign="center"
-          animation={`${fadeFloat} 1.2s ease 2.6s forwards`}
           opacity={0}
+          animation={`${fadeFloat} 1.2s ease 2.6s forwards, ${shimmer} 4s linear 3.8s infinite`}
           sx={{
-            background: `linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8)`,
+            background: 'linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8)',
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            animation: `${fadeFloat} 1.2s ease 2.6s forwards, ${shimmer} 4s linear 3.8s infinite`,
           }}
         >
           ゆづき welcomes you
         </Text>
 
-        {/* ── Sakura icon separator ── */}
-        <Flex
-          align="center"
-          gap={4}
-          animation={`${fadeFloat} 1s ease 0.75s forwards`}
-          opacity={0}
-        >
-          <Box
-            w="70px"
-            h="1px"
-            bg={`linear-gradient(90deg, transparent, ${opencodeTokens.colors.accent.sakura}50)`}
-          />
-
-          <Box color={opencodeTokens.colors.accent.sakura} animation={`${glowPulse} 3s ease-in-out infinite`}>
+        {/* Sakura separator */}
+        <Flex align="center" gap="16px" aria-hidden="true" animation={`${fadeFloat} 1s ease 0.75s forwards`} opacity={0}>
+          <Box w="70px" h="1px" bg={`linear-gradient(90deg, transparent, ${rose(0.31)})`} />
+          <Box color={SAKURA} animation={`${glowPulse} 3s ease-in-out infinite`}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C13 7 19 9 22 12C19 15 13 17 12 22C11 17 5 15 2 12C5 9 11 7 12 2Z" />
             </svg>
           </Box>
-
-          <Box
-            w="70px"
-            h="1px"
-            bg={`linear-gradient(270deg, transparent, ${opencodeTokens.colors.accent.sakura}50)`}
-          />
+          <Box w="70px" h="1px" bg={`linear-gradient(270deg, transparent, ${rose(0.31)})`} />
         </Flex>
       </Flex>
     </Box>
