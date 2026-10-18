@@ -149,7 +149,7 @@ export default function Milestones() {
                   aria-controls={`panel-${tab.key}`}
                   tabIndex={isSelected ? 0 : -1}
                   onClick={() => setSelectedTab(idx)}
-                  onKeyDown={(e) => {
+                  onKeyDown={(e: React.KeyboardEvent) => {
                     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                       e.preventDefault();
                       setSelectedTab((prev) => (prev + 1) % TABS.length);
