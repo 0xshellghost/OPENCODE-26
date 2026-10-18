@@ -88,58 +88,6 @@ export default function YuzukiGuide({
         transition: 'opacity 0.6s ease',
       }}
     >
-      {/* ─── a) Name banner (far right top) ─── */}
-      <button
-        type="button"
-        className={styles.banner}
-        onClick={openStory}
-        aria-label="Meet Yuzuki, your guide"
-        style={{
-          opacity: isOpen ? 0.3 : 1,
-        }}
-      >
-        {/* Solid, elegant hiragana: ゆづき */}
-        <div className={styles.bannerChars} aria-hidden="true">
-          <span>ゆ</span>
-          <span>づ</span>
-          <span>き</span>
-        </div>
-
-        {/* Pink Hanko Seal: 桜守 (cherry blossom keeper) */}
-        <div className={styles.hankoSeal} aria-hidden="true">
-          <div className={styles.hankoText}>
-            <span>桜</span>
-            <span>守</span>
-          </div>
-        </div>
-
-        {/* Small widely-spaced uppercase name */}
-        <span className={styles.bannerEn}>{YUZUKI_CHARACTER.name}</span>
-      </button>
-
-      {/* ─── b) Petal hotspot (beside her shoulder, never on face/body) ─── */}
-      <button
-        type="button"
-        className={styles.hotspot}
-        onClick={openStory}
-        aria-label="Meet Yuzuki, your guide"
-        style={{
-          opacity: isOpen ? 0 : 1,
-          pointerEvents: isOpen ? 'none' : 'auto',
-        }}
-      >
-        <span className={styles.hotspotDotWrap}>
-          <span className={styles.hotspotPing} aria-hidden="true" />
-          <span className={styles.hotspotDot} aria-hidden="true">
-            <Flower2 size={11} strokeWidth={2} />
-          </span>
-        </span>
-        <span className={styles.hotspotPill}>
-          <span>Meet {YUZUKI_CHARACTER.name}</span>
-          <span className={styles.hotspotArrow} aria-hidden="true">→</span>
-        </span>
-      </button>
-
       {/* ─── Artwork Click Area (tapping her artwork layer triggers story) ─── */}
       <button
         type="button"
