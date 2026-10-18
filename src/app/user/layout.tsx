@@ -10,7 +10,7 @@ import { useAuth } from 'contexts/AuthContext';
 
 const sections = [
   { label: 'Events', href: '/user/home', icon: CalendarDays },
-  { label: 'Leaderboard', href: '/user/leaderboard', icon: Trophy },
+  { label: 'Leaderboard', href: '/user/leaderboard/Opencode', icon: Trophy },
   { label: 'RPlace Canvas', href: '/user/rplace', icon: Palette },
   { label: 'Winners', href: '/user/winners', icon: Trophy },
   { label: 'Milestones', href: '/user/milestones', icon: Flag },
@@ -29,7 +29,16 @@ export default function UserLayout({ children }: PropsWithChildren) {
       <SiteNavbar />
       <div className="oc-community-nav">
         <nav aria-label="Community navigation">
-          {sections.map(({ label, href, icon: Icon }) => <Link key={href} href={href} aria-current={pathname.startsWith(href) ? 'page' : undefined}><Icon size={15} />{label}</Link>)}
+          {sections.map(({ label, href, icon: Icon }) => {
+            const isLeaderboard = href.includes('/leaderboard');
+            const isActive = isLeaderboard ? pathname?.includes('/leaderboard') : pathname?.startsWith(href);
+            return (
+              <Link key={href} href={href} aria-current={isActive ? 'page' : undefined}>
+                <Icon size={15} />
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         <span className="oc-community-label">A SEASON OF POSSIBILITIES</span>
       </div>

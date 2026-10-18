@@ -40,7 +40,7 @@ const routes: IRoute[] = [
     name: 'Leaderboard',
     layout: '/user',
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
-    path: '/leaderboard',
+    path: '/leaderboard/Opencode',
   },
   {
     name: 'Repositories',

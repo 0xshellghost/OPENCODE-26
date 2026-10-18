@@ -24,6 +24,9 @@ export function SidebarLinks(props: SidebarLinksProps) {
   // verifies if routeName is the one active (in browser input)
   const activeRoute = useCallback(
     (routeName: string) => {
+      if (routeName.includes('leaderboard')) {
+        return pathname?.includes('/leaderboard');
+      }
       return pathname?.includes(routeName);
     },
     [pathname],

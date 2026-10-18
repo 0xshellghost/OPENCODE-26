@@ -646,7 +646,7 @@ function ColumnTable({
       border="1px solid rgba(240, 168, 184, 0.22)"
       backdropFilter="blur(24px)"
       boxShadow="0 20px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(240, 168, 184, 0.08), inset 0 1px 0 0 rgba(255, 241, 236, 0.1)"
-      zIndex={10}
+      zIndex={1}
     >
       {/* HEADER */}
       <Flex

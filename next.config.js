@@ -12,6 +12,25 @@ const nextConfig = {
       { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
     ] }];
   },
+  async redirects() {
+    return [
+      {
+        source: '/leaderboard',
+        destination: '/user/leaderboard/Opencode',
+        permanent: false,
+      },
+      {
+        source: '/leaderboard/:eventName*',
+        destination: '/user/leaderboard/:eventName*',
+        permanent: false,
+      },
+      {
+        source: '/user/leaderboard',
+        destination: '/user/leaderboard/Opencode',
+        permanent: false,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },

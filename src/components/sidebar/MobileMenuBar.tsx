@@ -58,6 +58,9 @@ export default function MobileMenuBar(props: MobileMenuBarProps) {
   );
 
   const isActive = (routePath: string) => {
+    if (routePath.includes('leaderboard')) {
+      return pathname?.includes('/leaderboard');
+    }
     return pathname?.includes(routePath);
   };
 

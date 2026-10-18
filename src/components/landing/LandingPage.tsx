@@ -8,7 +8,7 @@ import SakuraToggle from 'components/common/SakuraToggle';
 const GITHUB_LOGIN_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/github`;
 
 const navigation = [
-  { label: 'Leaderboard', href: '/user/leaderboard' },
+  { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
   { label: 'FAQ', href: '/faq' },
   { label: 'Sign In with GitHub', href: GITHUB_LOGIN_URL },
 ];
@@ -40,7 +40,7 @@ export default function LandingPage() {
       <OpenCodeExperience
         id="opencode"
         ctaLabel="Explore the leaderboard"
-        ctaHref="/user/leaderboard"
+        ctaHref="/user/leaderboard/Opencode"
         skipTargetId="opencode-content"
         quality="auto"
         navigation={navigation}

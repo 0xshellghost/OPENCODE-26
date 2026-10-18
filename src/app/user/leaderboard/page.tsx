@@ -1,7 +1,5 @@
-'use client';
-
-import LeaderboardView from 'views/admin/dataTables/components/LeaderboardView';
+import { redirect } from 'next/navigation';
 
 export default function LeaderboardPage() {
-  return <LeaderboardView />;
+  redirect('/user/leaderboard/Opencode');
 }

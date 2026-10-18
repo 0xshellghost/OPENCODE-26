@@ -22,5 +22,5 @@ export const YUZUKI_CHARACTER = {
   tagline: 'An original character, inspired by Japanese cherry blossom folklore.',
   endingNote: 'Yuzuki is an original character created for Opencode 2026.',
   ctaText: 'Start contributing',
-  ctaHref: '/user/leaderboard',
+  ctaHref: '/user/leaderboard/Opencode',
 };

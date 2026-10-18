@@ -26,7 +26,7 @@ export const selfHostedAssets: OpenCodeAssets = {
   passage: '/images/opencode/hero-start.jpeg',
 }
 export const defaultNavigation: OpenCodeNavigationItem[] = [
-  { label: 'Leaderboard', href: '/user/leaderboard' },
+  { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
   { label: 'FAQ', href: '/faq' },
 ]
 export const chapters = ['Arrival', 'Departure', 'Passage', 'Convergence', 'Together']

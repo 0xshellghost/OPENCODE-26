@@ -13,7 +13,7 @@ import OpenCodeLogo from 'components/common/OpenCodeLogo';
 const navigation = [
   { label: 'Home', href: '/' },
   { label: 'Events', href: '/user/home' },
-  { label: 'Leaderboard', href: '/user/leaderboard' },
+  { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
   { label: 'RPlace Canvas', href: '/user/rplace' },
   { label: 'FAQ', href: '/faq' },
 ];
@@ -31,6 +31,12 @@ export default function SiteNavbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isLinkActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href.includes('/leaderboard')) return pathname?.includes('/leaderboard');
+    return pathname?.startsWith(href);
+  };
+
   return (
     <header className={`oc-navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="oc-navbar-inner">
@@ -39,7 +45,15 @@ export default function SiteNavbar() {
           <span>OPENCODE <small>2026</small></span>
         </Link>
         <nav className="oc-desktop-nav" aria-label="Main navigation">
-          {navigation.map(({ label, href }) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname.startsWith(href)) ? 'page' : undefined}>{label}</Link>)}
+          {navigation.map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-current={isLinkActive(href) ? 'page' : undefined}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
         <div className="oc-nav-actions">
           <SakuraToggle />
@@ -56,7 +70,16 @@ export default function SiteNavbar() {
         </div>
       </div>
       {open && <nav id="mobile-navigation" className="oc-mobile-nav" aria-label="Mobile navigation">
-        {[...navigation, { label: 'Winners', href: '/user/winners' }, { label: 'Milestones', href: '/user/milestones' }, { label: 'Repositories', href: '/user/repos' }].map(({ label, href }) => <Link key={href} href={href} onClick={() => setOpen(false)} aria-current={pathname === href ? 'page' : undefined}>{label}<ArrowUpRight size={14} /></Link>)}
+        {[...navigation, { label: 'Winners', href: '/user/winners' }, { label: 'Milestones', href: '/user/milestones' }, { label: 'Repositories', href: '/user/repos' }].map(({ label, href }) => (
+          <Link
+            key={href}
+            href={href}
+            onClick={() => setOpen(false)}
+            aria-current={isLinkActive(href) ? 'page' : undefined}
+          >
+            {label}<ArrowUpRight size={14} />
+          </Link>
+        ))}
       </nav>}
     </header>
   );

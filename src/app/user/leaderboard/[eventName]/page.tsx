@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useMemo, useState, useCallback } from 'react';
+import { useDeferredValue, useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -10,14 +10,15 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Portal,
   SimpleGrid,
   Text,
   chakra,
 } from '@chakra-ui/react';
 import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
-import { FaBuilding, FaCalendarAlt, FaCheck, FaCrown, FaSearchMinus } from 'react-icons/fa';
+import { useParams, useRouter } from 'next/navigation';
+import { FaBuilding, FaCalendarAlt, FaCheck, FaCrown, FaSearchMinus, FaTrophy } from 'react-icons/fa';
 import { MdClear } from 'react-icons/md';
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
@@ -25,6 +26,7 @@ import ColumnsTable, {
 } from 'views/admin/dataTables/components/ColumnsTable';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
+import { FetchedEvents } from '../../../../api/events/events';
 
 const SERIF = "Georgia, 'Times New Roman', serif";
 const CONTROL_H = '44px';
@@ -60,12 +62,56 @@ const controlStyle = {
 
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollege, setSelectedCollege] = useState('All');
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
+  const [isEventHovered, setIsEventHovered] = useState(false);
 
   const eventLabel = safeDecode(eventName);
+
+  const { data: eventData } = useQuery({
+    queryKey: ['EventInfo'],
+    queryFn: FetchedEvents,
+  });
+
+  const availableEventNames = useMemo(() => {
+    const list: string[] = [];
+    if (eventData?.data && Array.isArray(eventData.data)) {
+      for (const ev of eventData.data) {
+        if (ev?.name && !list.some((item) => item.toLowerCase() === ev.name.toLowerCase())) {
+          list.push(ev.name);
+        }
+      }
+    }
+    if (eventLabel && !list.some((item) => item.toLowerCase() === eventLabel.toLowerCase())) {
+      list.unshift(eventLabel);
+    }
+    if (!list.some((item) => item.toLowerCase() === 'opencode')) {
+      list.push('Opencode');
+    }
+    return list;
+  }, [eventData, eventLabel]);
+
+  const handleSelectEvent = useCallback(
+    (name: string) => {
+      if (name.toLowerCase() === eventLabel.toLowerCase()) return;
+      const targetUrl = `/user/leaderboard/${encodeURIComponent(name)}`;
+      if (typeof window !== 'undefined' && (window as any).__startPageTransition) {
+        (window as any).__startPageTransition(targetUrl);
+        return;
+      }
+      router.push(targetUrl);
+    },
+    [eventLabel, router],
+  );
+
+  useEffect(() => {
+    setSelectedCollege('All');
+    setFirstYearOnly(false);
+    setSearchQuery('');
+  }, [eventName]);
 
   const { data: LeadData, isLoading } = useQuery({
     queryKey: ['LeadInfo', eventName],
@@ -213,7 +259,7 @@ export default function EventName() {
       <Flex
         className="glass-panel"
         position="relative"
-        zIndex={5}
+        zIndex={30}
         p={{ base: '12px', md: '14px 16px' }}
         gap="12px"
         flexWrap="wrap"
@@ -221,6 +267,76 @@ export default function EventName() {
       >
         <Box flex="1 1 260px" minW="220px">
           <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} />
+        </Box>
+
+        {/* Event selector dropdown */}
+        <Box onMouseEnter={() => setIsEventHovered(true)} onFocus={() => setIsEventHovered(true)}>
+          <Menu isLazy={!isEventHovered}>
+            <MenuButton
+              {...controlStyle}
+              borderColor="var(--border)"
+              position="relative"
+              aria-label="Select event"
+            >
+              <Flex align="center" gap="8px">
+                <Box display="flex" color="var(--accent)">
+                  <FaTrophy size={14} />
+                </Box>
+                <Text noOfLines={1} maxW={{ base: '110px', md: '170px' }} fontSize="13px" fontWeight="600">
+                  {eventLabel || 'Select Event'}
+                </Text>
+                <Box display="flex" color="var(--subtle)">
+                  <ChevronDown size={14} />
+                </Box>
+              </Flex>
+            </MenuButton>
+            <Portal>
+              <MenuList
+                bg="var(--card-strong)"
+                color="var(--text)"
+                border="1px solid var(--border)"
+                borderRadius="14px"
+                boxShadow="var(--shadow)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                maxH="300px"
+                overflowY="auto"
+                minW="220px"
+                zIndex={1500}
+                sx={{
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-track': { bg: 'transparent' },
+                  '&::-webkit-scrollbar-thumb': { bg: 'var(--border)', borderRadius: 'full' },
+                }}
+              >
+                {availableEventNames.map((name) => {
+                  const isSelected = name.toLowerCase() === eventLabel.toLowerCase();
+                  return (
+                    <MenuItem
+                      key={name}
+                      onClick={() => handleSelectEvent(name)}
+                      bg="transparent"
+                      _hover={{ bg: 'var(--accent-soft)' }}
+                      _focus={{ bg: 'var(--accent-soft)' }}
+                      borderRadius="8px"
+                      mx="6px"
+                      w="calc(100% - 12px)"
+                      px="12px"
+                      py="8px"
+                      fontSize="13px"
+                      fontWeight={isSelected ? '700' : '500'}
+                      color={isSelected ? 'var(--accent)' : 'var(--text)'}
+                    >
+                      <Flex w="100%" justify="space-between" align="center" gap="10px">
+                        <Text noOfLines={1}>{name}</Text>
+                        {isSelected && <FaCheck size={12} />}
+                      </Flex>
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </Portal>
+          </Menu>
         </Box>
 
         {/* College filter */}
@@ -261,50 +377,52 @@ export default function EventName() {
                 />
               )}
             </MenuButton>
-            <MenuList
-              bg="var(--card-strong)"
-              color="var(--text)"
-              border="1px solid var(--border)"
-              borderRadius="14px"
-              boxShadow="var(--shadow)"
-              backdropFilter="blur(20px)"
-              py="6px"
-              maxH="300px"
-              overflowY="auto"
-              minW="220px"
-              zIndex={20}
-              sx={{
-                '&::-webkit-scrollbar': { width: '4px' },
-                '&::-webkit-scrollbar-track': { bg: 'transparent' },
-                '&::-webkit-scrollbar-thumb': { bg: 'var(--border)', borderRadius: 'full' },
-              }}
-            >
-              {['All', ...collegeOptions].map((college) => {
-                const selected = selectedCollege === college;
-                return (
-                  <MenuItem
-                    key={college}
-                    onClick={() => setSelectedCollege(college)}
-                    bg="transparent"
-                    _hover={{ bg: 'var(--accent-soft)' }}
-                    _focus={{ bg: 'var(--accent-soft)' }}
-                    borderRadius="8px"
-                    mx="6px"
-                    w="calc(100% - 12px)"
-                    px="12px"
-                    py="8px"
-                    fontSize="13px"
-                    fontWeight={selected ? '700' : '500'}
-                    color={selected ? 'var(--accent)' : 'var(--text)'}
-                  >
-                    <Flex w="100%" justify="space-between" align="center" gap="10px">
-                      <Text noOfLines={1}>{college === 'All' ? 'All Colleges' : college}</Text>
-                      {selected && <FaCheck size={12} />}
-                    </Flex>
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
+            <Portal>
+              <MenuList
+                bg="var(--card-strong)"
+                color="var(--text)"
+                border="1px solid var(--border)"
+                borderRadius="14px"
+                boxShadow="var(--shadow)"
+                backdropFilter="blur(20px)"
+                py="6px"
+                maxH="300px"
+                overflowY="auto"
+                minW="220px"
+                zIndex={1500}
+                sx={{
+                  '&::-webkit-scrollbar': { width: '4px' },
+                  '&::-webkit-scrollbar-track': { bg: 'transparent' },
+                  '&::-webkit-scrollbar-thumb': { bg: 'var(--border)', borderRadius: 'full' },
+                }}
+              >
+                {['All', ...collegeOptions].map((college) => {
+                  const selected = selectedCollege === college;
+                  return (
+                    <MenuItem
+                      key={college}
+                      onClick={() => setSelectedCollege(college)}
+                      bg="transparent"
+                      _hover={{ bg: 'var(--accent-soft)' }}
+                      _focus={{ bg: 'var(--accent-soft)' }}
+                      borderRadius="8px"
+                      mx="6px"
+                      w="calc(100% - 12px)"
+                      px="12px"
+                      py="8px"
+                      fontSize="13px"
+                      fontWeight={selected ? '700' : '500'}
+                      color={selected ? 'var(--accent)' : 'var(--text)'}
+                    >
+                      <Flex w="100%" justify="space-between" align="center" gap="10px">
+                        <Text noOfLines={1}>{college === 'All' ? 'All Colleges' : college}</Text>
+                        {selected && <FaCheck size={12} />}
+                      </Flex>
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </Portal>
           </Menu>
         </Box>
 
@@ -437,6 +555,8 @@ export default function EventName() {
       {/* ─── 5. TABLE ─── */}
       {!showEmpty && (
         <Box
+          position="relative"
+          zIndex={1}
           opacity={isStale ? 0.6 : 1}
           transition="opacity 0.2s ease"
           pointerEvents={isStale ? 'none' : 'auto'}

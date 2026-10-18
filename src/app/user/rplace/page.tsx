@@ -953,7 +953,7 @@ export default function RPlaceCanvasPage() {
 
         {/* Actions */}
         <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align="center" gap="14px">
-          <Link href="/user/leaderboard" className="oc-button oc-button-secondary" aria-label="View Leaderboard">
+          <Link href="/user/leaderboard/Opencode" className="oc-button oc-button-secondary" aria-label="View Leaderboard">
             <Trophy size={16} />
             View Leaderboard
           </Link>
