@@ -240,8 +240,8 @@ export default function EventCollection({
                 onClick={() => setActiveCategory(cat.id as any)}
                 className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
                   activeCategory === cat.id
-                    ? 'bg-[#f0a8b8] text-[#1b1420] shadow-[0_4px_16px_rgba(240,168,184,0.35)]'
-                    : 'bg-[rgba(32,20,38,0.7)] text-[#dfced5] border border-[rgba(240,168,184,0.2)] hover:border-[#f0a8b8] hover:text-[#fff1ec]'
+                    ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_4px_16px_var(--accent-soft)]'
+                    : 'bg-[var(--card-soft)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
                 }`}
               >
                 {cat.label}
@@ -251,7 +251,7 @@ export default function EventCollection({
 
           <div className="flex items-center gap-3">
             <Link
-              className="px-4 py-2 rounded-full text-xs font-semibold bg-[rgba(32,20,38,0.7)] text-[#f0a8b8] border border-[rgba(240,168,184,0.25)] hover:border-[#f0a8b8] hover:bg-[rgba(240,168,184,0.1)] transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-full text-xs font-semibold bg-[var(--card-soft)] text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] transition-all flex items-center gap-1.5"
               href={leaderboard ? '/user/winners' : '/user/repos'}
             >
               {leaderboard ? 'Meet the winners' : 'Explore repositories'} <ArrowUpRight size={14} />
@@ -271,15 +271,15 @@ export default function EventCollection({
         </div>
 
         {!loading && !error && (
-          <div className="flex items-center justify-between text-xs text-[#dfced5] opacity-80 font-mono">
+          <div className="flex items-center justify-between text-xs text-[var(--muted)] font-mono">
             <p>
-              Showing <span className="text-[#f0a8b8] font-bold"><CountUp to={filtered.length} duration={0.8} /></span> of {events.length} curated events
+              Showing <span className="text-[var(--accent)] font-bold"><CountUp to={filtered.length} duration={0.8} /></span> of {events.length} curated events
             </p>
             {activeCategory !== 'all' && (
               <button
                 type="button"
                 onClick={() => setActiveCategory('all')}
-                className="text-[#f0a8b8] hover:underline"
+                className="text-[var(--accent)] hover:underline"
               >
                 Reset filters
               </button>
@@ -351,20 +351,20 @@ export default function EventCollection({
                 <article
                   className="group relative flex flex-col h-full rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
                   style={{
-                    background: 'linear-gradient(145deg, rgba(32, 19, 41, 0.88) 0%, rgba(45, 26, 56, 0.82) 100%)',
+                    background: 'var(--surface)',
                     backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(240, 168, 184, 0.2)',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.45)',
+                    border: '1px solid var(--border)',
+                    boxShadow: 'var(--shadow)',
                   }}
                 >
                   {/* Visual Banner Header */}
-                  <div className="relative h-40 w-full overflow-hidden bg-[#180e1c]">
+                  <div className="relative h-40 w-full overflow-hidden bg-[var(--bg)]">
                     <EventCardImage event={event} fallbackScene={scenes[index % scenes.length]} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[rgba(27,16,35,0.95)] via-[rgba(27,16,35,0.4)] to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
 
                     {/* Top Status & Track Badges */}
                     <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[rgba(20,12,25,0.85)] border border-[rgba(240,168,184,0.3)] text-[#f0a8b8] backdrop-blur-md">
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[var(--card-bg)] border border-[var(--border)] text-[var(--accent)] backdrop-blur-md">
                         {track}
                       </span>
 
@@ -387,7 +387,7 @@ export default function EventCollection({
 
                     {/* Event Logo Avatar Badge */}
                     <div className="absolute -bottom-3 left-5 z-10 flex items-center">
-                      <div className="w-12 h-12 rounded-xl bg-[#2a1733] border-2 border-[rgba(240,168,184,0.5)] shadow-lg overflow-hidden flex items-center justify-center p-1">
+                      <div className="w-12 h-12 rounded-xl bg-[var(--surface)] border-2 border-[var(--border-strong)] shadow-lg overflow-hidden flex items-center justify-center p-1">
                         {event.logoImageURL ? (
                           <img
                             src={event.logoImageURL}
@@ -398,7 +398,7 @@ export default function EventCollection({
                             }}
                           />
                         ) : (
-                          <Icon size={22} className="text-[#f0a8b8]" />
+                          <Icon size={22} className="text-[var(--accent)]" />
                         )}
                       </div>
                     </div>
@@ -408,44 +408,44 @@ export default function EventCollection({
                   <div className="p-5 pt-6 flex-1 flex flex-col justify-between">
                     <div>
                       {/* Date Indicator */}
-                      <div className="flex items-center gap-1.5 text-xs text-[#dfced5] opacity-80 mb-2 font-mono">
-                        <CalendarDays size={13} className="text-[#f0a8b8]" />
+                      <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] mb-2 font-mono">
+                        <CalendarDays size={13} className="text-[var(--accent)]" />
                         <span>{dateRange}</span>
                       </div>
 
                       {/* Event Title */}
-                      <h3 className="text-xl font-bold text-[#fff1ec] group-hover:text-[#f0a8b8] transition-colors leading-tight mb-2">
+                      <h3 className="text-xl font-bold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors leading-tight mb-2">
                         {decodedName}
                       </h3>
 
                       {/* Event Description */}
-                      <p className="text-xs text-[#dfced5] opacity-85 leading-relaxed line-clamp-3 mb-4">
+                      <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3 mb-4">
                         {event.description ||
                           'Collaborate with fellow student developers, contribute code, and build impactful software together.'}
                       </p>
                     </div>
 
                     {/* Developer Meta Stats Strip */}
-                    <div className="pt-3 border-t border-[rgba(240,168,184,0.15)] flex flex-col gap-3">
-                      <div className="grid grid-cols-3 gap-2 py-1 text-center bg-[rgba(20,12,24,0.45)] rounded-xl border border-[rgba(240,168,184,0.12)]">
+                    <div className="pt-3 border-t border-[var(--border)] flex flex-col gap-3">
+                      <div className="grid grid-cols-3 gap-2 py-1 text-center bg-[var(--card-soft)] rounded-xl border border-[var(--border)]">
                         <div className="px-1 py-1">
-                          <p className="text-[10px] text-[#dfced5] opacity-70 uppercase tracking-wider">Format</p>
-                          <p className="text-xs font-bold text-[#fff1ec] truncate">Online</p>
+                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Format</p>
+                          <p className="text-xs font-bold text-[var(--fg)] truncate">Online</p>
                         </div>
-                        <div className="px-1 py-1 border-x border-[rgba(240,168,184,0.12)]">
-                          <p className="text-[10px] text-[#dfced5] opacity-70 uppercase tracking-wider">Participants</p>
+                        <div className="px-1 py-1 border-x border-[var(--border)]">
+                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Participants</p>
                           <p className="text-xs font-bold text-[#f5c542] font-mono truncate">150+ Devs</p>
                         </div>
                         <div className="px-1 py-1">
-                          <p className="text-[10px] text-[#dfced5] opacity-70 uppercase tracking-wider">Rankings</p>
-                          <p className="text-xs font-bold text-[#f0a8b8] truncate">Live</p>
+                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Rankings</p>
+                          <p className="text-xs font-bold text-[var(--accent)] truncate">Live</p>
                         </div>
                       </div>
 
                       {/* Tactile Action Link */}
                       <Link
                         href={`/user/leaderboard/${encodeURIComponent(event.name)}`}
-                        className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-[rgba(240,168,184,0.12)] text-[#fff1ec] border border-[rgba(240,168,184,0.3)] hover:bg-[#f0a8b8] hover:text-[#1b1420] transition-all duration-200 group-hover:border-[#f0a8b8] shadow-sm"
+                        className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-[var(--accent-soft)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] transition-all duration-200 group-hover:border-[var(--accent)] shadow-sm"
                       >
                         <span>{leaderboard ? 'View Leaderboard' : 'Explore Event & Standings'}</span>
                         <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />

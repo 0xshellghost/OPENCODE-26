@@ -25,11 +25,11 @@ interface PersonalRaceTrackerProps {
 }
 
 const TIERS = [
-  { name: "Initiate", minPts: 0, icon: FaSeedling, color: "#dfced5" },
+  { name: "Initiate", minPts: 0, icon: FaSeedling, color: "var(--muted)" },
   { name: "Challenger", minPts: 500, icon: FaStar, color: "#63B3ED" },
   { name: "Master", minPts: 1500, icon: FaMedal, color: "#B794F4" },
   { name: "Grandmaster", minPts: 3000, icon: FaCrown, color: "#FFD700" },
-  { name: "Legend", minPts: 4500, icon: FaTrophy, color: "#f0a8b8" },
+  { name: "Legend", minPts: 4500, icon: FaTrophy, color: "var(--accent)" },
 ];
 
 export default function PersonalRaceTracker({
@@ -120,7 +120,7 @@ export default function PersonalRaceTracker({
   if (!raceData) {
     return (
       <Flex direction="column" align="center" justify="center" py="40px">
-        <Text color="#dfced5" fontSize="14px">
+        <Text color="var(--muted)" fontSize="14px">
           No participant data available for {eventName}.
         </Text>
       </Flex>
@@ -171,7 +171,7 @@ export default function PersonalRaceTracker({
           </Box>
           <Box>
             <Flex align="center" gap="8px">
-              <Text fontWeight="800" fontSize="16px" color="#fff1ec">
+              <Text fontWeight="800" fontSize="16px" color="var(--fg)">
                 {user.name}
               </Text>
               {isYou && (
@@ -180,7 +180,7 @@ export default function PersonalRaceTracker({
                   py="1px"
                   borderRadius="full"
                   bg="linear-gradient(135deg, #f0a8b8 0%, #c04a67 100%)"
-                  color="#1a0c16"
+                  color="var(--accent-ink)"
                   fontSize="10px"
                   fontWeight="900"
                 >
@@ -188,7 +188,7 @@ export default function PersonalRaceTracker({
                 </Box>
               )}
             </Flex>
-            <Text fontSize="12px" color="#dfced5" opacity={0.8}>
+            <Text fontSize="12px" color="var(--muted)">
               @{user.githubid} {user.college ? `· ${user.college}` : ""}
             </Text>
           </Box>
@@ -196,19 +196,19 @@ export default function PersonalRaceTracker({
 
         <Flex gap={{ base: "16px", sm: "24px" }} align="center">
           <Box textAlign={{ base: "left", sm: "right" }}>
-            <Text fontSize="11px" color="#dfced5" fontWeight="600" textTransform="uppercase">
+            <Text fontSize="11px" color="var(--muted)" fontWeight="600" textTransform="uppercase">
               Rank
             </Text>
-            <Text fontFamily="var(--f-mono)" fontSize="18px" fontWeight="900" color="#fff1ec">
+            <Text fontFamily="var(--f-mono)" fontSize="18px" fontWeight="900" color="var(--fg)">
               #{userRank}{" "}
-              <Text as="span" fontSize="11px" color="#f0a8b8" fontWeight="700">
+              <Text as="span" fontSize="11px" color="var(--accent)" fontWeight="700">
                 (Top {percentile}%)
               </Text>
             </Text>
           </Box>
 
           <Box textAlign={{ base: "left", sm: "right" }}>
-            <Text fontSize="11px" color="#dfced5" fontWeight="600" textTransform="uppercase">
+            <Text fontSize="11px" color="var(--muted)" fontWeight="600" textTransform="uppercase">
               Points
             </Text>
             <Text fontFamily="var(--f-mono)" fontSize="18px" fontWeight="900" color="#FFD700">
@@ -217,10 +217,10 @@ export default function PersonalRaceTracker({
           </Box>
 
           <Box textAlign={{ base: "left", sm: "right" }}>
-            <Text fontSize="11px" color="#dfced5" fontWeight="600" textTransform="uppercase">
+            <Text fontSize="11px" color="var(--muted)" fontWeight="600" textTransform="uppercase">
               PRs
             </Text>
-            <Text fontFamily="var(--f-mono)" fontSize="18px" fontWeight="900" color="#fff1ec">
+            <Text fontFamily="var(--f-mono)" fontSize="18px" fontWeight="900" color="var(--fg)">
               {userPRs}
             </Text>
           </Box>
@@ -237,20 +237,20 @@ export default function PersonalRaceTracker({
           border="1px solid rgba(240, 168, 184, 0.18)"
         >
           <Flex align="center" gap="6px" mb="8px">
-            <Box color="#f0a8b8">
+            <Box color="var(--accent)">
               <FaArrowUp size={12} />
             </Box>
-            <Text fontSize="11px" fontWeight="700" color="#dfced5" textTransform="uppercase" letterSpacing="0.06em">
+            <Text fontSize="11px" fontWeight="700" color="var(--muted)" textTransform="uppercase" letterSpacing="0.06em">
               To Reach #{Math.max(1, userRank - 1)}
             </Text>
           </Flex>
 
           {personAbove ? (
             <>
-              <Text fontFamily="var(--f-mono)" fontSize="20px" fontWeight="900" color="#f0a8b8">
+              <Text fontFamily="var(--f-mono)" fontSize="20px" fontWeight="900" color="var(--accent)">
                 +{pointsToAbove.toLocaleString()} pts
               </Text>
-              <Text fontSize="12px" color="#dfced5" opacity={0.8} mt="4px" noOfLines={1}>
+              <Text fontSize="12px" color="var(--muted)" mt="4px" noOfLines={1}>
                 Ahead: {personAbove.name} ({personAbove.points} pts)
               </Text>
             </>
@@ -272,7 +272,7 @@ export default function PersonalRaceTracker({
             <Box color="#68D391">
               <FaShieldAlt size={12} />
             </Box>
-            <Text fontSize="11px" fontWeight="700" color="#dfced5" textTransform="uppercase" letterSpacing="0.06em">
+            <Text fontSize="11px" fontWeight="700" color="var(--muted)" textTransform="uppercase" letterSpacing="0.06em">
               Lead Over #{userRank + 1}
             </Text>
           </Flex>
@@ -282,12 +282,12 @@ export default function PersonalRaceTracker({
               <Text fontFamily="var(--f-mono)" fontSize="20px" fontWeight="900" color="#68D391">
                 +{leadOverBelow.toLocaleString()} pts
               </Text>
-              <Text fontSize="12px" color="#dfced5" opacity={0.8} mt="4px" noOfLines={1}>
+              <Text fontSize="12px" color="var(--muted)" mt="4px" noOfLines={1}>
                 Behind: {personBelow.name} ({personBelow.points} pts)
               </Text>
             </>
           ) : (
-            <Text fontSize="14px" fontWeight="700" color="#dfced5">
+            <Text fontSize="14px" fontWeight="700" color="var(--muted)">
               Last position
             </Text>
           )}
@@ -304,7 +304,7 @@ export default function PersonalRaceTracker({
             <Box color="#FFD700">
               <FaTrophy size={12} />
             </Box>
-            <Text fontSize="11px" fontWeight="700" color="#dfced5" textTransform="uppercase" letterSpacing="0.06em">
+            <Text fontSize="11px" fontWeight="700" color="var(--muted)" textTransform="uppercase" letterSpacing="0.06em">
               Distance to #1
             </Text>
           </Flex>
@@ -314,7 +314,7 @@ export default function PersonalRaceTracker({
               <Text fontFamily="var(--f-mono)" fontSize="20px" fontWeight="900" color="#FFD700">
                 +{pointsToLeader.toLocaleString()} pts
               </Text>
-              <Text fontSize="12px" color="#dfced5" opacity={0.8} mt="4px" noOfLines={1}>
+              <Text fontSize="12px" color="var(--muted)" mt="4px" noOfLines={1}>
                 Leader: {leader.name} ({leader.points} pts)
               </Text>
             </>
@@ -330,7 +330,7 @@ export default function PersonalRaceTracker({
       <Box
         p={{ base: "14px 16px", md: "18px 20px" }}
         borderRadius="20px"
-        bg="rgba(20, 12, 24, 0.45)"
+        bg="var(--card-soft)"
         border="1px solid rgba(240, 168, 184, 0.16)"
       >
         <Flex justify="space-between" align="center" mb="14px" flexWrap="wrap" gap="10px">
@@ -338,14 +338,14 @@ export default function PersonalRaceTracker({
             <Box color={currentTier.color}>
               <CurrentTierIcon size={15} />
             </Box>
-            <Text fontSize="13px" fontWeight="800" color="#fff1ec">
+            <Text fontSize="13px" fontWeight="800" color="var(--fg)">
               Current Tier: <Text as="span" color={currentTier.color}>{currentTier.name}</Text>
             </Text>
           </Flex>
 
           {nextTier ? (
-            <Text fontSize="12px" color="#dfced5" fontFamily="var(--f-mono)">
-              <Text as="span" color="#f0a8b8" fontWeight="800">
+            <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
+              <Text as="span" color="var(--accent)" fontWeight="800">
                 +{pointsToNextTier.toLocaleString()} pts
               </Text>{" "}
               to unlock {nextTier.name}
@@ -395,7 +395,7 @@ export default function PersonalRaceTracker({
                 <Text
                   fontSize="12px"
                   fontWeight={isCurrent ? "900" : "700"}
-                  color={isCurrent ? "#fff1ec" : tier.color}
+                  color={isCurrent ? "var(--fg)" : tier.color}
                   textAlign="center"
                 >
                   {tier.name}
@@ -403,8 +403,7 @@ export default function PersonalRaceTracker({
                 <Text
                   fontFamily="var(--f-mono)"
                   fontSize="11px"
-                  color="#dfced5"
-                  opacity={0.8}
+                  color="var(--muted)"
                   mt="2px"
                 >
                   {tier.minPts.toLocaleString()}+ pts
@@ -417,7 +416,7 @@ export default function PersonalRaceTracker({
                     py="1px"
                     borderRadius="full"
                     bg={tier.color}
-                    color="#1a0c16"
+                    color="var(--accent-ink)"
                     fontSize="9px"
                     fontWeight="900"
                     letterSpacing="0.05em"

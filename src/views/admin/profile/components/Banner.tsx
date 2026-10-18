@@ -30,10 +30,10 @@ export default function Banner(props: {
     ...rest
   } = props;
 
-  const textPrimary = '#fff1ec';
-  const textSecondary = '#dfced5';
-  const avatarBorder = 'rgba(240, 168, 184, 0.5)';
-  const avatarShadow = '0 0 28px rgba(240, 168, 184, 0.35), 0 8px 24px rgba(0, 0, 0, 0.55)';
+  const textPrimary = 'var(--fg)';
+  const textSecondary = 'var(--muted)';
+  const avatarBorder = 'var(--border-strong)';
+  const avatarShadow = 'var(--shadow)';
 
   return (
     <Box
@@ -53,7 +53,7 @@ export default function Banner(props: {
         >
           User Identity
         </Text>
-        <Text fontSize="12px" color={textSecondary} opacity={0.8} fontFamily="var(--f-mono)">
+        <Text fontSize="12px" color={textSecondary} fontFamily="var(--f-mono)">
           Contributor
         </Text>
       </Flex>
@@ -93,7 +93,6 @@ export default function Banner(props: {
         {/* GitHub handle */}
         <Text
           color={textSecondary}
-          opacity={0.85}
           fontSize="14px"
           mt="4px"
           mb={tags && tags.length > 0 ? '10px' : '16px'}
@@ -116,18 +115,18 @@ export default function Banner(props: {
           w="100%"
           maxW="260px"
           mx="auto"
-          bg="rgba(240, 168, 184, 0.12)"
-          color="#fff1ec"
-          border="1px solid rgba(240, 168, 184, 0.3)"
+          bg="var(--accent-soft)"
+          color="var(--fg)"
+          border="1px solid var(--border)"
           borderRadius="full"
           fontWeight="700"
           fontSize="13px"
           py="18px"
           _hover={{
-            bg: 'rgba(240, 168, 184, 0.22)',
-            borderColor: '#f0a8b8',
+            bg: 'var(--accent-soft)',
+            borderColor: 'var(--accent)',
             transform: 'translateY(-1px)',
-            boxShadow: '0 6px 20px rgba(240, 168, 184, 0.25)',
+            boxShadow: 'var(--shadow)',
           }}
           transition="all 0.3s ease"
           onClick={onEdit}

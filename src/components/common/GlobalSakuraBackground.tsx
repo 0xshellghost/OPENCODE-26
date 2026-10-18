@@ -20,13 +20,50 @@ export default function GlobalSakuraBackground() {
     pointerY: 0,
   });
   const [graphicsUnavailable, setGraphicsUnavailable] = useState(false);
+  const [isLight, setIsLight] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const checkLight = () => {
+      setIsLight(document.documentElement.classList.contains('chakra-ui-light'));
+    };
+    checkLight();
+
+    const observer = new MutationObserver(() => {
+      checkLight();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Landing page ('/') already has its own interactive petal scene in OpenCodeExperience
   const isLandingPage = pathname === '/';
 
   // Three.js 3D WebGL Petals
   useEffect(() => {
-    if (!enabled || isLandingPage || graphicsUnavailable || !canvasHost.current) {
+    if (!enabled || isLandingPage || graphicsUnavailable || !canvasHost.current || prefersReducedMotion) {
       if (scene.current) {
         scene.current.dispose();
         scene.current = null;
@@ -63,7 +100,7 @@ export default function GlobalSakuraBackground() {
       controller?.dispose();
       scene.current = null;
     };
-  }, [enabled, isLandingPage, graphicsUnavailable]);
+  }, [enabled, isLandingPage, graphicsUnavailable, prefersReducedMotion]);
 
   // Pointer tracking for wind effect
   useEffect(() => {
@@ -89,7 +126,7 @@ export default function GlobalSakuraBackground() {
 
   // 2D Canvas Fallback in case WebGL is unavailable
   useEffect(() => {
-    if (!enabled || isLandingPage || !graphicsUnavailable || !fallbackCanvasRef.current) return;
+    if (!enabled || isLandingPage || !graphicsUnavailable || !fallbackCanvasRef.current || prefersReducedMotion) return;
 
     const canvas = fallbackCanvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -105,7 +142,8 @@ export default function GlobalSakuraBackground() {
     };
     window.addEventListener('resize', handleResize);
 
-    const petalCount = Math.min(60, Math.floor(width / 25));
+    const isLightMode = document.documentElement.classList.contains('chakra-ui-light');
+    const petalCount = isLightMode ? 12 : Math.min(60, Math.floor(width / 25));
     const petals = Array.from({ length: petalCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -151,9 +189,9 @@ export default function GlobalSakuraBackground() {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
     };
-  }, [enabled, isLandingPage, graphicsUnavailable]);
+  }, [enabled, isLandingPage, graphicsUnavailable, prefersReducedMotion]);
 
-  if (!enabled || isLandingPage) return null;
+  if (!enabled || isLandingPage || prefersReducedMotion) return null;
 
   return (
     <div
@@ -161,9 +199,9 @@ export default function GlobalSakuraBackground() {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 15, // Floating above backgrounds and cards, below navbars & modals
+        zIndex: 0,
         pointerEvents: 'none',
-        opacity: 0.95,
+        opacity: isLight ? 0.35 : 0.85,
         background: 'transparent',
       }}
     >

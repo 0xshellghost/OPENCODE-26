@@ -6,18 +6,18 @@ export const opencodeTokens = {
       surface: 'var(--surface)',
       glass: 'var(--surface)',
       glassLight: 'var(--surface-2)',
-      glassDark: 'var(--surface-2)',
+      glassDark: 'var(--card-bg)',
     },
     // Primary Accents
     accent: {
-      sakura: '#f0a8b8',
-      sakuraHover: '#ffd0dc',
-      ivory: '#fff1ec',
-      purple: '#c04a67',
-      purpleHover: '#a83853',
-      purpleMuted: 'rgba(240, 168, 184, 0.16)',
-      ember: '#ff8f6b',
-      emberLight: '#c9532b',
+      sakura: 'var(--accent)',
+      sakuraHover: 'var(--accent-hover)',
+      ivory: 'var(--text)',
+      purple: 'var(--accent)',
+      purpleHover: 'var(--accent-hover)',
+      purpleMuted: 'var(--accent-soft)',
+      ember: 'var(--ember)',
+      emberLight: 'var(--ember)',
     },
     // Leaderboard Ranks
     rank: {

@@ -138,7 +138,7 @@ export default function Viewevents() {
               name={item.name}
               des={item.description}
               image={item.logoImageURL}
-              download={`/admin/viewevents/${encodeURIComponent(item.name)}`}
+              download={`/user/leaderboard/${encodeURIComponent(item.name)}`}
             />
             <Box mt={3} display="flex" justifyContent="center">
               <Button

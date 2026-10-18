@@ -6,14 +6,13 @@ import {
   Text,
   Badge,
 } from '@chakra-ui/react';
-import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import { PullRequest } from 'app/user/profile/page';
 import Card from 'components/card/Card';
 import { FaGithub, FaCodeBranch } from 'react-icons/fa';
 
 export default function Project({ pr }: { pr: PullRequest }) {
-  const textPrimary = '#fff1ec';
-  const textSecondary = '#dfced5';
+  const textPrimary = 'var(--fg)';
+  const textSecondary = 'var(--muted)';
 
   const status = pr.status.toLowerCase();
   const statusStyles =
@@ -23,22 +22,22 @@ export default function Project({ pr }: { pr: PullRequest }) {
       ? { bg: 'rgba(183, 148, 244, 0.18)', color: '#B794F4', border: '1px solid rgba(183, 148, 244, 0.35)' }
       : status === 'rejected'
       ? { bg: 'rgba(252, 129, 129, 0.18)', color: '#FC8181', border: '1px solid rgba(252, 129, 129, 0.35)' }
-      : { bg: 'rgba(255, 255, 255, 0.1)', color: '#dfced5', border: '1px solid rgba(255, 255, 255, 0.2)' };
+      : { bg: 'rgba(255, 255, 255, 0.1)', color: 'var(--muted)', border: '1px solid rgba(255, 255, 255, 0.2)' };
 
   return (
     <Card
-      bg="rgba(240, 168, 184, 0.05)"
+      bg="var(--card-soft)"
       backdropFilter="blur(20px)"
       p="16px"
       borderRadius="16px"
-      border="1px solid rgba(240, 168, 184, 0.18)"
+      border="1px solid var(--border)"
       transition="all 0.3s ease"
-      boxShadow="0 4px 15px 0 rgba(0, 0, 0, 0.25)"
+      boxShadow="var(--shadow)"
       _hover={{
         transform: 'translateY(-2px)',
-        boxShadow: '0 8px 28px 0 rgba(0, 0, 0, 0.45)',
-        borderColor: '#f0a8b8',
-        bg: 'rgba(240, 168, 184, 0.09)',
+        boxShadow: 'var(--shadow)',
+        borderColor: 'var(--accent)',
+        bg: 'var(--accent-soft)',
       }}
     >
       <Flex gap="14px" align="flex-start">
@@ -46,9 +45,9 @@ export default function Project({ pr }: { pr: PullRequest }) {
         <Box
           p="10px"
           borderRadius="12px"
-          bg="rgba(240, 168, 184, 0.14)"
-          border="1px solid rgba(240, 168, 184, 0.3)"
-          color="#f0a8b8"
+          bg="var(--accent-soft)"
+          border="1px solid var(--border)"
+          color="var(--accent)"
           flexShrink={0}
         >
           <Icon as={FaGithub} h="20px" w="20px" />
@@ -115,7 +114,7 @@ export default function Project({ pr }: { pr: PullRequest }) {
           {/* STATUS & POINTS */}
           <Flex mt="12px" align="center" justify="space-between" flexWrap="wrap" gap="10px">
             <Flex align="center" gap="8px">
-              <Text fontSize="sm" color={textSecondary} opacity={0.85}>
+              <Text fontSize="sm" color={textSecondary}>
                 Status
               </Text>
               <Box
@@ -134,14 +133,14 @@ export default function Project({ pr }: { pr: PullRequest }) {
               <Flex
                 align="center"
                 gap="6px"
-                bg="rgba(240, 168, 184, 0.12)"
-                border="1px solid rgba(240, 168, 184, 0.25)"
+                bg="var(--accent-soft)"
+                border="1px solid var(--border)"
                 px="10px"
                 py="3px"
                 borderRadius="8px"
               >
-                <Text fontSize="xs" fontWeight="700" color="#f0a8b8">POINTS</Text>
-                <Text fontSize="sm" fontWeight="800" color="#fff1ec" fontFamily="var(--f-mono)">
+                <Text fontSize="xs" fontWeight="700" color="var(--accent)">POINTS</Text>
+                <Text fontSize="sm" fontWeight="800" color="var(--fg)" fontFamily="var(--f-mono)">
                   +{pr.issue.currentPoints}
                 </Text>
               </Flex>

@@ -28,11 +28,10 @@ import { useEffect, useState } from 'react';
 import { RingLoader } from 'react-spinners';
 import { useRouter } from 'next/navigation';
 
-import {
-  useToast,
-} from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import { EditPRPoints } from 'api/admin/admin';
 import { fetchLoggedInBasicDetails } from 'api/profile/profile';
+import { isAdminUser } from 'utils/jwt';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -45,35 +44,10 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Define the shape of the JWT payload
-  interface JWTPayload {
-    roles?: {
-      isAdmin: boolean;
-    };
-    [key: string]: any;
-  }
-
-  // Helper to decode JWT payload
-  function parseJwt(token: string | null): JWTPayload | null {
-    if (!token) return null;
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join(''),
-      );
-      return JSON.parse(jsonPayload);
-    } catch {
-      return null;
-    }
-  }
-
-  const handleIncrementPointsChange = (e: any) => {
+  const handleIncrementPointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIncrementPoints(e.target.value);
   };
+
   const handleOpenModal = (prDetails: any) => {
     setSelectedPrDetails(prDetails);
     setIsModalOpen(true);
@@ -85,7 +59,7 @@ export default function Dashboard() {
     setIsModalOpen(false);
   };
 
-  const [userPrDetails, setuserPrDetails] = useState<any[]>([]);
+  const [userPrDetails, setUserPrDetails] = useState<any[]>([]);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const auth = useAuth();
 
@@ -108,11 +82,7 @@ export default function Dashboard() {
   // Admin-only guard: Redirect non-admin users away from admin page
   useEffect(() => {
     if (!isMounted) return;
-    const token = localStorage.getItem('token');
-    const payload = parseJwt(token);
-
-    if (!payload?.roles?.isAdmin) {
-      console.error('Only admin can view events');
+    if (!isAdminUser()) {
       router.push('/user/home');
     }
   }, [isMounted, router]);
@@ -120,25 +90,21 @@ export default function Dashboard() {
   const pointUpdate = useMutation({
     mutationFn: EditPRPoints,
     onSuccess: () => {
-      // console.log('Success');
-
       toast({
         title: 'Points Updated',
         description: 'PR points were successfully updated.',
         status: 'success',
-        duration: 10000,
+        duration: 5000,
         isClosable: true,
       });
-
       setIsModalOpen(false);
     },
-    onError: () => {
-      // console.log('Error');
+    onError: (error: any) => {
       toast({
-        title: 'Points not Updated',
-        description: 'PR points were successfully updated.',
+        title: 'Update Failed',
+        description: error?.message || 'Could not update PR points.',
         status: 'error',
-        duration: 3000,
+        duration: 4000,
         isClosable: true,
       });
     },
@@ -197,11 +163,11 @@ export default function Dashboard() {
     try {
       setIsLoading(true);
       const res = await refetch();
-      setuserPrDetails(res.data);
+      setUserPrDetails(res.data || []);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.error('Error fetching data:', error);
+      console.error('Error fetching PR details:', error);
     }
   };
 

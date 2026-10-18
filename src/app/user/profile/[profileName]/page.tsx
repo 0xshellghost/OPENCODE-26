@@ -112,10 +112,10 @@ export default function ProfileOverviewOther() {
 
   // Panel styling matching the Kyoto cherry blossom & dusk plum theme
   const glassPanel = {
-    bg: "linear-gradient(135deg, rgba(30, 18, 38, 0.85) 0%, rgba(42, 24, 50, 0.82) 100%)",
+    bg: "var(--surface)",
     backdropFilter: "blur(24px)",
-    border: "1px solid rgba(240, 168, 184, 0.22)",
-    boxShadow: "0 18px 45px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(240, 168, 184, 0.08)",
+    border: "1px solid var(--border)",
+    boxShadow: "var(--shadow)",
   };
 
   if (isLoading) {
@@ -160,14 +160,14 @@ export default function ProfileOverviewOther() {
               <Avatar
                 src={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
                 size="xl"
-                border="3.5px solid rgba(240, 168, 184, 0.5)"
-                boxShadow="0 0 24px rgba(240, 168, 184, 0.35), 0 8px 24px rgba(0, 0, 0, 0.55)"
+                border="3.5px solid var(--border-strong)"
+                boxShadow="var(--shadow)"
                 mb="14px"
               />
-              <Text fontSize="22px" fontWeight="800" color="#fff1ec">
+              <Text fontSize="22px" fontWeight="800" color="var(--fg)">
                 {profile?.name || profileName}
               </Text>
-              <Text fontSize="13px" color="#dfced5" opacity={0.85}>
+              <Text fontSize="13px" color="var(--muted)">
                 @{profile?.githubId || profileName}
               </Text>
 
@@ -181,19 +181,19 @@ export default function ProfileOverviewOther() {
                   size="sm"
                   w="100%"
                   maxW="260px"
-                  bg="rgba(240, 168, 184, 0.12)"
-                  color="#fff1ec"
-                  border="1px solid rgba(240, 168, 184, 0.3)"
+                  bg="var(--accent-soft)"
+                  color="var(--fg)"
+                  border="1px solid var(--border)"
                   borderRadius="full"
                   fontWeight="700"
                   fontSize="13px"
                   py="18px"
                   mt="14px"
                   _hover={{
-                    bg: 'rgba(240, 168, 184, 0.22)',
-                    borderColor: '#f0a8b8',
+                    bg: 'var(--accent-soft)',
+                    borderColor: 'var(--accent)',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 6px 20px rgba(240, 168, 184, 0.25)',
+                    boxShadow: 'var(--shadow)',
                   }}
                   transition="all 0.3s ease"
                   onClick={onOpen}
@@ -243,10 +243,10 @@ export default function ProfileOverviewOther() {
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
             <Box {...glassPanel} borderRadius="20px" p="20px" mb="20px">
               <Flex justify="space-between" align="center" mb="14px">
-                <Text fontWeight="800" color="#fff1ec">
+                <Text fontWeight="800" color="var(--fg)">
                   Unlocked Badges
                 </Text>
-                <Text fontSize="12px" color="#dfced5" opacity={0.8} fontFamily="var(--f-mono)">
+                <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
                   {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
                 </Text>
               </Flex>
@@ -328,10 +328,10 @@ export default function ProfileOverviewOther() {
           {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
             <Box {...glassPanel} borderRadius="22px" p="24px" mb="20px">
               <Flex justify="space-between" align="center" mb="16px">
-                <Text fontSize="18px" fontWeight="800" color="#fff1ec">
+                <Text fontSize="18px" fontWeight="800" color="var(--fg)">
                   Unlocked Badges
                 </Text>
-                <Text fontSize="12px" color="#dfced5" opacity={0.8} fontFamily="var(--f-mono)">
+                <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
                   {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
                 </Text>
               </Flex>
@@ -379,16 +379,16 @@ function BadgeCard({ badge }: { badge: BadgeDefinition }) {
     <Flex
       direction="row"
       align="center"
-      bg="rgba(240, 168, 184, 0.06)"
-      border="1px solid rgba(240, 168, 184, 0.18)"
+      bg="var(--card-soft)"
+      border="1px solid var(--border)"
       borderRadius="16px"
       p="14px"
       gap="16px"
       transition="all 0.3s ease"
       _hover={{
-        borderColor: '#f0a8b8',
+        borderColor: 'var(--accent)',
         transform: 'translateY(-2px)',
-        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.35)',
+        boxShadow: 'var(--shadow)',
       }}
     >
       <Flex
@@ -397,18 +397,18 @@ function BadgeCard({ badge }: { badge: BadgeDefinition }) {
         w="46px"
         h="46px"
         borderRadius="full"
-        bg="rgba(240, 168, 184, 0.15)"
-        color="#f0a8b8"
-        border="1px solid rgba(240, 168, 184, 0.35)"
-        boxShadow="0 0 12px rgba(240, 168, 184, 0.25)"
+        bg="var(--accent-soft)"
+        color="var(--accent)"
+        border="1px solid var(--border-strong)"
+        boxShadow="var(--shadow)"
       >
         <Icon as={badge.icon} boxSize={5} />
       </Flex>
       <Box>
-        <Text fontSize="15px" fontWeight="800" color="#fff1ec">
+        <Text fontSize="15px" fontWeight="800" color="var(--fg)">
           {badge.title}
         </Text>
-        <Text fontSize="13px" color="#dfced5" opacity={0.8} mt="2px">
+        <Text fontSize="13px" color="var(--muted)" mt="2px">
           {badge.description}
         </Text>
       </Box>

@@ -65,13 +65,13 @@ export default function EditProfileModal({
     queryFn: fetchColleges,
   });
 
-  const modalBg = 'linear-gradient(135deg, rgba(28, 16, 36, 0.98) 0%, rgba(38, 22, 46, 0.98) 100%)';
-  const titleColor = '#fff1ec';
-  const labelColor = '#dfced5';
-  const lockedBg = 'rgba(255, 255, 255, 0.04)';
-  const lockedBorder = 'rgba(240, 168, 184, 0.12)';
-  const lockedText = '#a89aa2';
-  const brandStars = '#f0a8b8';
+  const modalBg = 'var(--card-strong)';
+  const titleColor = 'var(--fg)';
+  const labelColor = 'var(--muted)';
+  const lockedBg = 'var(--card-soft)';
+  const lockedBorder = 'var(--border)';
+  const lockedText = 'var(--subtle)';
+  const brandStars = 'var(--accent)';
 
   useEffect(() => {
     if (isOpen && profile) {
@@ -206,10 +206,10 @@ export default function EditProfileModal({
         position="relative"
         bg={modalBg}
         borderRadius="22px"
-        border="1px solid rgba(240, 168, 184, 0.25)"
+        border="1px solid var(--border)"
         backdropFilter="blur(24px)"
         p={{ base: '20px', md: '26px' }}
-        boxShadow="0 20px 45px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(240, 168, 184, 0.08)"
+        boxShadow="var(--shadow)"
         w="90%"
         maxW="600px"
         maxH="90vh"
@@ -502,18 +502,18 @@ export default function EditProfileModal({
               borderRadius="full"
               size="sm"
               type="button"
-              color="#dfced5"
-              _hover={{ bg: 'rgba(240, 168, 184, 0.1)', color: '#fff1ec' }}
+              color="var(--muted)"
+              _hover={{ bg: 'var(--accent-soft)', color: 'var(--fg)' }}
             >
               Cancel
             </Button>
             <Button
-              bg="linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)"
-              color="#1f0f18"
+              bg="var(--accent)"
+              color="var(--accent-ink)"
               _hover={{
-                bg: 'linear-gradient(135deg, #ffd0dc 0%, #f0a8b8 100%)',
+                bg: 'var(--accent-hover)',
                 transform: 'scale(1.02)',
-                boxShadow: '0 6px 20px rgba(240, 168, 184, 0.4)',
+                boxShadow: 'var(--shadow)',
               }}
               type="submit"
               isLoading={isSubmitting}

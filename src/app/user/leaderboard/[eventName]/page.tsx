@@ -70,6 +70,7 @@ export default function EventName() {
   const [isEventHovered, setIsEventHovered] = useState(false);
 
   const eventLabel = safeDecode(eventName);
+  const isOpencode = eventLabel.toLowerCase().includes('opencode');
 
   const { data: eventData } = useQuery({
     queryKey: ['EventInfo'],
@@ -77,20 +78,25 @@ export default function EventName() {
   });
 
   const availableEventNames = useMemo(() => {
+    const seen = new Set<string>();
     const list: string[] = [];
+
+    const addEvent = (name?: string) => {
+      if (!name) return;
+      const key = name.trim().toLowerCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      list.push(name.trim());
+    };
+
+    if (eventLabel) addEvent(eventLabel);
     if (eventData?.data && Array.isArray(eventData.data)) {
       for (const ev of eventData.data) {
-        if (ev?.name && !list.some((item) => item.toLowerCase() === ev.name.toLowerCase())) {
-          list.push(ev.name);
-        }
+        addEvent(ev?.name);
       }
     }
-    if (eventLabel && !list.some((item) => item.toLowerCase() === eventLabel.toLowerCase())) {
-      list.unshift(eventLabel);
-    }
-    if (!list.some((item) => item.toLowerCase() === 'opencode')) {
-      list.push('Opencode');
-    }
+    addEvent('Opencode');
+
     return list;
   }, [eventData, eventLabel]);
 
@@ -147,28 +153,24 @@ export default function EventName() {
     selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
 
   const filteredTableData = useMemo(() => {
-    let data = tableDataColumns;
-    if (selectedCollege !== 'All') {
-      data = data.filter(
-        (row) =>
-          (row.college as string)?.trim().toLowerCase() ===
-          selectedCollege.toLowerCase(),
-      );
-    }
-    if (firstYearOnly) {
-      data = data.filter(
-        (row) => String(row.graduationYear ?? '').trim() === '2029',
-      );
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      data = data.filter(
-        (row) =>
+    const q = searchQuery.trim().toLowerCase();
+    const collegeLower = selectedCollege !== 'All' ? selectedCollege.toLowerCase() : null;
+
+    return tableDataColumns.filter((row) => {
+      if (collegeLower && (row.college as string)?.trim().toLowerCase() !== collegeLower) {
+        return false;
+      }
+      if (firstYearOnly && String(row.graduationYear ?? '').trim() !== '2029') {
+        return false;
+      }
+      if (q) {
+        const matchesUser =
           row.githubid?.toLowerCase().includes(q) ||
-          row.name?.toLowerCase().includes(q),
-      );
-    }
-    return data;
+          row.name?.toLowerCase().includes(q);
+        if (!matchesUser) return false;
+      }
+      return true;
+    });
   }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
 
   const deferredTableData = useDeferredValue(filteredTableData);
@@ -229,11 +231,13 @@ export default function EventName() {
         <Box flex="1" minW="0">
           <p className="oc-eyebrow" style={{ marginBottom: '12px' }}>
             <span />
-            {eventLabel} · The Arena of Creators
+            {isOpencode ? `${eventLabel} · The Arena of Creators` : `${eventLabel} · Official Standings`}
           </p>
           <h1 style={{ marginBottom: '12px' }}>Leaderboard</h1>
           <p className="oc-description">
-            Compete with curiosity. Contribute with purpose. Every step forward earns its place here.
+            {isOpencode
+              ? 'Compete with curiosity. Contribute with purpose. Every step forward earns its place here.'
+              : `Official participant standings and verified scores for ${eventLabel}.`}
           </p>
         </Box>
 
@@ -512,9 +516,9 @@ export default function EventName() {
       {/* ─── 3. TOP 3 SPOTLIGHT ─── */}
       {showSpotlight && (
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
-          <SpotlightCard row={topThree[0]} rank={1} />
-          <SpotlightCard row={topThree[1]} rank={2} />
-          <SpotlightCard row={topThree[2]} rank={3} />
+          <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} />
+          <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} />
+          <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} />
         </SimpleGrid>
       )}
 
@@ -632,7 +636,15 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   );
 }
 
-function SpotlightCard({ row, rank }: { row: RowObj; rank: 1 | 2 | 3 }) {
+function SpotlightCard({
+  row,
+  rank,
+  isOpencode,
+}: {
+  row: RowObj;
+  rank: 1 | 2 | 3;
+  isOpencode: boolean;
+}) {
   const medal = MEDALS[rank];
   const isFirst = rank === 1;
   const college = String(row.college ?? '').trim();
@@ -709,11 +721,13 @@ function SpotlightCard({ row, rank }: { row: RowObj; rank: 1 | 2 | 3 }) {
       >
         {Number(row.points).toLocaleString()}{' '}
         <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
-          pts
+          {isOpencode ? 'pts' : 'score'}
         </Text>
       </Text>
       <Text fontSize="12px" color="var(--muted)" mt="2px">
-        {Number(row.prmerged).toLocaleString()} PRs merged
+        {isOpencode
+          ? `${Number(row.prmerged).toLocaleString()} PRs merged`
+          : 'Official Ranking'}
       </Text>
     </Box>
   );

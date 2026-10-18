@@ -88,8 +88,8 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
             px="26px"
             py="22px"
             minW="270px"
-            bg="linear-gradient(135deg, rgba(30, 18, 38, 0.85) 0%, rgba(42, 24, 50, 0.82) 100%)"
-            border="1px solid rgba(240, 168, 184, 0.15)"
+            bg="var(--surface)"
+            border="1px solid var(--border)"
           >
             <Flex align="center" gap="14px" mb="14px">
               <Skeleton boxSize="48px" borderRadius="full" />
@@ -121,7 +121,7 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
           px="26px"
           py="22px"
           minW="270px"
-          bg="linear-gradient(135deg, rgba(30, 18, 38, 0.85) 0%, rgba(42, 24, 50, 0.82) 100%)"
+          bg="var(--surface)"
           backdropFilter="blur(24px)"
           boxShadow={`0 10px 30px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}33`}
           border={`1px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}66`}
@@ -189,7 +189,7 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
 }
 
 function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrations: string } }) {
-  const glass = 'linear-gradient(135deg, rgba(30, 18, 38, 0.85) 0%, rgba(42, 24, 50, 0.82) 100%)';
+  const glass = 'var(--surface)';
   const text = opencodeTokens.colors.text.primary;
   const muted = opencodeTokens.colors.text.secondary;
 
@@ -215,8 +215,8 @@ function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrat
       borderRadius="50%"
       bg={glass}
       backdropFilter="blur(20px)"
-      border="1px solid rgba(240, 168, 184, 0.22)"
-      boxShadow="0 20px 45px rgba(0, 0, 0, 0.55)"
+      border="1px solid var(--border)"
+      boxShadow="var(--shadow)"
       flexDir="column"
       alignItems="center"
       justifyContent="center"
@@ -225,8 +225,8 @@ function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrat
       zIndex={1}
       transition="all 0.3s ease"
       _hover={{
-        borderColor: '#f0a8b8',
-        boxShadow: '0 20px 45px rgba(240, 168, 184, 0.25)',
+        borderColor: 'var(--accent)',
+        boxShadow: '0 20px 45px var(--accent-soft)',
       }}
     >
       <Box
@@ -293,7 +293,7 @@ function Podium({
 }) {
   const text = opencodeTokens.colors.text.primary;
   const muted = opencodeTokens.colors.text.secondary;
-  const glass = 'rgba(28, 16, 36, 0.9)';
+  const glass = 'var(--card-bg)';
 
   if (isLoading) {
     return (
@@ -308,10 +308,10 @@ function Podium({
   if (winners.length === 0) {
     return (
       <Box textAlign="center" py="50px">
-        <Text fontSize="16px" fontWeight="700" color="#fff1ec">
+        <Text fontSize="16px" fontWeight="700" color="var(--fg)">
           No winners recorded yet for this category.
         </Text>
-        <Text fontSize="13px" color="#dfced5" opacity={0.8} mt="4px">
+        <Text fontSize="13px" color="var(--muted)" mt="4px">
           Leaderboard entries will appear here once contributions are scored.
         </Text>
       </Box>
@@ -550,21 +550,21 @@ export default function WinnersPodiumComparisonPage() {
                   py="10px"
                   fontWeight="700"
                   fontSize="14px"
-                  color="#dfced5"
-                  border="1px solid rgba(240, 168, 184, 0.2)"
-                  bg="rgba(240, 168, 184, 0.06)"
+                  color="var(--muted)"
+                  border="1px solid var(--border)"
+                  bg="var(--card-soft)"
                   backdropFilter="blur(16px)"
                   transition="all 0.3s ease"
                   _selected={{
-                    bg: 'linear-gradient(135deg, rgba(240, 168, 184, 0.28), rgba(192, 74, 103, 0.38))',
-                    color: '#fff1ec',
-                    borderColor: '#f0a8b8',
-                    boxShadow: '0 0 20px rgba(240, 168, 184, 0.35)',
+                    bg: 'var(--accent)',
+                    color: 'var(--accent-ink)',
+                    borderColor: 'var(--accent)',
+                    boxShadow: '0 0 20px var(--accent-soft)',
                     transform: 'scale(1.03)',
                   }}
                   _hover={{
-                    borderColor: '#f0a8b8',
-                    bg: 'rgba(240, 168, 184, 0.12)',
+                    borderColor: 'var(--accent)',
+                    bg: 'var(--accent-soft)',
                   }}
                 >
                   Overall Podium
@@ -575,21 +575,21 @@ export default function WinnersPodiumComparisonPage() {
                   py="10px"
                   fontWeight="700"
                   fontSize="14px"
-                  color="#dfced5"
-                  border="1px solid rgba(240, 168, 184, 0.2)"
-                  bg="rgba(240, 168, 184, 0.06)"
+                  color="var(--muted)"
+                  border="1px solid var(--border)"
+                  bg="var(--card-soft)"
                   backdropFilter="blur(16px)"
                   transition="all 0.3s ease"
                   _selected={{
-                    bg: 'linear-gradient(135deg, rgba(240, 168, 184, 0.28), rgba(192, 74, 103, 0.38))',
-                    color: '#fff1ec',
-                    borderColor: '#f0a8b8',
-                    boxShadow: '0 0 20px rgba(240, 168, 184, 0.35)',
+                    bg: 'var(--accent)',
+                    color: 'var(--accent-ink)',
+                    borderColor: 'var(--accent)',
+                    boxShadow: '0 0 20px var(--accent-soft)',
                     transform: 'scale(1.03)',
                   }}
                   _hover={{
-                    borderColor: '#f0a8b8',
-                    bg: 'rgba(240, 168, 184, 0.12)',
+                    borderColor: 'var(--accent)',
+                    bg: 'var(--accent-soft)',
                   }}
                 >
                   IIIT A Podium

@@ -100,3 +100,32 @@ export async function addMentor(userId: string) {
   if (!response.ok) throw new Error('Failed to add mentor/admin');
   return await response.json();
 }
+
+export async function uploadEventLeaderboard(eventName: string, file: File) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found. Please sign in as admin.');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('eventName', eventName);
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${encodeURIComponent(eventName)}/leaderboard/upload`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    },
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || `Failed to upload leaderboard: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+

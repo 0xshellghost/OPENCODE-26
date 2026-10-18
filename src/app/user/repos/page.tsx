@@ -110,8 +110,8 @@ export default function ReposPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'web' | 'mobile' | 'ai' | 'systems'>('all');
 
-  const textColor = '#fff1ec';
-  const mutedText = '#dfced5';
+  const textColor = 'var(--fg)';
+  const mutedText = 'var(--muted)';
 
   const { data: eventData, isLoading: isLoadingEvents } = useQuery({
     queryKey: ['EventInfo'],
@@ -169,7 +169,7 @@ export default function ReposPage() {
   if (isLoading || isLoadingEvents) {
     return (
       <Flex justify="center" align="center" h="100vh">
-        <RingLoader color="#f0a8b8" />
+        <RingLoader color="var(--accent)" />
       </Flex>
     );
   }
@@ -204,8 +204,8 @@ export default function ReposPage() {
                   onClick={() => setActiveFilter(chip.id as any)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
                     isActive
-                      ? 'bg-[#f0a8b8] text-[#1b1420] shadow-[0_4px_16px_rgba(240,168,184,0.35)]'
-                      : 'bg-[rgba(32,20,38,0.7)] text-[#dfced5] border border-[rgba(240,168,184,0.2)] hover:border-[#f0a8b8] hover:text-[#fff1ec]'
+                      ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_4px_16px_var(--accent-soft)]'
+                      : 'bg-[var(--card-soft)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
                   }`}
                 >
                   <IconComp size={13} />
@@ -223,12 +223,12 @@ export default function ReposPage() {
               px="16px"
               py="10px"
               borderRadius="full"
-              bg="rgba(32, 20, 38, 0.75)"
-              border="1px solid rgba(240, 168, 184, 0.25)"
-              _focusWithin={{ borderColor: '#f0a8b8', boxShadow: '0 0 16px rgba(240,168,184,0.25)' }}
+              bg="var(--surface)"
+              border="1px solid var(--border)"
+              _focusWithin={{ borderColor: 'var(--accent)', boxShadow: '0 0 16px var(--accent-soft)' }}
               transition="all 0.25s ease"
             >
-              <Search size={15} color="#f0a8b8" />
+              <Search size={15} color="var(--accent)" />
               <input
                 type="search"
                 value={searchQuery}
@@ -238,7 +238,7 @@ export default function ReposPage() {
                   background: 'transparent',
                   outline: 'none',
                   border: 'none',
-                  color: '#fff1ec',
+                  color: 'var(--fg)',
                   fontSize: '13px',
                   width: '100%',
                 }}
@@ -251,7 +251,7 @@ export default function ReposPage() {
         <Flex justify="space-between" align="center" mt="16px" fontSize="12px" fontFamily="var(--f-mono)" color={mutedText}>
           <Text>
             Displaying{' '}
-            <Text as="span" color="#f0a8b8" fontWeight="800">
+            <Text as="span" color="var(--accent)" fontWeight="800">
               <CountUp to={filteredRepos.length} duration={0.8} />
             </Text>{' '}
             open-source repositories
@@ -260,7 +260,7 @@ export default function ReposPage() {
             <button
               type="button"
               onClick={() => setActiveFilter('all')}
-              className="text-[#f0a8b8] hover:underline cursor-pointer"
+              className="text-[var(--accent)] hover:underline cursor-pointer"
             >
               Show all ({repositories.length})
             </button>
@@ -276,10 +276,10 @@ export default function ReposPage() {
           justify="center"
           py="70px"
           borderRadius="24px"
-          bg="rgba(32, 20, 38, 0.6)"
-          border="1px solid rgba(240, 168, 184, 0.2)"
+          bg="var(--surface)"
+          border="1px solid var(--border)"
         >
-          <Icon as={FolderGit2} color="#f0a8b8" mb="16px" w="42px" h="42px" />
+          <Icon as={FolderGit2} color="var(--accent)" mb="16px" w="42px" h="42px" />
           <Text fontSize="xl" fontWeight="700" color={textColor}>
             No repositories matched your filters
           </Text>
@@ -292,7 +292,7 @@ export default function ReposPage() {
               setSearchQuery('');
               setActiveFilter('all');
             }}
-            className="mt-4 px-4 py-2 rounded-full text-xs font-bold bg-[rgba(240,168,184,0.15)] text-[#f0a8b8] border border-[rgba(240,168,184,0.3)] hover:bg-[#f0a8b8] hover:text-[#1b1420] transition-all"
+            className="mt-4 px-4 py-2 rounded-full text-xs font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] transition-all"
           >
             Reset search & filters
           </button>
@@ -314,15 +314,15 @@ export default function ReposPage() {
                   h="100%"
                   p="22px"
                   borderRadius="20px"
-                  bg="linear-gradient(145deg, rgba(32, 19, 41, 0.88) 0%, rgba(45, 26, 56, 0.82) 100%)"
+                  bg="var(--surface)"
                   backdropFilter="blur(20px)"
-                  border="1px solid rgba(240, 168, 184, 0.2)"
-                  boxShadow="0 10px 28px rgba(0, 0, 0, 0.45)"
+                  border="1px solid var(--border)"
+                  boxShadow="var(--shadow)"
                   transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
                   _hover={{
                     transform: 'translateY(-4px)',
-                    borderColor: '#f0a8b8',
-                    boxShadow: '0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(240, 168, 184, 0.2)',
+                    borderColor: 'var(--accent)',
+                    boxShadow: 'var(--shadow), 0 0 20px var(--accent-soft)',
                   }}
                   className="group"
                 >
@@ -334,7 +334,7 @@ export default function ReposPage() {
                         <Text
                           fontSize="11px"
                           fontFamily="var(--f-mono)"
-                          color="#a38e98"
+                          color="var(--subtle)"
                           fontWeight="600"
                           letterSpacing="0.04em"
                           mb="2px"
@@ -348,7 +348,7 @@ export default function ReposPage() {
                           color={textColor}
                           wordBreak="break-word"
                           lineHeight="1.2"
-                          className="group-hover:text-[#f0a8b8] transition-colors"
+                          className="group-hover:text-[var(--accent)] transition-colors"
                         >
                           {repo.name}
                         </Text>
@@ -360,7 +360,7 @@ export default function ReposPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`View ${repo.name} on GitHub`}
-                        className="p-2 rounded-xl bg-[rgba(20,12,24,0.6)] border border-[rgba(240,168,184,0.2)] text-[#dfced5] hover:bg-[#f0a8b8] hover:text-[#1b1420] hover:border-[#f0a8b8] transition-all ml-2"
+                        className="p-2 rounded-xl bg-[var(--card-soft)] border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] hover:border-[var(--accent)] transition-all ml-2"
                       >
                         <FaGithub size={16} />
                       </a>
@@ -369,7 +369,7 @@ export default function ReposPage() {
                     {/* Developer Meta: Language Dot + Difficulty Badge */}
                     <Flex align="center" gap="10px" mb="14px" flexWrap="wrap">
                       {/* Language Dot */}
-                      <Flex align="center" gap="5px" fontSize="12px" fontFamily="var(--f-mono)" color="#fff1ec" fontWeight="700">
+                      <Flex align="center" gap="5px" fontSize="12px" fontFamily="var(--f-mono)" color="var(--fg)" fontWeight="700">
                         <Box w="8px" h="8px" borderRadius="full" bg={lang.color} boxShadow={`0 0 8px ${lang.color}88`} />
                         <span>{lang.name}</span>
                       </Flex>
@@ -393,7 +393,6 @@ export default function ReposPage() {
                       fontSize="13px"
                       mb="18px"
                       lineHeight="1.65"
-                      opacity={0.88}
                       noOfLines={3}
                     >
                       {repo.description}
@@ -404,7 +403,7 @@ export default function ReposPage() {
                       {repo.tags?.map((tag: string) => (
                         <span
                           key={tag}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[rgba(20,12,25,0.55)] border border-[rgba(240,168,184,0.18)] text-[#dfced5] hover:border-[rgba(240,168,184,0.4)] transition-colors"
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[var(--card-soft)] border border-[var(--border)] text-[var(--muted)] hover:border-[var(--border-strong)] transition-colors"
                         >
                           {tag}
                         </span>
@@ -413,11 +412,11 @@ export default function ReposPage() {
                   </div>
 
                   {/* Footer: Maintainers & Community Discord Action */}
-                  <Box pt="14px" borderTop="1px solid rgba(240, 168, 184, 0.14)">
+                  <Box pt="14px" borderTop="1px solid var(--line)">
                     <Flex justify="space-between" align="center" gap="10px">
                       {/* Maintainers Avatars */}
                       <Flex align="center" gap="6px">
-                        <Text fontSize="11px" fontWeight="700" color="#a38e98" textTransform="uppercase" letterSpacing="0.05em">
+                        <Text fontSize="11px" fontWeight="700" color="var(--subtle)" textTransform="uppercase" letterSpacing="0.05em">
                           Team:
                         </Text>
                         <AvatarGroup size="xs" max={3}>
@@ -426,7 +425,7 @@ export default function ReposPage() {
                               <Avatar
                                 name={m.name}
                                 src={`https://github.com/${m.name}.png`}
-                                border="1.5px solid #2a1832"
+                                border="1.5px solid var(--border)"
                               />
                             </Tooltip>
                           ))}
@@ -438,7 +437,7 @@ export default function ReposPage() {
                         href="https://discord.com/channels/885149696249708635/885151791329722448"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs font-semibold text-[#f0a8b8] hover:text-[#fff1ec] transition-colors"
+                        className="flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] hover:text-[var(--fg)] transition-colors"
                       >
                         <FaDiscord size={14} className="text-[#5865F2]" />
                         <span>Discord</span>
@@ -451,7 +450,7 @@ export default function ReposPage() {
                       href={repo.githubLink || `https://github.com/opencodeiiita/${repo.name}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3.5 w-full py-2 px-3 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 bg-[rgba(240,168,184,0.1)] text-[#fff1ec] border border-[rgba(240,168,184,0.25)] hover:bg-[#f0a8b8] hover:text-[#1b1420] hover:border-[#f0a8b8] transition-all"
+                      className="mt-3.5 w-full py-2 px-3 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1.5 bg-[var(--accent-soft)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] hover:border-[var(--accent)] transition-all"
                     >
                       <GitBranch size={13} />
                       <span>Browse Code & Issues</span>

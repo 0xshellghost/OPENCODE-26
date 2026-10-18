@@ -68,8 +68,8 @@ export default function CommunityMetrics({
   const totalSubmitted = Math.max(prMerged, totalPRsSubmitted || prMerged);
   const mergeRate = totalSubmitted > 0 ? Math.round((prMerged / totalSubmitted) * 100) : 100;
 
-  const statCardBg = 'rgba(240, 168, 184, 0.06)';
-  const statBorder = 'rgba(240, 168, 184, 0.2)';
+  const statCardBg = 'var(--card-soft)';
+  const statBorder = 'var(--border)';
 
   const CurrentTierIcon = currentTier.icon;
 
@@ -80,11 +80,11 @@ export default function CommunityMetrics({
         <Text
           fontSize="15px"
           fontWeight="700"
-          color="#fff1ec"
+          color="var(--fg)"
         >
           Community Metrics
         </Text>
-        <Text fontSize="12px" color="#dfced5" opacity={0.8} fontFamily="var(--f-mono)">
+        <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
           Season Standings
         </Text>
       </Flex>
@@ -107,9 +107,9 @@ export default function CommunityMetrics({
           overflow="hidden"
           transition="all 0.3s ease"
           _hover={{
-            borderColor: '#f0a8b8',
+            borderColor: 'var(--accent)',
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
+            boxShadow: 'var(--shadow)',
           }}
         >
           <Flex
@@ -121,17 +121,17 @@ export default function CommunityMetrics({
             w="26px"
             h="26px"
             borderRadius="8px"
-            bg="rgba(240, 168, 184, 0.15)"
-            border="1px solid rgba(240, 168, 184, 0.3)"
+            bg="var(--accent-soft)"
+            border="1px solid var(--border)"
           >
-            <Icon as={GitMerge} w="13px" h="13px" color="#f0a8b8" />
+            <Icon as={GitMerge} w="13px" h="13px" color="var(--accent)" />
           </Flex>
 
           <Text
             fontSize="26px"
             fontWeight="900"
             lineHeight="1"
-            color="#fff1ec"
+            color="var(--fg)"
             fontFamily="var(--f-mono)"
             mt="8px"
           >
@@ -140,12 +140,12 @@ export default function CommunityMetrics({
           <Text
             fontSize="12px"
             fontWeight="700"
-            color="#dfced5"
+            color="var(--muted)"
             mt="4px"
           >
             Merged PRs
           </Text>
-          <Text fontSize="11px" color="#dfced5" opacity={0.7} mt="1px">
+          <Text fontSize="11px" color="var(--muted)" mt="1px">
             {mergeRate}% merged
           </Text>
         </Box>
@@ -164,7 +164,7 @@ export default function CommunityMetrics({
           _hover={{
             borderColor: '#FFD700',
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
+            boxShadow: 'var(--shadow)',
           }}
         >
           <Flex
@@ -195,12 +195,12 @@ export default function CommunityMetrics({
           <Text
             fontSize="12px"
             fontWeight="700"
-            color="#dfced5"
+            color="var(--muted)"
             mt="4px"
           >
             Points Earned
           </Text>
-          <Text fontSize="11px" color="#dfced5" opacity={0.7} mt="1px">
+          <Text fontSize="11px" color="var(--muted)" mt="1px">
             Avg {avgPts} pts/PR
           </Text>
         </Box>
@@ -219,7 +219,7 @@ export default function CommunityMetrics({
           _hover={{
             borderColor: currentTier.color,
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
+            boxShadow: 'var(--shadow)',
           }}
         >
           <Flex
@@ -251,12 +251,12 @@ export default function CommunityMetrics({
           <Text
             fontSize="12px"
             fontWeight="700"
-            color="#dfced5"
+            color="var(--muted)"
             mt="4px"
           >
             Current Tier
           </Text>
-          <Text fontSize="11px" color="#dfced5" opacity={0.7} mt="1px">
+          <Text fontSize="11px" color="var(--muted)" mt="1px">
             {currentTier.minPts.toLocaleString()}+ pts league
           </Text>
         </Box>
@@ -273,9 +273,9 @@ export default function CommunityMetrics({
           overflow="hidden"
           transition="all 0.3s ease"
           _hover={{
-            borderColor: '#f0a8b8',
+            borderColor: 'var(--accent)',
             transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
+            boxShadow: 'var(--shadow)',
           }}
         >
           <Flex
@@ -287,17 +287,17 @@ export default function CommunityMetrics({
             w="26px"
             h="26px"
             borderRadius="8px"
-            bg="rgba(240, 168, 184, 0.15)"
-            border="1px solid rgba(240, 168, 184, 0.3)"
+            bg="var(--accent-soft)"
+            border="1px solid var(--border)"
           >
-            <Icon as={Award} w="13px" h="13px" color="#f0a8b8" />
+            <Icon as={Award} w="13px" h="13px" color="var(--accent)" />
           </Flex>
 
           <Text
             fontSize="26px"
             fontWeight="900"
             lineHeight="1"
-            color="#fff1ec"
+            color="var(--fg)"
             fontFamily="var(--f-mono)"
             mt="8px"
           >
@@ -306,12 +306,12 @@ export default function CommunityMetrics({
           <Text
             fontSize="12px"
             fontWeight="700"
-            color="#dfced5"
+            color="var(--muted)"
             mt="4px"
           >
             Standing
           </Text>
-          <Text fontSize="11px" color="#f0a8b8" fontWeight="700" mt="1px">
+          <Text fontSize="11px" color="var(--accent)" fontWeight="700" mt="1px">
             Top <CountUp to={topPercentile} duration={1.2} />% Contributor
           </Text>
         </Box>
@@ -321,18 +321,18 @@ export default function CommunityMetrics({
       <Box
         p="14px 16px"
         borderRadius="16px"
-        bg="rgba(20, 12, 24, 0.45)"
-        border="1px solid rgba(240, 168, 184, 0.16)"
+        bg="var(--card-soft)"
+        border="1px solid var(--border)"
       >
         <Flex justify="space-between" align="center" mb="8px" fontSize="12px">
           <Flex align="center" gap="6px">
             <Icon as={CurrentTierIcon} w="12px" h="12px" color={currentTier.color} />
-            <Text fontWeight="800" color="#fff1ec">
+            <Text fontWeight="800" color="var(--fg)">
               Tier Progression
             </Text>
           </Flex>
           {nextTier ? (
-            <Text fontFamily="var(--f-mono)" fontWeight="700" color="#f0a8b8">
+            <Text fontFamily="var(--f-mono)" fontWeight="700" color="var(--accent)">
               +<CountUp to={pointsToNextTier} duration={1.2} separator="," /> pts to {nextTier.name}
             </Text>
           ) : (
@@ -343,21 +343,21 @@ export default function CommunityMetrics({
         </Flex>
 
         {/* Progress Bar */}
-        <Box h="7px" w="100%" bg="rgba(240, 168, 184, 0.12)" borderRadius="full" overflow="hidden" mb="6px">
+        <Box h="7px" w="100%" bg="var(--accent-soft)" borderRadius="full" overflow="hidden" mb="6px">
           <Box
             h="100%"
             w={`${tierProgressPct}%`}
             bg={
               nextTier
-                ? "linear-gradient(90deg, #f0a8b8 0%, #FFD700 100%)"
-                : "linear-gradient(90deg, #FFD700 0%, #f0a8b8 100%)"
+                ? "linear-gradient(90deg, var(--accent) 0%, #FFD700 100%)"
+                : "linear-gradient(90deg, #FFD700 0%, var(--accent) 100%)"
             }
             borderRadius="full"
             transition="width 0.6s ease"
           />
         </Box>
 
-        <Flex justify="space-between" fontSize="11px" color="#dfced5" opacity={0.8}>
+        <Flex justify="space-between" fontSize="11px" color="var(--muted)">
           <Text>{currentTier.name} ({currentTier.minPts} pts)</Text>
           <Text>{nextTier ? `${nextTier.name} (${nextTier.minPts} pts)` : 'Legend (4,500+)'}</Text>
         </Flex>

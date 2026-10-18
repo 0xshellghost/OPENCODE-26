@@ -26,8 +26,8 @@ export default function GeneralInformation(props: {
   const { name, githubId, discordId, college, email, gender, year, role, ...rest } =
     props;
 
-  const itemBg = 'rgba(240, 168, 184, 0.06)';
-  const itemBorder = 'rgba(240, 168, 184, 0.18)';
+  const itemBg = 'var(--card-soft)';
+  const itemBorder = 'var(--border)';
 
   const Item = ({
     label,
@@ -52,10 +52,10 @@ export default function GeneralInformation(props: {
         h="100%"
         transition="all 0.3s ease"
         _hover={{
-          borderColor: '#f0a8b8',
-          bg: 'rgba(240, 168, 184, 0.1)',
+          borderColor: 'var(--accent)',
+          bg: 'var(--accent-soft)',
           transform: 'translateY(-2px)',
-          boxShadow: '0 6px 20px rgba(0, 0, 0, 0.3)',
+          boxShadow: 'var(--shadow)',
         }}
       >
         <Flex align="center" justify="space-between" gap="10px" h="100%">
@@ -63,8 +63,7 @@ export default function GeneralInformation(props: {
             <Text
               fontSize="10px"
               fontWeight="700"
-              color="#dfced5"
-              opacity={0.8}
+              color="var(--muted)"
               textTransform="uppercase"
               letterSpacing="0.8px"
               mb="3px"
@@ -80,7 +79,7 @@ export default function GeneralInformation(props: {
               <Text
                 fontSize="13px"
                 fontWeight="700"
-                color="#fff1ec"
+                color="var(--fg)"
                 lineHeight="1.35"
                 wordBreak="break-word"
                 noOfLines={noClamp ? undefined : 1}
@@ -96,10 +95,10 @@ export default function GeneralInformation(props: {
               w="32px"
               h="32px"
               borderRadius="10px"
-              bg="rgba(240, 168, 184, 0.14)"
-              border="1px solid rgba(240, 168, 184, 0.28)"
+              bg="var(--accent-soft)"
+              border="1px solid var(--border)"
               flexShrink={0}
-              color="#f0a8b8"
+              color="var(--accent)"
             >
               <Icon as={icon} w="15px" h="15px" />
             </Flex>
@@ -116,11 +115,11 @@ export default function GeneralInformation(props: {
         <Text
           fontSize="15px"
           fontWeight="700"
-          color="#fff1ec"
+          color="var(--fg)"
         >
           General Information
         </Text>
-        <Text fontSize="12px" color="#dfced5" opacity={0.8} fontFamily="var(--f-mono)">
+        <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
           Profile Details
         </Text>
       </Flex>
