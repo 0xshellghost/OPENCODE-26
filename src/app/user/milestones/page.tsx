@@ -133,6 +133,8 @@ export default function Milestones() {
             borderRadius="999px"
             boxShadow="var(--shadow)"
             backdropFilter="blur(16px)"
+            maxW="100%"
+            overflowX="auto"
             gap="4px"
             position="relative"
           >
@@ -165,8 +167,9 @@ export default function Milestones() {
                     }
                   }}
                   position="relative"
-                  px={{ base: '16px', sm: '24px' }}
-                  py="9px"
+                  px={{ base: '14px', md: '20px' }}
+                  py={{ base: '8px', md: '9px' }}
+                  minH={{ base: '40px', md: '38px' }}
                   borderRadius="999px"
                   fontSize={{ base: '13px', md: '14px' }}
                   fontFamily="var(--f-body)"
@@ -176,6 +179,7 @@ export default function Milestones() {
                   cursor="pointer"
                   border="none"
                   bg="transparent"
+                  whiteSpace="nowrap"
                   transition="color 0.2s ease"
                   _hover={{
                     color: isSelected ? 'var(--accent-ink)' : 'var(--fg)',
@@ -200,8 +204,8 @@ export default function Milestones() {
                       transition={prefersReducedMotion ? { duration: 0.01 } : tabIndicatorTransition}
                     />
                   )}
-                  <Flex align="center" gap="8px" position="relative" zIndex={1}>
-                    <Icon as={IconComponent} boxSize="17px" />
+                  <Flex align="center" gap={{ base: '6px', md: '8px' }} position="relative" zIndex={1}>
+                    <Icon as={IconComponent} boxSize={{ base: '15px', md: '17px' }} />
                     <span>{tab.label}</span>
                   </Flex>
                 </Box>
@@ -257,18 +261,18 @@ export default function Milestones() {
 function StatTile({ label, value }: { label: string; value: string }) {
   return (
     <Box
-      px={{ base: '12px', sm: '16px', md: '20px' }}
-      py={{ base: '10px', md: '14px' }}
+      px={{ base: '8px', sm: '14px', md: '20px' }}
+      py={{ base: '8px', sm: '10px', md: '14px' }}
       borderRadius="16px"
       bg="var(--card-soft)"
       border="1px solid var(--border)"
       textAlign="center"
-      minW={{ base: '86px', sm: '104px', md: '124px' }}
+      minW={{ base: '0', sm: '100px', md: '124px' }}
       flex={{ base: '1', sm: 'initial' }}
     >
       <Text
         fontFamily="Georgia, serif"
-        fontSize={{ base: '20px', sm: '24px', md: '28px' }}
+        fontSize={{ base: '18px', sm: '22px', md: '28px' }}
         fontWeight="400"
         color="var(--text)"
         lineHeight="1"
@@ -277,7 +281,7 @@ function StatTile({ label, value }: { label: string; value: string }) {
         {value}
       </Text>
       <Text
-        fontSize={{ base: '10.5px', sm: '11.5px', md: '12px' }}
+        fontSize={{ base: '10px', sm: '11px', md: '12px' }}
         color="var(--muted)"
         mt="4px"
         fontWeight="500"

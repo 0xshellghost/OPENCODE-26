@@ -73,6 +73,7 @@
   gap: 6px;
   max-width: 220px;
   position: relative;
+  min-width: 0;
 }
 
 .statItem + .statItem::before {
@@ -354,12 +355,14 @@
     padding: 60px 20px;
   }
   .statsBar {
-    flex-direction: column;
-    gap: 24px;
-    padding: 28px 20px;
+    padding: 26px 16px;
   }
-  .statItem + .statItem::before {
-    display: none;
+  .statNumber {
+    font-size: clamp(24px, 3.8vw, 36px);
+  }
+  .statLabel {
+    font-size: 10px;
+    letter-spacing: 0.12em;
   }
 }
 
@@ -372,6 +375,40 @@
   }
   .sectionDescription {
     margin-bottom: 32px;
+  }
+  .statsBar {
+    padding: 20px 8px;
+  }
+  .statItem {
+    gap: 4px;
+    padding: 0 4px;
+  }
+  .statItem + .statItem::before {
+    height: 28px;
+  }
+  .statNumber {
+    font-size: clamp(19px, 5.5vw, 26px);
+  }
+  .statLabel {
+    font-size: clamp(8.5px, 2.4vw, 9.5px);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .statsBar {
+    padding: 16px 4px;
+  }
+  .statItem + .statItem::before {
+    height: 22px;
+  }
+  .statNumber {
+    font-size: 17px;
+  }
+  .statLabel {
+    font-size: 8px;
+    letter-spacing: 0.03em;
   }
 }
 

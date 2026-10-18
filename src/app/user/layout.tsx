@@ -35,7 +35,7 @@ export default function UserLayout({ children }: PropsWithChildren) {
             return (
               <Link key={href} href={href} aria-current={isActive ? 'page' : undefined}>
                 <Icon size={15} />
-                {label}
+                <span className="oc-nav-label">{label}</span>
               </Link>
             );
           })}

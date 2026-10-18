@@ -82,7 +82,7 @@ const primaryBtn = {
 } as const;
 
 const statTile = {
-  p: '18px 20px',
+  p: { base: '14px 16px', md: '18px 20px' },
   borderRadius: '14px',
   bg: 'var(--card-soft)',
   border: '1px solid var(--border)',
@@ -452,12 +452,12 @@ export default function RPlaceCanvasPage() {
     // provides max-width + padding, so this page only needs to stack its sections.
     <VStack spacing="24px" align="stretch" w="100%">
       {/* ─── 1. HEADER (same markup/classes as the other pages) ─── */}
-      <div className="oc-page-heading" style={{ marginBottom: 0 }}>
+      <div className="oc-page-heading" style={{ marginBottom: 0, width: '100%' }}>
         <Flex
           direction={{ base: 'column', md: 'row' }}
           align={{ base: 'stretch', md: 'center' }}
           justify="space-between"
-          gap="24px"
+          gap={{ base: '16px', md: '24px' }}
           w="100%"
         >
           <Box flex="1" minW={0}>
@@ -512,8 +512,8 @@ export default function RPlaceCanvasPage() {
 
       {/* ─── 2. STATUS & CONTROLS ─── */}
       <Box className="glass-panel" p={{ base: '12px 14px', md: '14px 20px' }}>
-        <Flex w="100%" align="center" justify="space-between" flexWrap="wrap" gap="14px">
-          <HStack spacing="10px" flexWrap="wrap">
+        <Flex w="100%" align="center" justify="space-between" flexWrap="wrap" gap={{ base: '12px', md: '14px' }}>
+          <HStack spacing="10px" flexWrap="wrap" rowGap="8px">
             {/* Snapshot status */}
             <HStack
               {...pill}
@@ -534,7 +534,7 @@ export default function RPlaceCanvasPage() {
             </HStack>
 
             {/* Auto-sync */}
-            <HStack {...pill} spacing="6px">
+            <HStack {...pill} spacing="6px" display={{ base: 'none', sm: 'flex' }}>
               <Clock size={12} color="var(--accent)" />
               <Text fontSize="12px" fontWeight="500" color="var(--muted)">
                 Auto-syncs every 5 mins
@@ -566,7 +566,9 @@ export default function RPlaceCanvasPage() {
                 boxShadow={wsConnected ? `0 0 6px ${LIVE_GREEN}` : 'none'}
               />
               <Text fontSize="12px" fontWeight="600" color={wsConnected ? LIVE_GREEN : '#F6AD55'}>
-                {wsConnected ? 'Canvas WS: Live' : 'Canvas WS: Reconnecting...'}
+                <Text as="span" display={{ base: 'none', sm: 'inline' }}>Canvas WS: </Text>
+                <Text as="span" display={{ base: 'inline', sm: 'none' }}>WS: </Text>
+                {wsConnected ? 'Live' : 'Reconnecting...'}
               </Text>
               {!wsConnected && (
                 <Tooltip label="Retry WebSocket connection" hasArrow>
@@ -578,8 +580,8 @@ export default function RPlaceCanvasPage() {
                     color="#F6AD55"
                     _hover={{ bg: 'rgba(237, 137, 54, 0.2)' }}
                     onClick={reconnectWs}
-                    h="18px"
-                    minW="18px"
+                    h="20px"
+                    minW="20px"
                   />
                 </Tooltip>
               )}
@@ -587,7 +589,7 @@ export default function RPlaceCanvasPage() {
           </HStack>
 
           {/* Controls */}
-          <HStack spacing="10px" flexWrap="wrap">
+          <HStack spacing="10px" flexWrap="wrap" rowGap="8px">
             <HStack
               bg="var(--card-soft)"
               p="3px 6px"
@@ -845,7 +847,7 @@ export default function RPlaceCanvasPage() {
           of 10 pixels with a rapid 5-second cooldown.
         </p>
 
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing="16px" my="24px" w="100%">
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '12px', md: '16px' }} my="24px" w="100%">
           {/* Points */}
           <Box {...statTile}>
             <Flex justify="space-between" align="center" mb="8px">
@@ -903,7 +905,7 @@ export default function RPlaceCanvasPage() {
         </SimpleGrid>
 
         {/* Progress */}
-        <Box p="18px 20px" borderRadius="14px" bg="var(--card-soft)" border="1px solid var(--border)" w="100%" mb="24px">
+        <Box p={{ base: '14px 16px', md: '18px 20px' }} borderRadius="14px" bg="var(--card-soft)" border="1px solid var(--border)" w="100%" mb="24px">
           <Flex justify="space-between" align="center" mb="12px" flexWrap="wrap" gap="8px">
             <HStack spacing="10px" flexWrap="wrap">
               <Text fontSize="13px" fontWeight="600" color="var(--text)">
@@ -952,7 +954,7 @@ export default function RPlaceCanvasPage() {
         </Box>
 
         {/* Actions */}
-        <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align="center" gap="14px">
+        <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align={{ base: 'stretch', sm: 'center' }} gap="14px">
           <Link href="/user/leaderboard/Opencode" className="oc-button oc-button-secondary" aria-label="View Leaderboard">
             <Trophy size={16} />
             View Leaderboard

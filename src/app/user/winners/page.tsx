@@ -80,14 +80,16 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
 
   if (isLoading) {
     return (
-      <Flex justify="center" gap="28px" wrap="wrap" mt="28px">
+      <Flex justify="center" gap={{ base: '16px', md: '28px' }} wrap="wrap" mt="28px">
         {[0, 1, 2].map((i) => (
           <Box
             key={i}
             borderRadius="22px"
-            px="26px"
-            py="22px"
-            minW="270px"
+            px={{ base: '18px', sm: '26px' }}
+            py={{ base: '18px', sm: '22px' }}
+            w={{ base: '100%', sm: 'auto' }}
+            minW={{ base: '100%', sm: '260px' }}
+            maxW={{ base: '100%', sm: '320px' }}
             bg="var(--surface)"
             border="1px solid var(--border)"
           >
@@ -113,14 +115,17 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
   }
 
   return (
-    <Flex justify="center" gap="28px" wrap="wrap" mt="28px">
+    <Flex justify="center" gap={{ base: '16px', md: '28px' }} wrap="wrap" mt="28px">
       {winners.slice(0, 3).map((w, i) => (
         <Box
           key={w.githubid}
           borderRadius="22px"
-          px="26px"
-          py="22px"
-          minW="270px"
+          px={{ base: '18px', sm: '26px' }}
+          py={{ base: '18px', sm: '22px' }}
+          w={{ base: '100%', sm: 'auto' }}
+          minW={{ base: '100%', sm: '260px' }}
+          maxW={{ base: '100%', sm: '320px' }}
+          flex={{ base: '1 1 100%', sm: '1 1 260px' }}
           bg="var(--surface)"
           backdropFilter="blur(24px)"
           boxShadow={`0 10px 30px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}33`}
@@ -297,9 +302,9 @@ function Podium({
 
   if (isLoading) {
     return (
-      <Flex justify="center" align="flex-end" gap="18px" h="280px" mt="32px">
+      <Flex justify="center" align="flex-end" gap={{ base: '8px', sm: '14px', md: '18px' }} h="280px" mt="32px">
         {[140, 210, 160].map((h, i) => (
-          <Skeleton key={i} w="110px" h={`${h}px`} borderRadius="16px 16px 0 0" />
+          <Skeleton key={i} w={{ base: '65px', sm: '90px', md: '110px' }} h={`${h}px`} borderRadius="16px 16px 0 0" />
         ))}
       </Flex>
     );
@@ -338,37 +343,43 @@ function Podium({
       position="relative"
       left="50%"
       marginLeft="-50vw"
+      overflow="hidden"
     >
-      <Box display="flex" justifyContent="center">
+      <Box display="flex" justifyContent="center" px={{ base: '8px', sm: '16px' }} maxW="100vw" overflowX="auto">
         <Box
           display="grid"
-          gridTemplateColumns={`repeat(${order.length}, 120px)`}
+          gridTemplateColumns={{
+            base: `repeat(${order.length}, minmax(60px, 80px))`,
+            sm: `repeat(${order.length}, 100px)`,
+            md: `repeat(${order.length}, 120px)`,
+          }}
           justifyContent="center"
           alignItems="end"
-          columnGap="18px"
+          columnGap={{ base: '8px', sm: '14px', md: '18px' }}
           mt="32px"
         >
           {order.map((w, i) => (
-            <Box key={w.githubid} textAlign="center">
+            <Box key={w.githubid} textAlign="center" minW={0}>
               <Avatar
                 src={w.avatarUrl || `https://github.com/${w.githubid}.png`}
                 name={w.name}
-                size={w.position === 1 ? 'xl' : 'lg'}
+                size={w.position === 1 ? { base: 'md', md: 'xl' } : { base: 'sm', md: 'lg' }}
                 border={`4px solid ${w.color || '#F5C542'}`}
                 boxShadow={`0 0 20px ${w.color || '#F5C542'}55`}
                 mb="8px"
               />
 
-              <Text fontWeight="800" color={text} fontSize="14px" noOfLines={1} title={w.name}>
+              <Text fontWeight="800" color={text} fontSize={{ base: '11px', sm: '13px', md: '14px' }} noOfLines={1} title={w.name}>
                 {w.name}
               </Text>
-              <Text fontSize="12px" color={muted} mb="8px" noOfLines={1}>
+              <Text fontSize={{ base: '10px', sm: '11px', md: '12px' }} color={muted} mb="8px" noOfLines={1}>
                 @{w.githubid}
               </Text>
 
               <Box
                 h={heights[i] || '160px'}
-                w="110px"
+                w={{ base: '65px', sm: '90px', md: '110px' }}
+                mx="auto"
                 bg={w.color || '#F5C542'}
                 borderRadius="16px 16px 0 0"
                 boxShadow={`0 10px 30px ${w.color || '#F5C542'}44`}
@@ -380,7 +391,7 @@ function Podium({
                   h="100%"
                   align="center"
                   justify="center"
-                  fontSize="24px"
+                  fontSize={{ base: '18px', md: '24px' }}
                   fontWeight="900"
                   color="white"
                   transition="opacity 0.2s ease"
@@ -400,21 +411,21 @@ function Podium({
                   opacity={0}
                   transition="opacity 0.25s ease"
                   _groupHover={{ opacity: 1 }}
-                  p="8px"
+                  p={{ base: '4px', md: '8px' }}
                 >
-                  <Text fontSize="11px" color={muted} fontWeight="700">
+                  <Text fontSize={{ base: '9px', md: '11px' }} color={muted} fontWeight="700">
                     POINTS
                   </Text>
-                  <Text fontSize="18px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
+                  <Text fontSize={{ base: '12px', md: '18px' }} fontWeight="900" color={text} fontFamily="var(--f-mono)">
                     {w.points.toLocaleString()}
                   </Text>
 
-                  <Box h="6px" />
+                  <Box h={{ base: '2px', md: '6px' }} />
 
-                  <Text fontSize="11px" color={muted} fontWeight="700">
-                    PRs MERGED
+                  <Text fontSize={{ base: '9px', md: '11px' }} color={muted} fontWeight="700">
+                    PRs
                   </Text>
-                  <Text fontSize="18px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
+                  <Text fontSize={{ base: '12px', md: '18px' }} fontWeight="900" color={text} fontFamily="var(--f-mono)">
                     {w.prmerged.toLocaleString()}
                   </Text>
                 </Flex>
@@ -429,14 +440,14 @@ function Podium({
 
 function WinnersHeader() {
   return (
-    <header className="oc-page-heading" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: '12px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px' }}>
+    <header className="oc-page-heading" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: '12px', maxWidth: '100%', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%', width: '100%' }}>
+        <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px', maxWidth: '100%' }}>
           <span />
           <ShinyText text="HALL OF FAME" speed={5} shineColor="#ffded2" />
           <span />
         </p>
-        <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)' }}>
+        <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)', maxWidth: '100%', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
           <BlurText text="Legacy of Legends" delay={50} animateBy="words" direction="top" />
         </h1>
         <p className="oc-description" style={{ textAlign: 'center', maxWidth: '540px', margin: 0 }}>
@@ -543,13 +554,13 @@ export default function WinnersPodiumComparisonPage() {
             />
 
             <Tabs index={tab} onChange={setTab} variant="unstyled">
-              <TabList justifyContent="center" gap="14px">
+              <TabList justifyContent="center" gap={{ base: '8px', sm: '14px' }}>
                 <Tab
                   borderRadius="full"
-                  px="26px"
-                  py="10px"
+                  px={{ base: '18px', md: '26px' }}
+                  py={{ base: '8px', md: '10px' }}
                   fontWeight="700"
-                  fontSize="14px"
+                  fontSize={{ base: '12px', md: '14px' }}
                   color="var(--muted)"
                   border="1px solid var(--border)"
                   bg="var(--card-soft)"
@@ -571,10 +582,10 @@ export default function WinnersPodiumComparisonPage() {
                 </Tab>
                 <Tab
                   borderRadius="full"
-                  px="26px"
-                  py="10px"
+                  px={{ base: '18px', md: '26px' }}
+                  py={{ base: '8px', md: '10px' }}
                   fontWeight="700"
-                  fontSize="14px"
+                  fontSize={{ base: '12px', md: '14px' }}
                   color="var(--muted)"
                   border="1px solid var(--border)"
                   bg="var(--card-soft)"
