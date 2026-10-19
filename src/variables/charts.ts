@@ -82,12 +82,12 @@ export const barChartOptionsDailyTraffic: ApexGeneric = {
         [
           {
             offset: 0,
-            color: "#4318FF",
+            color: "#58B99A",
             opacity: 1,
           },
           {
             offset: 100,
-            color: "rgba(67, 24, 255, 1)",
+            color: "rgba(88, 185, 154, 1)",
             opacity: 0.28,
           },
         ],
@@ -187,12 +187,12 @@ export const barChartOptionsUserActivity = {
   },
   fill: {
     type: "solid",
-    colors: ["#5E37FF", "#6AD2FF"],
+    colors: ["#58B99A", "#B8E5D5"],
   },
   legend: {
     show: false,
   },
-  colors: ["#5E37FF", "#6AD2FF"],
+  colors: ["#58B99A", "#B8E5D5"],
   dataLabels: {
     enabled: false,
   },
@@ -291,12 +291,12 @@ export const barChartOptionsConsumption: ApexGeneric = {
   },
   fill: {
     type: "solid",
-    colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+    colors: ["#58B99A", "#B8E5D5", "#D4F0E7"],
   },
   legend: {
     show: false,
   },
-  colors: ["#5E37FF", "#6AD2FF", "#E1E9F8"],
+  colors: ["#58B99A", "#B8E5D5", "#D4F0E7"],
   dataLabels: {
     enabled: false,
   },
@@ -310,7 +310,7 @@ export const barChartOptionsConsumption: ApexGeneric = {
 
 export const pieChartOptions: ApexGeneric = {
   labels: ["Your files", "System", "Empty"],
-  colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
+  colors: ["#58B99A", "#B8E5D5", "#E0EBE7"],
   chart: {
     width: "50px",
   },
@@ -339,7 +339,7 @@ export const pieChartOptions: ApexGeneric = {
     },
   },
   fill: {
-    colors: ["#4318FF", "#6AD2FF", "#EFF4FB"],
+    colors: ["#58B99A", "#B8E5D5", "#E0EBE7"],
   },
   tooltip: {
     enabled: true,
@@ -373,14 +373,14 @@ export const lineChartOptionsTotalSpent: ApexOptions = {
       left: 0,
       blur: 10,
       opacity: 0.1,
-      color: "#4318FF",
+      color: "#58B99A",
     },
   },
-  colors: ["#4318FF", "#39B8FF"],
+  colors: ["#58B99A", "#A3DAC7"],
   markers: {
     size: 0,
     colors: "white",
-    strokeColors: "#e9a7b2",
+    strokeColors: "#8FAFC4",
     strokeWidth: 3,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
@@ -427,9 +427,7 @@ export const lineChartOptionsTotalSpent: ApexOptions = {
   grid: {
     show: false,
     column: {
-      // color: ["#7551FF", "#39B8FF"],
       opacity: 0.5,
     },
   },
-  // color: ["#7551FF", "#39B8FF"],
 };

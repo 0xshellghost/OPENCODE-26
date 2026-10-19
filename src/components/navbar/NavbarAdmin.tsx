@@ -77,7 +77,9 @@ export default function AdminNavbar(props: AdminNavbarProps) {
       pt={{ base: '14px', md: '22px' }}
       pb={{base:"16px", md:"20px"}}
       zIndex="20"
-      bgGradient="linear(to-b, rgba(26,22,37,0.9) 0%, rgba(26,22,37,0.4) 60%, rgba(26,22,37,0) 100%)"
+      bg="var(--nav-bg)"
+      backdropFilter="blur(16px)"
+      borderBottom="1px solid var(--border)"
     >
       <Flex justify="space-between" align="center">
         <Text
@@ -126,7 +128,7 @@ export default function AdminNavbar(props: AdminNavbarProps) {
                 onClick={() => router.push('/user/profile')}
                 bg="transparent"
                 _hover={{ bg: opencodeTokens.colors.background.glassLight }}
-                color="white"
+                color={opencodeTokens.colors.text.primary}
               >
                 Profile Settings
               </MenuItem>

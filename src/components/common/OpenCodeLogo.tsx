@@ -8,7 +8,7 @@ interface OpenCodeLogoProps {
   color?: string;
 }
 
-export default function OpenCodeLogo({ className = '', width = 30, height = 30, color = '#e9a7b2' }: OpenCodeLogoProps) {
+export default function OpenCodeLogo({ className = '', width = 30, height = 30, color = 'var(--accent, #B8E5D5)' }: OpenCodeLogoProps) {
   return (
     <div
       className={className}

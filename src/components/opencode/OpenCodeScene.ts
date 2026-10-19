@@ -4,16 +4,16 @@ import type { OpenCodeQuality, SceneParameters } from './experience-config'
 export function createPetalScene(host: HTMLElement, parameters: SceneParameters, quality: OpenCodeQuality, onFailure: () => void) {
   const small = host.clientWidth < 768
   const conservative = quality === 'low' || (quality === 'auto' && (small || (navigator.hardwareConcurrency || 4) <= 4))
-  const count = conservative ? 45 : quality === 'high' ? 150 : 85
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !conservative, powerPreference: 'low-power' })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, conservative ? 1 : 1.5))
+  const count = conservative ? 40 : quality === 'high' ? 85 : 55
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: 'low-power' })
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, conservative ? 1 : 1.25))
   renderer.setClearColor(0x000000, 0)
   renderer.domElement.setAttribute('aria-hidden', 'true')
   host.appendChild(renderer.domElement)
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 60)
   camera.position.z = 14
-  const geometry = new THREE.PlaneGeometry(1, 1.45, 6, 8)
+  const geometry = new THREE.PlaneGeometry(1, 1.45, 4, 6)
   const positions = geometry.attributes.position
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i)
@@ -23,12 +23,12 @@ export function createPetalScene(host: HTMLElement, parameters: SceneParameters,
     positions.setXYZ(i, x * Math.pow(Math.max(0, Math.sin(Math.PI * t)), 0.65), y, 0.28 * x * x + 0.2 * Math.sin(t * Math.PI))
   }
   geometry.computeVertexNormals()
-  const material = new THREE.MeshStandardMaterial({ color: '#f0a8b8', roughness: 0.7, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+  const material = new THREE.MeshStandardMaterial({ color: '#B8E5D5', roughness: 0.7, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
   const petals = new THREE.InstancedMesh(geometry, material, count)
   petals.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
   petals.frustumCulled = false
   scene.add(petals)
-  scene.add(new THREE.AmbientLight('#fff1ec', 2.3))
+  scene.add(new THREE.AmbientLight('#F4F1E8', 2.3))
   const sun = new THREE.DirectionalLight('#ffd2a0', 3.2)
   sun.position.set(-3, 5, 8)
   scene.add(sun)

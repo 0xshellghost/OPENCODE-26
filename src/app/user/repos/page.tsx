@@ -72,40 +72,6 @@ function detectPrimaryLanguage(repo: any): { name: string; color: string } {
   return { name: 'TypeScript', color: '#3178c6' };
 }
 
-function getDifficultyBadge(idx: number): { label: string; color: string; border: string; bg: string } {
-  const cycle = idx % 4;
-  if (cycle === 0) {
-    return {
-      label: '★ Good First Issues',
-      color: '#45c07f',
-      border: 'rgba(69, 192, 127, 0.35)',
-      bg: 'rgba(69, 192, 127, 0.12)',
-    };
-  }
-  if (cycle === 1) {
-    return {
-      label: '⚡ Active Architecture',
-      color: '#63B3ED',
-      border: 'rgba(99, 179, 237, 0.35)',
-      bg: 'rgba(99, 179, 237, 0.12)',
-    };
-  }
-  if (cycle === 2) {
-    return {
-      label: '❖ Production App',
-      color: '#f0a8b8',
-      border: 'rgba(240, 168, 184, 0.35)',
-      bg: 'rgba(240, 168, 184, 0.12)',
-    };
-  }
-  return {
-    label: '✦ High Impact',
-    color: '#f5c542',
-    border: 'rgba(245, 197, 66, 0.35)',
-    bg: 'rgba(245, 197, 66, 0.12)',
-  };
-}
-
 export default function ReposPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'web' | 'mobile' | 'ai' | 'systems'>('all');
@@ -302,7 +268,6 @@ export default function ReposPage() {
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="24px" mb="40px">
           {filteredRepos.map((repo: any, idx: number) => {
             const lang = detectPrimaryLanguage(repo);
-            const difficulty = getDifficultyBadge(idx);
 
             return (
               <AnimatedContent key={repo.name || idx} delay={idx * 0.03}>
@@ -366,25 +331,24 @@ export default function ReposPage() {
                       </a>
                     </Flex>
 
-                    {/* Developer Meta: Language Dot + Difficulty Badge */}
+                    {/* Developer Meta: Language Dot */}
                     <Flex align="center" gap="10px" mb="14px" flexWrap="wrap">
-                      {/* Language Dot */}
-                      <Flex align="center" gap="5px" fontSize="12px" fontFamily="var(--f-mono)" color="var(--fg)" fontWeight="700">
-                        <Box w="8px" h="8px" borderRadius="full" bg={lang.color} boxShadow={`0 0 8px ${lang.color}88`} />
+                      <Flex
+                        align="center"
+                        gap="6px"
+                        px="2.5"
+                        py="1"
+                        borderRadius="md"
+                        bg="var(--surface-2)"
+                        border="1px solid var(--border)"
+                        fontSize="11px"
+                        fontFamily="var(--f-mono)"
+                        color="var(--fg)"
+                        fontWeight="600"
+                      >
+                        <Box w="7px" h="7px" borderRadius="full" bg={lang.color} />
                         <span>{lang.name}</span>
                       </Flex>
-
-                      {/* Difficulty Badge */}
-                      <span
-                        className="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                        style={{
-                          color: difficulty.color,
-                          backgroundColor: difficulty.bg,
-                          border: `1px solid ${difficulty.border}`,
-                        }}
-                      >
-                        {difficulty.label}
-                      </span>
                     </Flex>
 
                     {/* Project Description */}

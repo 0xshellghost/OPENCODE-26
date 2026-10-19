@@ -19,11 +19,35 @@ export const opencodeTokens = {
       ember: 'var(--ember)',
       emberLight: 'var(--ember)',
     },
+    // Secondary & Accent Colors
+    secondary: {
+      default: 'var(--secondary)',
+      hover: 'var(--secondary-hover)',
+      soft: 'var(--secondary-soft)',
+      border: 'var(--secondary-border)',
+    },
+    status: {
+      live: {
+        bg: 'var(--status-live-bg)',
+        text: 'var(--status-live-text)',
+        border: 'var(--status-live-border)',
+      },
+      upcoming: {
+        bg: 'var(--status-upcoming-bg)',
+        text: 'var(--status-upcoming-text)',
+        border: 'var(--status-upcoming-border)',
+      },
+      concluded: {
+        bg: 'var(--status-concluded-bg)',
+        text: 'var(--status-concluded-text)',
+        border: 'var(--status-concluded-border)',
+      },
+    },
     // Leaderboard Ranks
     rank: {
-      gold: '#ffd700',
-      silver: '#c0c0c0',
-      bronze: '#cd7f32',
+      gold: '#F5C542',
+      silver: '#94A3B8',
+      bronze: '#D97706',
     },
     // Text
     text: {

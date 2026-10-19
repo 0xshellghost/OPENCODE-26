@@ -29,7 +29,7 @@ export const progressStyles = {
           },
           track: {
             borderRadius: "20px",
-            bg: mode("#CF9690", "whiteAlpha.50")(props),
+            bg: mode("#6B8F83", "whiteAlpha.50")(props),
             h: "8px",
             w: "54px",
           },

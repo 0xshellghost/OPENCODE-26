@@ -55,9 +55,9 @@ export type RowObj = {
 const columnHelper = createColumnHelper<RowObj>();
 
 const TROPHY_COLORS: Record<number, string> = {
-  1: "#FFD700", // Gold
-  2: "#E2E8F0", // Silver
-  3: "#F0A8B8", // Bronze / Sakura
+  1: "#F5C542", // Gold (Warm Amber)
+  2: "#94A3B8", // Silver (Slate Silver)
+  3: "#D97706", // Bronze (Warm Bronze)
 };
 
 const useIsomorphicLayoutEffect =
@@ -91,25 +91,25 @@ function RankBadge({ position }: { position: string | number }) {
         borderRadius="full"
         bg={
           pos === 1
-            ? "rgba(255, 215, 0, 0.12)"
+            ? "rgba(245, 197, 66, 0.15)"
             : pos === 2
-            ? "rgba(226, 232, 240, 0.12)"
-            : "rgba(240, 168, 184, 0.12)"
+            ? "rgba(148, 163, 184, 0.15)"
+            : "rgba(217, 119, 6, 0.15)"
         }
         border="1px solid"
         borderColor={
           pos === 1
-            ? "rgba(255, 215, 0, 0.45)"
+            ? "rgba(245, 197, 66, 0.45)"
             : pos === 2
-            ? "rgba(226, 232, 240, 0.45)"
-            : "rgba(240, 168, 184, 0.45)"
+            ? "rgba(148, 163, 184, 0.45)"
+            : "rgba(217, 119, 6, 0.45)"
         }
         boxShadow={
           pos === 1
-            ? "0 0 12px rgba(255, 215, 0, 0.25)"
+            ? "0 0 12px rgba(245, 197, 66, 0.25)"
             : pos === 2
-            ? "0 0 12px rgba(226, 232, 240, 0.2)"
-            : "0 0 12px rgba(240, 168, 184, 0.2)"
+            ? "0 0 12px rgba(148, 163, 184, 0.2)"
+            : "0 0 12px rgba(217, 119, 6, 0.2)"
         }
       >
         <FaTrophy color={trophyColor} size={13} />
@@ -165,7 +165,7 @@ function UserCell({
                 <Box
                   borderRadius="full"
                   p="2px"
-                  bg="linear-gradient(135deg, rgba(240, 168, 184, 0.45), rgba(192, 74, 103, 0.25))"
+                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.45), rgba(45, 139, 111, 0.25))"
                   transition="transform 0.2s ease"
                   _hover={{ transform: "scale(1.06)" }}
                 >
@@ -177,14 +177,14 @@ function UserCell({
                     position="absolute"
                     top="-8px"
                     right="-14px"
-                    bg="linear-gradient(135deg, #FFB547 0%, #ED8936 100%)"
-                    color="#1a0c16"
+                    bg="var(--secondary)"
+                    color="#0C1C2C"
                     fontSize="9px"
                     fontWeight="900"
                     px="6px"
                     py="1px"
                     borderRadius="full"
-                    boxShadow="0 2px 6px rgba(0,0,0,0.4)"
+                    boxShadow="0 2px 6px rgba(0,0,0,0.3)"
                     letterSpacing="0.05em"
                   >
                     MENTOR
@@ -205,14 +205,14 @@ function UserCell({
 
                 {isYou && (
                   <Box
-                    px="8px"
-                    py="2px"
+                    bg="var(--accent)"
+                    color="var(--accent-ink)"
                     fontSize="10px"
                     fontWeight="900"
+                    px="8px"
+                    py="2px"
                     borderRadius="full"
-                    bg="linear-gradient(135deg, #f0a8b8 0%, #c04a67 100%)"
-                    color="#1a0c16"
-                    boxShadow="0 2px 8px rgba(240, 168, 184, 0.4)"
+                    boxShadow="0 2px 8px var(--accent-soft)"
                     letterSpacing="0.06em"
                   >
                     YOU
@@ -451,7 +451,7 @@ function MobileLeaderboard({
                 <Box
                   borderRadius="full"
                   p="2px"
-                  bg="linear-gradient(135deg, rgba(240, 168, 184, 0.4), rgba(192, 74, 103, 0.2))"
+                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.4), rgba(45, 139, 111, 0.2))"
                 >
                   <NextAvatar src={user.avatarUrl} h="42px" w="42px" />
                 </Box>
@@ -512,7 +512,7 @@ function MobileLeaderboard({
                 >
                   {user.points}
                 </Text>
-                <FaTrophy color="#FFD700" size={12} />
+                <FaTrophy color="var(--secondary)" size={12} />
               </Flex>
             </Flex>
           </Flex>
@@ -667,7 +667,7 @@ function ColumnTable({
             >
               {info.getValue()}
             </Text>
-            <FaTrophy color="#FFD700" size={14} />
+            <FaTrophy color="var(--secondary)" size={14} />
           </Flex>
         ),
       }),
@@ -779,20 +779,16 @@ function ColumnTable({
               fontSize="13px"
               fontWeight={showRankings ? "700" : "500"}
               leftIcon={<FaList size={12} />}
-              bg={
-                showRankings
-                  ? "linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)"
-                  : "transparent"
-              }
-              color={showRankings ? "#1a0c16" : "var(--muted)"}
+              bg={showRankings ? "var(--accent)" : "transparent"}
+              color={showRankings ? "var(--accent-ink)" : "var(--muted)"}
               boxShadow={
-                showRankings ? "0 2px 10px rgba(240, 168, 184, 0.35)" : "none"
+                showRankings ? "0 2px 8px var(--accent-soft)" : "none"
               }
               _hover={{
-                color: showRankings ? "#1a0c16" : "var(--fg)",
+                color: showRankings ? "var(--accent-ink)" : "var(--fg)",
                 bg: showRankings
-                  ? "linear-gradient(135deg, #f3b6c4 0%, #f09cb0 100%)"
-                  : "rgba(240, 168, 184, 0.08)",
+                  ? "var(--accent-hover)"
+                  : "var(--accent-soft)",
               }}
               _active={{ transform: "scale(0.98)" }}
               transition="all 0.2s ease"
@@ -809,20 +805,16 @@ function ColumnTable({
               fontSize="13px"
               fontWeight={!showRankings ? "700" : "500"}
               leftIcon={<FaFlagCheckered size={12} />}
-              bg={
-                !showRankings
-                  ? "linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)"
-                  : "transparent"
-              }
-              color={!showRankings ? "#1a0c16" : "var(--muted)"}
+              bg={!showRankings ? "var(--accent)" : "transparent"}
+              color={!showRankings ? "var(--accent-ink)" : "var(--muted)"}
               boxShadow={
-                !showRankings ? "0 2px 10px rgba(240, 168, 184, 0.35)" : "none"
+                !showRankings ? "0 2px 8px var(--accent-soft)" : "none"
               }
               _hover={{
-                color: !showRankings ? "#1a0c16" : "var(--fg)",
+                color: !showRankings ? "var(--accent-ink)" : "var(--fg)",
                 bg: !showRankings
-                  ? "linear-gradient(135deg, #f3b6c4 0%, #f09cb0 100%)"
-                  : "rgba(240, 168, 184, 0.08)",
+                  ? "var(--accent-hover)"
+                  : "var(--accent-soft)",
               }}
               _active={{ transform: "scale(0.98)" }}
               transition="all 0.2s ease"
@@ -882,7 +874,7 @@ function ColumnTable({
                     data-row-id={row.id}
                     bg={
                       isCurrentUser(row)
-                        ? "linear-gradient(90deg, rgba(240, 168, 184, 0.18) 0%, rgba(192, 74, 103, 0.14) 100%)"
+                        ? "linear-gradient(90deg, rgba(88, 185, 154, 0.18) 0%, rgba(45, 139, 111, 0.14) 100%)"
                         : "transparent"
                     }
                     color="var(--fg)"
@@ -893,7 +885,7 @@ function ColumnTable({
                     }
                     _hover={{
                       bg: isCurrentUser(row)
-                        ? "linear-gradient(90deg, rgba(240, 168, 184, 0.25) 0%, rgba(192, 74, 103, 0.20) 100%)"
+                        ? "linear-gradient(90deg, rgba(88, 185, 154, 0.25) 0%, rgba(45, 139, 111, 0.20) 100%)"
                         : "var(--accent-soft)",
                     }}
                     borderBottom="1px solid"

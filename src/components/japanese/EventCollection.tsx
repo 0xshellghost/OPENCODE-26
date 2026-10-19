@@ -214,7 +214,7 @@ export default function EventCollection({
   const Icon = leaderboard ? Trophy : CalendarDays;
 
   return (
-    <ClickSpark sparkColor="rgba(240, 168, 184, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
+    <ClickSpark sparkColor="rgba(88, 185, 154, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
       <PageHeading
         eyebrow={leaderboard ? 'THE ARENA OF CREATORS' : 'EXPLORE · PARTICIPATE · CREATE'}
         title={leaderboard ? 'Leaderboard' : 'Find your next beginning.'}
@@ -224,7 +224,7 @@ export default function EventCollection({
             : 'Explore active tracks, follow participant leaderboards, and find real open-source events to build and learn.'
         }
       >
-        <ShinyText speed={5} shineColor="#ffded2">
+        <ShinyText speed={5} shineColor="#D4F0E7">
           <span lang="ja">{leaderboard ? '切磋琢磨' : '一期一会'}</span>
         </ShinyText>
       </PageHeading>
@@ -238,10 +238,10 @@ export default function EventCollection({
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategory(cat.id as any)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                   activeCategory === cat.id
-                    ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_4px_16px_var(--accent-soft)]'
-                    : 'bg-[var(--card-soft)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
+                    ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_2px_12px_var(--accent-soft)] font-bold'
+                    : 'bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
                 }`}
               >
                 {cat.label}
@@ -251,7 +251,7 @@ export default function EventCollection({
 
           <div className="flex items-center gap-3">
             <Link
-              className="px-4 py-2 rounded-full text-xs font-semibold bg-[var(--card-soft)] text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] transition-all flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[var(--surface)] text-[var(--secondary)] border border-[var(--secondary-border)] hover:bg-[var(--secondary-soft)] hover:border-[var(--secondary)] transition-all flex items-center gap-1.5"
               href={leaderboard ? '/user/winners' : '/user/repos'}
             >
               {leaderboard ? 'Meet the winners' : 'Explore repositories'} <ArrowUpRight size={14} />
@@ -296,8 +296,8 @@ export default function EventCollection({
               key={n}
               height="380px"
               borderRadius="20px"
-              startColor="rgba(42, 24, 50, 0.6)"
-              endColor="rgba(65, 35, 75, 0.4)"
+              startColor="rgba(11, 28, 42, 0.6)"
+              endColor="rgba(16, 37, 53, 0.4)"
             />
           ))}
         </div>
@@ -331,131 +331,248 @@ export default function EventCollection({
           )}
         </div>
       ) : (
-        /* Human-Crafted, Developer-First Event Cards Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((event, index) => {
-            const decodedName = (() => {
+        /* Dynamic Event Showcase: Flagship Landmark + Curated Grid */
+        <div>
+          {/* Flagship Landmark Banner (Rendered when viewing all events without search query) */}
+          {!search && activeCategory === 'all' && filtered.length > 1 && (() => {
+            const featured = filtered[0];
+            const decodedFeaturedName = (() => {
               try {
-                return decodeURIComponent(event.name || '');
+                return decodeURIComponent(featured.name || '');
               } catch {
-                return event.name;
+                return featured.name;
               }
             })();
-
-            const track = getEventTrack(event.name, event.description);
-            const status = getEventStatus(event.startDate, event.endDate);
-            const dateRange = formatEventDates(event.startDate, event.endDate);
+            const featuredTrack = getEventTrack(featured.name, featured.description);
+            const featuredStatus = getEventStatus(featured.startDate, featured.endDate);
+            const featuredDates = formatEventDates(featured.startDate, featured.endDate);
 
             return (
-              <AnimatedContent key={event.name} delay={index * 0.04}>
+              <div className="mb-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-2 h-2 rounded-full bg-[var(--secondary)] animate-ping" />
+                  <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)] font-mono">
+                    Featured Flagship Arena
+                  </span>
+                </div>
+
                 <article
-                  className="group relative flex flex-col h-full rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
+                  className="group relative grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl"
                   style={{
                     background: 'var(--surface)',
-                    backdropFilter: 'blur(20px)',
                     border: '1px solid var(--border)',
                     boxShadow: 'var(--shadow)',
                   }}
                 >
-                  {/* Visual Banner Header */}
-                  <div className="relative h-40 w-full overflow-hidden bg-[var(--bg)]">
-                    <EventCardImage event={event} fallbackScene={scenes[index % scenes.length]} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
-
-                    {/* Top Status & Track Badges */}
-                    <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[var(--card-bg)] border border-[var(--border)] text-[var(--accent)] backdrop-blur-md">
-                        {track}
+                  {/* Left Scenic Visual Banner */}
+                  <div className="lg:col-span-5 relative h-56 lg:h-auto min-h-[220px] overflow-hidden bg-[var(--bg)]">
+                    <EventCardImage event={featured} fallbackScene="kyoto-evening" />
+                    <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent to-[var(--surface)] opacity-75" />
+                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-md text-xs font-bold bg-[var(--surface)]/90 backdrop-blur-md text-[var(--fg)] border border-[var(--border)] shadow-sm">
+                        {featuredTrack}
                       </span>
-
-                      {status.type === 'live' ? (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 backdrop-blur-md flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                          Live Now
-                        </span>
-                      ) : status.type === 'upcoming' ? (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-950/80 border border-amber-500/40 text-amber-300 backdrop-blur-md flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          Upcoming
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-zinc-900/80 border border-zinc-700 text-zinc-400 backdrop-blur-md">
-                          Concluded
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Event Logo Avatar Badge */}
-                    <div className="absolute -bottom-3 left-5 z-10 flex items-center">
-                      <div className="w-12 h-12 rounded-xl bg-[var(--surface)] border-2 border-[var(--border-strong)] shadow-lg overflow-hidden flex items-center justify-center p-1">
-                        {event.logoImageURL ? (
-                          <img
-                            src={event.logoImageURL}
-                            alt={decodedName}
-                            className="w-full h-full object-cover rounded-lg"
-                            onError={(e) => {
-                              (e.target as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <Icon size={22} className="text-[var(--accent)]" />
-                        )}
-                      </div>
+                      <span
+                        className="px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
+                        style={{
+                          backgroundColor: 'var(--status-live-bg)',
+                          color: 'var(--status-live-text)',
+                          borderColor: 'var(--status-live-border)',
+                          borderWidth: '1px',
+                        }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--status-live-text)' }} />
+                        {featuredStatus.label}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Card Content Body */}
-                  <div className="p-5 pt-6 flex-1 flex flex-col justify-between">
+                  {/* Right Landmark Body */}
+                  <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
                     <div>
-                      {/* Date Indicator */}
-                      <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] mb-2 font-mono">
-                        <CalendarDays size={13} className="text-[var(--accent)]" />
-                        <span>{dateRange}</span>
+                      <div className="flex items-center gap-2 text-xs text-[var(--muted)] mb-3 font-mono">
+                        <CalendarDays size={14} className="text-[var(--accent)]" />
+                        <span>{featuredDates}</span>
                       </div>
-
-                      {/* Event Title */}
-                      <h3 className="text-xl font-bold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors leading-tight mb-2">
-                        {decodedName}
+                      <h3 className="text-2xl sm:text-3xl font-extrabold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors mb-3 leading-tight">
+                        {decodedFeaturedName}
                       </h3>
-
-                      {/* Event Description */}
-                      <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3 mb-4">
-                        {event.description ||
-                          'Collaborate with fellow student developers, contribute code, and build impactful software together.'}
+                      <p className="text-sm text-[var(--muted)] leading-relaxed mb-6 line-clamp-3">
+                        {featured.description ||
+                          'Join thousands of student developers in the premier seasonal open-source sprint. Collaborate with maintainers, submit pull requests, and climb the official standings.'}
                       </p>
                     </div>
 
-                    {/* Developer Meta Stats Strip */}
-                    <div className="pt-3 border-t border-[var(--border)] flex flex-col gap-3">
-                      <div className="grid grid-cols-3 gap-2 py-1 text-center bg-[var(--card-soft)] rounded-xl border border-[var(--border)]">
-                        <div className="px-1 py-1">
-                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Format</p>
-                          <p className="text-xs font-bold text-[var(--fg)] truncate">Online</p>
-                        </div>
-                        <div className="px-1 py-1 border-x border-[var(--border)]">
-                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Participants</p>
-                          <p className="text-xs font-bold text-[#f5c542] font-mono truncate">150+ Devs</p>
-                        </div>
-                        <div className="px-1 py-1">
-                          <p className="text-[10px] text-[var(--muted)] uppercase tracking-wider">Rankings</p>
-                          <p className="text-xs font-bold text-[var(--accent)] truncate">Live</p>
-                        </div>
+                    <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--border)]">
+                      <div className="flex items-center gap-2 text-xs text-[var(--muted)] font-mono">
+                        <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
+                        <span>Active Community Sprint</span>
                       </div>
-
-                      {/* Tactile Action Link */}
                       <Link
-                        href={`/user/leaderboard/${encodeURIComponent(event.name)}`}
-                        className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 bg-[var(--accent-soft)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] transition-all duration-200 group-hover:border-[var(--accent)] shadow-sm"
+                        href={`/user/leaderboard/${encodeURIComponent(featured.name)}`}
+                        className="px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-md group-hover:scale-[1.02]"
                       >
-                        <span>{leaderboard ? 'View Leaderboard' : 'Explore Event & Standings'}</span>
-                        <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                        <span>{leaderboard ? 'View Arena Standings' : 'Enter Arena & Leaderboard'}</span>
+                        <ChevronRight size={15} />
                       </Link>
                     </div>
                   </div>
                 </article>
-              </AnimatedContent>
+
+                {/* Section Separator */}
+                <div className="flex items-center gap-4 mt-10 mb-6">
+                  <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
+                    All Active & Upcoming Tracks
+                  </h4>
+                  <div className="flex-1 h-[1px] bg-[var(--border)]" />
+                  <span className="text-xs text-[var(--subtle)] font-mono">
+                    {filtered.length - 1} more tracks
+                  </span>
+                </div>
+              </div>
             );
-          })}
+          })()}
+
+          {/* Grid of Events */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(!search && activeCategory === 'all' && filtered.length > 1
+              ? filtered.slice(1)
+              : filtered
+            ).map((event, index) => {
+              const decodedName = (() => {
+                try {
+                  return decodeURIComponent(event.name || '');
+                } catch {
+                  return event.name;
+                }
+              })();
+
+              const track = getEventTrack(event.name, event.description);
+              const status = getEventStatus(event.startDate, event.endDate);
+              const dateRange = formatEventDates(event.startDate, event.endDate);
+              const isLive = status.type === 'live';
+
+              return (
+                <AnimatedContent key={event.name} delay={index * 0.04}>
+                  <article
+                    className={`group relative flex flex-col h-full rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 ${
+                      isLive ? 'border-t-2 border-t-[var(--accent)]' : ''
+                    }`}
+                    style={{
+                      background: 'var(--surface)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid var(--border)',
+                      boxShadow: 'var(--shadow)',
+                    }}
+                  >
+                    {/* Visual Banner Header */}
+                    <div className="relative h-40 w-full overflow-hidden bg-[var(--bg)]">
+                      <EventCardImage event={event} fallbackScene={scenes[index % scenes.length]} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
+
+                      {/* Top Status & Track Badges */}
+                      <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
+                        <span className="px-2.5 py-1 rounded-md text-[11px] font-medium tracking-wide bg-[var(--surface)]/85 text-[var(--fg)] border border-[var(--border)] shadow-sm backdrop-blur-md">
+                          {track}
+                        </span>
+
+                        {status.type === 'live' ? (
+                          <span
+                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
+                            style={{
+                              backgroundColor: 'var(--status-live-bg)',
+                              color: 'var(--status-live-text)',
+                              borderColor: 'var(--status-live-border)',
+                              borderWidth: '1px',
+                            }}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--status-live-text)' }} />
+                            Live Now
+                          </span>
+                        ) : status.type === 'upcoming' ? (
+                          <span
+                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
+                            style={{
+                              backgroundColor: 'var(--status-upcoming-bg)',
+                              color: 'var(--status-upcoming-text)',
+                              borderColor: 'var(--status-upcoming-border)',
+                              borderWidth: '1px',
+                            }}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--status-upcoming-text)' }} />
+                            Upcoming
+                          </span>
+                        ) : (
+                          <span
+                            className="px-2.5 py-1 rounded-md text-[11px] font-medium shadow-sm backdrop-blur-md"
+                            style={{
+                              backgroundColor: 'var(--status-concluded-bg)',
+                              color: 'var(--status-concluded-text)',
+                              borderColor: 'var(--status-concluded-border)',
+                              borderWidth: '1px',
+                            }}
+                          >
+                            Concluded
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Event Logo Avatar Badge */}
+                      <div className="absolute -bottom-3 left-5 z-10 flex items-center">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--surface)] border-2 border-[var(--border-strong)] shadow-lg overflow-hidden flex items-center justify-center p-1">
+                          {event.logoImageURL ? (
+                            <img
+                              src={event.logoImageURL}
+                              alt={decodedName}
+                              className="w-full h-full object-cover rounded-lg"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <Icon size={22} className="text-[var(--accent)]" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Content Body */}
+                    <div className="p-5 pt-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        {/* Date Indicator */}
+                        <div className="flex items-center gap-1.5 text-xs text-[var(--muted)] mb-2 font-mono">
+                          <CalendarDays size={13} className="text-[var(--accent)]" />
+                          <span>{dateRange}</span>
+                        </div>
+
+                        {/* Event Title */}
+                        <h3 className="text-xl font-bold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors leading-tight mb-2">
+                          {decodedName}
+                        </h3>
+
+                        {/* Event Description */}
+                        <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3 mb-4">
+                          {event.description ||
+                            'Collaborate with fellow student developers, contribute code, and build impactful software together.'}
+                        </p>
+                      </div>
+
+                      {/* Clean Action Footer */}
+                      <div className="pt-3 border-t border-[var(--border)]">
+                        <Link
+                          href={`/user/leaderboard/${encodeURIComponent(event.name)}`}
+                          className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-center flex items-center justify-center gap-2 bg-[var(--surface-2)] text-[var(--fg)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] hover:border-[var(--accent)] transition-all duration-200 shadow-sm"
+                        >
+                          <span>{leaderboard ? 'View Leaderboard' : 'Explore Event & Standings'}</span>
+                          <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                </AnimatedContent>
+              );
+            })}
+          </div>
         </div>
       )}
     </ClickSpark>

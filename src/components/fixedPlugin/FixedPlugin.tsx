@@ -4,7 +4,7 @@ import { IoMdMoon, IoMdSunny } from 'react-icons/io';
 export default function FixedPlugin(props: { [x: string]: any }) {
   const { ...rest } = props;
   const { colorMode, toggleColorMode } = useColorMode();
-  let bgButton = 'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)';
+  let bgButton = 'linear-gradient(135deg, #58B99A 0%, #2D8B6F 100%)';
 
   let left = '';
   let right = '35px';
@@ -22,7 +22,7 @@ export default function FixedPlugin(props: { [x: string]: any }) {
       right={right}
       bottom="30px"
       border="1px solid"
-      borderColor="#6A53FF"
+      borderColor="#58B99A"
       borderRadius="50px"
       onClick={toggleColorMode}
       display="flex"

@@ -185,7 +185,7 @@ export default function CampusBattleDashboard({
   if (!tableData || tableData.length === 0) {
     return (
       <Flex direction="column" align="center" justify="center" py="50px">
-        <Text color="#dfced5" fontSize="16px">
+        <Text color="#AEBCC7" fontSize="16px">
           No college data available for {eventName}.
         </Text>
       </Flex>
@@ -205,7 +205,7 @@ export default function CampusBattleDashboard({
           <Box
             p="20px"
             borderRadius="22px"
-            bg="linear-gradient(135deg, rgba(35, 20, 44, 0.75) 0%, rgba(48, 26, 56, 0.70) 100%)"
+            bg="linear-gradient(135deg, rgba(16, 37, 53, 0.75) 0%, rgba(13, 34, 51, 0.70) 100%)"
             border="1px solid rgba(226, 232, 240, 0.35)"
             backdropFilter="blur(20px)"
             boxShadow="0 10px 30px rgba(0, 0, 0, 0.45)"
@@ -235,7 +235,7 @@ export default function CampusBattleDashboard({
             <Text
               fontSize="18px"
               fontWeight="800"
-              color="#fff1ec"
+              color="#F4F1E8"
               mb="4px"
               noOfLines={1}
               title={top2.name}
@@ -252,17 +252,17 @@ export default function CampusBattleDashboard({
               mb="12px"
             >
               {top2.points.toLocaleString()}{" "}
-              <Text as="span" fontSize="14px" fontWeight="600" color="#dfced5">
+              <Text as="span" fontSize="14px" fontWeight="600" color="#AEBCC7">
                 pts
               </Text>
             </Text>
 
             <Flex justify="space-between" align="center" p="10px 14px" bg="rgba(0,0,0,0.25)" borderRadius="14px" mb="12px">
-              <Text fontSize="12px" color="#dfced5">
-                <Text as="span" fontWeight="800" color="#fff1ec">{top2.contributors}</Text> Contributors
+              <Text fontSize="12px" color="#AEBCC7">
+                <Text as="span" fontWeight="800" color="#F4F1E8">{top2.contributors}</Text> Contributors
               </Text>
-              <Text fontSize="12px" color="#dfced5">
-                <Text as="span" fontWeight="800" color="#fff1ec">{top2.prs}</Text> PRs
+              <Text fontSize="12px" color="#AEBCC7">
+                <Text as="span" fontWeight="800" color="#F4F1E8">{top2.prs}</Text> PRs
               </Text>
             </Flex>
 
@@ -273,7 +273,7 @@ export default function CampusBattleDashboard({
                 <Text fontSize="10px" color="#E2E8F0" fontWeight="700" letterSpacing="0.05em">
                   CAMPUS MVP
                 </Text>
-                <Text fontSize="12px" fontWeight="700" color="#fff1ec" noOfLines={1}>
+                <Text fontSize="12px" fontWeight="700" color="#F4F1E8" noOfLines={1}>
                   {top2.topContributor.name} ({top2.topContributor.points} pts)
                 </Text>
               </Box>
@@ -286,7 +286,7 @@ export default function CampusBattleDashboard({
           <Box
             p="24px"
             borderRadius="24px"
-            bg="linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(45, 24, 52, 0.85) 100%)"
+            bg="linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(13, 34, 51, 0.85) 100%)"
             border="2px solid rgba(255, 215, 0, 0.55)"
             backdropFilter="blur(22px)"
             boxShadow="0 14px 40px rgba(255, 215, 0, 0.25), 0 0 30px rgba(255, 215, 0, 0.15)"
@@ -313,7 +313,7 @@ export default function CampusBattleDashboard({
               py="4px"
               borderRadius="full"
               bg="linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
-              color="#1a0c16"
+              color="#0C1C2C"
               fontSize="12px"
               fontWeight="900"
               fontFamily="var(--f-mono)"
@@ -321,13 +321,13 @@ export default function CampusBattleDashboard({
               mb="14px"
               boxShadow="0 4px 14px rgba(255, 215, 0, 0.4)"
             >
-              <FaCrown size={13} color="#1a0c16" /> #1 REIGNING CHAMPION
+              <FaCrown size={13} color="#0C1C2C" /> #1 REIGNING CHAMPION
             </Flex>
 
             <Text
               fontSize="20px"
               fontWeight="900"
-              color="#fff1ec"
+              color="#F4F1E8"
               mb="6px"
               noOfLines={1}
               title={top1.name}
@@ -344,22 +344,22 @@ export default function CampusBattleDashboard({
               mb="14px"
             >
               {top1.points.toLocaleString()}{" "}
-              <Text as="span" fontSize="16px" fontWeight="600" color="#dfced5">
+              <Text as="span" fontSize="16px" fontWeight="600" color="#AEBCC7">
                 pts
               </Text>
             </Text>
 
             <Flex justify="space-between" align="center" p="12px 16px" bg="rgba(0,0,0,0.35)" borderRadius="16px" border="1px solid rgba(255, 215, 0, 0.25)" mb="14px">
               <Box>
-                <Text fontSize="11px" color="#dfced5" textTransform="uppercase" fontWeight="700">
+                <Text fontSize="11px" color="#AEBCC7" textTransform="uppercase" fontWeight="700">
                   Dev Squad
                 </Text>
-                <Text fontSize="15px" fontWeight="900" color="#fff1ec">
+                <Text fontSize="15px" fontWeight="900" color="#F4F1E8">
                   {top1.contributors} creators
                 </Text>
               </Box>
               <Box textAlign="right">
-                <Text fontSize="11px" color="#dfced5" textTransform="uppercase" fontWeight="700">
+                <Text fontSize="11px" color="#AEBCC7" textTransform="uppercase" fontWeight="700">
                   Total PRs
                 </Text>
                 <Text fontSize="15px" fontWeight="900" color="#FFD700">
@@ -375,7 +375,7 @@ export default function CampusBattleDashboard({
                 <Text fontSize="11px" color="#FFD700" fontWeight="900" letterSpacing="0.06em">
                   ★ CAMPUS MVP
                 </Text>
-                <Text fontSize="13px" fontWeight="800" color="#fff1ec" noOfLines={1}>
+                <Text fontSize="13px" fontWeight="800" color="#F4F1E8" noOfLines={1}>
                   {top1.topContributor.name} ({top1.topContributor.points} pts)
                 </Text>
               </Box>
@@ -388,8 +388,8 @@ export default function CampusBattleDashboard({
           <Box
             p="20px"
             borderRadius="22px"
-            bg="linear-gradient(135deg, rgba(35, 20, 44, 0.75) 0%, rgba(48, 26, 56, 0.70) 100%)"
-            border="1px solid rgba(240, 168, 184, 0.35)"
+            bg="linear-gradient(135deg, rgba(16, 37, 53, 0.75) 0%, rgba(13, 34, 51, 0.70) 100%)"
+            border="1px solid rgba(88, 185, 154, 0.35)"
             backdropFilter="blur(20px)"
             boxShadow="0 10px 30px rgba(0, 0, 0, 0.45)"
             order={{ base: 3, md: 3 }}
@@ -403,22 +403,22 @@ export default function CampusBattleDashboard({
               px="12px"
               py="3px"
               borderRadius="full"
-              bg="rgba(240, 168, 184, 0.15)"
-              border="1px solid rgba(240, 168, 184, 0.4)"
-              color="#f0a8b8"
+              bg="rgba(88, 185, 154, 0.15)"
+              border="1px solid rgba(88, 185, 154, 0.4)"
+              color="#B8E5D5"
               fontSize="12px"
               fontWeight="900"
               fontFamily="var(--f-mono)"
               w="fit-content"
               mb="12px"
             >
-              <FaMedal size={11} color="#f0a8b8" /> #3 CONTENDER
+              <FaMedal size={11} color="#B8E5D5" /> #3 CONTENDER
             </Flex>
 
             <Text
               fontSize="18px"
               fontWeight="800"
-              color="#fff1ec"
+              color="#F4F1E8"
               mb="4px"
               noOfLines={1}
               title={top3.name}
@@ -430,33 +430,33 @@ export default function CampusBattleDashboard({
               fontFamily="var(--f-mono)"
               fontSize="28px"
               fontWeight="900"
-              color="#f0a8b8"
+              color="#B8E5D5"
               lineHeight="1"
               mb="12px"
             >
               {top3.points.toLocaleString()}{" "}
-              <Text as="span" fontSize="14px" fontWeight="600" color="#dfced5">
+              <Text as="span" fontSize="14px" fontWeight="600" color="#AEBCC7">
                 pts
               </Text>
             </Text>
 
             <Flex justify="space-between" align="center" p="10px 14px" bg="rgba(0,0,0,0.25)" borderRadius="14px" mb="12px">
-              <Text fontSize="12px" color="#dfced5">
-                <Text as="span" fontWeight="800" color="#fff1ec">{top3.contributors}</Text> Contributors
+              <Text fontSize="12px" color="#AEBCC7">
+                <Text as="span" fontWeight="800" color="#F4F1E8">{top3.contributors}</Text> Contributors
               </Text>
-              <Text fontSize="12px" color="#dfced5">
-                <Text as="span" fontWeight="800" color="#fff1ec">{top3.prs}</Text> PRs
+              <Text fontSize="12px" color="#AEBCC7">
+                <Text as="span" fontWeight="800" color="#F4F1E8">{top3.prs}</Text> PRs
               </Text>
             </Flex>
 
             {/* Campus MVP */}
-            <Flex align="center" gap="10px" p="8px 12px" bg="rgba(240, 168, 184, 0.08)" borderRadius="12px">
+            <Flex align="center" gap="10px" p="8px 12px" bg="rgba(88, 185, 154, 0.08)" borderRadius="12px">
               <NextAvatar src={top3.topContributor.avatarUrl} h="32px" w="32px" />
               <Box minW={0}>
-                <Text fontSize="10px" color="#f0a8b8" fontWeight="700" letterSpacing="0.05em">
+                <Text fontSize="10px" color="#B8E5D5" fontWeight="700" letterSpacing="0.05em">
                   CAMPUS MVP
                 </Text>
-                <Text fontSize="12px" fontWeight="700" color="#fff1ec" noOfLines={1}>
+                <Text fontSize="12px" fontWeight="700" color="#F4F1E8" noOfLines={1}>
                   {top3.topContributor.name} ({top3.topContributor.points} pts)
                 </Text>
               </Box>
@@ -468,8 +468,8 @@ export default function CampusBattleDashboard({
       {/* 2. CAMPUS BATTLE TABLE CONTAINER */}
       <Box
         borderRadius="24px"
-        bg="linear-gradient(135deg, rgba(30, 18, 38, 0.85) 0%, rgba(42, 24, 50, 0.82) 100%)"
-        border="1px solid rgba(240, 168, 184, 0.22)"
+        bg="linear-gradient(135deg, rgba(16, 37, 53, 0.85) 0%, rgba(13, 34, 51, 0.82) 100%)"
+        border="1px solid rgba(88, 185, 154, 0.22)"
         backdropFilter="blur(24px)"
         boxShadow="0 18px 45px rgba(0, 0, 0, 0.55)"
         p={{ base: "16px", md: "24px" }}
@@ -482,72 +482,72 @@ export default function CampusBattleDashboard({
           gap="16px"
           mb="20px"
           pb="16px"
-          borderBottom="1px solid rgba(240, 168, 184, 0.14)"
+          borderBottom="1px solid rgba(88, 185, 154, 0.14)"
         >
           <Box>
             <Flex align="center" gap="10px">
-              <Box color="#f0a8b8">
+              <Box color="#B8E5D5">
                 <FaUniversity size={20} />
               </Box>
               <Text
                 fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
                 fontSize={{ base: "22px", md: "26px" }}
                 fontWeight="700"
-                color="#fff1ec"
+                color="#F4F1E8"
                 lineHeight="1.2"
               >
                 Campus Leaderboard
               </Text>
             </Flex>
-            <Text fontSize="13px" color="#dfced5" mt="4px">
+            <Text fontSize="13px" color="#AEBCC7" mt="4px">
               {colleges.length} competing colleges & universities · Ranked by cumulative points
             </Text>
           </Box>
 
           {/* Quick Search */}
           <InputGroup maxW={{ base: "100%", sm: "280px" }}>
-            <InputLeftElement pointerEvents="none" color="#dfced5">
+            <InputLeftElement pointerEvents="none" color="#AEBCC7">
               <FaSearch size={14} />
             </InputLeftElement>
             <Input
               placeholder="Search college or MVP..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              bg="rgba(20, 12, 24, 0.65)"
-              border="1px solid rgba(240, 168, 184, 0.22)"
+              bg="rgba(7, 19, 31, 0.65)"
+              border="1px solid rgba(88, 185, 154, 0.22)"
               borderRadius="full"
-              color="#fff1ec"
+              color="#F4F1E8"
               fontSize="13px"
               _focus={{
-                borderColor: "#f0a8b8",
-                boxShadow: "0 0 10px rgba(240, 168, 184, 0.3)",
+                borderColor: "#B8E5D5",
+                boxShadow: "0 0 10px rgba(88, 185, 154, 0.3)",
               }}
-              _placeholder={{ color: "rgba(223, 206, 213, 0.5)" }}
+              _placeholder={{ color: "rgba(174, 188, 199, 0.5)" }}
             />
           </InputGroup>
         </Flex>
 
         {/* Table */}
-        <Box overflowX="auto" borderRadius="18px" border="1px solid rgba(240, 168, 184, 0.16)" bg="rgba(20, 12, 24, 0.45)">
+        <Box overflowX="auto" borderRadius="18px" border="1px solid rgba(88, 185, 154, 0.16)" bg="rgba(7, 19, 31, 0.45)">
           <Table variant="unstyled" minW="760px">
-            <Thead bg="rgba(240, 168, 184, 0.06)" borderBottom="1px solid rgba(240, 168, 184, 0.2)">
+            <Thead bg="rgba(88, 185, 154, 0.06)" borderBottom="1px solid rgba(88, 185, 154, 0.2)">
               <Tr>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
                   RANK
                 </Th>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em">
                   COLLEGE / INSTITUTION
                 </Th>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
                   CONTRIBUTORS
                 </Th>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
                   PRS MERGED
                 </Th>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="center">
                   AVG / DEV
                 </Th>
-                <Th py="14px" px="16px" color="#dfced5" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="right">
+                <Th py="14px" px="16px" color="#AEBCC7" fontFamily="var(--f-mono)" fontSize="12px" letterSpacing="0.12em" textAlign="right">
                   TOTAL POINTS
                 </Th>
               </Tr>
@@ -563,8 +563,8 @@ export default function CampusBattleDashboard({
                     : rank === 2
                     ? "#E2E8F0"
                     : rank === 3
-                    ? "#f0a8b8"
-                    : "#dfced5";
+                    ? "#B8E5D5"
+                    : "#AEBCC7";
 
                 return (
                   <React.Fragment key={col.id}>
@@ -572,9 +572,9 @@ export default function CampusBattleDashboard({
                       cursor="pointer"
                       onClick={() => toggleExpand(col.id)}
                       transition="all 0.2s ease"
-                      bg={isExpanded ? "rgba(240, 168, 184, 0.09)" : "transparent"}
-                      _hover={{ bg: "rgba(240, 168, 184, 0.07)" }}
-                      borderBottom="1px solid rgba(240, 168, 184, 0.1)"
+                      bg={isExpanded ? "rgba(88, 185, 154, 0.09)" : "transparent"}
+                      _hover={{ bg: "rgba(88, 185, 154, 0.07)" }}
+                      borderBottom="1px solid rgba(88, 185, 154, 0.1)"
                     >
                       {/* Rank */}
                       <Td py="16px" px="16px" textAlign="center">
@@ -592,7 +592,7 @@ export default function CampusBattleDashboard({
                                   ? "rgba(255, 215, 0, 0.12)"
                                   : rank === 2
                                   ? "rgba(226, 232, 240, 0.12)"
-                                  : "rgba(240, 168, 184, 0.12)"
+                                  : "rgba(88, 185, 154, 0.12)"
                               }
                               border="1px solid"
                               borderColor={rankColor}
@@ -612,7 +612,7 @@ export default function CampusBattleDashboard({
                               fontFamily="var(--f-mono)"
                               fontWeight="700"
                               fontSize="14px"
-                              color="#dfced5"
+                              color="#AEBCC7"
                             >
                               #{rank}
                             </Text>
@@ -624,15 +624,15 @@ export default function CampusBattleDashboard({
                       <Td py="16px" px="16px">
                         <Box>
                           <Flex align="center" gap="8px">
-                            <Text fontWeight="800" fontSize="15px" color="#fff1ec">
+                            <Text fontWeight="800" fontSize="15px" color="#F4F1E8">
                               {col.name}
                             </Text>
-                            <Box color="#dfced5" opacity={0.6}>
+                            <Box color="#AEBCC7" opacity={0.6}>
                               {isExpanded ? <FaChevronUp size={11} /> : <FaChevronDown size={11} />}
                             </Box>
                           </Flex>
-                          <Text fontSize="12px" color="#dfced5" opacity={0.8} mt="2px">
-                            MVP: <Text as="span" color="#ffd0dc" fontWeight="600">{col.topContributor.name}</Text> (@{col.topContributor.githubid})
+                          <Text fontSize="12px" color="#AEBCC7" opacity={0.8} mt="2px">
+                            MVP: <Text as="span" color="#D4F0E7" fontWeight="600">{col.topContributor.name}</Text> (@{col.topContributor.githubid})
                           </Text>
                         </Box>
                       </Td>
@@ -646,13 +646,13 @@ export default function CampusBattleDashboard({
                             px="12px"
                             py="3px"
                             borderRadius="full"
-                            bg="rgba(240, 168, 184, 0.1)"
-                            border="1px solid rgba(240, 168, 184, 0.2)"
-                            color="#fff1ec"
+                            bg="rgba(88, 185, 154, 0.1)"
+                            border="1px solid rgba(88, 185, 154, 0.2)"
+                            color="#F4F1E8"
                             fontSize="13px"
                             fontWeight="700"
                           >
-                            <FaUsers size={11} color="#f0a8b8" />
+                            <FaUsers size={11} color="#B8E5D5" />
                             {col.contributors} devs
                           </Flex>
                         </Flex>
@@ -667,14 +667,14 @@ export default function CampusBattleDashboard({
                             px="12px"
                             py="3px"
                             borderRadius="full"
-                            bg="rgba(240, 168, 184, 0.1)"
-                            border="1px solid rgba(240, 168, 184, 0.2)"
-                            color="#fff1ec"
+                            bg="rgba(88, 185, 154, 0.1)"
+                            border="1px solid rgba(88, 185, 154, 0.2)"
+                            color="#F4F1E8"
                             fontFamily="var(--f-mono)"
                             fontSize="13px"
                             fontWeight="700"
                           >
-                            <FaCodeBranch size={11} color="#f0a8b8" />
+                            <FaCodeBranch size={11} color="#B8E5D5" />
                             {col.prs} PRs
                           </Flex>
                         </Flex>
@@ -682,7 +682,7 @@ export default function CampusBattleDashboard({
 
                       {/* Avg / Dev */}
                       <Td py="16px" px="16px" textAlign="center">
-                        <Text fontFamily="var(--f-mono)" fontWeight="700" fontSize="13px" color="#dfced5">
+                        <Text fontFamily="var(--f-mono)" fontWeight="700" fontSize="13px" color="#AEBCC7">
                           {col.avgPoints} pts
                         </Text>
                       </Td>
@@ -694,24 +694,24 @@ export default function CampusBattleDashboard({
                             fontFamily="var(--f-mono)"
                             fontWeight="900"
                             fontSize="16px"
-                            color={rank === 1 ? "#FFD700" : "#ffd0dc"}
+                            color={rank === 1 ? "#FFD700" : "#D4F0E7"}
                           >
                             {col.points.toLocaleString()}
                           </Text>
-                          <FaTrophy color={rank === 1 ? "#FFD700" : "#f0a8b8"} size={13} />
+                          <FaTrophy color={rank === 1 ? "#FFD700" : "#B8E5D5"} size={13} />
                         </Flex>
                       </Td>
                     </Tr>
 
                     {/* EXPANDABLE CONTRIBUTORS LIST FOR THIS COLLEGE */}
                     {isExpanded && (
-                      <Tr bg="rgba(15, 10, 20, 0.55)">
+                      <Tr bg="rgba(7, 19, 31, 0.55)">
                         <Td colSpan={6} py="16px" px="24px">
                           <Box>
                             <Text
                               fontSize="12px"
                               fontWeight="700"
-                              color="#f0a8b8"
+                              color="#B8E5D5"
                               letterSpacing="0.08em"
                               textTransform="uppercase"
                               mb="10px"
@@ -731,30 +731,30 @@ export default function CampusBattleDashboard({
                                     gap="10px"
                                     p="10px 14px"
                                     borderRadius="14px"
-                                    bg="rgba(30, 18, 38, 0.7)"
-                                    border="1px solid rgba(240, 168, 184, 0.16)"
+                                    bg="rgba(16, 37, 53, 0.7)"
+                                    border="1px solid rgba(88, 185, 154, 0.16)"
                                     transition="all 0.2s ease"
                                     _hover={{
-                                      borderColor: "#f0a8b8",
+                                      borderColor: "#B8E5D5",
                                       transform: "translateY(-1px)",
-                                      bg: "rgba(45, 24, 52, 0.8)",
+                                      bg: "rgba(13, 34, 51, 0.8)",
                                     }}
                                   >
                                     <NextAvatar src={user.avatarUrl} h="34px" w="34px" />
                                     <Box minW={0} flex="1">
                                       <Flex align="center" justify="space-between">
-                                        <Text fontWeight="800" fontSize="13px" color="#fff1ec" noOfLines={1}>
+                                        <Text fontWeight="800" fontSize="13px" color="#F4F1E8" noOfLines={1}>
                                           {user.name}
                                         </Text>
-                                        <Text fontFamily="var(--f-mono)" fontWeight="800" fontSize="12px" color="#ffd0dc">
+                                        <Text fontFamily="var(--f-mono)" fontWeight="800" fontSize="12px" color="#D4F0E7">
                                           #{user.position}
                                         </Text>
                                       </Flex>
                                       <Flex justify="space-between" align="center" mt="2px">
-                                        <Text fontSize="11px" color="#dfced5" opacity={0.7} noOfLines={1}>
+                                        <Text fontSize="11px" color="#AEBCC7" opacity={0.7} noOfLines={1}>
                                           @{user.githubid}
                                         </Text>
-                                        <Text fontSize="11px" color="#f0a8b8" fontWeight="700" fontFamily="var(--f-mono)">
+                                        <Text fontSize="11px" color="#B8E5D5" fontWeight="700" fontFamily="var(--f-mono)">
                                           {user.points} pts
                                         </Text>
                                       </Flex>

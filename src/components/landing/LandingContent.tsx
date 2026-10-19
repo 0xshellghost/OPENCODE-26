@@ -64,7 +64,7 @@ export default function LandingContent() {
           <div className={styles.statNumber}>1.2k+</div>
           <div className={styles.statLabel}>Participants</div>
         </div>
-        <div className={styles.statItem}>
+        <div className={`${styles.statItem} ${styles.statItemPrimary}`}>
           <div className={styles.statNumber}>165</div>
           <div className={styles.statLabel}>Repositories</div>
         </div>
@@ -85,21 +85,21 @@ export default function LandingContent() {
         </p>
 
         <div className={`${styles.featuresGrid} ${styles.fadeInUp}`}>
-          <div className={styles.featureCard}>
+          <div className={`${styles.featureCard} ${styles.featureCardTeal}`}>
             <div className={styles.featureIcon}><FaCode size={20} /></div>
             <h3 className={styles.featureTitle}>Real-World Coding</h3>
             <p className={styles.featureDescription}>
               Step out of the classroom and dive into production codebases. Fix bugs, add features, and learn best practices.
             </p>
           </div>
-          <div className={styles.featureCard}>
+          <div className={`${styles.featureCard} ${styles.featureCardCyan}`}>
             <div className={styles.featureIcon}><FaUsers size={20} /></div>
             <h3 className={styles.featureTitle}>Vibrant Community</h3>
             <p className={styles.featureDescription}>
               Join a network of passionate developers. Get mentored by experienced maintainers and collaborate with peers.
             </p>
           </div>
-          <div className={styles.featureCard}>
+          <div className={`${styles.featureCard} ${styles.featureCardAmber}`}>
             <div className={styles.featureIcon}><FaTrophy size={19} /></div>
             <h3 className={styles.featureTitle}>Earn Rewards</h3>
             <p className={styles.featureDescription}>
@@ -144,7 +144,7 @@ export default function LandingContent() {
               Tackle complex features, optimize performance, and collaborate on architecture. The leaderboard heats up.
             </p>
           </div>
-          <div className={styles.timelineItem}>
+          <div className={`${styles.timelineItem} ${styles.timelineItemGold}`}>
             <div className={styles.timelineDot} />
             <div className={styles.timelineDate}>Phase 4 — Closing</div>
             <h3 className={styles.timelineTitle}>The Sakura Festival</h3>

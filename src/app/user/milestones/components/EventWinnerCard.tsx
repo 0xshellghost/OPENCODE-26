@@ -86,21 +86,21 @@ const rankStyles: Record<
     border: 'rgba(212, 175, 55, 0.45)',
     label: '1st Place · Gold',
     accentColor: '#d4af37',
-    text: '#2a1420',
+    text: '#0C1C2C',
   },
   2: {
     bg: 'linear-gradient(180deg, #e8ecf1 0%, #d5dbe3 100%)',
     border: 'rgba(160, 174, 192, 0.45)',
     label: '2nd Place · Silver',
     accentColor: '#a0aec0',
-    text: '#2a1420',
+    text: '#0C1C2C',
   },
   3: {
     bg: 'linear-gradient(180deg, #eddcd2 0%, #ddc4b5 100%)',
     border: 'rgba(205, 127, 50, 0.4)',
     label: '3rd Place · Bronze',
     accentColor: '#cd7f32',
-    text: '#2a1420',
+    text: '#0C1C2C',
   },
 };
 

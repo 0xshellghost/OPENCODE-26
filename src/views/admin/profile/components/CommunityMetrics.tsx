@@ -20,11 +20,11 @@ interface CommunityMetricsProps {
 }
 
 const TIERS = [
-  { name: 'Initiate', minPts: 0, color: '#dfced5', icon: Shield },
+  { name: 'Initiate', minPts: 0, color: '#AEBCC7', icon: Shield },
   { name: 'Challenger', minPts: 500, color: '#63B3ED', icon: Shield },
   { name: 'Master', minPts: 1500, color: '#B794F4', icon: Award },
   { name: 'Grandmaster', minPts: 3000, color: '#FFD700', icon: Crown },
-  { name: 'Legend', minPts: 4500, color: '#f0a8b8', icon: Star },
+  { name: 'Legend', minPts: 4500, color: '#B8E5D5', icon: Star },
 ];
 
 export default function CommunityMetrics({

@@ -48,8 +48,8 @@ export default function OpenCodeExperience({
   const [ready, setReady] = useState(false)
   const [graphicsUnavailable, setGraphicsUnavailable] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [pointerState, setPointerState] = useState({ x: 0, y: 0 })
+  const [showSkipIntro, setShowSkipIntro] = useState(true)
+  const showSkipIntroRef = useRef(true)
   const [storyOpen, setStoryOpen] = useState(false)
   completionCallback.current = onComplete
 
@@ -140,7 +140,11 @@ export default function OpenCodeExperience({
           gsap.set(finale.current, { opacity: range(p, 0.72, 0.87), y: (1 - range(p, 0.72, 0.87)) * 36 })
           gsap.set(map.current, { rotateX: (1 - range(p, 0.67, 0.92)) * 52, rotateZ: (1 - range(p, 0.67, 0.92)) * -14, scale: 0.8 + range(p, 0.67, 0.92) * 0.2 })
           gsap.set(progressLine.current, { scaleY: p })
-          setScrollProgress(p)
+          const atTop = p < 0.05
+          if (atTop !== showSkipIntroRef.current) {
+            showSkipIntroRef.current = atTop
+            setShowSkipIntro(atTop)
+          }
           if (p >= 0.9 && !completed.current) { completed.current = true; completionCallback.current?.() }
           scene.current?.invalidate()
         }
@@ -186,12 +190,9 @@ export default function OpenCodeExperience({
       <div ref={stage} className={styles.stage} onPointerMove={(event) => {
         if (paused || reduced || !matchMedia('(pointer: fine)').matches) return
         const bounds = event.currentTarget.getBoundingClientRect()
-        const px = (event.clientX - bounds.left) / bounds.width * 2 - 1
-        const py = (event.clientY - bounds.top) / bounds.height * 2 - 1
-        parameters.current.pointerX = px
-        parameters.current.pointerY = py
-        setPointerState({ x: px, y: py })
-      }} onPointerLeave={() => { parameters.current.pointerX = 0; parameters.current.pointerY = 0; setPointerState({ x: 0, y: 0 }) }}>
+        parameters.current.pointerX = (event.clientX - bounds.left) / bounds.width * 2 - 1
+        parameters.current.pointerY = (event.clientY - bounds.top) / bounds.height * 2 - 1
+      }} onPointerLeave={() => { parameters.current.pointerX = 0; parameters.current.pointerY = 0; }}>
         <div className={styles.scenery} aria-hidden="true">
           <div
             ref={heroArt}
@@ -224,9 +225,6 @@ export default function OpenCodeExperience({
         {/* Guide character presence & interactive story */}
         <YuzukiGuide
           chapter={chapter}
-          pointerX={pointerState.x}
-          pointerY={pointerState.y}
-          progress={scrollProgress}
           reducedMotion={reduced}
           onOpenChange={setStoryOpen}
         />
@@ -358,7 +356,7 @@ export default function OpenCodeExperience({
             <a className={styles.finalCta} href={ctaHref} tabIndex={!reduced && chapter < 4 ? -1 : undefined}>{ctaLabel}<ArrowRight size={18} aria-hidden="true" /></a>
             <button className={styles.replay} tabIndex={!reduced && chapter < 4 ? -1 : undefined} onClick={() => scrollToChapter(0, true)}><RotateCcw size={15} aria-hidden="true" /> Replay the journey</button>
             <p style={{ marginTop: '18px', fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase' as const, opacity: 0.5, display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
-              <Flower2 size={13} strokeWidth={1.4} style={{ color: '#e9a7b2' }} aria-hidden="true" />
+              <Flower2 size={13} strokeWidth={1.4} style={{ color: '#B8E5D5' }} aria-hidden="true" />
               Guided by Yuzuki
             </p>
           </div>
@@ -395,7 +393,7 @@ export default function OpenCodeExperience({
           </div>
 
           <div className={styles.bottomRightArea}>
-            {chapter === 0 && scrollProgress < 0.05 && !reduced && (
+            {chapter === 0 && showSkipIntro && !reduced && (
               <button
                 type="button"
                 className={styles.skipIntroButton}
