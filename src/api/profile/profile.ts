@@ -1,3 +1,5 @@
+import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
+
 export async function fetchLoggedInBasicDetails() {
   if (typeof window === 'undefined') return null;
 
@@ -149,17 +151,62 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
   return data;
 }
 
-export async function fetchColleges() {
+export async function fetchColleges(param?: string | { queryKey?: unknown }): Promise<string[]> {
+  const targetEvent =
+    typeof param === 'string' && param
+      ? param
+      : process.env.NEXT_PUBLIC_EVENT_NAME || "OPENCODE'26";
+
+  // 1. Fetch registered colleges from the active event leaderboard
+  try {
+    const leadData = await FetchedLeaderboard(targetEvent);
+    if (leadData && Array.isArray(leadData)) {
+      const colleges = leadData
+        .map((item) => (item.collegeName ?? '')?.trim())
+        .filter(Boolean);
+      const uniqueColleges = [...new Set(colleges)].sort();
+      if (uniqueColleges.length > 0) {
+        return uniqueColleges;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching colleges from event leaderboard:', error);
+  }
+
+  // 2. Fallback to /api/v1/colleges if available
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/colleges`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch colleges');
+    if (response.ok) {
+      const data = await response.json();
+      if (Array.isArray(data.data) && data.data.length > 0) {
+        return [...new Set((data.data as string[]).map((c) => c?.trim()).filter(Boolean))].sort();
+      }
     }
-    const data = await response.json();
-    return data.data; // Assuming response_200 wraps in { data: ... }
-  } catch (error) {
-    console.error('Error fetching colleges:', error);
-    return [];
+  } catch {
+    // ignore backend colleges endpoint error
   }
+
+  // 3. Fallback list of known colleges when offline or event is newly initialized
+  return [
+    'Birla Institute of Technology and Science, Pilani',
+    'Delhi Technological University',
+    'Indian Institute of Information Technology, Allahabad',
+    'Indian Institute of Information Technology, Hyderabad',
+    'Indian Institute of Information Technology, Lucknow',
+    'Indian Institute of Technology BHU',
+    'Indian Institute of Technology Bombay',
+    'Indian Institute of Technology Delhi',
+    'Indian Institute of Technology Kanpur',
+    'Indian Institute of Technology Kharagpur',
+    'Indian Institute of Technology Madras',
+    'Indian Institute of Technology Roorkee',
+    'Motilal Nehru National Institute of Technology, Allahabad',
+    'National Institute of Technology, Rourkela',
+    'National Institute of Technology, Surathkal',
+    'National Institute of Technology, Tiruchirappalli',
+    'National Institute of Technology, Warangal',
+    'Netaji Subhas University of Technology',
+    'Vellore Institute of Technology',
+  ];
 }
 

@@ -10,6 +10,7 @@ import { sendRegData, fetchColleges } from 'api/profile/profile';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
 import RegistrationField from 'components/japanese/RegistrationField';
+import CollegeAutocompleteField from 'components/japanese/CollegeAutocompleteField';
 
 export default function Register() {
   const [formData, setFormData] = useState({ name: '', email: '', gender: '', degree: '', branch: '', college: 'IIIT Allahabad', discordId: '', githubId: '', graduationYear: '', avatarUrl: '', year: '' });
@@ -20,7 +21,7 @@ export default function Register() {
 
   const { data: colleges = [] } = useQuery({
     queryKey: ['colleges'],
-    queryFn: fetchColleges,
+    queryFn: () => fetchColleges(),
   });
 
   useEffect(() => {
@@ -39,6 +40,10 @@ export default function Register() {
   const handleOtherCollegeChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setOtherCollege(event.target.value);
     setFormData(previous => ({ ...previous, college: event.target.value }));
+  };
+  const handleSelectCollege = (college: string) => {
+    setOtherCollege(college);
+    setFormData(previous => ({ ...previous, college }));
   };
   const registerMutation = useMutation({
     mutationFn: sendRegData,
@@ -70,12 +75,16 @@ export default function Register() {
         <section className="oc-form-section"><h2><span>02</span>Your academic chapter</h2><div className="oc-form-grid">
           <RegistrationField name="collegeType" label="College" value={collegeType} onChange={handleCollegeChange} options={['IIIT Allahabad', 'Other']} full />
           {collegeType === 'Other' && (
-            <>
-              <RegistrationField name="college" label="College name" value={otherCollege} onChange={handleOtherCollegeChange} placeholder="Your institution" full list="colleges-list" />
-              <datalist id="colleges-list">
-                {colleges.map((c: string) => <option key={c} value={c} />)}
-              </datalist>
-            </>
+            <CollegeAutocompleteField
+              name="college"
+              label="College name"
+              value={otherCollege}
+              onChange={handleOtherCollegeChange}
+              onSelect={handleSelectCollege}
+              colleges={colleges}
+              placeholder="Your institution"
+              full
+            />
           )}
           <RegistrationField name="degree" label="Degree" value={formData.degree} onChange={handleChange} options={['BTECH', 'MTECH', 'PHD', 'Other']} />
           <RegistrationField name="branch" label="Branch" value={formData.branch} onChange={handleChange} placeholder="Your field of study" />

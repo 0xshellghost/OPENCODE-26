@@ -402,6 +402,59 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .oc-field select option, .japanese-page option { color: var(--fg); background: var(--bg-2); }
 .oc-field-full { grid-column: 1 / -1; }
 .oc-form-error { color: var(--accent); font-size: 13px; font-family: var(--f-body); padding: 12px 0; }
+.oc-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--card-strong);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 1500;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.oc-autocomplete-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+.oc-autocomplete-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.oc-autocomplete-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+.oc-autocomplete-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  margin: 2px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.oc-autocomplete-item:hover,
+.oc-autocomplete-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.oc-autocomplete-item.selected {
+  font-weight: 700;
+  color: var(--accent);
+}
 .oc-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 24px; margin: 45px 0 35px; }
 .oc-winner { text-align: center; padding: 30px 22px; display: flex; flex-direction: column; align-items: center; position: relative; border-radius: 18px 18px 8px 8px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 26%, transparent), color-mix(in srgb, var(--accent) 4%, transparent)); border: 1px solid var(--line); }
 .oc-winner-first { padding-top: 48px; padding-bottom: 42px; background: linear-gradient(180deg, color-mix(in srgb, var(--ember) 38%, transparent), color-mix(in srgb, var(--accent) 6%, transparent)); border-color: rgba(255, 143, 107, .4); box-shadow: 0 12px 40px -15px rgba(255, 143, 107, .25); }

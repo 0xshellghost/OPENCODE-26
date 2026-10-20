@@ -62,7 +62,7 @@ export default function EditProfileModal({
 
   const { data: colleges = [] } = useQuery({
     queryKey: ['colleges'],
-    queryFn: fetchColleges,
+    queryFn: () => fetchColleges(),
   });
 
   const modalBg = 'var(--card-strong)';
