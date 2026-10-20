@@ -15,6 +15,9 @@ const navigation = [
   { label: 'Events', href: '/user/home' },
   { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
   { label: 'RPlace Canvas', href: '/user/rplace' },
+  { label: 'Winners', href: '/user/winners' },
+  { label: 'Milestones', href: '/user/milestones' },
+  { label: 'Repositories', href: '/user/repos' },
   { label: 'FAQ', href: '/faq' },
 ];
 
@@ -59,7 +62,11 @@ export default function SiteNavbar() {
           <SakuraToggle />
           <ThemeToggle />
           <span className="oc-nav-divider" />
-          <Link className="oc-nav-signin" href={isLoggedIn ? '/user/profile' : '/auth/sign-in'}>
+          <Link
+            className="oc-nav-signin"
+            href={isLoggedIn ? '/user/profile' : '/auth/sign-in'}
+            aria-current={pathname?.startsWith('/user/profile') ? 'page' : undefined}
+          >
             {isLoggedIn ? <><UserRound size={16} /> Profile</> : <>Sign in <ArrowUpRight size={15} /></>}
           </Link>
           <button type="button" className="oc-icon-button oc-mobile-toggle" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen(!open)}>
@@ -70,7 +77,7 @@ export default function SiteNavbar() {
         </div>
       </div>
       {open && <nav id="mobile-navigation" className="oc-mobile-nav" aria-label="Mobile navigation">
-        {[...navigation, { label: 'Winners', href: '/user/winners' }, { label: 'Milestones', href: '/user/milestones' }, { label: 'Repositories', href: '/user/repos' }].map(({ label, href }) => (
+        {navigation.map(({ label, href }) => (
           <Link
             key={href}
             href={href}
@@ -80,6 +87,13 @@ export default function SiteNavbar() {
             {label}<ArrowUpRight size={14} />
           </Link>
         ))}
+        <Link
+          href={isLoggedIn ? '/user/profile' : '/auth/sign-in'}
+          onClick={() => setOpen(false)}
+          aria-current={pathname?.startsWith('/user/profile') || pathname?.startsWith('/auth') ? 'page' : undefined}
+        >
+          {isLoggedIn ? 'Profile' : 'Sign in'}<ArrowUpRight size={14} />
+        </Link>
       </nav>}
     </header>
   );

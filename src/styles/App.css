@@ -286,8 +286,8 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .oc-brand-mark { object-fit: contain; }
 .chakra-ui-light .oc-brand-mark { filter: brightness(.23); }
 .oc-brand small { font-size: 11px; font-weight: 400; color: var(--muted); font-family: var(--f-body); letter-spacing: 0; margin-left: 3px; }
-.oc-desktop-nav { display: flex; align-items: center; gap: 32px; height: 100%; }
-.oc-desktop-nav a { position: relative; display: flex; align-items: center; height: 100%; font-size: 14px; font-family: var(--f-body); font-weight: 500; color: var(--muted); transition: color .2s; }
+.oc-desktop-nav { display: flex; align-items: center; gap: 24px; height: 100%; }
+.oc-desktop-nav a { position: relative; display: flex; align-items: center; height: 100%; font-size: 13.5px; font-family: var(--f-body); font-weight: 500; color: var(--muted); transition: color .2s; white-space: nowrap; }
 .oc-desktop-nav a:hover, .oc-desktop-nav a[aria-current] { color: var(--fg); }
 .oc-desktop-nav a::after { content: ''; height: 2px; background: var(--accent); position: absolute; bottom: 20px; left: 0; right: 0; transform: scaleX(0); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: left; }
 .oc-desktop-nav a[aria-current]::after { transform: scaleX(1); }
@@ -298,6 +298,8 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .oc-nav-divider { height: 21px; width: 1px; background: var(--border); }
 .oc-nav-signin { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: var(--fg); font-size: 13.5px; font-weight: 600; font-family: var(--f-body); white-space: nowrap; text-decoration: none; transition: all .2s ease; cursor: pointer; }
 .oc-nav-signin:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 14px var(--accent-soft); }
+.oc-nav-signin[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; box-shadow: 0 2px 8px -2px rgba(88, 185, 154, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.oc-nav-signin[aria-current="page"]:hover { background: var(--accent-hover, var(--accent)); color: var(--accent-ink); }
 .oc-mobile-toggle { display: none; }
 .oc-mobile-nav { display: flex; flex-direction: column; padding: 8px 24px 20px; border-top: 1px solid var(--border); background: var(--nav-bg); backdrop-filter: blur(20px); }
 .oc-mobile-nav a { display: flex; justify-content: space-between; padding: 12px; font-size: 14px; font-weight: 500; color: var(--muted); border-radius: 8px; }
@@ -480,10 +482,16 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .japanese-page .chakra-input::placeholder { color: var(--muted); opacity: .85; }
 .oc-landing-theme { position: fixed; right: 20px; bottom: 22px; z-index: 100; border: 1px solid rgba(88, 185, 154, 0.45); background: rgba(11, 28, 42, 0.88); border-radius: 999px; backdrop-filter: blur(18px); padding: 5px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); }
 @media (min-width: 1600px) { .oc-main { padding-top: 80px; } }
+@media (max-width: 1200px) {
+  .oc-desktop-nav { gap: 16px; }
+  .oc-desktop-nav a { font-size: 13px; }
+  .oc-navbar-inner { padding: 0 28px; }
+}
 @media (max-width: 1100px) {
   .oc-community-label { display: none; }
-  .oc-navbar-inner { padding: 0 28px; }
-  .oc-desktop-nav { gap: 20px; }
+  .oc-navbar-inner { padding: 0 24px; }
+  .oc-desktop-nav { gap: 12px; }
+  .oc-desktop-nav a { font-size: 12.5px; }
   .oc-main { padding: 44px 28px 60px; }
   .oc-community-nav { width: calc(100% - 48px); padding: 6px 20px; margin: 18px auto; }
   .oc-event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -491,6 +499,10 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
   .oc-auth-layout { gap: 48px; padding: 55px 28px; }
   .oc-auth-card { padding: 32px; }
   .oc-register-layout { gap: 40px; padding: 50px 28px; }
+}
+@media (max-width: 960px) {
+  .oc-desktop-nav { display: none; }
+  .oc-mobile-toggle { display: inline-flex; }
 }
 @media (max-width: 760px) {
   .oc-navbar-inner { height: 68px; padding: 0 16px; gap: 10px; }
