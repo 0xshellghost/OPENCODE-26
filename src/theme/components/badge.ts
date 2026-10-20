@@ -26,6 +26,13 @@ export const badgeStyles: { components: { Badge: StyleConfig } } = {
             bg: mode("brand.600", "brand.400")(props),
           },
         }),
+        secondary: () => ({
+          bg: "var(--secondary-soft)",
+          color: "var(--secondary)",
+          border: "1px solid var(--secondary-border)",
+          borderRadius: "8px",
+          fontWeight: "600",
+        }),
       },
     },
   },

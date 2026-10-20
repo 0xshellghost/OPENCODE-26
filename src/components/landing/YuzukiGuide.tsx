@@ -33,7 +33,7 @@ export default function YuzukiGuide({
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
   // Visible on chapter 0 & 1, subtly fades out as user advances deep into journey
-  const isVisible = chapter <= 1 && progress < 0.42;
+  const isVisible = chapter <= 1;
 
   const openStory = useCallback((e?: React.SyntheticEvent | Event) => {
     if (e && 'currentTarget' in e) {

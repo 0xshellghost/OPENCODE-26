@@ -135,13 +135,13 @@ const pivotParticipants = (participants: ParticipantSeries[], startDate: string,
 };
 
 const COLORS = [
-  '#f0a8b8', '#FFB547', '#48BB78', '#63B3ED', '#B794F4', '#F687B3', '#4FD1C5', '#F6AD55', '#E2E8F0', '#FC8181',
+  '#B8E5D5', '#FFB547', '#48BB78', '#63B3ED', '#B794F4', '#F687B3', '#4FD1C5', '#F6AD55', '#E2E8F0', '#FC8181',
   '#F6E05E', '#9F7AEA', '#ED8936', '#38B2AC', '#68D391'
 ];
 
 function ThirtyDayGraph({ data, startDate, endDate }:{ data: ParticipantSeries[]; startDate: string; endDate: string; }) {
   const transformed = useMemo(() => pivotParticipants(data, startDate, endDate, 'daily'), [data, startDate, endDate]);
-  if (!transformed.dates.length) return <div style={{ color: '#dfced5', textAlign: 'center', padding: '40px 0' }}>No data available</div>;
+  if (!transformed.dates.length) return <div style={{ color: '#AEBCC7', textAlign: 'center', padding: '40px 0' }}>No data available</div>;
 
   const labels = transformed.dates.map((_, i) => `Day ${i + 1}`);
 
@@ -179,17 +179,17 @@ function ThirtyDayGraph({ data, startDate, endDate }:{ data: ParticipantSeries[]
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#dfced5',
+          color: '#AEBCC7',
           font: { size: 12 },
           boxWidth: 12,
           padding: 16,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(28, 16, 34, 0.95)',
-        titleColor: '#fff1ec',
-        bodyColor: '#dfced5',
-        borderColor: 'rgba(240, 168, 184, 0.3)',
+        backgroundColor: 'rgba(11, 28, 42, 0.95)',
+        titleColor: '#F4F1E8',
+        bodyColor: '#AEBCC7',
+        borderColor: 'rgba(88, 185, 154, 0.3)',
         borderWidth: 1,
         padding: 10,
         callbacks: {
@@ -201,13 +201,13 @@ function ThirtyDayGraph({ data, startDate, endDate }:{ data: ParticipantSeries[]
     scales: {
       x: {
         title: { display: false },
-        ticks: { color: '#dfced5' },
-        grid: { color: 'rgba(240, 168, 184, 0.08)' }
+        ticks: { color: '#AEBCC7' },
+        grid: { color: 'rgba(88, 185, 154, 0.08)' }
       },
       y: {
         beginAtZero: true,
-        ticks: { precision: 0, color: '#dfced5' },
-        grid: { color: 'rgba(240, 168, 184, 0.08)' }
+        ticks: { precision: 0, color: '#AEBCC7' },
+        grid: { color: 'rgba(88, 185, 154, 0.08)' }
       }
     }
   };
@@ -217,7 +217,7 @@ function ThirtyDayGraph({ data, startDate, endDate }:{ data: ParticipantSeries[]
 
 function SingleDayGraph({ data, dayIso }:{ data: ParticipantSeries[]; dayIso: string; }) {
   const transformed = useMemo(() => pivotParticipants(data, dayIso, dayIso, 'tenMin'), [data, dayIso]);
-  if (!transformed.dates.length) return <div style={{ color: '#dfced5', textAlign: 'center', padding: '40px 0' }}>No data available</div>;
+  if (!transformed.dates.length) return <div style={{ color: '#AEBCC7', textAlign: 'center', padding: '40px 0' }}>No data available</div>;
 
   const labels = transformed.dates.map((d, i) => {
     try {
@@ -258,17 +258,17 @@ function SingleDayGraph({ data, dayIso }:{ data: ParticipantSeries[]; dayIso: st
       legend: {
         position: 'top' as const,
         labels: {
-          color: '#dfced5',
+          color: '#AEBCC7',
           font: { size: 12 },
           boxWidth: 12,
           padding: 16,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(28, 16, 34, 0.95)',
-        titleColor: '#fff1ec',
-        bodyColor: '#dfced5',
-        borderColor: 'rgba(240, 168, 184, 0.3)',
+        backgroundColor: 'rgba(11, 28, 42, 0.95)',
+        titleColor: '#F4F1E8',
+        bodyColor: '#AEBCC7',
+        borderColor: 'rgba(88, 185, 154, 0.3)',
         borderWidth: 1,
         padding: 10,
         callbacks: {
@@ -287,13 +287,13 @@ function SingleDayGraph({ data, dayIso }:{ data: ParticipantSeries[]; dayIso: st
     scales: {
       x: {
         title: { display: false },
-        ticks: { color: '#dfced5' },
-        grid: { color: 'rgba(240, 168, 184, 0.08)' }
+        ticks: { color: '#AEBCC7' },
+        grid: { color: 'rgba(88, 185, 154, 0.08)' }
       },
       y: {
         beginAtZero: false,
-        ticks: { precision: 0, color: '#dfced5' },
-        grid: { color: 'rgba(240, 168, 184, 0.08)' }
+        ticks: { precision: 0, color: '#AEBCC7' },
+        grid: { color: 'rgba(88, 185, 154, 0.08)' }
       }
     }
   };
@@ -319,27 +319,27 @@ export default function LeaderboardGraph({ eventName, topN = 10, startDate, endD
     queryFn: () => fetchProgress(eventName)
   });
 
-  if (isLoading) return <div className="flex justify-center items-center h-64"><RingLoader color="#f0a8b8" /></div>;
-  if (isError) return <div style={{ color: '#f0a8b8', padding: '24px 0', textAlign: 'center' }}>Error: {(error as Error).message}</div>;
+  if (isLoading) return <div className="flex justify-center items-center h-64"><RingLoader color="#B8E5D5" /></div>;
+  if (isError) return <div style={{ color: '#B8E5D5', padding: '24px 0', textAlign: 'center' }}>Error: {(error as Error).message}</div>;
 
-  if (!data || data.length === 0) return <div style={{ color: '#dfced5', padding: '24px 0', textAlign: 'center' }}>No data available</div>;
+  if (!data || data.length === 0) return <div style={{ color: '#AEBCC7', padding: '24px 0', textAlign: 'center' }}>No data available</div>;
 
   return (
     <div style={{ width: '100%', height: 480 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ display: 'flex', gap: 8, background: 'rgba(20, 12, 24, 0.75)', padding: '3px', borderRadius: 9999, border: '1px solid rgba(240, 168, 184, 0.22)' }}>
+        <div style={{ display: 'flex', gap: 8, background: 'rgba(7, 19, 31, 0.75)', padding: '3px', borderRadius: 9999, border: '1px solid rgba(88, 185, 154, 0.22)' }}>
           <button
             onClick={() => setMode('daily')}
             style={{
               padding: '6px 16px',
-              background: mode === 'daily' ? 'linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)' : 'transparent',
-              color: mode === 'daily' ? '#1a0c16' : '#dfced5',
+              background: mode === 'daily' ? 'linear-gradient(135deg, #B8E5D5 0%, #7ECDB5 100%)' : 'transparent',
+              color: mode === 'daily' ? '#0C1C2C' : '#AEBCC7',
               border: 'none',
               borderRadius: 9999,
               fontWeight: mode === 'daily' ? 700 : 500,
               fontSize: 13,
               cursor: 'pointer',
-              boxShadow: mode === 'daily' ? '0 2px 10px rgba(240, 168, 184, 0.35)' : 'none',
+              boxShadow: mode === 'daily' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
               transition: 'all 0.2s ease',
             }}
           >
@@ -349,14 +349,14 @@ export default function LeaderboardGraph({ eventName, topN = 10, startDate, endD
             onClick={() => setMode('tenMin')}
             style={{
               padding: '6px 16px',
-              background: mode === 'tenMin' ? 'linear-gradient(135deg, #f0a8b8 0%, #ea8ea2 100%)' : 'transparent',
-              color: mode === 'tenMin' ? '#1a0c16' : '#dfced5',
+              background: mode === 'tenMin' ? 'linear-gradient(135deg, #B8E5D5 0%, #7ECDB5 100%)' : 'transparent',
+              color: mode === 'tenMin' ? '#0C1C2C' : '#AEBCC7',
               border: 'none',
               borderRadius: 9999,
               fontWeight: mode === 'tenMin' ? 700 : 500,
               fontSize: 13,
               cursor: 'pointer',
-              boxShadow: mode === 'tenMin' ? '0 2px 10px rgba(240, 168, 184, 0.35)' : 'none',
+              boxShadow: mode === 'tenMin' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
               transition: 'all 0.2s ease',
             }}
           >
@@ -365,15 +365,15 @@ export default function LeaderboardGraph({ eventName, topN = 10, startDate, endD
         </div>
         {mode === 'tenMin' && (
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <label style={{ fontSize: 13, color: '#dfced5', fontWeight: 600 }}>Day:</label>
+            <label style={{ fontSize: 13, color: '#AEBCC7', fontWeight: 600 }}>Day:</label>
             <input
               type="date"
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
               style={{
-                background: 'rgba(20, 12, 24, 0.75)',
-                color: '#fff1ec',
-                border: '1px solid rgba(240, 168, 184, 0.3)',
+                background: 'rgba(7, 19, 31, 0.75)',
+                color: '#F4F1E8',
+                border: '1px solid rgba(88, 185, 154, 0.3)',
                 borderRadius: 8,
                 padding: '6px 10px',
                 fontSize: 13,
@@ -392,7 +392,7 @@ export default function LeaderboardGraph({ eventName, topN = 10, startDate, endD
         )}
       </div>
 
-      <label style={{ display: 'block', textAlign: 'center', fontSize: '13px', marginTop: '12px', color: '#dfced5', opacity: 0.8 }}>
+      <label style={{ display: 'block', textAlign: 'center', fontSize: '13px', marginTop: '12px', color: '#AEBCC7', opacity: 0.8 }}>
         The graph is updated automatically every 8 hours.
       </label>
     </div>

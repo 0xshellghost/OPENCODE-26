@@ -534,7 +534,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     fontSize="10px"
                                     fontWeight="700"
                                     bg="#e8ecf1"
-                                    color="#2a1420"
+                                    color="#0C1C2C"
                                     px="6px"
                                     boxShadow="sm"
                                   >
@@ -560,7 +560,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     p="6px"
                                   >
                                     <Text
-                                      color="#2a1420"
+                                      color="#0C1C2C"
                                       fontWeight="700"
                                       fontSize="13px"
                                       noOfLines={1}
@@ -568,7 +568,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     >
                                       {formatName(podium2[0].name.split(' ')[0])}
                                     </Text>
-                                    <Text color="#2a1420" fontSize="12px" fontWeight="600" opacity={0.85}>
+                                    <Text color="#0C1C2C" fontSize="12px" fontWeight="600" opacity={0.85}>
                                       <AnimatedScore
                                         value={podium2[0].score}
                                         disabled={Boolean(prefersReducedMotion)}
@@ -651,7 +651,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     fontSize="10.5px"
                                     fontWeight="800"
                                     bg="#f7e7b4"
-                                    color="#2a1420"
+                                    color="#0C1C2C"
                                     px="8px"
                                     boxShadow="md"
                                     zIndex={3}
@@ -678,7 +678,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     p="6px"
                                   >
                                     <Text
-                                      color="#2a1420"
+                                      color="#0C1C2C"
                                       fontWeight="800"
                                       fontSize="14px"
                                       noOfLines={1}
@@ -686,7 +686,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     >
                                       {formatName(podium1[0].name.split(' ')[0])}
                                     </Text>
-                                    <Text color="#2a1420" fontSize="13px" fontWeight="700" opacity={0.9}>
+                                    <Text color="#0C1C2C" fontSize="13px" fontWeight="700" opacity={0.9}>
                                       <AnimatedScore
                                         value={podium1[0].score}
                                         disabled={Boolean(prefersReducedMotion)}
@@ -732,7 +732,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     fontSize="10px"
                                     fontWeight="700"
                                     bg="#eddcd2"
-                                    color="#2a1420"
+                                    color="#0C1C2C"
                                     px="6px"
                                     boxShadow="sm"
                                   >
@@ -758,7 +758,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     p="6px"
                                   >
                                     <Text
-                                      color="#2a1420"
+                                      color="#0C1C2C"
                                       fontWeight="700"
                                       fontSize="13px"
                                       noOfLines={1}
@@ -766,7 +766,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     >
                                       {formatName(podium3[0].name.split(' ')[0])}
                                     </Text>
-                                    <Text color="#2a1420" fontSize="12px" fontWeight="600" opacity={0.85}>
+                                    <Text color="#0C1C2C" fontSize="12px" fontWeight="600" opacity={0.85}>
                                       <AnimatedScore
                                         value={podium3[0].score}
                                         disabled={Boolean(prefersReducedMotion)}

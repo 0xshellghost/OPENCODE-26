@@ -20,7 +20,6 @@ export default function GlobalSakuraBackground() {
     pointerY: 0,
   });
   const [graphicsUnavailable, setGraphicsUnavailable] = useState(false);
-  const [isLight, setIsLight] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -35,26 +34,6 @@ export default function GlobalSakuraBackground() {
     mediaQuery.addEventListener('change', handleChange);
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const checkLight = () => {
-      setIsLight(document.documentElement.classList.contains('chakra-ui-light'));
-    };
-    checkLight();
-
-    const observer = new MutationObserver(() => {
-      checkLight();
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => {
-      observer.disconnect();
     };
   }, []);
 
@@ -82,7 +61,7 @@ export default function GlobalSakuraBackground() {
           controller = createPetalScene(
             host,
             parameters.current,
-            'high',
+            'auto',
             () => setGraphicsUnavailable(true)
           );
           scene.current = controller;
@@ -102,12 +81,19 @@ export default function GlobalSakuraBackground() {
     };
   }, [enabled, isLandingPage, graphicsUnavailable, prefersReducedMotion]);
 
-  // Pointer tracking for wind effect
+  // Pointer tracking for wind effect - throttled to display refresh rate
   useEffect(() => {
+    let ticking = false;
     const handleMouseMove = (e: MouseEvent) => {
       if (parameters.current.paused || !matchMedia('(pointer: fine)').matches) return;
-      parameters.current.pointerX = (e.clientX / window.innerWidth) * 2 - 1;
-      parameters.current.pointerY = (e.clientY / window.innerHeight) * 2 - 1;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          parameters.current.pointerX = (e.clientX / window.innerWidth) * 2 - 1;
+          parameters.current.pointerY = (e.clientY / window.innerHeight) * 2 - 1;
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     const handleMouseLeave = () => {
@@ -115,8 +101,8 @@ export default function GlobalSakuraBackground() {
       parameters.current.pointerY = 0;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -132,7 +118,7 @@ export default function GlobalSakuraBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
+    let animId: number = 0;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -140,22 +126,26 @@ export default function GlobalSakuraBackground() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
 
     const isLightMode = document.documentElement.classList.contains('chakra-ui-light');
-    const petalCount = isLightMode ? 12 : Math.min(60, Math.floor(width / 25));
+    const petalCount = isLightMode ? 12 : Math.min(35, Math.floor(width / 40));
     const petals = Array.from({ length: petalCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      size: Math.random() * 8 + 6,
-      speedX: Math.random() * 1.5 + 0.5,
-      speedY: Math.random() * 1.2 + 0.8,
+      size: Math.random() * 7 + 5,
+      speedX: Math.random() * 1.2 + 0.4,
+      speedY: Math.random() * 1.0 + 0.6,
       rotation: Math.random() * 360,
-      rotSpeed: (Math.random() - 0.5) * 2,
-      opacity: Math.random() * 0.4 + 0.5,
+      rotSpeed: (Math.random() - 0.5) * 1.5,
+      opacity: Math.random() * 0.4 + 0.4,
     }));
 
     const render = () => {
+      if (document.hidden) {
+        animId = 0;
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
 
       for (const p of petals) {
@@ -169,7 +159,7 @@ export default function GlobalSakuraBackground() {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate((p.rotation * Math.PI) / 180);
-        ctx.fillStyle = `rgba(244, 167, 185, ${p.opacity})`;
+        ctx.fillStyle = `rgba(88, 185, 154, ${p.opacity})`;
 
         // Draw curved petal
         ctx.beginPath();
@@ -183,11 +173,22 @@ export default function GlobalSakuraBackground() {
       animId = requestAnimationFrame(render);
     };
 
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (animId) cancelAnimationFrame(animId);
+        animId = 0;
+      } else if (!animId) {
+        animId = requestAnimationFrame(render);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
     animId = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [enabled, isLandingPage, graphicsUnavailable, prefersReducedMotion]);
 
@@ -196,14 +197,7 @@ export default function GlobalSakuraBackground() {
   return (
     <div
       aria-hidden="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: 'none',
-        opacity: isLight ? 0.35 : 0.85,
-        background: 'transparent',
-      }}
+      className="global-sakura-host"
     >
       {graphicsUnavailable ? (
         <canvas

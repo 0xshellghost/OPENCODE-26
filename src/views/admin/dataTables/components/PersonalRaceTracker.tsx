@@ -157,15 +157,15 @@ export default function PersonalRaceTracker({
         gap="16px"
         p={{ base: "16px", md: "20px" }}
         borderRadius="20px"
-        bg="linear-gradient(135deg, rgba(32, 18, 40, 0.75) 0%, rgba(45, 26, 54, 0.70) 100%)"
-        border="1px solid rgba(240, 168, 184, 0.2)"
+        bg="linear-gradient(135deg, rgba(16, 37, 53, 0.75) 0%, rgba(13, 34, 51, 0.70) 100%)"
+        border="1px solid rgba(88, 185, 154, 0.2)"
         backdropFilter="blur(16px)"
       >
         <Flex align="center" gap="14px">
           <Box
             borderRadius="full"
             p="2px"
-            bg="linear-gradient(135deg, rgba(240, 168, 184, 0.45), rgba(192, 74, 103, 0.25))"
+            bg="linear-gradient(135deg, rgba(88, 185, 154, 0.45), rgba(45, 139, 111, 0.25))"
           >
             <NextAvatar src={user.avatarUrl} h="48px" w="48px" />
           </Box>
@@ -179,7 +179,7 @@ export default function PersonalRaceTracker({
                   px="7px"
                   py="1px"
                   borderRadius="full"
-                  bg="linear-gradient(135deg, #f0a8b8 0%, #c04a67 100%)"
+                  bg="linear-gradient(135deg, #B8E5D5 0%, #2D8B6F 100%)"
                   color="var(--accent-ink)"
                   fontSize="10px"
                   fontWeight="900"
@@ -233,8 +233,8 @@ export default function PersonalRaceTracker({
         <Box
           p="16px"
           borderRadius="18px"
-          bg="rgba(240, 168, 184, 0.06)"
-          border="1px solid rgba(240, 168, 184, 0.18)"
+          bg="rgba(88, 185, 154, 0.06)"
+          border="1px solid rgba(88, 185, 154, 0.18)"
         >
           <Flex align="center" gap="6px" mb="8px">
             <Box color="var(--accent)">
@@ -265,8 +265,8 @@ export default function PersonalRaceTracker({
         <Box
           p="16px"
           borderRadius="18px"
-          bg="rgba(240, 168, 184, 0.06)"
-          border="1px solid rgba(240, 168, 184, 0.18)"
+          bg="rgba(88, 185, 154, 0.06)"
+          border="1px solid rgba(88, 185, 154, 0.18)"
         >
           <Flex align="center" gap="6px" mb="8px">
             <Box color="#68D391">
@@ -297,8 +297,8 @@ export default function PersonalRaceTracker({
         <Box
           p="16px"
           borderRadius="18px"
-          bg="rgba(240, 168, 184, 0.06)"
-          border="1px solid rgba(240, 168, 184, 0.18)"
+          bg="rgba(88, 185, 154, 0.06)"
+          border="1px solid rgba(88, 185, 154, 0.18)"
         >
           <Flex align="center" gap="6px" mb="8px">
             <Box color="#FFD700">
@@ -331,7 +331,7 @@ export default function PersonalRaceTracker({
         p={{ base: "14px 16px", md: "18px 20px" }}
         borderRadius="20px"
         bg="var(--card-soft)"
-        border="1px solid rgba(240, 168, 184, 0.16)"
+        border="1px solid rgba(88, 185, 154, 0.16)"
       >
         <Flex justify="space-between" align="center" mb="14px" flexWrap="wrap" gap="10px">
           <Flex align="center" gap="8px">
@@ -372,9 +372,9 @@ export default function PersonalRaceTracker({
                 borderRadius="14px"
                 bg={
                   isCurrent
-                    ? "linear-gradient(135deg, rgba(240, 168, 184, 0.18) 0%, rgba(255, 215, 0, 0.12) 100%)"
+                    ? "linear-gradient(135deg, rgba(88, 185, 154, 0.18) 0%, rgba(255, 215, 0, 0.12) 100%)"
                     : isReached
-                    ? "rgba(240, 168, 184, 0.05)"
+                    ? "rgba(88, 185, 154, 0.05)"
                     : "rgba(0, 0, 0, 0.25)"
                 }
                 border="1px solid"
@@ -382,7 +382,7 @@ export default function PersonalRaceTracker({
                   isCurrent
                     ? tier.color
                     : isReached
-                    ? "rgba(240, 168, 184, 0.22)"
+                    ? "rgba(88, 185, 154, 0.22)"
                     : "rgba(255, 255, 255, 0.06)"
                 }
                 boxShadow={isCurrent ? `0 0 16px ${tier.color}35` : "none"}

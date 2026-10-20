@@ -4,7 +4,7 @@ import { Icon, Text, useColorModeValue } from '@chakra-ui/react';
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import './MiniCalendar.css'; // ⬅️ IMPORTANT
+import 'styles/MiniCalendar.css';
 
 import Card from 'components/card/Card';
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
@@ -16,7 +16,7 @@ export default function MiniCalendar(props: {
   const { selectRange = false, ...rest } = props;
   const [value, onChange] = useState<Date | [Date, Date]>(new Date());
 
-  const accentColor = useColorModeValue('#e9a7b2', '#e9a7b2');
+  const accentColor = useColorModeValue('#2D8B6F', '#B8E5D5');
 
   return (
     <Card

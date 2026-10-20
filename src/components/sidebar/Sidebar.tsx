@@ -69,7 +69,7 @@ function Sidebar({ routes }: SidebarProps) {
         h="100vh"
         bg={opencodeTokens.colors.background.glassDark}
         backdropFilter="blur(24px)"
-        boxShadow="20px 0 50px rgba(0,0,0,0.5)"
+        boxShadow="var(--shadow)"
         borderRight={`1px solid ${opencodeTokens.colors.border.light}`}
       >
         <Link href="/">
@@ -78,7 +78,7 @@ function Sidebar({ routes }: SidebarProps) {
             align="center"
             px="32px"
             gap="10px"
-            color="white"
+            color={opencodeTokens.colors.text.primary}
             _hover={{ color: opencodeTokens.colors.accent.sakura }}
             transition="all 0.3s"
             cursor="pointer"

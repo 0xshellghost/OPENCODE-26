@@ -32,9 +32,9 @@ export const buttonStyles = {
         }),
         brand: (props: StyleFunctionProps) => ({
           bg: mode("brand.500", "brand.200")(props),
-          color: mode("white", "#2a1420")(props),
+          color: mode("white", "#0C1C2C")(props),
           borderRadius: "9999px",
-          boxShadow: mode("0 12px 36px -10px rgba(192, 74, 103, 0.4)", "0 12px 36px -10px rgba(240, 168, 184, 0.4)")(props),
+          boxShadow: mode("0 12px 36px -10px rgba(45, 139, 111, 0.4)", "0 12px 36px -10px rgba(88, 185, 154, 0.4)")(props),
           _focus: {
             bg: mode("brand.500", "brand.200")(props),
           },
@@ -62,10 +62,10 @@ export const buttonStyles = {
           },
         }),
         lightBrand: (props: StyleFunctionProps) => ({
-          bg: mode("#F2EFFF", "whiteAlpha.100")(props),
+          bg: mode("brand.50", "whiteAlpha.100")(props),
           color: mode("brand.500", "white")(props),
           _focus: {
-            bg: mode("#F2EFFF", "whiteAlpha.100")(props),
+            bg: mode("brand.50", "whiteAlpha.100")(props),
           },
           _active: {
             bg: mode("secondaryGray.300", "whiteAlpha.100")(props),
@@ -113,6 +113,24 @@ export const buttonStyles = {
           _active: { bg: mode("transparent", "brand.400")(props) },
           _hover: {
             bg: mode("secondaryGray.100", "brand.400")(props),
+          },
+        }),
+        secondary: () => ({
+          bg: "var(--secondary)",
+          color: "#0C1C2C",
+          borderRadius: "9999px",
+          fontWeight: "600",
+          boxShadow: "0 4px 16px var(--secondary-soft)",
+          _focus: {
+            bg: "var(--secondary-hover)",
+          },
+          _active: {
+            bg: "var(--secondary-hover)",
+            transform: "scale(0.98)",
+          },
+          _hover: {
+            bg: "var(--secondary-hover)",
+            transform: "translateY(-1px)",
           },
         }),
       },

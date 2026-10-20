@@ -32,9 +32,9 @@ const SERIF = "Georgia, 'Times New Roman', serif";
 const CONTROL_H = '44px';
 
 const MEDALS = {
-  1: { bg: 'linear-gradient(180deg, #f7e7b4 0%, #ecd599 100%)', ring: 'rgba(212, 175, 55, 0.55)', ink: '#2a1420' },
-  2: { bg: 'linear-gradient(180deg, #e8ecf1 0%, #d5dbe3 100%)', ring: 'rgba(160, 174, 192, 0.55)', ink: '#2a1420' },
-  3: { bg: 'linear-gradient(180deg, #eddcd2 0%, #ddc4b5 100%)', ring: 'rgba(205, 127, 50, 0.45)', ink: '#2a1420' },
+  1: { bg: 'linear-gradient(135deg, #F5C542 0%, #EAB308 100%)', ring: 'rgba(245, 197, 66, 0.6)', ink: '#0C1C2C' },
+  2: { bg: 'linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%)', ring: 'rgba(148, 163, 184, 0.6)', ink: '#0C1C2C' },
+  3: { bg: 'linear-gradient(135deg, #FDBA74 0%, #D97706 100%)', ring: 'rgba(217, 119, 6, 0.6)', ink: '#0C1C2C' },
 } as const;
 
 function safeDecode(value: string | undefined): string {
@@ -49,14 +49,15 @@ function safeDecode(value: string | undefined): string {
 const controlStyle = {
   h: CONTROL_H,
   px: '14px',
-  bg: 'var(--card-soft)',
-  border: '1px solid',
+  bg: 'var(--surface)',
+  border: '1px solid var(--border)',
   borderRadius: '12px',
   color: 'var(--text)',
   fontSize: '13px',
   fontWeight: '600',
+  boxShadow: 'var(--shadow)',
   transition: 'all 0.2s ease',
-  _hover: { borderColor: 'var(--border-strong)', bg: 'var(--accent-soft)' },
+  _hover: { borderColor: 'var(--accent)', bg: 'var(--surface-2)' },
   _focusVisible: { outline: '2px solid var(--accent)', outlineOffset: '2px' },
 } as const;
 
@@ -515,11 +516,25 @@ export default function EventName() {
 
       {/* ─── 3. TOP 3 SPOTLIGHT ─── */}
       {showSpotlight && (
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
-          <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} />
-          <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} />
-          <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} />
-        </SimpleGrid>
+        <Box>
+          <Flex align="center" justify="space-between" mb="12px" px="4px">
+            <HStack spacing="8px">
+              <Box w="6px" h="6px" borderRadius="full" bg="var(--secondary)" />
+              <Text fontSize="xs" fontWeight="700" letterSpacing="0.1em" textTransform="uppercase" color="var(--secondary)" fontFamily="var(--f-mono)">
+                Podium of Honor · Top Standings
+              </Text>
+            </HStack>
+            <Text fontSize="11px" color="var(--subtle)" fontFamily="var(--f-mono)">
+              Verified Seasonal Results
+            </Text>
+          </Flex>
+
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
+            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} />
+            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} />
+            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} />
+          </SimpleGrid>
+        </Box>
       )}
 
       {/* ─── 4. EMPTY STATE ─── */}
@@ -579,9 +594,10 @@ function StatTile({ label, value }: { label: string; value: string }) {
     <Box
       px={{ base: '12px', sm: '16px', md: '20px' }}
       py={{ base: '10px', md: '14px' }}
-      borderRadius="16px"
-      bg="var(--card-soft)"
+      borderRadius="14px"
+      bg="var(--surface)"
       border="1px solid var(--border)"
+      boxShadow="var(--shadow)"
       textAlign="center"
       minW={{ base: '86px', sm: '104px', md: '124px' }}
       flex={{ base: '1', sm: 'initial' }}
@@ -606,15 +622,16 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   return (
     <HStack
       spacing="4px"
-      pl="12px"
-      pr="5px"
-      py="4px"
-      borderRadius="full"
-      bg="var(--accent-soft)"
-      border="1px solid var(--border-strong)"
+      pl="10px"
+      pr="4px"
+      py="3px"
+      borderRadius="8px"
+      bg="var(--surface)"
+      border="1px solid var(--border)"
       color="var(--accent)"
       fontSize="12px"
       fontWeight="600"
+      boxShadow="var(--shadow)"
     >
       <Text noOfLines={1} maxW="220px">
         {label}
@@ -625,9 +642,9 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
         onClick={onRemove}
         display="flex"
         p="3px"
-        borderRadius="full"
+        borderRadius="4px"
         transition="background 0.2s ease"
-        _hover={{ bg: 'var(--accent-soft)' }}
+        _hover={{ bg: 'var(--surface-2)' }}
         _focusVisible={{ outline: '2px solid var(--accent)' }}
       >
         <MdClear size={13} />
@@ -647,6 +664,8 @@ function SpotlightCard({
 }) {
   const medal = MEDALS[rank];
   const isFirst = rank === 1;
+  const isSecond = rank === 2;
+  const isThird = rank === 3;
   const college = String(row.college ?? '').trim();
 
   return (
@@ -654,37 +673,65 @@ function SpotlightCard({
       className="glass-panel"
       position="relative"
       textAlign="center"
-      p={{ base: '20px 16px', md: isFirst ? '30px 20px 26px' : '22px 18px' }}
+      overflow="hidden"
+      p={{ base: '20px 16px', md: isFirst ? '36px 22px 28px' : '22px 18px' }}
       // 1st place sits in the middle on desktop, but first on mobile
-      order={{ base: rank, md: rank === 1 ? 2 : rank === 2 ? 1 : 3 }}
-      boxShadow={`0 0 0 1px ${medal.ring}, 0 18px 40px -20px ${medal.ring}`}
-      transition="transform 0.25s ease"
+      order={{ base: rank, md: isFirst ? 2 : isSecond ? 1 : 3 }}
+      borderTopWidth={isFirst ? '3px' : '2px'}
+      borderTopColor={isFirst ? 'var(--secondary)' : isSecond ? 'rgba(148, 163, 184, 0.7)' : 'rgba(217, 119, 6, 0.7)'}
+      boxShadow={
+        isFirst
+          ? `0 0 0 1px ${medal.ring}, 0 20px 50px -15px rgba(245, 197, 66, 0.25)`
+          : `0 0 0 1px ${medal.ring}, 0 14px 30px -15px ${medal.ring}`
+      }
+      transition="all 0.3s ease"
       _hover={{ transform: 'translateY(-4px)' }}
     >
+      {/* Top ambient highlight gradient */}
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        right="0"
+        h="60px"
+        bg={
+          isFirst
+            ? 'linear-gradient(180deg, rgba(245, 197, 66, 0.08) 0%, transparent 100%)'
+            : isSecond
+            ? 'linear-gradient(180deg, rgba(148, 163, 184, 0.06) 0%, transparent 100%)'
+            : 'linear-gradient(180deg, rgba(217, 119, 6, 0.06) 0%, transparent 100%)'
+        }
+        pointerEvents="none"
+      />
+
       {isFirst && (
-        <Box display="flex" justifyContent="center" color="#f6c445" mb="8px">
+        <Flex justify="center" align="center" gap="6px" color="var(--secondary)" mb="10px">
           <FaCrown size={22} />
-        </Box>
+          <Text fontSize="10px" fontWeight="900" letterSpacing="0.12em" textTransform="uppercase" fontFamily="var(--f-mono)">
+            Champion
+          </Text>
+        </Flex>
       )}
 
-      <Box position="relative" display="inline-block">
+      <Box position="relative" display="inline-block" mt={isFirst ? '0' : '6px'}>
         <Avatar
           src={row.avatarUrl as string}
           name={row.name}
           size={isFirst ? 'xl' : 'lg'}
           border="3px solid"
           borderColor={medal.ring}
+          boxShadow={isFirst ? '0 0 20px rgba(245, 197, 66, 0.35)' : 'none'}
         />
         <Box
           position="absolute"
           bottom="-6px"
           left="50%"
           transform="translateX(-50%)"
-          px="9px"
-          py="1px"
+          px="10px"
+          py="1.5px"
           borderRadius="full"
           fontSize="11px"
-          fontWeight="800"
+          fontWeight="900"
           bg={medal.bg}
           color={medal.ink}
           boxShadow="0 2px 8px rgba(0,0,0,0.25)"
@@ -695,7 +742,8 @@ function SpotlightCard({
 
       <Text
         fontFamily={SERIF}
-        fontSize={{ base: '19px', md: isFirst ? '23px' : '19px' }}
+        fontSize={{ base: '19px', md: isFirst ? '24px' : '19px' }}
+        fontWeight={isFirst ? '700' : '600'}
         color="var(--text)"
         noOfLines={1}
         mt="16px"
@@ -713,8 +761,9 @@ function SpotlightCard({
 
       <Text
         fontFamily={SERIF}
-        fontSize={{ base: '30px', md: isFirst ? '40px' : '32px' }}
-        color="var(--text)"
+        fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
+        fontWeight={isFirst ? '800' : '600'}
+        color={isFirst ? 'var(--secondary)' : 'var(--text)'}
         lineHeight="1.1"
         mt="14px"
         style={{ fontVariantNumeric: 'tabular-nums' }}

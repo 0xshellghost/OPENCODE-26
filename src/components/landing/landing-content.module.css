@@ -97,6 +97,11 @@
   line-height: 1;
 }
 
+.statItemPrimary .statNumber {
+  color: var(--accent);
+  font-weight: 400;
+}
+
 .statLabel {
   font-family: var(--f-mono);
   font-size: 11px;
@@ -177,6 +182,26 @@
   opacity: 1;
 }
 
+.featureCardTeal .featureIcon {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.featureCardCyan .featureIcon {
+  background: var(--cyan-soft);
+  color: var(--cyan);
+}
+
+.featureCardAmber .featureIcon {
+  background: var(--secondary-soft);
+  color: var(--secondary);
+}
+
+.featureCardAmber:hover {
+  border-color: var(--secondary-border);
+  box-shadow: var(--shadow), 0 12px 36px -10px var(--secondary-soft);
+}
+
 /* ═══════════════════════════════════════════════
    3. TIMELINE
    ═══════════════════════════════════════════════ */
@@ -236,6 +261,16 @@
   margin-bottom: 6px;
 }
 
+.timelineItemGold .timelineDot {
+  border-color: var(--secondary);
+  background: var(--secondary);
+  box-shadow: 0 0 0 4px var(--bg), 0 0 16px var(--secondary);
+}
+
+.timelineItemGold .timelineDate {
+  color: var(--secondary);
+}
+
 .timelineTitle {
   font-family: var(--f-body);
   font-size: 17px;
@@ -259,7 +294,7 @@
   position: relative;
   padding: 80px 32px;
   text-align: center;
-  background: linear-gradient(180deg, var(--bg) 0%, rgba(240, 168, 184, 0.06) 50%, var(--bg-2) 100%);
+  background: linear-gradient(180deg, var(--bg) 0%, rgba(88, 185, 154, 0.06) 50%, var(--bg-2) 100%);
   overflow: hidden;
   border-top: 1px solid var(--line);
 }

@@ -14,8 +14,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
  * responsive sizes, and rgba()/hex colours.
  */
 const SAKURA = opencodeTokens.colors.accent.sakura;
-/** Sakura pink with alpha. Avoids the `${hex}40` suffix trick, which breaks if the token is not a 6-digit hex. */
-const rose = (alpha: number) => `rgba(233, 167, 178, ${alpha})`;
+/** Mint teal with alpha for loader elements. */
+const rose = (alpha: number) => `rgba(88, 185, 154, ${alpha})`;
 
 /** Short, on-theme status lines. They advance on a timer and stop on the last one. */
 const MESSAGES = ['Lighting the lanterns', 'Gathering petals', 'Opening the gate', 'Almost there'];
@@ -82,8 +82,8 @@ const breathe = keyframes`
 `;
 
 const diamondPulse = keyframes`
-  0%, 100% { box-shadow: 0 0 4px rgba(233, 167, 178, 0.4); }
-  50%      { box-shadow: 0 0 12px rgba(233, 167, 178, 0.8); }
+  0%, 100% { box-shadow: 0 0 4px rgba(88, 185, 154, 0.4); }
+  50%      { box-shadow: 0 0 12px rgba(88, 185, 154, 0.8); }
 `;
 
 /* ───────────── sakura petal ───────────── */
@@ -112,7 +112,7 @@ function SakuraPetal({ delay, left, size, duration, drift }: PetalProps) {
         w={`${size}px`}
         h={`${size * 0.7}px`}
         borderRadius="50% 0 50% 50%"
-        bg={`linear-gradient(135deg, ${rose(0.9)}, rgba(255, 200, 210, 0.6))`}
+        bg={`linear-gradient(135deg, ${rose(0.9)}, rgba(184, 229, 213, 0.6))`}
         animation={`${petalSway} ${duration * 0.45}s ease-in-out ${delay}s infinite`}
       />
     </Box>
@@ -187,7 +187,7 @@ export default function InitialLoader({ isExiting = false, onComplete }: Initial
       position="fixed"
       inset={0}
       zIndex={99999}
-      bg="#0a0514"
+      bg="#07131F"
       backgroundImage="url('/images/loading-bg.png')"
       backgroundSize="cover"
       backgroundPosition="center"
@@ -209,7 +209,7 @@ export default function InitialLoader({ isExiting = false, onComplete }: Initial
       <Box
         position="absolute"
         inset={0}
-        bg="radial-gradient(ellipse 70% 60% at center 45%, rgba(15, 8, 25, 0.15) 0%, rgba(10, 5, 20, 0.55) 50%, rgba(5, 2, 12, 0.85) 100%)"
+        bg="radial-gradient(ellipse 70% 60% at center 45%, rgba(11, 28, 42, 0.15) 0%, rgba(7, 19, 31, 0.55) 50%, rgba(5, 14, 23, 0.85) 100%)"
         pointerEvents="none"
         aria-hidden="true"
       />
@@ -223,7 +223,7 @@ export default function InitialLoader({ isExiting = false, onComplete }: Initial
         w="min(760px, 96vw)"
         h="min(560px, 80vh)"
         transform="translate(-50%, -50%)"
-        bg="radial-gradient(ellipse at center, rgba(8, 4, 16, 0.72) 0%, rgba(8, 4, 16, 0.45) 45%, transparent 72%)"
+        bg="radial-gradient(ellipse at center, rgba(7, 19, 31, 0.72) 0%, rgba(7, 19, 31, 0.45) 45%, transparent 72%)"
         pointerEvents="none"
         aria-hidden="true"
       />
@@ -482,7 +482,7 @@ export default function InitialLoader({ isExiting = false, onComplete }: Initial
           opacity={0}
           animation={`${fadeFloat} 1.2s ease 2.6s forwards, ${shimmer} 4s linear 3.8s infinite`}
           sx={{
-            background: 'linear-gradient(90deg, #f0a8b8, #fff1ec, #f0a8b8)',
+            background: 'linear-gradient(90deg, #B8E5D5, #F4F1E8, #B8E5D5)',
             backgroundSize: '200% auto',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
