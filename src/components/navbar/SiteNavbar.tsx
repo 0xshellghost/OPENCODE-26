@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { ArrowUpRight, Menu, X, UserRound, Flower2 } from 'lucide-react';
 import { useAuth } from 'contexts/AuthContext';
+import { useFeatures } from 'contexts/FeaturesContext';
 import ThemeToggle from 'components/japanese/ThemeToggle';
 import SakuraToggle from 'components/common/SakuraToggle';
 import OpenCodeLogo from 'components/common/OpenCodeLogo';
@@ -24,8 +25,15 @@ const navigation = [
 export default function SiteNavbar() {
   const pathname = usePathname();
   const { isLoggedIn } = useAuth();
+  const { features } = useFeatures();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const activeNavigation = navigation.filter((item) => {
+    if (item.href === '/user/winners' && !features.showWinners) return false;
+    if (item.href === '/user/milestones' && !features.showMilestones) return false;
+    return true;
+  });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -48,7 +56,7 @@ export default function SiteNavbar() {
           <span>OPENCODE <small>2026</small></span>
         </Link>
         <nav className="oc-desktop-nav" aria-label="Main navigation">
-          {navigation.map(({ label, href }) => (
+          {activeNavigation.map(({ label, href }) => (
             <Link
               key={href}
               href={href}
@@ -77,7 +85,7 @@ export default function SiteNavbar() {
         </div>
       </div>
       {open && <nav id="mobile-navigation" className="oc-mobile-nav" aria-label="Mobile navigation">
-        {navigation.map(({ label, href }) => (
+        {activeNavigation.map(({ label, href }) => (
           <Link
             key={href}
             href={href}

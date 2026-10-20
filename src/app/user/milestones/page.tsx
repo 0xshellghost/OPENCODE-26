@@ -14,6 +14,9 @@ import {
   fetchWeeklyLeaderboards,
 } from 'api/milestones/milestones';
 import { MdEmojiEvents, MdLeaderboard } from 'react-icons/md';
+import { useRouter } from 'next/navigation';
+import { useFeatures } from 'contexts/FeaturesContext';
+import { isAdminUser } from 'utils/jwt';
 import { EventWinnersCard } from './components/EventWinnerCard';
 import { WeeklyLeaderboardCard } from './components/WeeklyLeaderboard';
 import { tabIndicatorTransition } from './components/leaderboardMotion';
@@ -42,6 +45,14 @@ const TABS = [
 export default function Milestones() {
   const [selectedTab, setSelectedTab] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+  const router = useRouter();
+  const { features } = useFeatures();
+
+  React.useEffect(() => {
+    if (!features.showMilestones && !isAdminUser()) {
+      router.replace('/user/home');
+    }
+  }, [features.showMilestones, router]);
 
   const WEEKS_TO_SHOW = [true, true, true, true, true];
   const SHOW_EVENTS = true;

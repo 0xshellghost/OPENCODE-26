@@ -8,6 +8,7 @@ import { ChakraProvider, cookieStorageManager } from '@chakra-ui/react';
 import { AuthProvider } from 'contexts/AuthContext';
 import { SidebarProvider } from 'contexts/SidebarContext';
 import { SakuraProvider } from 'contexts/SakuraContext';
+import { FeaturesProvider } from 'contexts/FeaturesContext';
 import theme from 'theme/theme';
 
 import dynamic from 'next/dynamic';
@@ -173,36 +174,38 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SakuraProvider>
-        {/* Global sakura petals on every page */}
-        <GlobalSakuraBackground />
+      <FeaturesProvider>
+        <SakuraProvider>
+          {/* Global sakura petals on every page */}
+          <GlobalSakuraBackground />
 
-        <AuthProvider>
-          <SidebarProvider>
-            <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
-              <div
-                style={{
-                  opacity: isLoading && pathname === '/' && !isExiting ? 0 : 1,
-                  visibility: isLoading && pathname === '/' && !isExiting ? 'hidden' : 'visible',
-                  transition: 'opacity 0.7s ease-out',
-                }}
-              >
-                {children}
-              </div>
-            </ChakraProvider>
-          </SidebarProvider>
-        </AuthProvider>
+          <AuthProvider>
+            <SidebarProvider>
+              <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
+                <div
+                  style={{
+                    opacity: isLoading && pathname === '/' && !isExiting ? 0 : 1,
+                    visibility: isLoading && pathname === '/' && !isExiting ? 'hidden' : 'visible',
+                    transition: 'opacity 0.7s ease-out',
+                  }}
+                >
+                  {children}
+                </div>
+              </ChakraProvider>
+            </SidebarProvider>
+          </AuthProvider>
 
-        {isLoading && pathname === '/' && (
-          <InitialLoader
-            isExiting={isExiting}
-            onComplete={() => setAnimationDone(true)}
-            variant={initialVariant}
-          />
-        )}
+          {isLoading && pathname === '/' && (
+            <InitialLoader
+              isExiting={isExiting}
+              onComplete={() => setAnimationDone(true)}
+              variant={initialVariant}
+            />
+          )}
 
-        <PageTransition />
-      </SakuraProvider>
+          <PageTransition />
+        </SakuraProvider>
+      </FeaturesProvider>
     </QueryClientProvider>
   );
 }

@@ -15,7 +15,10 @@ import {
 } from '@chakra-ui/react';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useFeatures } from 'contexts/FeaturesContext';
+import { isAdminUser } from 'utils/jwt';
 import BlurText from '../../../components/reactbits/BlurText';
 import ShinyText from '../../../components/reactbits/ShinyText';
 import ClickSpark from '../../../components/reactbits/ClickSpark';
@@ -468,6 +471,14 @@ function WinnersHeader() {
 
 export default function WinnersPodiumComparisonPage() {
   const [tab, setTab] = useState(0);
+  const router = useRouter();
+  const { features } = useFeatures();
+
+  useEffect(() => {
+    if (!features.showWinners && !isAdminUser()) {
+      router.replace('/user/home');
+    }
+  }, [features.showWinners, router]);
 
   // 1. Fetch available events to determine active event name
   const { data: eventData } = useQuery({

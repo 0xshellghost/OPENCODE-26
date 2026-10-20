@@ -21,6 +21,7 @@ import ShinyText from '../reactbits/ShinyText';
 import ClickSpark from '../reactbits/ClickSpark';
 import CountUp from '../reactbits/CountUp';
 import AnimatedContent from '../reactbits/AnimatedContent';
+import { useFeatures } from 'contexts/FeaturesContext';
 
 type Event = {
   name: string;
@@ -182,6 +183,7 @@ export default function EventCollection({
 }) {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<'all' | 'live' | 'hackathon' | 'opensource' | 'ai'>('all');
+  const { features } = useFeatures();
 
   const categories = [
     { id: 'all', label: 'All Events' },
@@ -252,9 +254,9 @@ export default function EventCollection({
           <div className="flex items-center gap-3">
             <Link
               className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[var(--surface)] text-[var(--secondary)] border border-[var(--secondary-border)] hover:bg-[var(--secondary-soft)] hover:border-[var(--secondary)] transition-all flex items-center gap-1.5"
-              href={leaderboard ? '/user/winners' : '/user/repos'}
+              href={leaderboard && features.showWinners ? '/user/winners' : '/user/repos'}
             >
-              {leaderboard ? 'Meet the winners' : 'Explore repositories'} <ArrowUpRight size={14} />
+              {leaderboard && features.showWinners ? 'Meet the winners' : 'Explore repositories'} <ArrowUpRight size={14} />
             </Link>
 
             <label className="oc-search" style={{ minWidth: '220px' }}>

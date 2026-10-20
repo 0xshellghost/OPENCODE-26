@@ -19,6 +19,7 @@ import {
   Icon,
   Badge,
   HStack,
+  Switch,
 } from '@chakra-ui/react';
 import {
   MdAdd,
@@ -38,11 +39,13 @@ import { addRepo, deleteRepo, renameRepo, addMentor, uploadEventLeaderboard } fr
 import { useRouter } from 'next/navigation';
 import { RingLoader } from 'react-spinners';
 import { isAdminUser } from 'utils/jwt';
+import { useFeatures } from 'contexts/FeaturesContext';
 
 export default function ManagementPage() {
   const router = useRouter();
   const toast = useToast();
   const [isMounted, setIsMounted] = useState(false);
+  const { features, toggleFeature } = useFeatures();
   
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -264,6 +267,85 @@ ON DUPLICATE KEY UPDATE
       <Text color={textColor} fontSize="2xl" mb="24px" fontWeight="700">
         Management Tools
       </Text>
+
+      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+        <Heading size="md" mb="16px" color={textColor}>Tab Visibility</Heading>
+        <Text fontSize="sm" mb="20px" color="gray.500">
+          Toggle visibility of community tabs in the navigation.
+        </Text>
+
+        <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="20px">
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>Winners</Text>
+                <Badge colorScheme={features.showWinners ? 'green' : 'gray'}>
+                  {features.showWinners ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the Winners tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showWinners}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                await toggleFeature('showWinners', val);
+                toast({
+                  title: `Winners tab ${val ? 'enabled' : 'hidden'}`,
+                  status: 'info',
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </Flex>
+
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>Milestones</Text>
+                <Badge colorScheme={features.showMilestones ? 'green' : 'gray'}>
+                  {features.showMilestones ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the Milestones tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showMilestones}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                await toggleFeature('showMilestones', val);
+                toast({
+                  title: `Milestones tab ${val ? 'enabled' : 'hidden'}`,
+                  status: 'info',
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </Flex>
+        </Grid>
+      </Box>
 
       {/* ─── EVENT LEADERBOARD UPLOAD (SQL) ─── */}
       <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
