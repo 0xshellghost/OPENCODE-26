@@ -123,7 +123,7 @@ export async function uploadEventLeaderboard(eventName: string, file: File) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || `Failed to upload leaderboard: ${response.statusText}`);
+    throw new Error(errorData?.error || errorData?.message || `Failed to upload leaderboard: ${response.statusText}`);
   }
 
   return await response.json();

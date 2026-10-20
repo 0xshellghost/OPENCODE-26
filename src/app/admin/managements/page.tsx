@@ -56,7 +56,7 @@ export default function ManagementPage() {
   const [renameNewRepo, setRenameNewRepo] = useState('');
   const [mentorGithubId, setMentorGithubId] = useState('');
 
-  // Leaderboard Excel Upload State
+  // Leaderboard SQL Upload State
   const [uploadEvent, setUploadEvent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -138,12 +138,12 @@ export default function ManagementPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const validExtensions = ['.xlsx', '.xls', '.csv'];
+      const validExtensions = ['.sql'];
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!validExtensions.includes(fileExtension)) {
         toast({
           title: 'Invalid File Type',
-          description: 'Please upload an Excel (.xlsx, .xls) or CSV (.csv) file.',
+          description: 'Please upload a SQL script (.sql) file.',
           status: 'error',
           isClosable: true,
         });
@@ -154,19 +154,57 @@ export default function ManagementPage() {
   };
 
   const handleDownloadTemplate = () => {
-    const csvContent = "data:text/csv;charset=utf-8," + 
-      "Position,Name,GitHub Username,Points,College,Graduation Year\n" +
-      "1,Ada Lovelace,adalovelace,500,IIIT Allahabad,2026\n" +
-      "2,Alan Turing,aturing,450,IIIT Allahabad,2027\n" +
-      "3,Margaret Hamilton,mhamilton,420,IIT Delhi,2026\n" +
-      "4,Grace Hopper,ghopper,380,NIT Trichy,2028\n";
-    const encodedUri = encodeURI(csvContent);
+    const targetEvent = uploadEvent || 'EVENT_NAME';
+    const sqlContent = `-- SQL Leaderboard Template for event: ${targetEvent}
+-- Replace '${targetEvent}' with your actual event name if not already set.
+-- Note: Opencode leaderboard is live and automated; this template is for other events.
+
+-- 1. Insert or update User profiles
+INSERT INTO \`User\` (\`id\`, \`name\`, \`email\`, \`avatarUrl\`, \`college\`, \`graduationYear\`, \`branch\`, \`degree\`, \`githubId\`, \`year\`, \`createdAt\`, \`updatedAt\`)
+VALUES
+  (UUID(), 'Ada Lovelace', 'adalovelace@users.noreply.github.com', 'https://avatars.githubusercontent.com/adalovelace', 'IIIT Allahabad', 2026, 'IT', 'B.Tech', 'adalovelace', '4th', NOW(), NOW()),
+  (UUID(), 'Alan Turing', 'aturing@users.noreply.github.com', 'https://avatars.githubusercontent.com/aturing', 'IIIT Allahabad', 2027, 'ECE', 'B.Tech', 'aturing', '3rd', NOW(), NOW()),
+  (UUID(), 'Margaret Hamilton', 'mhamilton@users.noreply.github.com', 'https://avatars.githubusercontent.com/mhamilton', 'IIT Delhi', 2026, 'CSE', 'B.Tech', 'mhamilton', '4th', NOW(), NOW()),
+  (UUID(), 'Grace Hopper', 'ghopper@users.noreply.github.com', 'https://avatars.githubusercontent.com/ghopper', 'NIT Trichy', 2028, 'ECE', 'B.Tech', 'ghopper', '2nd', NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+  \`name\` = VALUES(\`name\`),
+  \`college\` = VALUES(\`college\`),
+  \`graduationYear\` = VALUES(\`graduationYear\`),
+  \`avatarUrl\` = VALUES(\`avatarUrl\`),
+  \`updatedAt\` = NOW();
+
+-- 2. Insert or update Participants
+INSERT INTO \`Participant\` (\`id\`, \`participantId\`)
+VALUES
+  (UUID(), 'adalovelace'),
+  (UUID(), 'aturing'),
+  (UUID(), 'mhamilton'),
+  (UUID(), 'ghopper')
+ON DUPLICATE KEY UPDATE
+  \`participantId\` = VALUES(\`participantId\`);
+
+-- 3. Insert or update Leaderboard Entries
+INSERT INTO \`LeaderboardEntry\` (\`id\`, \`participantId\`, \`eventName\`, \`points\`, \`PRmerged\`)
+VALUES
+  (UUID(), 'adalovelace', '${targetEvent}', 500, 0),
+  (UUID(), 'aturing', '${targetEvent}', 450, 0),
+  (UUID(), 'mhamilton', '${targetEvent}', 420, 0),
+  (UUID(), 'ghopper', '${targetEvent}', 380, 0)
+ON DUPLICATE KEY UPDATE
+  \`points\` = VALUES(\`points\`),
+  \`PRmerged\` = VALUES(\`PRmerged\`);
+`;
+
+    const blob = new Blob([sqlContent], { type: 'application/sql;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "event_leaderboard_template.csv");
+    link.setAttribute("href", url);
+    const filename = `${uploadEvent ? uploadEvent.replace(/\s+/g, '_') : 'event'}_leaderboard_template.sql`;
+    link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleUploadLeaderboard = async () => {
@@ -174,8 +212,17 @@ export default function ManagementPage() {
       toast({ title: 'Please select an event first.', status: 'warning', isClosable: true });
       return;
     }
+    if (uploadEvent.toLowerCase().includes('opencode')) {
+      toast({
+        title: 'Action Not Allowed',
+        description: 'Opencode leaderboard is live and automated. SQL upload is only permitted for other events.',
+        status: 'error',
+        isClosable: true,
+      });
+      return;
+    }
     if (!selectedFile) {
-      toast({ title: 'Please select a spreadsheet file (.xlsx or .csv) to upload.', status: 'warning', isClosable: true });
+      toast({ title: 'Please select a SQL script file (.sql) to upload.', status: 'warning', isClosable: true });
       return;
     }
 
@@ -184,7 +231,7 @@ export default function ManagementPage() {
       await uploadEventLeaderboard(uploadEvent, selectedFile);
       toast({
         title: 'Leaderboard Uploaded Successfully!',
-        description: `Rankings for "${uploadEvent}" have been updated and are now live.`,
+        description: `SQL script executed. Rankings for "${uploadEvent}" have been updated and are now live.`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -194,7 +241,7 @@ export default function ManagementPage() {
     } catch (error: any) {
       toast({
         title: 'Upload Failed',
-        description: error?.message || 'Failed to upload event leaderboard.',
+        description: error?.message || 'Failed to upload and execute leaderboard SQL.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -218,7 +265,7 @@ export default function ManagementPage() {
         Management Tools
       </Text>
 
-      {/* ─── EVENT LEADERBOARD UPLOAD (EXCEL / CSV) ─── */}
+      {/* ─── EVENT LEADERBOARD UPLOAD (SQL) ─── */}
       <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
         <Flex justify="space-between" align={{ base: 'flex-start', sm: 'center' }} mb="8px" flexWrap="wrap" gap="10px">
           <Flex align="center" gap="10px">
@@ -228,13 +275,13 @@ export default function ManagementPage() {
             <Heading size="md" color={textColor}>Upload Event Leaderboard</Heading>
           </Flex>
           <Badge colorScheme="purple" px="10px" py="4px" borderRadius="full" fontSize="12px">
-            Excel / CSV
+            SQL
           </Badge>
         </Flex>
         
         <Text fontSize="sm" mb="20px" color="gray.500">
-          Upload official rankings and scores for non-OpenCode events (Hackathons, Contests, Design Sprints).
-          Rankings uploaded here will be displayed to users when selecting this event in the Leaderboard.
+          Upload official rankings and scores via SQL for non-OpenCode events (Hackathons, Contests, Design Sprints).
+          Rankings uploaded via SQL script will be executed and displayed to users when selecting this event in the Leaderboard.
         </Text>
 
         <FormControl mb="20px">
@@ -248,8 +295,8 @@ export default function ManagementPage() {
             {eventData?.data?.map((e) => {
               const isOpencode = e.name.toLowerCase().includes('opencode');
               return (
-                <option key={e.name} value={e.name}>
-                  {e.name} {isOpencode ? '(PR Automated)' : '(Spreadsheet Managed)'}
+                <option key={e.name} value={e.name} disabled={isOpencode}>
+                  {e.name} {isOpencode ? '(Live Automated - Disabled)' : '(SQL Managed)'}
                 </option>
               );
             })}
@@ -278,7 +325,7 @@ export default function ManagementPage() {
             <input
               type="file"
               ref={fileInputRef}
-              accept=".xlsx,.xls,.csv"
+              accept=".sql"
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
@@ -295,16 +342,16 @@ export default function ManagementPage() {
                     {selectedFile.name}
                   </Text>
                   <Text fontSize="12px" color="gray.500" mt="2px">
-                    {(selectedFile.size / 1024).toFixed(1)} KB · Ready to upload
+                    {(selectedFile.size / 1024).toFixed(1)} KB · Ready to execute & upload
                   </Text>
                 </Box>
               ) : (
                 <Box>
                   <Text fontWeight="600" color={textColor} fontSize="14px">
-                    Click to browse or drag and drop spreadsheet
+                    Click to browse or drag and drop SQL script
                   </Text>
                   <Text fontSize="12px" color="gray.500" mt="4px">
-                    Supports Microsoft Excel (.xlsx, .xls) and CSV (.csv)
+                    Supports SQL scripts (.sql) containing LeaderboardEntry / User records
                   </Text>
                 </Box>
               )}
@@ -320,7 +367,7 @@ export default function ManagementPage() {
               onClick={handleDownloadTemplate}
               colorScheme="gray"
             >
-              Download Template (.csv)
+              Download Template (.sql)
             </Button>
 
             <HStack spacing="10px">
@@ -344,7 +391,7 @@ export default function ManagementPage() {
                 leftIcon={<Icon as={MdUploadFile} />}
                 onClick={handleUploadLeaderboard}
                 isLoading={isUploading}
-                loadingText="Uploading..."
+                loadingText="Executing SQL..."
                 isDisabled={!selectedFile || !uploadEvent}
               >
                 Upload Leaderboard
