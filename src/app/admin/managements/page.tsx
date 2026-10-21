@@ -31,6 +31,7 @@ import {
   MdCloudUpload,
   MdTableChart,
   MdCheckCircle,
+  MdStar,
 } from 'react-icons/md';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
@@ -45,7 +46,7 @@ export default function ManagementPage() {
   const router = useRouter();
   const toast = useToast();
   const [isMounted, setIsMounted] = useState(false);
-  const { features, toggleFeature } = useFeatures();
+  const { features, toggleFeature, setFlagshipEvent } = useFeatures();
   
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -64,6 +65,46 @@ export default function ManagementPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Flagship Event State
+  const [selectedFlagship, setSelectedFlagship] = useState(features.flagshipEvent || '');
+
+  useEffect(() => {
+    setSelectedFlagship(features.flagshipEvent || '');
+  }, [features.flagshipEvent]);
+
+  const handleSetFlagship = async () => {
+    if (!selectedFlagship) {
+      toast({ title: 'Please select an event to make flagship.', status: 'warning', isClosable: true });
+      return;
+    }
+    const success = await setFlagshipEvent(selectedFlagship);
+    if (success) {
+      toast({
+        title: 'Flagship Event Updated',
+        description: `"${selectedFlagship}" is now set as the Flagship Event.`,
+        status: 'success',
+        isClosable: true,
+      });
+    } else {
+      toast({ title: 'Failed to update flagship event', status: 'error', isClosable: true });
+    }
+  };
+
+  const handleRemoveFlagship = async () => {
+    const success = await setFlagshipEvent(null);
+    if (success) {
+      setSelectedFlagship('');
+      toast({
+        title: 'Flagship Event Removed',
+        description: 'No event is currently set as flagship.',
+        status: 'info',
+        isClosable: true,
+      });
+    } else {
+      toast({ title: 'Failed to remove flagship event', status: 'error', isClosable: true });
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -423,7 +464,7 @@ ON DUPLICATE KEY UPDATE
           >
             <Box>
               <HStack spacing="8px" mb="4px">
-                <Text fontWeight="600" color={textColor}>RPlace</Text>
+                <Text fontWeight="600" color={textColor}>Leaderboard</Text>
                 <Badge colorScheme={features.showLeaderboard ? 'green' : 'gray'}>
                   {features.showLeaderboard ? 'Visible' : 'Hidden'}
                 </Badge>
@@ -446,6 +487,66 @@ ON DUPLICATE KEY UPDATE
               }}
             />
           </Flex>
+        </Grid>
+      </Box>
+
+      {/* ─── FLAGSHIP EVENT CONTROL ─── */}
+      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+        <Flex justify="space-between" align={{ base: 'flex-start', sm: 'center' }} mb="8px" flexWrap="wrap" gap="10px">
+          <Flex align="center" gap="10px">
+            <Box p="8px" borderRadius="10px" bg="yellow.50" color="yellow.600">
+              <Icon as={MdStar} boxSize={6} />
+            </Box>
+            <Heading size="md" color={textColor}>Flagship Event</Heading>
+          </Flex>
+          {features.flagshipEvent ? (
+            <Badge colorScheme="green" px="10px" py="4px" borderRadius="full" fontSize="12px">
+              Active: {features.flagshipEvent}
+            </Badge>
+          ) : (
+            <Badge colorScheme="gray" px="10px" py="4px" borderRadius="full" fontSize="12px">
+              No Flagship Event
+            </Badge>
+          )}
+        </Flex>
+
+        <Text fontSize="sm" mb="20px" color="gray.500">
+          The flagship event is highlighted with the prominent &ldquo;Featured Flagship Arena&rdquo; banner at the top of the user events page. You can change it or remove it entirely.
+        </Text>
+
+        <Grid templateColumns={{ base: '1fr', md: '3fr 1fr 1fr' }} gap="15px" alignItems="center">
+          <Select
+            placeholder="Select an Event..."
+            variant="auth"
+            value={selectedFlagship}
+            onChange={(e) => setSelectedFlagship(e.target.value)}
+          >
+            {eventData?.data?.map((e) => (
+              <option key={e.name} value={e.name}>
+                {e.name} {e.name.toLowerCase() === features.flagshipEvent?.toLowerCase() ? '(Current Flagship)' : ''}
+              </option>
+            ))}
+          </Select>
+
+          <Button
+            colorScheme="brand"
+            w="100%"
+            leftIcon={<Icon as={MdStar} />}
+            isDisabled={!selectedFlagship || selectedFlagship === features.flagshipEvent}
+            onClick={handleSetFlagship}
+          >
+            Set Flagship
+          </Button>
+
+          <Button
+            variant="outline"
+            colorScheme="red"
+            w="100%"
+            isDisabled={!features.flagshipEvent}
+            onClick={handleRemoveFlagship}
+          >
+            Remove Flagship
+          </Button>
         </Grid>
       </Box>
 

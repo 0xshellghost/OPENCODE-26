@@ -15,6 +15,7 @@ import ShinyText from '../reactbits/ShinyText';
 import ClickSpark from '../reactbits/ClickSpark';
 import AnimatedContent from '../reactbits/AnimatedContent';
 import { useFeatures } from 'contexts/FeaturesContext';
+import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 
 type Event = {
   name: string;
@@ -27,6 +28,7 @@ type Event = {
   coverImageURL?: string;
   coverImageUrl?: string;
   coverImages?: (string | { url?: string; imageUrl?: string })[];
+  coverImagesURL?: (string | { url?: string; imageUrl?: string })[];
   coverImageURLs?: string[];
   image?: string;
   imageUrl?: string;
@@ -86,56 +88,8 @@ function EventCardImage({
   const fallbackUrl = `/images/${fallbackScene}.png`;
 
   const resolvedUrl = useMemo(() => {
-    let raw: string | undefined;
-
-    if (event.coverImageURL && typeof event.coverImageURL === 'string') {
-      raw = event.coverImageURL;
-    } else if (event.coverImageUrl && typeof event.coverImageUrl === 'string') {
-      raw = event.coverImageUrl;
-    } else if (Array.isArray(event.coverImages) && event.coverImages.length > 0) {
-      const first = event.coverImages[0];
-      if (typeof first === 'string') raw = first;
-      else if (first && typeof first === 'object') {
-        raw = first.url || first.imageUrl;
-      }
-    } else if (Array.isArray(event.coverImageURLs) && event.coverImageURLs.length > 0) {
-      raw = event.coverImageURLs[0];
-    } else if (event.logoImageURL && typeof event.logoImageURL === 'string') {
-      raw = event.logoImageURL;
-    } else if (event.logoImageUrl && typeof event.logoImageUrl === 'string') {
-      raw = event.logoImageUrl;
-    } else if (event.logoImage && typeof event.logoImage === 'string') {
-      raw = event.logoImage;
-    } else if (event.image && typeof event.image === 'string') {
-      raw = event.image;
-    } else if (event.imageUrl && typeof event.imageUrl === 'string') {
-      raw = event.imageUrl;
-    }
-
-    if (!raw || typeof raw !== 'string' || !raw.trim()) {
-      return fallbackUrl;
-    }
-
-    const trimmed = raw.trim();
-    if (
-      trimmed.startsWith('http://') ||
-      trimmed.startsWith('https://') ||
-      trimmed.startsWith('data:') ||
-      trimmed.startsWith('blob:')
-    ) {
-      return trimmed;
-    }
-
-    if (trimmed.startsWith('/images/') || trimmed.startsWith('/img/')) {
-      return trimmed;
-    }
-
-    const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || '').replace(/\/+$/, '');
-    if (trimmed.startsWith('/')) {
-      return backendUrl ? `${backendUrl}${trimmed}` : trimmed;
-    }
-
-    return backendUrl ? `${backendUrl}/${trimmed}` : `/${trimmed}`;
+    const rawCover = getEventCoverImage(event);
+    return resolveImageUrl(rawCover, fallbackUrl);
   }, [event, fallbackUrl]);
 
   const [imgSrc, setImgSrc] = useState(resolvedUrl);
@@ -158,6 +112,137 @@ function EventCardImage({
       }}
       className="object-cover transition-transform duration-700 group-hover:scale-105"
     />
+  );
+}
+
+function FlagshipCard({
+  event,
+  leaderboard = false,
+}: {
+  event: Event;
+  leaderboard?: boolean;
+}) {
+  const title = useMemo(() => {
+    try {
+      return decodeURIComponent(event.name || '');
+    } catch {
+      return event.name;
+    }
+  }, [event.name]);
+
+  const track = getEventTrack(event.name, event.description);
+  const status = getEventStatus(event.startDate, event.endDate);
+  const dates = formatEventDates(event.startDate, event.endDate);
+
+  const bannerUrl = resolveImageUrl(
+    getEventCoverImage(event),
+    '/images/kyoto-evening.png',
+  );
+  const logoUrl = resolveImageUrl(getEventLogoImage(event));
+  const Icon = leaderboard ? Trophy : CalendarDays;
+
+  return (
+    <div className="mb-12">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-[var(--secondary)] animate-ping" />
+        <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)] font-mono">
+          Featured Flagship Arena
+        </span>
+      </div>
+
+      <article
+        className="group relative flex flex-col rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl"
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)',
+        }}
+      >
+        {/* Full-width banner image */}
+        <div className="relative w-full h-60 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[var(--bg)]">
+          <Image
+            src={bannerUrl}
+            alt={event.name ? `${event.name} banner` : 'Event banner'}
+            fill
+            unoptimized
+            priority
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-transparent to-black/30 opacity-90" />
+
+          {/* Badges */}
+          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 flex flex-wrap items-center gap-2">
+            <span className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface)]/90 backdrop-blur-md text-[var(--fg)] border border-[var(--border)] shadow-md">
+              {track}
+            </span>
+            <span
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md backdrop-blur-md"
+              style={{
+                backgroundColor: 'var(--status-live-bg)',
+                color: 'var(--status-live-text)',
+                borderColor: 'var(--status-live-border)',
+                borderWidth: '1px',
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: 'var(--status-live-text)' }}
+              />
+              {status.label}
+            </span>
+          </div>
+
+          {/* Logo badge in bottom-left */}
+          <div className="absolute -bottom-8 left-6 sm:left-10 z-20">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[var(--surface)] border-4 border-[var(--surface)] shadow-2xl overflow-hidden flex items-center justify-center p-1.5">
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={title}
+                  className="w-full h-full object-cover rounded-xl"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <Icon size={32} className="text-[var(--accent)]" />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Name and description below banner */}
+        <div className="pt-12 sm:pt-14 px-6 sm:px-10 pb-8 sm:pb-10 flex flex-col justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-[var(--muted)] mb-3 font-mono">
+              <CalendarDays size={14} className="text-[var(--accent)]" />
+              <span>{dates}</span>
+            </div>
+            <h3 className="text-2xl sm:text-4xl font-extrabold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors mb-3 leading-tight">
+              {title}
+            </h3>
+            <p className="text-sm sm:text-base text-[var(--muted)] leading-relaxed max-w-4xl">
+              {event.description ||
+                'Join thousands of student developers in the premier seasonal open-source sprint. Collaborate with maintainers, submit pull requests, and climb the official standings.'}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-[var(--border)]">
+            <div className="flex items-center gap-2 text-xs text-[var(--muted)] font-mono">
+              <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
+              <span>Active Community Sprint</span>
+            </div>
+            <Link
+              href={`/user/leaderboard/${encodeURIComponent(event.name)}`}
+              className="px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-md group-hover:scale-[1.02]"
+            >
+              <span>{leaderboard ? 'View Arena Standings' : 'Enter Arena & Leaderboard'}</span>
+              <ChevronRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </article>
+    </div>
   );
 }
 
@@ -242,107 +327,19 @@ export default function EventCollection({
       ) : (
         /* Dynamic Event Showcase: Flagship Landmark + Curated Grid */
         <div>
-          {/* Flagship Landmark Banner (Rendered only when a flagship event is active) */}
-          {flagship && (() => {
-            const featured = flagship;
-            const decodedFeaturedName = (() => {
-              try {
-                return decodeURIComponent(featured.name || '');
-              } catch {
-                return featured.name;
-              }
-            })();
-            const featuredTrack = getEventTrack(featured.name, featured.description);
-            const featuredStatus = getEventStatus(featured.startDate, featured.endDate);
-            const featuredDates = formatEventDates(featured.startDate, featured.endDate);
+          {flagship && <FlagshipCard event={flagship} leaderboard={leaderboard} />}
 
-            return (
-              <div className="mb-10">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-[var(--secondary)] animate-ping" />
-                  <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)] font-mono">
-                    Featured Flagship Arena
-                  </span>
-                </div>
-
-                <article
-                  className="group relative grid grid-cols-1 lg:grid-cols-12 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl"
-                  style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    boxShadow: 'var(--shadow)',
-                  }}
-                >
-                  {/* Left Scenic Visual Banner */}
-                  <div className="lg:col-span-5 relative h-56 lg:h-auto min-h-[220px] overflow-hidden bg-[var(--bg)]">
-                    <EventCardImage event={featured} fallbackScene="kyoto-evening" />
-                    <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent to-[var(--surface)] opacity-75" />
-                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-md text-xs font-bold bg-[var(--surface)]/90 backdrop-blur-md text-[var(--fg)] border border-[var(--border)] shadow-sm">
-                        {featuredTrack}
-                      </span>
-                      <span
-                        className="px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
-                        style={{
-                          backgroundColor: 'var(--status-live-bg)',
-                          color: 'var(--status-live-text)',
-                          borderColor: 'var(--status-live-border)',
-                          borderWidth: '1px',
-                        }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--status-live-text)' }} />
-                        {featuredStatus.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Right Landmark Body */}
-                  <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 text-xs text-[var(--muted)] mb-3 font-mono">
-                        <CalendarDays size={14} className="text-[var(--accent)]" />
-                        <span>{featuredDates}</span>
-                      </div>
-                      <h3 className="text-2xl sm:text-3xl font-extrabold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors mb-3 leading-tight">
-                        {decodedFeaturedName}
-                      </h3>
-                      <p className="text-sm text-[var(--muted)] leading-relaxed mb-6 line-clamp-3">
-                        {featured.description ||
-                          'Join thousands of student developers in the premier seasonal open-source sprint. Collaborate with maintainers, submit pull requests, and climb the official standings.'}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--border)]">
-                      <div className="flex items-center gap-2 text-xs text-[var(--muted)] font-mono">
-                        <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
-                        <span>Active Community Sprint</span>
-                      </div>
-                      <Link
-                        href={`/user/leaderboard/${encodeURIComponent(featured.name)}`}
-                        className="px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-md group-hover:scale-[1.02]"
-                      >
-                        <span>{leaderboard ? 'View Arena Standings' : 'Enter Arena & Leaderboard'}</span>
-                        <ChevronRight size={15} />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-
-                {/* Section Separator */}
-                {gridEvents.length > 0 && (
-                  <div className="flex items-center gap-4 mt-10 mb-6">
-                    <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
-                      All Active & Upcoming Tracks
-                    </h4>
-                    <div className="flex-1 h-[1px] bg-[var(--border)]" />
-                    <span className="text-xs text-[var(--subtle)] font-mono">
-                      {gridEvents.length} more {gridEvents.length === 1 ? 'track' : 'tracks'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
+          {flagship && gridEvents.length > 0 && (
+            <div className="flex items-center gap-4 mt-10 mb-6">
+              <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
+                All Active & Upcoming Tracks
+              </h4>
+              <div className="flex-1 h-[1px] bg-[var(--border)]" />
+              <span className="text-xs text-[var(--subtle)] font-mono">
+                {gridEvents.length} more {gridEvents.length === 1 ? 'track' : 'tracks'}
+              </span>
+            </div>
+          )}
 
           {/* Grid of Events */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -359,6 +356,7 @@ export default function EventCollection({
               const status = getEventStatus(event.startDate, event.endDate);
               const dateRange = formatEventDates(event.startDate, event.endDate);
               const isLive = status.type === 'live';
+              const cardLogoUrl = resolveImageUrl(getEventLogoImage(event));
 
               return (
                 <AnimatedContent key={event.name} delay={index * 0.04}>
@@ -428,9 +426,9 @@ export default function EventCollection({
                       {/* Event Logo Avatar Badge */}
                       <div className="absolute -bottom-3 left-5 z-10 flex items-center">
                         <div className="w-12 h-12 rounded-xl bg-[var(--surface)] border-2 border-[var(--border-strong)] shadow-lg overflow-hidden flex items-center justify-center p-1">
-                          {event.logoImageURL ? (
+                          {cardLogoUrl ? (
                             <img
-                              src={event.logoImageURL}
+                              src={cardLogoUrl}
                               alt={decodedName}
                               className="w-full h-full object-cover rounded-lg"
                               onError={(e) => {

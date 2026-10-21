@@ -8,6 +8,7 @@ import { MdStar, MdStarBorder } from 'react-icons/md';
 import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
+import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 
 // 1. Define Types
 interface EventItem {
@@ -175,6 +176,11 @@ export default function Viewevents() {
       >
         {events.map((item, i) => {
           const isFlagship = features?.flagshipEvent?.toLowerCase() === item.name?.toLowerCase();
+          const bannerImg = resolveImageUrl(
+            getEventCoverImage(item),
+            resolveImageUrl(getEventLogoImage(item), '/images/kyoto-evening.png'),
+          );
+          const logoImg = resolveImageUrl(getEventLogoImage(item));
 
           return (
             <Box key={i} w={{ base: '320px', md: '360px', lg: '420px' }} position="relative">
@@ -202,7 +208,8 @@ export default function Viewevents() {
               <NFT
                 name={item.name}
                 des={item.description}
-                image={item.logoImageURL}
+                image={bannerImg}
+                logoImage={logoImg}
                 download={`/user/leaderboard/${encodeURIComponent(item.name)}`}
               />
 
