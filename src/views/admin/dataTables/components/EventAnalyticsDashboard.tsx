@@ -99,12 +99,12 @@ export default function EventAnalyticsDashboard({
 
     // Tiers breakdown
     const tiers = {
-      elite: tableData.filter((u) => u.points >= 4000).length,
-      master: tableData.filter((u) => u.points >= 2000 && u.points < 4000)
+      elite: tableData.filter((u) => (u.points ?? 0) >= 4000).length,
+      master: tableData.filter((u) => (u.points ?? 0) >= 2000 && (u.points ?? 0) < 4000)
         .length,
-      challenger: tableData.filter((u) => u.points >= 1000 && u.points < 2000)
+      challenger: tableData.filter((u) => (u.points ?? 0) >= 1000 && (u.points ?? 0) < 2000)
         .length,
-      emerging: tableData.filter((u) => u.points < 1000).length,
+      emerging: tableData.filter((u) => (u.points ?? 0) < 1000).length,
     };
 
     // Top 3 for Podium
