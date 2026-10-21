@@ -13,7 +13,7 @@ import OpenCodeLogo from 'components/common/OpenCodeLogo';
 
 const navigation = [
   { label: 'Home', href: '/' },
-  { label: 'Events', href: '/user/home' },
+  { label: 'Events', href: '/user/events' },
   { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
   { label: 'RPlace Canvas', href: '/user/rplace' },
   { label: 'Winners', href: '/user/winners' },

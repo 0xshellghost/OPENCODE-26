@@ -4,22 +4,15 @@ import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  ArrowUpRight,
   CalendarDays,
-  Search,
   Trophy,
   RefreshCw,
-  Users,
-  Code2,
-  Sparkles,
-  Layers,
   ChevronRight,
 } from 'lucide-react';
 import { Skeleton } from '@chakra-ui/react';
 import PageHeading from './PageHeading';
 import ShinyText from '../reactbits/ShinyText';
 import ClickSpark from '../reactbits/ClickSpark';
-import CountUp from '../reactbits/CountUp';
 import AnimatedContent from '../reactbits/AnimatedContent';
 import { useFeatures } from 'contexts/FeaturesContext';
 
@@ -181,39 +174,25 @@ export default function EventCollection({
   retry: () => void;
   leaderboard?: boolean;
 }) {
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState<'all' | 'live' | 'hackathon' | 'opensource' | 'ai'>('all');
   const { features } = useFeatures();
-
-  const categories = [
-    { id: 'all', label: 'All Events' },
-    { id: 'live', label: 'Live Now' },
-    { id: 'hackathon', label: 'Hackathons' },
-    { id: 'opensource', label: 'Open Source Sprints' },
-    { id: 'ai', label: 'Systems & AI' },
-  ];
-
-  const filtered = useMemo(() => {
-    return events.filter((event) => {
-      const matchSearch = `${event.name} ${event.description || ''}`
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      if (!matchSearch) return false;
-
-      const track = getEventTrack(event.name, event.description).toLowerCase();
-      const status = getEventStatus(event.startDate, event.endDate).type;
-
-      if (activeCategory === 'live') return status === 'live';
-      if (activeCategory === 'hackathon') return track.includes('hackathon');
-      if (activeCategory === 'opensource') return track.includes('open source');
-      if (activeCategory === 'ai') return track.includes('ai') || track.includes('systems');
-
-      return true;
-    });
-  }, [events, search, activeCategory]);
-
   const scenes = ['kyoto-evening', 'kyoto-garden', 'kyoto-torii'];
   const Icon = leaderboard ? Trophy : CalendarDays;
+
+  // Resolve flagship event from admin configuration
+  const flagship = useMemo(() => {
+    if (!features?.flagshipEvent) return null;
+    return (
+      events.find(
+        (e) => e.name?.toLowerCase() === features.flagshipEvent?.toLowerCase(),
+      ) || null
+    );
+  }, [events, features?.flagshipEvent]);
+
+  // Filter out the flagship event so it isn't duplicated in the grid
+  const gridEvents = useMemo(() => {
+    if (!flagship) return events;
+    return events.filter((e) => e.name !== flagship.name);
+  }, [events, flagship]);
 
   return (
     <ClickSpark sparkColor="rgba(88, 185, 154, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
@@ -230,65 +209,6 @@ export default function EventCollection({
           <span lang="ja">{leaderboard ? '切磋琢磨' : '一期一会'}</span>
         </ShinyText>
       </PageHeading>
-
-      {/* Main Filter & Search Toolbar */}
-      <div className="flex flex-col gap-4 mb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setActiveCategory(cat.id as any)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
-                  activeCategory === cat.id
-                    ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_2px_12px_var(--accent-soft)] font-bold'
-                    : 'bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[var(--surface)] text-[var(--secondary)] border border-[var(--secondary-border)] hover:bg-[var(--secondary-soft)] hover:border-[var(--secondary)] transition-all flex items-center gap-1.5"
-              href={leaderboard && features.showWinners ? '/user/winners' : '/user/repos'}
-            >
-              {leaderboard && features.showWinners ? 'Meet the winners' : 'Explore repositories'} <ArrowUpRight size={14} />
-            </Link>
-
-            <label className="oc-search" style={{ minWidth: '220px' }}>
-              <Search size={15} />
-              <span className="sr-only">Search events</span>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Filter by title or keyword…"
-              />
-            </label>
-          </div>
-        </div>
-
-        {!loading && !error && (
-          <div className="flex items-center justify-between text-xs text-[var(--muted)] font-mono">
-            <p>
-              Showing <span className="text-[var(--accent)] font-bold"><CountUp to={filtered.length} duration={0.8} /></span> of {events.length} curated events
-            </p>
-            {activeCategory !== 'all' && (
-              <button
-                type="button"
-                onClick={() => setActiveCategory('all')}
-                className="text-[var(--accent)] hover:underline"
-              >
-                Reset filters
-              </button>
-            )}
-          </div>
-        )}
-      </div>
 
       {/* Loading Skeleton Grid */}
       {loading ? (
@@ -313,31 +233,18 @@ export default function EventCollection({
             Try again
           </button>
         </div>
-      ) : !filtered.length ? (
+      ) : !events.length ? (
         <div className="glass-panel oc-empty">
-          <Search size={28} />
-          <h2>{search ? 'No matching events found' : 'New beginnings are on the way.'}</h2>
-          <p>
-            {search
-              ? 'Try a different keyword or reset your category filter.'
-              : 'Events will appear here when they are announced. In the meantime, explore our repositories.'}
-          </p>
-          {search ? (
-            <button className="oc-button oc-button-secondary" onClick={() => { setSearch(''); setActiveCategory('all'); }}>
-              Clear search
-            </button>
-          ) : (
-            <Link className="oc-button oc-button-secondary" href="/user/repos">
-              Explore repositories <ArrowUpRight size={15} />
-            </Link>
-          )}
+          <CalendarDays size={28} />
+          <h2>New beginnings are on the way.</h2>
+          <p>Events will appear here when they are announced.</p>
         </div>
       ) : (
         /* Dynamic Event Showcase: Flagship Landmark + Curated Grid */
         <div>
-          {/* Flagship Landmark Banner (Rendered when viewing all events without search query) */}
-          {!search && activeCategory === 'all' && filtered.length > 1 && (() => {
-            const featured = filtered[0];
+          {/* Flagship Landmark Banner */}
+          {events.length > 1 && (() => {
+            const featured = events[0];
             const decodedFeaturedName = (() => {
               try {
                 return decodeURIComponent(featured.name || '');
@@ -428,7 +335,7 @@ export default function EventCollection({
                   </h4>
                   <div className="flex-1 h-[1px] bg-[var(--border)]" />
                   <span className="text-xs text-[var(--subtle)] font-mono">
-                    {filtered.length - 1} more tracks
+                    {events.length - 1} more tracks
                   </span>
                 </div>
               </div>
@@ -437,9 +344,9 @@ export default function EventCollection({
 
           {/* Grid of Events */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(!search && activeCategory === 'all' && filtered.length > 1
-              ? filtered.slice(1)
-              : filtered
+            {(events.length > 1
+              ? events.slice(1)
+              : events
             ).map((event, index) => {
               const decodedName = (() => {
                 try {
