@@ -344,6 +344,108 @@ ON DUPLICATE KEY UPDATE
               }}
             />
           </Flex>
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>RPlace</Text>
+                <Badge colorScheme={features.showRPlace ? 'green' : 'gray'}>
+                  {features.showRPlace ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the RPlace tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showRPlace}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                await toggleFeature('showRPlace', val);
+                toast({
+                  title: `RPlace tab ${val ? 'enabled' : 'hidden'}`,
+                  status: 'info',
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </Flex>
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>Repositories</Text>
+                <Badge colorScheme={features.showRepositories ? 'green' : 'gray'}>
+                  {features.showRepositories ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the Repositories tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showRepositories}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                await toggleFeature('showRepositories', val);
+                toast({
+                  title: `Repositories tab ${val ? 'enabled' : 'hidden'}`,
+                  status: 'info',
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </Flex>
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>RPlace</Text>
+                <Badge colorScheme={features.showLeaderboard ? 'green' : 'gray'}>
+                  {features.showLeaderboard ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the Leaderboard tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showLeaderboard}
+              onChange={async (e) => {
+                const val = e.target.checked;
+                await toggleFeature('showLeaderboard', val);
+                toast({
+                  title: `Leaderboard tab ${val ? 'enabled' : 'hidden'}`,
+                  status: 'info',
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </Flex>
         </Grid>
       </Box>
 

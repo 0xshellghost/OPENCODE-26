@@ -32,6 +32,9 @@ export default function SiteNavbar() {
   const activeNavigation = navigation.filter((item) => {
     if (item.href === '/user/winners' && !features.showWinners) return false;
     if (item.href === '/user/milestones' && !features.showMilestones) return false;
+    if (item.href === '/user/leaderboard/Opencode' && !features.showLeaderboard) return false;
+    if (item.href === '/user/repos' && !features.showRepositories) return false;
+    if (item.href === '/user/rplace' && !features.showRPlace) return false;
     return true;
   });
 

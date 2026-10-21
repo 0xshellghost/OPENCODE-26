@@ -5,6 +5,9 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 export interface FeaturesConfig {
   showWinners: boolean;
   showMilestones: boolean;
+  showRPlace: boolean;
+  showRepositories: boolean;
+  showLeaderboard: boolean;
 }
 
 interface FeaturesContextType {
@@ -17,6 +20,9 @@ const STORAGE_KEY = 'oc-feature-flags';
 const DEFAULT_FEATURES: FeaturesConfig = {
   showWinners: true,
   showMilestones: true,
+  showRepositories: true,
+  showRPlace: true,
+  showLeaderboard: true,
 };
 
 const FeaturesContext = createContext<FeaturesContextType>({
@@ -44,6 +50,9 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
           const next = {
             showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : prev.showWinners,
             showMilestones: typeof data.showMilestones === 'boolean' ? data.showMilestones : prev.showMilestones,
+            showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
+            showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
+            showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
           };
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(next));

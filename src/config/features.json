@@ -1,4 +1,7 @@
 {
   "showWinners": false,
-  "showMilestones": false
+  "showMilestones": false,
+  "showLeaderboard": false,
+  "showRepositories": false,
+  "showRPlace": false
 }
