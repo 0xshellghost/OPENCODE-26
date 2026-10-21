@@ -65,22 +65,23 @@ interface CanvasProps {
 }
 
 const pillStyle = {
-  px: '10px',
-  py: '4px',
-  bg: 'var(--card-soft)',
-  border: '1px solid var(--border)',
+  px: '12px',
+  py: '6px',
+  bg: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: 'full',
+  backdropFilter: 'blur(8px)',
 } as const;
 
 const controlBtnStyle = {
   size: 'sm',
   variant: 'outline',
-  borderColor: 'var(--border)',
+  borderColor: 'rgba(255,255,255,0.1)',
   color: 'var(--text)',
-  bg: 'var(--card-soft)',
+  bg: 'rgba(255,255,255,0.04)',
   borderRadius: '10px',
   fontWeight: '500',
-  _hover: { bg: 'var(--accent-soft)', borderColor: 'var(--border-strong)' },
+  _hover: { bg: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.16)' },
 } as const;
 
 export default function Canvas({ userTier, userHandle }: CanvasProps) {
@@ -113,7 +114,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
 
   // Viewport transforms (zoomed-in by default so individual pixels are clearly visible)
-  const DEFAULT_ZOOM = 10.0;
+  const DEFAULT_ZOOM = 1.0;
   const MIN_ZOOM = 0.04;
   const MAX_ZOOM = 300.0;
 
@@ -545,7 +546,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     <Box
       ref={containerRef}
       className="glass-panel"
-      p={{ base: '12px', sm: '16px', md: '20px' }}
+      p={{ base: '10px', sm: '14px', md: '18px' }}
       borderRadius={isFullscreen ? '0 !important' : undefined}
       position={isFullscreen ? 'fixed' : 'relative'}
       inset={isFullscreen ? 0 : 'auto'}
@@ -553,7 +554,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       h={isFullscreen ? '100vh' : 'auto'}
       display="flex"
       flexDirection="column"
-      gap="14px"
+      gap="16px"
       overflow="hidden"
       sx={isFullscreen ? { background: 'var(--bg) !important' } : undefined}
     >
@@ -658,10 +659,10 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         <HStack spacing="8px" flexWrap="wrap" rowGap="6px">
           {/* Zoom controls */}
           <HStack
-            bg="var(--card-soft)"
-            p="2px 6px"
+            bg="rgba(255,255,255,0.04)"
+            p="3px 8px"
             borderRadius="12px"
-            border="1px solid var(--border)"
+            border="1px solid rgba(255,255,255,0.08)"
             spacing="2px"
           >
             <Tooltip label="Zoom out" hasArrow>
@@ -679,7 +680,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
               />
             </Tooltip>
             <Text fontSize="12px" fontWeight="700" minW="42px" textAlign="center" color="var(--text)">
-              {Math.round(zoom * 100)}%
+              {zoom >= 1 ? Math.round(zoom * 100) : Math.round(zoom * 100)}%
             </Text>
             <Tooltip label="Zoom in" hasArrow>
               <IconButton
@@ -757,10 +758,25 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         ref={viewportRef}
         w="100%"
         h={isFullscreen ? 'calc(100vh - 140px)' : 'auto'}
-        minH={{ base: '260px', sm: '380px', md: '520px' }}
-        borderRadius="14px"
-        border="1px solid var(--border)"
-        background="radial-gradient(circle, var(--border) 1px, transparent 1px) 0 0 / 18px 18px, var(--card-strong)"
+        minH={{ base: '400px', sm: '520px', md: '700px' }}
+        borderRadius="16px"
+        border="1px solid rgba(255,255,255,0.06)"
+        background="radial-gradient(circle at 50% 50%, rgba(99,102,241,0.06) 0%, transparent 60%), radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / 24px 24px, var(--card-strong)"
+        sx={{
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '16px',
+            padding: '1px',
+            background: 'linear-gradient(135deg, rgba(99,102,241,0.2), transparent 40%, transparent 60%, rgba(168,85,247,0.15))',
+            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+            maskComposite: 'xor',
+            WebkitMaskComposite: 'xor',
+            pointerEvents: 'none',
+            zIndex: 0,
+          },
+        }}
         position="relative"
         overflow="hidden"
         display="flex"
@@ -841,7 +857,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             transformOrigin: 'center center',
             transition: isDragging ? 'none' : 'transform 0.12s ease-out',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border-strong)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.08), 0 0 80px rgba(99,102,241,0.08)',
             willChange: 'transform',
           }}
         />
@@ -850,15 +866,15 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         {!isError && (
           <HStack
             spacing="6px"
-            bg="var(--nav-bg)"
-            backdropFilter="blur(14px)"
-            border="1px solid var(--border)"
+            bg="rgba(0,0,0,0.6)"
+            backdropFilter="blur(16px)"
+            border="1px solid rgba(255,255,255,0.1)"
             borderRadius="full"
-            px="12px"
-            py="5px"
+            px="14px"
+            py="6px"
             position="absolute"
-            bottom="14px"
-            left="14px"
+            bottom="16px"
+            left="16px"
             pointerEvents="none"
             zIndex={10}
           >
@@ -883,15 +899,15 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         {!isError && (
           <HStack
             spacing="6px"
-            bg="var(--nav-bg)"
-            backdropFilter="blur(14px)"
-            border="1px solid var(--border)"
+            bg="rgba(0,0,0,0.6)"
+            backdropFilter="blur(16px)"
+            border="1px solid rgba(255,255,255,0.1)"
             borderRadius="full"
-            px="11px"
-            py="4px"
+            px="12px"
+            py="5px"
             position="absolute"
-            bottom="14px"
-            right="14px"
+            bottom="16px"
+            right="16px"
             pointerEvents="none"
             display={{ base: 'none', md: 'flex' }}
             zIndex={10}
@@ -905,10 +921,11 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
 
       {/* ─── 3. PALETTE DOCK: 16-Color Swatches & Drop Status ─── */}
       <Box
-        p={{ base: '10px 14px', sm: '12px 18px' }}
-        borderRadius="14px"
-        bg="var(--card-soft)"
-        border="1px solid var(--border)"
+        p={{ base: '14px 16px', sm: '16px 22px' }}
+        borderRadius="16px"
+        bg="rgba(255,255,255,0.03)"
+        border="1px solid rgba(255,255,255,0.08)"
+        backdropFilter="blur(12px)"
       >
         <Flex
           direction={{ base: 'column', md: 'row' }}
@@ -917,14 +934,14 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           gap="12px"
         >
           {/* Active color info preview */}
-          <HStack spacing="10px" minW={{ md: '170px' }}>
+          <HStack spacing="12px" minW={{ md: '180px' }}>
             <Box
-              w="28px"
-              h="28px"
-              borderRadius="8px"
+              w="32px"
+              h="32px"
+              borderRadius="10px"
               bg={activeColor.hex}
-              border="2px solid var(--border-strong)"
-              boxShadow={`0 0 12px ${activeColor.hex}44`}
+              border="2px solid rgba(255,255,255,0.15)"
+              boxShadow={`0 0 20px ${activeColor.hex}55, 0 0 40px ${activeColor.hex}22`}
               flexShrink={0}
             />
             <VStack align="start" spacing="0">
@@ -956,9 +973,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                     aria-label={`Select ${color.name}`}
                     aria-pressed={isSelected}
                     onClick={() => setSelectedColorId(color.id)}
-                    w={{ base: '26px', sm: '30px' }}
-                    h={{ base: '26px', sm: '30px' }}
-                    borderRadius="7px"
+                    w={{ base: '30px', sm: '34px' }}
+                    h={{ base: '30px', sm: '34px' }}
+                    borderRadius="9px"
                     bg={color.hex}
                     position="relative"
                     display="flex"

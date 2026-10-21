@@ -85,7 +85,7 @@ function Sidebar({ routes }: SidebarProps) {
           >
             <Flower2 size={24} strokeWidth={1.5} />
             <Text fontSize="20px" fontWeight="700" letterSpacing="0.05em">
-              OPENCODE
+              GEEKHAVEN
             </Text>
           </Flex>
         </Link>
