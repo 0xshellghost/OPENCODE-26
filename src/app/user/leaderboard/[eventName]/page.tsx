@@ -132,9 +132,9 @@ export default function EventName() {
       (LeadData || []).map((item) => ({
         position: String(item.position),
         name: item.name,
-        prmerged: Number(item.prmerged),
-        githubid: item.githubid,
-        points: Number(item.points),
+        prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+        githubid: item.githubid ?? undefined,
+        points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
         avatarUrl: item.avatarUrl,
         prDetailsURL: item.prDetailsURL,
         college: item.collegeName ?? '',
@@ -142,6 +142,13 @@ export default function EventName() {
       })),
     [LeadData],
   );
+
+  const hasPoints = useMemo(() => {
+    if (isOpencode) return true;
+    return tableDataColumns.some(
+      (r) => r.points !== undefined && r.points !== null && !isNaN(Number(r.points))
+    );
+  }, [isOpencode, tableDataColumns]);
 
   const collegeOptions = useMemo(() => {
     const colleges = tableDataColumns
@@ -166,13 +173,13 @@ export default function EventName() {
       }
       if (q) {
         const matchesUser =
-          row.githubid?.toLowerCase().includes(q) ||
+          (isOpencode && row.githubid?.toLowerCase().includes(q)) ||
           row.name?.toLowerCase().includes(q);
         if (!matchesUser) return false;
       }
       return true;
     });
-  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
+  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns, isOpencode]);
 
   const deferredTableData = useDeferredValue(filteredTableData);
   const isStale = deferredTableData !== filteredTableData;
@@ -180,8 +187,11 @@ export default function EventName() {
   const totalCount = tableDataColumns.length;
 
   const topScore = useMemo(
-    () => tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0),
-    [tableDataColumns],
+    () =>
+      hasPoints
+        ? tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0)
+        : null,
+    [tableDataColumns, hasPoints],
   );
 
   // Top 3 overall (not affected by filters) for the spotlight cards
@@ -205,8 +215,12 @@ export default function EventName() {
   // With any filter active the spotlight is hidden, so the table shows everyone who matches.
   const tableRows = useMemo(() => {
     if (!showSpotlight) return deferredTableData;
-    const spotlightIds = new Set(topThree.map((r) => r.githubid));
-    return deferredTableData.filter((r) => !spotlightIds.has(r.githubid));
+    const spotlightIds = new Set(
+      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    );
+    return deferredTableData.filter(
+      (r) => !spotlightIds.has(r.githubid || `${r.name}-${r.position}`)
+    );
   }, [showSpotlight, deferredTableData, topThree]);
 
   if (isLoading) {
@@ -254,7 +268,11 @@ export default function EventName() {
             label={hasActiveFilters ? 'Matching' : 'Showing'}
             value={participantCount.toLocaleString()}
           />
-          <StatTile label="Top score" value={topScore.toLocaleString()} />
+          {hasPoints && topScore !== null ? (
+            <StatTile label="Top score" value={topScore.toLocaleString()} />
+          ) : (
+            <StatTile label="Ranked" value={totalCount.toLocaleString()} />
+          )}
         </Flex>
       </Box>
 
@@ -530,9 +548,9 @@ export default function EventName() {
           </Flex>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
-            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} />
-            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} />
-            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} />
+            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} hasPoints={hasPoints} />
           </SimpleGrid>
         </Box>
       )}
@@ -657,10 +675,12 @@ function SpotlightCard({
   row,
   rank,
   isOpencode,
+  hasPoints,
 }: {
   row: RowObj;
   rank: 1 | 2 | 3;
   isOpencode: boolean;
+  hasPoints: boolean;
 }) {
   const medal = MEDALS[rank];
   const isFirst = rank === 1;
@@ -750,34 +770,56 @@ function SpotlightCard({
       >
         {row.name}
       </Text>
-      <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
-        @{row.githubid}
-      </Text>
+      {isOpencode && row.githubid ? (
+        <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
+          @{row.githubid}
+        </Text>
+      ) : null}
       {college && (
         <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="2px">
           {college}
         </Text>
       )}
 
-      <Text
-        fontFamily={SERIF}
-        fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
-        fontWeight={isFirst ? '800' : '600'}
-        color={isFirst ? 'var(--secondary)' : 'var(--text)'}
-        lineHeight="1.1"
-        mt="14px"
-        style={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {Number(row.points).toLocaleString()}{' '}
-        <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
-          {isOpencode ? 'pts' : 'score'}
-        </Text>
-      </Text>
-      <Text fontSize="12px" color="var(--muted)" mt="2px">
-        {isOpencode
-          ? `${Number(row.prmerged).toLocaleString()} PRs merged`
-          : 'Official Ranking'}
-      </Text>
+      {hasPoints && row.points !== undefined && row.points !== null ? (
+        <>
+          <Text
+            fontFamily={SERIF}
+            fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
+            fontWeight={isFirst ? '800' : '600'}
+            color={isFirst ? 'var(--secondary)' : 'var(--text)'}
+            lineHeight="1.1"
+            mt="14px"
+            style={{ fontVariantNumeric: 'tabular-nums' }}
+          >
+            {Number(row.points).toLocaleString()}{' '}
+            <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
+              {isOpencode ? 'pts' : 'points'}
+            </Text>
+          </Text>
+          <Text fontSize="12px" color="var(--muted)" mt="2px">
+            {isOpencode && row.prmerged !== undefined
+              ? `${Number(row.prmerged).toLocaleString()} PRs merged`
+              : 'Official Standing'}
+          </Text>
+        </>
+      ) : (
+        <Box mt="14px">
+          <Text
+            fontFamily="var(--f-mono), monospace"
+            fontSize="14px"
+            fontWeight="700"
+            color="var(--accent)"
+            textTransform="uppercase"
+            letterSpacing="0.08em"
+          >
+            Rank #{rank}
+          </Text>
+          <Text fontSize="12px" color="var(--muted)" mt="2px">
+            Official Standing
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }

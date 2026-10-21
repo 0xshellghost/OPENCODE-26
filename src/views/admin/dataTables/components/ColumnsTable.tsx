@@ -41,13 +41,13 @@ import { isMaintainer } from "constants/Maintainers";
 gsap.registerPlugin(Flip);
 
 export type RowObj = {
-  position: string;
+  position: string | number;
   name: string;
-  avatarUrl: string;
-  githubid: string;
-  prmerged: number;
-  points: number;
-  prDetailsURL: string;
+  avatarUrl?: string;
+  githubid?: string;
+  prmerged?: number;
+  points?: number;
+  prDetailsURL?: string;
   college?: string;
   graduationYear?: string | number;
 };
@@ -149,8 +149,8 @@ function UserCell({
   currentGithubId?: string;
   isOpencode: boolean;
 }) {
-  const isYou = rowData.githubid === currentGithubId;
-  const maintainer = isMaintainer(rowData.githubid);
+  const isYou = Boolean(rowData.githubid && rowData.githubid === currentGithubId);
+  const maintainer = Boolean(rowData.githubid && isMaintainer(rowData.githubid));
 
   return (
     <Popover trigger="hover" placement="right" openDelay={0} isLazy>
@@ -410,21 +410,58 @@ function TablePagination({
 function MobileLeaderboard({
   table,
   isOpencode,
+  hasPoints,
 }: {
   table: ReturnType<typeof useReactTable<RowObj>>;
   isOpencode: boolean;
+  hasPoints: boolean;
 }) {
   if (!table) return null;
   const rows = table.getPaginationRowModel().rows;
 
   return (
     <Flex direction="column" gap="14px">
-      {rows.map((row) => {
+      {rows.map((row, index) => {
         const user = row.original;
+        const rowKey = user.githubid || `${user.name}-${user.position}-${index}`;
+
+        const content = (
+          <Flex align="center" gap="12px">
+            <Flex align="center" justify="center" minW="32px">
+              <RankBadge position={user.position} />
+            </Flex>
+
+            {user.avatarUrl && (
+              <Box
+                borderRadius="full"
+                p="2px"
+                bg="linear-gradient(135deg, rgba(88, 185, 154, 0.4), rgba(45, 139, 111, 0.2))"
+                flexShrink={0}
+              >
+                <NextAvatar src={user.avatarUrl} h="42px" w="42px" />
+              </Box>
+            )}
+
+            <Box>
+              <Text fontWeight="700" fontSize="14px" color="var(--fg)">
+                {user.name}
+              </Text>
+              {isOpencode && user.githubid ? (
+                <Text fontSize="12px" color="var(--muted)">
+                  @{user.githubid}
+                </Text>
+              ) : user.college ? (
+                <Text fontSize="12px" color="var(--muted)" noOfLines={1} maxW="160px">
+                  {user.college}
+                </Text>
+              ) : null}
+            </Box>
+          </Flex>
+        );
 
         return (
           <Flex
-            key={user.githubid}
+            key={rowKey}
             align="center"
             justify="space-between"
             p="14px"
@@ -439,36 +476,19 @@ function MobileLeaderboard({
               transform: "translateY(-1px)",
             }}
           >
-            <Link
-              href={`/user/profile/${user.githubid}`}
-              _hover={{ textDecoration: "none" }}
-            >
-              <Flex align="center" gap="12px">
-                <Flex align="center" justify="center" minW="32px">
-                  <RankBadge position={user.position} />
-                </Flex>
-
-                <Box
-                  borderRadius="full"
-                  p="2px"
-                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.4), rgba(45, 139, 111, 0.2))"
-                >
-                  <NextAvatar src={user.avatarUrl} h="42px" w="42px" />
-                </Box>
-
-                <Box>
-                  <Text fontWeight="700" fontSize="14px" color="var(--fg)">
-                    {user.name}
-                  </Text>
-                  <Text fontSize="12px" color="var(--muted)">
-                    @{user.githubid}
-                  </Text>
-                </Box>
-              </Flex>
-            </Link>
+            {isOpencode && user.githubid ? (
+              <Link
+                href={`/user/profile/${user.githubid}`}
+                _hover={{ textDecoration: "none" }}
+              >
+                {content}
+              </Link>
+            ) : (
+              content
+            )}
 
             <Flex align="center" gap="10px">
-              {isOpencode ? (
+              {isOpencode && user.prmerged !== undefined ? (
                 <Flex
                   align="center"
                   justify="center"
@@ -484,36 +504,21 @@ function MobileLeaderboard({
                 >
                   {user.prmerged} PRs
                 </Flex>
-              ) : user.college ? (
-                <Flex
-                  align="center"
-                  justify="center"
-                  px="10px"
-                  py="3px"
-                  borderRadius="full"
-                  bg="var(--accent-soft)"
-                  border="1px solid var(--border)"
-                  color="var(--fg)"
-                  fontSize="11px"
-                  fontWeight="600"
-                  maxW="130px"
-                  noOfLines={1}
-                >
-                  {user.college}
-                </Flex>
               ) : null}
 
-              <Flex align="center" gap="6px">
-                <Text
-                  fontWeight="800"
-                  fontFamily="var(--f-mono), monospace"
-                  color="var(--accent)"
-                  fontSize="15px"
-                >
-                  {user.points}
-                </Text>
-                <FaTrophy color="var(--secondary)" size={12} />
-              </Flex>
+              {(isOpencode || hasPoints) && user.points !== undefined && user.points !== null ? (
+                <Flex align="center" gap="6px">
+                  <Text
+                    fontWeight="800"
+                    fontFamily="var(--f-mono), monospace"
+                    color="var(--accent)"
+                    fontSize="15px"
+                  >
+                    {user.points}
+                  </Text>
+                  <FaTrophy color="var(--secondary)" size={12} />
+                </Flex>
+              ) : null}
             </Flex>
           </Flex>
         );
@@ -560,6 +565,13 @@ function ColumnTable({
   const isOpencode = (eventName || "").toLowerCase().includes("opencode");
   const cleanEventName = decodeURIComponent(eventName || "");
 
+  const hasPoints = useMemo(() => {
+    if (isOpencode) return true;
+    return tableData.some(
+      (r) => r.points !== undefined && r.points !== null && !isNaN(Number(r.points))
+    );
+  }, [isOpencode, tableData]);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("position", {
@@ -583,43 +595,75 @@ function ColumnTable({
         ),
         cell: (info) => {
           const row = info.row.original;
-          return (
-            <Box textAlign="left">
-              <Text fontWeight="700" fontSize="15px" color="var(--fg)">
-                {info.getValue()}
-              </Text>
-              {row.college && (
-                <Text
-                  fontSize="12px"
-                  color="var(--muted)"
-                  noOfLines={1}
-                  maxW="240px"
-                >
-                  {row.college}
+          if (isOpencode) {
+            return (
+              <Box textAlign="left">
+                <Text fontWeight="700" fontSize="15px" color="var(--fg)">
+                  {info.getValue()}
                 </Text>
+                {row.college && (
+                  <Text
+                    fontSize="12px"
+                    color="var(--muted)"
+                    noOfLines={1}
+                    maxW="240px"
+                  >
+                    {row.college}
+                  </Text>
+                )}
+              </Box>
+            );
+          }
+
+          return (
+            <Flex align="center" gap="10px" textAlign="left">
+              {row.avatarUrl && (
+                <Box
+                  borderRadius="full"
+                  p="2px"
+                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.45), rgba(45, 139, 111, 0.25))"
+                  flexShrink={0}
+                >
+                  <NextAvatar src={row.avatarUrl} h="36px" w="36px" />
+                </Box>
               )}
-            </Box>
+              <Box>
+                <Text fontWeight="700" fontSize="15px" color="var(--fg)">
+                  {info.getValue()}
+                </Text>
+                {row.college && (
+                  <Text
+                    fontSize="12px"
+                    color="var(--muted)"
+                    noOfLines={1}
+                    maxW="240px"
+                  >
+                    {row.college}
+                  </Text>
+                )}
+              </Box>
+            </Flex>
           );
         },
       }),
 
-      columnHelper.accessor("githubid", {
-        header: () => (
-          <Text textAlign="left" letterSpacing="0.14em">
-            GITHUB
-          </Text>
-        ),
-        cell: (info) => (
-          <UserCell
-            rowData={info.row.original}
-            currentGithubId={currentGithubId}
-            isOpencode={isOpencode}
-          />
-        ),
-      }),
-
       ...(isOpencode
         ? [
+            columnHelper.accessor("githubid", {
+              header: () => (
+                <Text textAlign="left" letterSpacing="0.14em">
+                  GITHUB
+                </Text>
+              ),
+              cell: (info) => (
+                <UserCell
+                  rowData={info.row.original}
+                  currentGithubId={currentGithubId}
+                  isOpencode={isOpencode}
+                />
+              ),
+            }),
+
             columnHelper.accessor("prmerged", {
               header: () => (
                 <Flex justify="center">
@@ -651,28 +695,32 @@ function ColumnTable({
           ]
         : []),
 
-      columnHelper.accessor("points", {
-        header: () => (
-          <Flex justify="flex-end">
-            <Text letterSpacing="0.14em">{isOpencode ? "POINTS" : "SCORE"}</Text>
-          </Flex>
-        ),
-        cell: (info) => (
-          <Flex justify="flex-end" align="center" gap="8px">
-            <Text
-              fontFamily="var(--f-mono), monospace"
-              fontWeight="800"
-              fontSize="15px"
-              color="var(--accent)"
-            >
-              {info.getValue()}
-            </Text>
-            <FaTrophy color="var(--secondary)" size={14} />
-          </Flex>
-        ),
-      }),
+      ...(isOpencode || hasPoints
+        ? [
+            columnHelper.accessor("points", {
+              header: () => (
+                <Flex justify="flex-end">
+                  <Text letterSpacing="0.14em">POINTS</Text>
+                </Flex>
+              ),
+              cell: (info) => (
+                <Flex justify="flex-end" align="center" gap="8px">
+                  <Text
+                    fontFamily="var(--f-mono), monospace"
+                    fontWeight="800"
+                    fontSize="15px"
+                    color="var(--accent)"
+                  >
+                    {info.getValue()}
+                  </Text>
+                  <FaTrophy color="var(--secondary)" size={14} />
+                </Flex>
+              ),
+            }),
+          ]
+        : []),
     ],
-    [currentGithubId, isOpencode]
+    [currentGithubId, isOpencode, hasPoints]
   );
 
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
@@ -695,14 +743,14 @@ function ColumnTable({
     prevFlipStateRef.current = state;
   }, [pagination.pageIndex, sorting, isMobile, showRankings]);
 
-  // Keep logged in user prominently at top if present
+  // Keep logged in user prominently at top if present (applicable for OpenCode)
   const reorderedData = useMemo(() => {
-    if (!currentGithubId) return tableData;
+    if (!currentGithubId || !isOpencode) return tableData;
     const currentUser = tableData.find((u) => u.githubid === currentGithubId);
     if (!currentUser) return tableData;
 
     return [currentUser, ...tableData.filter((u) => u.githubid !== currentGithubId)];
-  }, [tableData, currentGithubId]);
+  }, [tableData, currentGithubId, isOpencode]);
 
   const table = useReactTable({
     data: reorderedData,
@@ -713,11 +761,11 @@ function ColumnTable({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getRowId: (row) => String(row.githubid),
+    getRowId: (row, index) => row.githubid || `${row.name}-${row.position}-${index}`,
   });
 
   const isCurrentUser = (row: any) =>
-    Boolean(currentGithubId && row.original.githubid === currentGithubId);
+    Boolean(isOpencode && currentGithubId && row.original.githubid === currentGithubId);
 
   return (
     <Card
@@ -829,7 +877,7 @@ function ColumnTable({
       {/* Main Table or Analytics View */}
       {showRankings || !isOpencode ? (
         isMobile ? (
-          <MobileLeaderboard table={table} isOpencode={isOpencode} />
+          <MobileLeaderboard table={table} isOpencode={isOpencode} hasPoints={hasPoints} />
         ) : (
           <Box
             overflowX="auto"

@@ -174,7 +174,7 @@ export default function CampusBattleDashboard({
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.topContributor.name.toLowerCase().includes(q) ||
-        c.topContributor.githubid.toLowerCase().includes(q)
+        (c.topContributor.githubid && c.topContributor.githubid.toLowerCase().includes(q))
     );
   }, [colleges, searchQuery]);
 
