@@ -242,9 +242,9 @@ export default function EventCollection({
       ) : (
         /* Dynamic Event Showcase: Flagship Landmark + Curated Grid */
         <div>
-          {/* Flagship Landmark Banner */}
-          {events.length > 1 && (() => {
-            const featured = events[0];
+          {/* Flagship Landmark Banner (Rendered only when a flagship event is active) */}
+          {flagship && (() => {
+            const featured = flagship;
             const decodedFeaturedName = (() => {
               try {
                 return decodeURIComponent(featured.name || '');
@@ -329,25 +329,24 @@ export default function EventCollection({
                 </article>
 
                 {/* Section Separator */}
-                <div className="flex items-center gap-4 mt-10 mb-6">
-                  <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
-                    All Active & Upcoming Tracks
-                  </h4>
-                  <div className="flex-1 h-[1px] bg-[var(--border)]" />
-                  <span className="text-xs text-[var(--subtle)] font-mono">
-                    {events.length - 1} more tracks
-                  </span>
-                </div>
+                {gridEvents.length > 0 && (
+                  <div className="flex items-center gap-4 mt-10 mb-6">
+                    <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
+                      All Active & Upcoming Tracks
+                    </h4>
+                    <div className="flex-1 h-[1px] bg-[var(--border)]" />
+                    <span className="text-xs text-[var(--subtle)] font-mono">
+                      {gridEvents.length} more {gridEvents.length === 1 ? 'track' : 'tracks'}
+                    </span>
+                  </div>
+                )}
               </div>
             );
           })()}
 
           {/* Grid of Events */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(events.length > 1
-              ? events.slice(1)
-              : events
-            ).map((event, index) => {
+            {gridEvents.map((event, index) => {
               const decodedName = (() => {
                 try {
                   return decodeURIComponent(event.name || '');

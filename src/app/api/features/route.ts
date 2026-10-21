@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = {
   showLeaderboard: true,
   showRepositories: true,
   showRPlace: true,
+  flagshipEvent: 'Opencode',
 };
 
 let cache = { ...DEFAULT_CONFIG };
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       showLeaderboard: typeof body.showLeaderboard === 'boolean' ? body.showLeaderboard : current.showLeaderboard,
       showRepositories: typeof body.showRepositories === 'boolean' ? body.showRepositories : current.showRepositories,
       showRPlace: typeof body.showRPlace === 'boolean' ? body.showRPlace : current.showRPlace,
-
+      flagshipEvent: body.flagshipEvent !== undefined ? body.flagshipEvent : (current.flagshipEvent ?? null),
     };
 
     cache = updated;

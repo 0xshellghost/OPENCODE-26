@@ -8,11 +8,13 @@ export interface FeaturesConfig {
   showRPlace: boolean;
   showRepositories: boolean;
   showLeaderboard: boolean;
+  flagshipEvent?: string | null;
 }
 
 interface FeaturesContextType {
   features: FeaturesConfig;
   toggleFeature: (key: keyof FeaturesConfig, value: boolean) => Promise<boolean>;
+  setFlagshipEvent: (eventName: string | null) => Promise<boolean>;
 }
 
 const STORAGE_KEY = 'oc-feature-flags';
@@ -23,11 +25,13 @@ const DEFAULT_FEATURES: FeaturesConfig = {
   showRepositories: true,
   showRPlace: true,
   showLeaderboard: true,
+  flagshipEvent: 'Opencode',
 };
 
 const FeaturesContext = createContext<FeaturesContextType>({
   features: DEFAULT_FEATURES,
   toggleFeature: async () => false,
+  setFlagshipEvent: async () => false,
 });
 
 export function FeaturesProvider({ children }: { children: ReactNode }) {
@@ -53,6 +57,7 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
             showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
             showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
             showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
+            flagshipEvent: data.flagshipEvent !== undefined ? data.flagshipEvent : prev.flagshipEvent,
           };
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -88,8 +93,33 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setFlagshipEvent = useCallback(async (eventName: string | null) => {
+    setFeatures((prev) => {
+      const next = { ...prev, flagshipEvent: eventName };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/features', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ flagshipEvent: eventName }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }, []);
+
   return (
-    <FeaturesContext.Provider value={{ features, toggleFeature }}>
+    <FeaturesContext.Provider value={{ features, toggleFeature, setFlagshipEvent }}>
       {children}
     </FeaturesContext.Provider>
   );

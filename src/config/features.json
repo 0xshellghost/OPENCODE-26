@@ -1,7 +1,8 @@
 {
   "showWinners": false,
   "showMilestones": false,
-  "showLeaderboard": false,
-  "showRepositories": false,
-  "showRPlace": false
+  "showLeaderboard": true,
+  "showRepositories": true,
+  "showRPlace": true,
+  "flagshipEvent": "Opencode"
 }
