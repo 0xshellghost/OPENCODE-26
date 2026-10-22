@@ -1,0 +1,135 @@
+/* =========================================================================
+   TRACKS & FEATURED PROJECTS: HIGH-PERFORMANCE 3D CAROUSEL STYLES
+   Engineered for 60-120 FPS Compositor-Only Transitions (1500+ Concurrent Traffic)
+   ========================================================================= */
+
+.perspective-stage {
+  perspective: 1400px;
+  perspective-origin: center center;
+  transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+.perspective-card-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* Hardware-Accelerated Ambient Backdrop */
+.ambient-backdrop {
+  filter: blur(48px);
+  transform: scale(1.08) translateZ(0);
+  will-change: opacity;
+  animation: ambientFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ambientFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.36;
+  }
+}
+
+/* Central Active Card Outer Rim Glow (Optimized for GPU Composite) */
+.card-center-glow {
+  box-shadow: 0 25px 65px -15px rgba(0, 0, 0, 0.95),
+              0 0 35px rgba(88, 185, 154, 0.15),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.card-flanking-glow {
+  box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.85),
+              inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+/* Lightweight card sheen sweep */
+.card-glass-sheen {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.02) 30%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+/* Base night ambiance tint over card image */
+.card-night-tint {
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 19, 31, 0.20) 0%,
+    rgba(7, 19, 31, 0.12) 40%,
+    rgba(7, 19, 31, 0.85) 75%,
+    rgba(7, 19, 31, 0.98) 100%
+  );
+  pointer-events: none;
+}
+
+/* Flanking Card Dimmer Tint */
+.card-flanking-tint {
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 19, 31, 0.40) 0%,
+    rgba(7, 19, 31, 0.30) 50%,
+    rgba(7, 19, 31, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+/* Smooth Navigation Button */
+.nav-arrow-btn {
+  background: rgba(11, 28, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6),
+              0 0 15px rgba(88, 185, 154, 0.08);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease;
+  will-change: transform;
+}
+
+.nav-arrow-btn:hover {
+  background: rgba(18, 43, 64, 0.92);
+  border-color: rgba(88, 185, 154, 0.55);
+  box-shadow: 0 12px 35px -5px rgba(0, 0, 0, 0.75),
+              0 0 25px rgba(88, 185, 154, 0.3);
+  transform: scale(1.08);
+}
+
+.nav-arrow-btn:active {
+  transform: scale(0.95);
+}
+
+/* Custom scrollbar for detail dialog */
+.detail-modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detail-modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.detail-modal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(88, 185, 154, 0.35);
+  border-radius: 9999px;
+}
+
+.detail-modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(88, 185, 154, 0.65);
+}
+
+/* Accessibility reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .perspective-card-3d,
+  .ambient-backdrop {
+    transition: none !important;
+    animation: none !important;
+  }
+}

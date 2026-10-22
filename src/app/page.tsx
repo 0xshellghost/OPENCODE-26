@@ -1,8 +1,6 @@
 'use client';
-import LandingPage from '../components/landing/LandingPage';
+import OpenCodeLandingView from 'features/opencode-landing/OpenCodeLandingView';
 
 export default function Home() {
-  
-
-  return <LandingPage />;
+  return <OpenCodeLandingView />;
 }
