@@ -15,7 +15,8 @@ import {
   Text,
   chakra,
 } from '@chakra-ui/react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { FaBuilding, FaCalendarAlt, FaCheck, FaCrown, FaSearchMinus, FaTrophy } from 'react-icons/fa';
@@ -179,11 +180,6 @@ export default function EventName() {
   const participantCount = filteredTableData.length;
   const totalCount = tableDataColumns.length;
 
-  const topScore = useMemo(
-    () => tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0),
-    [tableDataColumns],
-  );
-
   // Top 3 overall (not affected by filters) for the spotlight cards
   const topThree = useMemo(
     () =>
@@ -217,47 +213,6 @@ export default function EventName() {
 
   return (
     <Flex direction="column" gap="24px" w="100%" maxW="1400px" mx="auto">
-      {/* ─── 1. HEADER ─── */}
-      <Box
-        as="header"
-        className="oc-page-heading"
-        display="flex"
-        flexDirection={{ base: 'column', lg: 'row' }}
-        alignItems={{ base: 'flex-start', lg: 'center' }}
-        justifyContent="space-between"
-        gap={{ base: '20px', md: '28px' }}
-        mb="0"
-        p={{ base: '22px 20px', sm: '28px 32px', md: '34px 44px' }}
-      >
-        <Box flex="1" minW="0">
-          <p className="oc-eyebrow" style={{ marginBottom: '12px' }}>
-            <span />
-            {isOpencode ? `${eventLabel} · The Arena of Creators` : `${eventLabel} · Official Standings`}
-          </p>
-          <h1 style={{ marginBottom: '12px' }}>Leaderboard</h1>
-          <p className="oc-description">
-            {isOpencode
-              ? 'Compete with curiosity. Contribute with purpose. Every step forward earns its place here.'
-              : `Official participant standings and verified scores for ${eventLabel}.`}
-          </p>
-        </Box>
-
-        <Flex
-          gap={{ base: '8px', sm: '12px', md: '14px' }}
-          wrap="wrap"
-          w={{ base: '100%', lg: 'auto' }}
-          justify={{ base: 'space-between', sm: 'flex-start', lg: 'flex-end' }}
-          flexShrink={0}
-        >
-          <StatTile label="Participants" value={totalCount.toLocaleString()} />
-          <StatTile
-            label={hasActiveFilters ? 'Matching' : 'Showing'}
-            value={participantCount.toLocaleString()}
-          />
-          <StatTile label="Top score" value={topScore.toLocaleString()} />
-        </Flex>
-      </Box>
-
       {/* ─── 2. TOOLBAR ─── */}
       {/* position + zIndex keep the college dropdown above the table card below it
           (both cards use backdrop-filter, which creates stacking contexts) */}
@@ -589,35 +544,6 @@ export default function EventName() {
 
 /* ------------------ Helpers ------------------ */
 
-function StatTile({ label, value }: { label: string; value: string }) {
-  return (
-    <Box
-      px={{ base: '12px', sm: '16px', md: '20px' }}
-      py={{ base: '10px', md: '14px' }}
-      borderRadius="14px"
-      bg="var(--surface)"
-      border="1px solid var(--border)"
-      boxShadow="var(--shadow)"
-      textAlign="center"
-      minW={{ base: '86px', sm: '104px', md: '124px' }}
-      flex={{ base: '1', sm: 'initial' }}
-    >
-      <Text
-        fontFamily={SERIF}
-        fontSize={{ base: '20px', sm: '24px', md: '28px' }}
-        color="var(--text)"
-        lineHeight="1"
-        style={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {value}
-      </Text>
-      <Text fontSize={{ base: '10.5px', sm: '11.5px', md: '12px' }} color="var(--muted)" mt="4px" fontWeight="500" noOfLines={1}>
-        {label}
-      </Text>
-    </Box>
-  );
-}
-
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <HStack
@@ -667,117 +593,230 @@ function SpotlightCard({
   const isSecond = rank === 2;
   const isThird = rank === 3;
   const college = String(row.college ?? '').trim();
+  const hasPoints = row.points !== undefined && row.points !== null;
 
-  return (
+  const cardClass = isFirst
+    ? 'podium-card podium-card-gold'
+    : isSecond
+    ? 'podium-card podium-card-silver'
+    : 'podium-card podium-card-bronze';
+
+  const avatarHaloClass = isFirst
+    ? 'avatar-halo-gold'
+    : isSecond
+    ? 'avatar-halo-silver'
+    : 'avatar-halo-bronze';
+
+  const rankTag = isFirst
+    ? 'CHAMPION · #1'
+    : isSecond
+    ? 'RUNNER UP · #2'
+    : 'THIRD PLACE · #3';
+
+  const accentColor = isFirst
+    ? '#F5C542'
+    : isSecond
+    ? '#BAD7F5'
+    : '#FDBA74';
+
+  const scoreTextShadow = isFirst
+    ? '0 0 25px rgba(245, 197, 66, 0.45)'
+    : isSecond
+    ? '0 0 20px rgba(186, 215, 245, 0.35)'
+    : '0 0 20px rgba(253, 186, 116, 0.35)';
+
+  const cardContent = (
     <Box
-      className="glass-panel"
+      className={cardClass}
       position="relative"
       textAlign="center"
       overflow="hidden"
-      p={{ base: '20px 16px', md: isFirst ? '36px 22px 28px' : '22px 18px' }}
-      // 1st place sits in the middle on desktop, but first on mobile
+      p={{ base: '22px 16px', md: isFirst ? '36px 24px 32px' : '26px 20px 26px' }}
       order={{ base: rank, md: isFirst ? 2 : isSecond ? 1 : 3 }}
-      borderTopWidth={isFirst ? '3px' : '2px'}
-      borderTopColor={isFirst ? 'var(--secondary)' : isSecond ? 'rgba(148, 163, 184, 0.7)' : 'rgba(217, 119, 6, 0.7)'}
-      boxShadow={
-        isFirst
-          ? `0 0 0 1px ${medal.ring}, 0 20px 50px -15px rgba(245, 197, 66, 0.25)`
-          : `0 0 0 1px ${medal.ring}, 0 14px 30px -15px ${medal.ring}`
-      }
-      transition="all 0.3s ease"
-      _hover={{ transform: 'translateY(-4px)' }}
+      cursor={row.githubid ? 'pointer' : 'default'}
     >
-      {/* Top ambient highlight gradient */}
+      {/* Light spotlight cone / ambient beam from top */}
       <Box
         position="absolute"
         top="0"
-        left="0"
-        right="0"
-        h="60px"
+        left="50%"
+        transform="translateX(-50%)"
+        w="90%"
+        h="100px"
         bg={
           isFirst
-            ? 'linear-gradient(180deg, rgba(245, 197, 66, 0.08) 0%, transparent 100%)'
+            ? 'radial-gradient(ellipse at top, rgba(245, 197, 66, 0.22) 0%, transparent 70%)'
             : isSecond
-            ? 'linear-gradient(180deg, rgba(148, 163, 184, 0.06) 0%, transparent 100%)'
-            : 'linear-gradient(180deg, rgba(217, 119, 6, 0.06) 0%, transparent 100%)'
+            ? 'radial-gradient(ellipse at top, rgba(186, 215, 245, 0.16) 0%, transparent 70%)'
+            : 'radial-gradient(ellipse at top, rgba(253, 186, 116, 0.16) 0%, transparent 70%)'
         }
         pointerEvents="none"
       />
 
-      {isFirst && (
-        <Flex justify="center" align="center" gap="6px" color="var(--secondary)" mb="10px">
-          <FaCrown size={22} />
-          <Text fontSize="10px" fontWeight="900" letterSpacing="0.12em" textTransform="uppercase" fontFamily="var(--f-mono)">
-            Champion
+      {/* Podium rank / crown header */}
+      <Flex justify="center" align="center" gap="7px" color={accentColor} mb={isFirst ? '12px' : '10px'}>
+        {isFirst ? (
+          <Box className="podium-crown-icon" display="flex" alignItems="center" gap="6px">
+            <FaCrown size={22} color="#F5C542" />
+            <Text
+              fontSize="11px"
+              fontWeight="900"
+              letterSpacing="0.16em"
+              textTransform="uppercase"
+              fontFamily="var(--f-mono)"
+              color="#F5C542"
+            >
+              {rankTag}
+            </Text>
+          </Box>
+        ) : (
+          <Text
+            fontSize="10.5px"
+            fontWeight="800"
+            letterSpacing="0.14em"
+            textTransform="uppercase"
+            fontFamily="var(--f-mono)"
+            color={accentColor}
+          >
+            {rankTag}
           </Text>
-        </Flex>
-      )}
+        )}
+      </Flex>
 
-      <Box position="relative" display="inline-block" mt={isFirst ? '0' : '6px'}>
-        <Avatar
-          src={row.avatarUrl as string}
-          name={row.name}
-          size={isFirst ? 'xl' : 'lg'}
-          border="3px solid"
-          borderColor={medal.ring}
-          boxShadow={isFirst ? '0 0 20px rgba(245, 197, 66, 0.35)' : 'none'}
-        />
+      {/* Avatar with dynamic glowing halo ring */}
+      <Box position="relative" display="inline-block" my={isFirst ? '6px' : '4px'}>
+        <Box className={avatarHaloClass} borderRadius="full" p="4px">
+          <Avatar
+            src={row.avatarUrl as string}
+            name={row.name}
+            size={isFirst ? 'xl' : 'lg'}
+            border="3px solid"
+            borderColor={medal.ring}
+            boxShadow={
+              isFirst
+                ? '0 0 28px rgba(245, 197, 66, 0.45)'
+                : isSecond
+                ? '0 0 20px rgba(186, 215, 245, 0.35)'
+                : '0 0 20px rgba(253, 186, 116, 0.35)'
+            }
+          />
+        </Box>
         <Box
           position="absolute"
-          bottom="-6px"
+          bottom="-5px"
           left="50%"
           transform="translateX(-50%)"
-          px="10px"
-          py="1.5px"
+          px="12px"
+          py="2px"
           borderRadius="full"
           fontSize="11px"
           fontWeight="900"
           bg={medal.bg}
           color={medal.ink}
-          boxShadow="0 2px 8px rgba(0,0,0,0.25)"
+          boxShadow="0 4px 12px rgba(0,0,0,0.35)"
+          letterSpacing="0.04em"
         >
           #{rank}
         </Box>
       </Box>
 
+      {/* Name and GitHub handle */}
       <Text
         fontFamily={SERIF}
-        fontSize={{ base: '19px', md: isFirst ? '24px' : '19px' }}
+        fontSize={{ base: '20px', md: isFirst ? '25px' : '20px' }}
         fontWeight={isFirst ? '700' : '600'}
         color="var(--text)"
         noOfLines={1}
         mt="16px"
+        transition="color 0.2s ease"
+        _hover={{ color: 'var(--accent)' }}
       >
         {row.name}
       </Text>
-      <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
-        @{row.githubid}
-      </Text>
+
+
+      {isOpencode && row.githubid ? (
+        <Text fontSize="12.5px" color="var(--subtle)" fontWeight="600" noOfLines={1} mt="1px">
+          @{row.githubid}
+        </Text>
+      ) : null}
+
+
       {college && (
-        <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="2px">
+        <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="3px" px="10px">
           {college}
         </Text>
       )}
 
-      <Text
-        fontFamily={SERIF}
-        fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
-        fontWeight={isFirst ? '800' : '600'}
-        color={isFirst ? 'var(--secondary)' : 'var(--text)'}
-        lineHeight="1.1"
-        mt="14px"
-        style={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {Number(row.points).toLocaleString()}{' '}
-        <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
-          {isOpencode ? 'pts' : 'score'}
-        </Text>
-      </Text>
-      <Text fontSize="12px" color="var(--muted)" mt="2px">
-        {isOpencode
-          ? `${Number(row.prmerged).toLocaleString()} PRs merged`
-          : 'Official Ranking'}
-      </Text>
+
+      {/* Points & PRs score badge */}
+      {hasPoints ? (
+        <Box mt="16px">
+          <Text
+            fontFamily={SERIF}
+            fontSize={{ base: '32px', md: isFirst ? '46px' : '34px' }}
+            fontWeight={isFirst ? '800' : '700'}
+            color={accentColor}
+            lineHeight="1"
+            style={{ fontVariantNumeric: 'tabular-nums' }}
+            textShadow={scoreTextShadow}
+          >
+            {Number(row.points).toLocaleString()}{' '}
+            <Text as="span" fontFamily="var(--f-mono)" fontSize="13px" fontWeight="600" color="var(--muted)">
+              {isOpencode ? 'pts' : 'points'}
+            </Text>
+          </Text>
+
+          {isOpencode && row.prmerged !== undefined ? (
+            <Flex justify="center" mt="10px">
+              <Box
+                px="12px"
+                py="3px"
+                borderRadius="full"
+                bg="rgba(255, 255, 255, 0.05)"
+                border="1px solid var(--border)"
+                fontSize="11.5px"
+                fontWeight="700"
+                color="var(--text)"
+                fontFamily="var(--f-mono)"
+              >
+                {Number(row.prmerged).toLocaleString()} PRs merged
+              </Box>
+            </Flex>
+          ) : (
+            <Text fontSize="12px" color="var(--muted)" mt="4px">
+              Official Standing
+            </Text>
+          )}
+        </Box>
+      ) : (
+        <Box mt="16px">
+          <Text
+            fontFamily="var(--f-mono), monospace"
+            fontSize="14px"
+            fontWeight="800"
+            color="var(--accent)"
+            textTransform="uppercase"
+            letterSpacing="0.08em"
+          >
+            Rank #{rank}
+          </Text>
+          <Text fontSize="12px" color="var(--muted)" mt="2px">
+            Official Standing
+          </Text>
+        </Box>
+      )}
+
     </Box>
   );
+
+  if (row.githubid) {
+    return (
+      <Link href={`/user/profile/${row.githubid}`} style={{ textDecoration: 'none', display: 'contents' }}>
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 }

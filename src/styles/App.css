@@ -622,3 +622,181 @@ body.oc-initial-loading {
   touch-action: none !important;
 }
 
+
+
+/* ==========================================================================
+   LEADERBOARD PODIUM & RANKINGS ADVANCED EFFECTS
+   ========================================================================== */
+
+@keyframes goldAuraPulse {
+  0%, 100% {
+    box-shadow: 0 0 35px rgba(245, 197, 66, 0.22), 0 20px 50px -15px rgba(0, 0, 0, 0.75), inset 0 0 25px rgba(245, 197, 66, 0.08);
+    border-color: rgba(245, 197, 66, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 52px rgba(245, 197, 66, 0.42), 0 25px 60px -12px rgba(0, 0, 0, 0.85), inset 0 0 35px rgba(245, 197, 66, 0.16);
+    border-color: rgba(255, 225, 110, 0.9);
+  }
+}
+
+@keyframes silverAuraPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(186, 215, 245, 0.16), 0 16px 40px -15px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(186, 215, 245, 0.05);
+    border-color: rgba(186, 215, 245, 0.38);
+  }
+  50% {
+    box-shadow: 0 0 44px rgba(186, 215, 245, 0.28), 0 20px 48px -12px rgba(0, 0, 0, 0.8), inset 0 0 28px rgba(186, 215, 245, 0.12);
+    border-color: rgba(220, 238, 255, 0.75);
+  }
+}
+
+@keyframes bronzeAuraPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(235, 130, 60, 0.18), 0 16px 40px -15px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(235, 130, 60, 0.05);
+    border-color: rgba(235, 130, 60, 0.38);
+  }
+  50% {
+    box-shadow: 0 0 44px rgba(235, 130, 60, 0.32), 0 20px 48px -12px rgba(0, 0, 0, 0.8), inset 0 0 28px rgba(235, 130, 60, 0.12);
+    border-color: rgba(255, 165, 100, 0.75);
+  }
+}
+
+@keyframes crownBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.08);
+  }
+}
+
+@keyframes shimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  20%, 100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+@keyframes haloRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.podium-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px !important;
+  background: var(--surface) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.podium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 100%
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.podium-card:hover::before {
+  animation: shimmerSweep 1.6s ease-in-out infinite;
+}
+
+.podium-card:hover {
+  transform: translateY(-8px) !important;
+}
+
+.podium-card-gold {
+  border: 1.5px solid rgba(245, 197, 66, 0.55) !important;
+  animation: goldAuraPulse 3.5s ease-in-out infinite;
+  background: radial-gradient(ellipse at 50% 0%, rgba(245, 197, 66, 0.16) 0%, transparent 75%), var(--surface) !important;
+}
+
+.podium-card-gold:hover {
+  box-shadow: 0 0 55px rgba(245, 197, 66, 0.45), 0 28px 65px -10px rgba(0, 0, 0, 0.85) !important;
+  border-color: rgba(255, 230, 120, 0.95) !important;
+}
+
+.podium-card-silver {
+  border: 1.5px solid rgba(186, 215, 245, 0.38) !important;
+  animation: silverAuraPulse 4s ease-in-out infinite;
+  background: radial-gradient(ellipse at 50% 0%, rgba(186, 215, 245, 0.12) 0%, transparent 75%), var(--surface) !important;
+}
+
+.podium-card-silver:hover {
+  box-shadow: 0 0 45px rgba(186, 215, 245, 0.35), 0 24px 55px -10px rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(220, 238, 255, 0.85) !important;
+}
+
+.podium-card-bronze {
+  border: 1.5px solid rgba(235, 130, 60, 0.38) !important;
+  animation: bronzeAuraPulse 4s ease-in-out infinite;
+  background: radial-gradient(ellipse at 50% 0%, rgba(235, 130, 60, 0.12) 0%, transparent 75%), var(--surface) !important;
+}
+
+.podium-card-bronze:hover {
+  box-shadow: 0 0 45px rgba(235, 130, 60, 0.35), 0 24px 55px -10px rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(255, 175, 110, 0.85) !important;
+}
+
+.podium-crown-icon {
+  animation: crownBounce 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(245, 197, 66, 0.8));
+}
+
+.avatar-halo-gold {
+  position: relative;
+}
+.avatar-halo-gold::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(245, 197, 66, 0.6);
+  animation: haloRotate 16s linear infinite;
+  pointer-events: none;
+}
+
+.avatar-halo-silver {
+  position: relative;
+}
+.avatar-halo-silver::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(186, 215, 245, 0.5);
+  animation: haloRotate 20s linear infinite reverse;
+  pointer-events: none;
+}
+
+.avatar-halo-bronze {
+  position: relative;
+}
+.avatar-halo-bronze::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(235, 130, 60, 0.5);
+  animation: haloRotate 20s linear infinite;
+  pointer-events: none;
+}
