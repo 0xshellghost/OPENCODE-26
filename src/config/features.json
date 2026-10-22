@@ -1,4 +1,8 @@
 {
   "showWinners": false,
-  "showMilestones": false
+  "showMilestones": false,
+  "showLeaderboard": true,
+  "showRepositories": true,
+  "showRPlace": true,
+  "flagshipEvent": "Rift CTF"
 }

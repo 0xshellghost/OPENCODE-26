@@ -133,9 +133,9 @@ export default function EventName() {
       (LeadData || []).map((item) => ({
         position: String(item.position),
         name: item.name,
-        prmerged: Number(item.prmerged),
-        githubid: item.githubid,
-        points: Number(item.points),
+        prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+        githubid: item.githubid ?? undefined,
+        points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
         avatarUrl: item.avatarUrl,
         prDetailsURL: item.prDetailsURL,
         college: item.collegeName ?? '',
@@ -143,6 +143,13 @@ export default function EventName() {
       })),
     [LeadData],
   );
+
+  const hasPoints = useMemo(() => {
+    if (isOpencode) return true;
+    return tableDataColumns.some(
+      (r) => r.points !== undefined && r.points !== null && !isNaN(Number(r.points))
+    );
+  }, [isOpencode, tableDataColumns]);
 
   const collegeOptions = useMemo(() => {
     const colleges = tableDataColumns
@@ -167,18 +174,23 @@ export default function EventName() {
       }
       if (q) {
         const matchesUser =
-          row.githubid?.toLowerCase().includes(q) ||
+          (isOpencode && row.githubid?.toLowerCase().includes(q)) ||
           row.name?.toLowerCase().includes(q);
         if (!matchesUser) return false;
       }
       return true;
     });
-  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns]);
+  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns, isOpencode]);
 
   const deferredTableData = useDeferredValue(filteredTableData);
   const isStale = deferredTableData !== filteredTableData;
   const participantCount = filteredTableData.length;
   const totalCount = tableDataColumns.length;
+
+  const topScore = useMemo(
+    () => tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0),
+    [tableDataColumns],
+  );
 
   // Top 3 overall (not affected by filters) for the spotlight cards
   const topThree = useMemo(
@@ -201,8 +213,12 @@ export default function EventName() {
   // With any filter active the spotlight is hidden, so the table shows everyone who matches.
   const tableRows = useMemo(() => {
     if (!showSpotlight) return deferredTableData;
-    const spotlightIds = new Set(topThree.map((r) => r.githubid));
-    return deferredTableData.filter((r) => !spotlightIds.has(r.githubid));
+    const spotlightIds = new Set(
+      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    );
+    return deferredTableData.filter(
+      (r) => !spotlightIds.has(r.githubid || `${r.name}-${r.position}`)
+    );
   }, [showSpotlight, deferredTableData, topThree]);
 
   if (isLoading) {
@@ -485,9 +501,9 @@ export default function EventName() {
           </Flex>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
-            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} />
-            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} />
-            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} />
+            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} hasPoints={hasPoints} />
           </SimpleGrid>
         </Box>
       )}
@@ -583,17 +599,19 @@ function SpotlightCard({
   row,
   rank,
   isOpencode,
+  hasPoints: hasPointsProp,
 }: {
   row: RowObj;
   rank: 1 | 2 | 3;
   isOpencode: boolean;
+  hasPoints?: boolean;
 }) {
   const medal = MEDALS[rank];
   const isFirst = rank === 1;
   const isSecond = rank === 2;
   const isThird = rank === 3;
   const college = String(row.college ?? '').trim();
-  const hasPoints = row.points !== undefined && row.points !== null;
+  const hasPoints = hasPointsProp ?? (row.points !== undefined && row.points !== null);
 
   const cardClass = isFirst
     ? 'podium-card podium-card-gold'
@@ -733,80 +751,34 @@ function SpotlightCard({
       >
         {row.name}
       </Text>
-
-
-      {isOpencode && row.githubid ? (
-        <Text fontSize="12.5px" color="var(--subtle)" fontWeight="600" noOfLines={1} mt="1px">
-          @{row.githubid}
-        </Text>
-      ) : null}
-
-
+      <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
+        @{row.githubid}
+      </Text>
       {college && (
         <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="3px" px="10px">
           {college}
         </Text>
       )}
 
-
-      {/* Points & PRs score badge */}
-      {hasPoints ? (
-        <Box mt="16px">
-          <Text
-            fontFamily={SERIF}
-            fontSize={{ base: '32px', md: isFirst ? '46px' : '34px' }}
-            fontWeight={isFirst ? '800' : '700'}
-            color={accentColor}
-            lineHeight="1"
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-            textShadow={scoreTextShadow}
-          >
-            {Number(row.points).toLocaleString()}{' '}
-            <Text as="span" fontFamily="var(--f-mono)" fontSize="13px" fontWeight="600" color="var(--muted)">
-              {isOpencode ? 'pts' : 'points'}
-            </Text>
-          </Text>
-
-          {isOpencode && row.prmerged !== undefined ? (
-            <Flex justify="center" mt="10px">
-              <Box
-                px="12px"
-                py="3px"
-                borderRadius="full"
-                bg="rgba(255, 255, 255, 0.05)"
-                border="1px solid var(--border)"
-                fontSize="11.5px"
-                fontWeight="700"
-                color="var(--text)"
-                fontFamily="var(--f-mono)"
-              >
-                {Number(row.prmerged).toLocaleString()} PRs merged
-              </Box>
-            </Flex>
-          ) : (
-            <Text fontSize="12px" color="var(--muted)" mt="4px">
-              Official Standing
-            </Text>
-          )}
-        </Box>
-      ) : (
-        <Box mt="16px">
-          <Text
-            fontFamily="var(--f-mono), monospace"
-            fontSize="14px"
-            fontWeight="800"
-            color="var(--accent)"
-            textTransform="uppercase"
-            letterSpacing="0.08em"
-          >
-            Rank #{rank}
-          </Text>
-          <Text fontSize="12px" color="var(--muted)" mt="2px">
-            Official Standing
-          </Text>
-        </Box>
-      )}
-
+      <Text
+        fontFamily={SERIF}
+        fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
+        fontWeight={isFirst ? '800' : '600'}
+        color={isFirst ? 'var(--secondary)' : 'var(--text)'}
+        lineHeight="1.1"
+        mt="14px"
+        style={{ fontVariantNumeric: 'tabular-nums' }}
+      >
+        {Number(row.points).toLocaleString()}{' '}
+        <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
+          {isOpencode ? 'pts' : 'score'}
+        </Text>
+      </Text>
+      <Text fontSize="12px" color="var(--muted)" mt="2px">
+        {isOpencode
+          ? `${Number(row.prmerged).toLocaleString()} PRs merged`
+          : 'Official Ranking'}
+      </Text>
     </Box>
   );
 

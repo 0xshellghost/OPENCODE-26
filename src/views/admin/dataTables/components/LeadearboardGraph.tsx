@@ -224,6 +224,11 @@ export default function LeaderboardGraph({
 }) {
   const defaultStartDate = process.env.NEXT_PUBLIC_EVENT_START_DATE || '2025-12-14';
 
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['leaderboardProgress', eventName, topN],
+    queryFn: () => fetchProgress(eventName, topN),
+  });
+
   const { effectiveStartDate, effectiveEndDate } = useMemo(() => {
     let minD = startDate || defaultStartDate;
     let maxD = endDate || '';
@@ -252,10 +257,6 @@ export default function LeaderboardGraph({
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [contributorLimit, setContributorLimit] = useState<number>(5);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['leaderboardProgress', eventName, topN],
-    queryFn: () => fetchProgress(eventName, topN),
-  });
 
   // Sort participants by official total points from database
   const sortedParticipants = useMemo(() => {
