@@ -1,0 +1,12 @@
+.landingRoot {
+  --primary: #B8E5D5;
+  --primary-foreground: #0C1C2C;
+  --secondary: #0B1C2A;
+  --background: #07131F;
+  --foreground: #AEBCC7;
+  --card: #102535;
+  --ring: #58B99A;
+  background-color: #07131F;
+  color: #AEBCC7;
+  min-height: 100vh;
+}

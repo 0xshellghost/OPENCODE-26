@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&family=Cinzel:wght@500;600;700;800;900&family=Racing+Sans+One&display=swap');
+
+@font-face {
+  font-family: 'Racing Sans One';
+  src: url('https://fonts.gstatic.com/s/racingsansone/v17/sykr-yRtm7EvTrXNxkv5jfKKyDCwLw.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'HarryP';
+  src: url('/fonts/HarryP.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Henshin';
+  src: url('/fonts/Henshin.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hotsuka';
+  src: url('/fonts/Hotsuka.otf') format('opentype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'KanjiFont';
+  src: url('/fonts/ChineseDragon.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-zen {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+}
+
+.font-harry {
+  font-family: 'HarryP', fantasy, serif;
+}
+
+.font-henshin {
+  font-family: 'Henshin', fantasy, sans-serif;
+}
+
+.font-hotsuka {
+  font-family: 'Hotsuka', cursive, fantasy, sans-serif;
+}
+
+.font-kanji {
+  font-family: 'KanjiFont', fantasy, sans-serif;
+}
+
+.font-racing {
+  font-family: 'Racing Sans One', sans-serif;
+}
