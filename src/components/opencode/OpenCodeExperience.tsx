@@ -18,7 +18,7 @@ const GITHUB_LOGIN_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/git
 type SceneController = { invalidate: () => void; dispose: () => void }
 
 export default function OpenCodeExperience({
-  id, title = 'OPENCODE', year = 2026, eyebrow = 'Where tradition meets creation',
+  id, title = 'GEEKHAVEN', year = 2026, eyebrow = 'Where tradition meets creation',
   description = 'A new season of ideas, collaboration, and open-source possibilities.',
   assets, navigation = defaultNavigation, ctaLabel = 'Discover OpenCode', ctaHref = '#about',
   skipTargetId, className = '', quality = 'auto', onComplete,
@@ -233,12 +233,12 @@ export default function OpenCodeExperience({
           <a
             className={styles.wordmark}
             href={`#${rootId}`}
-            aria-label="OpenCode, back to the beginning"
+            aria-label="GeekHaven, back to the beginning"
             onClick={(e) => { e.preventDefault(); scrollToChapter(0, true) }}
           >
             <OpenCodeLogo width={28} height={28} color="var(--accent)" />
             <span className={styles.brandTitle}>
-              OPENCODE <small className={styles.brandYear}>2026</small>
+              GEEKHAVEN <small className={styles.brandYear}>2026</small>
             </span>
           </a>
 
@@ -380,12 +380,12 @@ export default function OpenCodeExperience({
             type="button"
             className={styles.scrollCue}
             onClick={() => chapter === 4 ? skip() : scrollToChapter(chapterStarts[Math.min(chapter + 1, 4)])}
-            aria-label={chapter === 4 ? 'Discover OpenCode' : 'Scroll to explore'}
+            aria-label={chapter === 4 ? 'Discover GeekHaven' : 'Scroll to explore'}
           >
             <span className={styles.scrollCircle}>
               <ArrowDown size={17} strokeWidth={1.2} aria-hidden="true" />
             </span>
-            <span>{chapter === 4 ? 'Discover OpenCode' : 'Scroll to explore'}</span>
+            <span>{chapter === 4 ? 'Discover GeekHaven' : 'Scroll to explore'}</span>
           </button>
 
           <div className={styles.creditLine}>

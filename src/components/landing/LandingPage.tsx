@@ -12,7 +12,7 @@ export default function LandingPage() {
   const yuzukiJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Event',
-    name: 'OpenCode 2026',
+    name: 'GeekHaven 2026',
     description: 'A season of ideas, collaboration, and open-source possibilities — guided by Yuzuki.',
     organizer: { '@type': 'Organization', name: 'GeekHaven, IIIT Allahabad' },
     character: {
@@ -33,6 +33,7 @@ export default function LandingPage() {
       />
       <OpenCodeExperience
         id="opencode"
+        title="GEEKHAVEN"
         ctaLabel="Explore the leaderboard"
         ctaHref="/user/leaderboard/Opencode"
         skipTargetId="opencode-content"

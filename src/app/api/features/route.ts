@@ -7,6 +7,10 @@ const FILE_PATH = path.join(process.cwd(), 'src/config/features.json');
 const DEFAULT_CONFIG = {
   showWinners: true,
   showMilestones: true,
+  showLeaderboard: true,
+  showRepositories: true,
+  showRPlace: true,
+  flagshipEvent: 'Opencode',
 };
 
 let cache = { ...DEFAULT_CONFIG };
@@ -32,6 +36,10 @@ export async function POST(req: NextRequest) {
     const updated = {
       showWinners: typeof body.showWinners === 'boolean' ? body.showWinners : current.showWinners,
       showMilestones: typeof body.showMilestones === 'boolean' ? body.showMilestones : current.showMilestones,
+      showLeaderboard: typeof body.showLeaderboard === 'boolean' ? body.showLeaderboard : current.showLeaderboard,
+      showRepositories: typeof body.showRepositories === 'boolean' ? body.showRepositories : current.showRepositories,
+      showRPlace: typeof body.showRPlace === 'boolean' ? body.showRPlace : current.showRPlace,
+      flagshipEvent: body.flagshipEvent !== undefined ? body.flagshipEvent : (current.flagshipEvent ?? null),
     };
 
     cache = updated;

@@ -21,11 +21,13 @@ export default function NFT(props: {
   name: string;
   des: string;
   download: string;
+  logoImage?: string;
 }) {
-  const { image, name, des, download } = props;
+  const { image, name, des, download, logoImage } = props;
   const [like, setLike] = useState(false);
   const textColor = useColorModeValue('navy.700', 'white');
   const textColorBid = useColorModeValue('brand.500', 'white');
+  const logoBorderColor = useColorModeValue('white', 'gray.800');
 
   return (
     <Card
@@ -39,6 +41,24 @@ export default function NFT(props: {
           <AspectRatio ratio={16 / 9}>
             <Image src={image} w={'100%'} borderRadius="20px" alt="" />
           </AspectRatio>
+          {logoImage && (
+            <Box
+              position="absolute"
+              bottom="-12px"
+              left="16px"
+              w="48px"
+              h="48px"
+              borderRadius="14px"
+              overflow="hidden"
+              border="3px solid"
+              borderColor={logoBorderColor}
+              bg="white"
+              boxShadow="0 4px 12px rgba(0,0,0,0.15)"
+              zIndex={2}
+            >
+              <Image src={logoImage} w="100%" h="100%" objectFit="cover" alt="" />
+            </Box>
+          )}
         </Box>
 
         <Flex
