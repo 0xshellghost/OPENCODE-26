@@ -81,7 +81,7 @@ export default function LandingContent() {
           Build something that matters.
         </h2>
         <p className={`${styles.sectionDescription} ${styles.fadeInUp}`}>
-          OpenCode is a month-long open-source celebration where students collaborate with maintainers to build, fix, and improve real-world projects.
+          GeekHaven is a month-long open-source celebration where students collaborate with maintainers to build, fix, and improve real-world projects.
         </p>
 
         <div className={`${styles.featuresGrid} ${styles.fadeInUp}`}>
@@ -164,7 +164,7 @@ export default function LandingContent() {
           Join thousands of developers in the largest open-source celebration. Your first contribution is just a click away.
         </p>
         <Link href="/auth/register" className={styles.joinButton}>
-          Join OpenCode 2026 <FaArrowRight size={14} />
+          Join GeekHaven 2026 <FaArrowRight size={14} />
         </Link>
       </section>
     </div>

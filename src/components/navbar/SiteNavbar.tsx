@@ -56,7 +56,7 @@ export default function SiteNavbar() {
       <div className="oc-navbar-inner">
         <Link href="/" className="oc-brand" aria-label="OpenCode home">
           <OpenCodeLogo width={30} height={30} className="oc-brand-mark" />
-          <span>OPENCODE <small>2026</small></span>
+          <span>GEEKHAVEN <small>2026</small></span>
         </Link>
         <nav className="oc-desktop-nav" aria-label="Main navigation">
           {activeNavigation.map(({ label, href }) => (
