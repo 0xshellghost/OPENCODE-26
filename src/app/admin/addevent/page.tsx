@@ -92,9 +92,10 @@ export default function Addevent() {
   };
 
   const coverUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setCoverFiles((prev) => [...prev, file]);
+    if (event.target.files && event.target.files.length > 0) {
+      setCoverFiles(Array.from(event.target.files));
+    } else {
+      setCoverFiles([]);
     }
   };
 
@@ -268,7 +269,7 @@ export default function Addevent() {
 
               <FormControl>
                 <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
-                  Cover Images
+                  Banner Image (Cover)
                 </FormLabel>
                 <Input
                   type="file"
@@ -279,7 +280,7 @@ export default function Addevent() {
                 />
                 {coverFiles.length > 0 && (
                   <Text fontSize="xs" color="gray.500" mt="2">
-                    {coverFiles.length} file(s) selected
+                    {coverFiles[0].name} selected
                   </Text>
                 )}
               </FormControl>

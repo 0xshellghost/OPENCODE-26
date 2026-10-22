@@ -1,11 +1,14 @@
 'use client';
 
-import { Box, Button, SimpleGrid, useToast, Text, Flex } from '@chakra-ui/react';
+import { Box, Button, SimpleGrid, useToast, Text, Flex, Badge, Icon } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { MdStar, MdStarBorder } from 'react-icons/md';
 import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
+import { useFeatures } from 'contexts/FeaturesContext';
+import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 
 // 1. Define Types
 interface EventItem {
@@ -28,6 +31,7 @@ export default function Viewevents() {
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const toast = useToast();
+  const { features, setFlagshipEvent } = useFeatures();
 
   // Helper to decode JWT
   const parseJwt = (token: string | null): JWTPayload | null => {
@@ -106,6 +110,44 @@ export default function Viewevents() {
     }
   };
 
+  const handleSetFlagship = async (eventName: string) => {
+    const success = await setFlagshipEvent(eventName);
+    if (success) {
+      toast({
+        title: 'Flagship Event Updated',
+        description: `"${eventName}" is now the active flagship event.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Failed to update flagship event',
+        status: 'error',
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleRemoveFlagship = async (eventName: string) => {
+    const success = await setFlagshipEvent(null);
+    if (success) {
+      toast({
+        title: 'Flagship Event Removed',
+        description: `"${eventName}" is no longer the flagship event.`,
+        status: 'info',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: 'Failed to remove flagship event',
+        status: 'error',
+        isClosable: true,
+      });
+    }
+  };
+
   if (!isMounted) return null;
   if (isLoading)
     return (
@@ -132,25 +174,79 @@ export default function Viewevents() {
         justifyItems="center"
         px={{ base: '12px', md: '20px', lg: '40px' }}
       >
-        {events.map((item, i) => (
-          <Box key={i} w={{ base: '320px', md: '360px', lg: '420px' }}>
-            <NFT
-              name={item.name}
-              des={item.description}
-              image={item.logoImageURL}
-              download={`/user/leaderboard/${encodeURIComponent(item.name)}`}
-            />
-            <Box mt={3} display="flex" justifyContent="center">
-              <Button
-                colorScheme="red"
-                size="sm"
-                onClick={() => deleteHandler(item.name)}
-              >
-                DELETE EVENT
-              </Button>
+        {events.map((item, i) => {
+          const isFlagship = features?.flagshipEvent?.toLowerCase() === item.name?.toLowerCase();
+          const bannerImg = resolveImageUrl(
+            getEventCoverImage(item),
+            resolveImageUrl(getEventLogoImage(item), '/images/kyoto-evening.png'),
+          );
+          const logoImg = resolveImageUrl(getEventLogoImage(item));
+
+          return (
+            <Box key={i} w={{ base: '320px', md: '360px', lg: '420px' }} position="relative">
+              {isFlagship && (
+                <Badge
+                  colorScheme="yellow"
+                  position="absolute"
+                  top="-12px"
+                  right="16px"
+                  zIndex={2}
+                  px="12px"
+                  py="4px"
+                  borderRadius="full"
+                  boxShadow="0 4px 12px rgba(234, 179, 8, 0.35)"
+                  fontSize="xs"
+                  fontWeight="bold"
+                  display="inline-flex"
+                  alignItems="center"
+                  gap="4px"
+                >
+                  <Icon as={MdStar} boxSize={3.5} /> Flagship Event
+                </Badge>
+              )}
+
+              <NFT
+                name={item.name}
+                des={item.description}
+                image={bannerImg}
+                logoImage={logoImg}
+                download={`/user/leaderboard/${encodeURIComponent(item.name)}`}
+              />
+
+              <Flex mt={3} gap={2} justify="center" align="center">
+                {isFlagship ? (
+                  <Button
+                    size="sm"
+                    colorScheme="yellow"
+                    variant="solid"
+                    leftIcon={<Icon as={MdStar} />}
+                    onClick={() => handleRemoveFlagship(item.name)}
+                  >
+                    Remove Flagship
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    colorScheme="brand"
+                    variant="outline"
+                    leftIcon={<Icon as={MdStarBorder} />}
+                    onClick={() => handleSetFlagship(item.name)}
+                  >
+                    Make Flagship
+                  </Button>
+                )}
+                <Button
+                  colorScheme="red"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => deleteHandler(item.name)}
+                >
+                  Delete
+                </Button>
+              </Flex>
             </Box>
-          </Box>
-        ))}
+          );
+        })}
       </SimpleGrid>
     </Box>
   );

@@ -1,12 +1,12 @@
 const LEADERBOARD_API_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`;
 export type LeaderboardEntry = {
-	position: number;
+	position: number | string;
 	name: string;
-	prmerged: string | number;
-	githubid: string;
-	points: string | number;
-  avatarUrl: string;
-  prDetailsURL: string;
+	githubid?: string;
+	prmerged?: string | number;
+	points?: string | number;
+  avatarUrl?: string;
+  prDetailsURL?: string;
   collegeName?: string;
   graduationYear?: string | number;
 };

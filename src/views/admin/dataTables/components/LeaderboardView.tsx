@@ -95,9 +95,9 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
   const tableDataColumns: RowObj[] = useMemo(() => (LeadData || []).map((item) => ({
     position: String(item.position),
     name: item.name,
-    prmerged: Number(item.prmerged),
-    githubid: item.githubid,
-    points: Number(item.points),
+    prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+    githubid: item.githubid ?? undefined,
+    points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
     avatarUrl: item.avatarUrl,
     prDetailsURL: item.prDetailsURL,
     college: item.collegeName ?? '',
@@ -133,7 +133,7 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
       const q = searchQuery.toLowerCase();
       data = data.filter(
         (row) =>
-          row.githubid?.toLowerCase().includes(q) ||
+          (row.githubid && row.githubid.toLowerCase().includes(q)) ||
           row.name?.toLowerCase().includes(q),
       );
     }

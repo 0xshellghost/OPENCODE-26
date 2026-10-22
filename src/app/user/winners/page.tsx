@@ -510,8 +510,8 @@ export default function WinnersPodiumComparisonPage() {
     if (!leaderboardData || leaderboardData.length === 0) return [];
     return leaderboardData.slice(0, 5).map((entry, idx) => ({
       position: Number(entry.position) || idx + 1,
-      name: entry.name || entry.githubid,
-      githubid: entry.githubid,
+      name: entry.name || entry.githubid || 'Participant',
+      githubid: entry.githubid || '',
       points: Number(entry.points) || 0,
       prmerged: Number(entry.prmerged) || 0,
       avatarUrl: entry.avatarUrl,
@@ -525,8 +525,8 @@ export default function WinnersPodiumComparisonPage() {
     const filtered = leaderboardData.filter((entry) => isIIITA(entry.collegeName));
     return filtered.slice(0, 5).map((entry, idx) => ({
       position: idx + 1,
-      name: entry.name || entry.githubid,
-      githubid: entry.githubid,
+      name: entry.name || entry.githubid || 'Participant',
+      githubid: entry.githubid || '',
       points: Number(entry.points) || 0,
       prmerged: Number(entry.prmerged) || 0,
       avatarUrl: entry.avatarUrl,

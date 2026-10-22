@@ -53,7 +53,7 @@ export default function PersonalRaceTracker({
     let userIndex = -1;
     if (currentGithubID) {
       userIndex = sorted.findIndex(
-        (u) => u.githubid.toLowerCase() === currentGithubID.toLowerCase()
+        (u) => u.githubid && u.githubid.toLowerCase() === currentGithubID.toLowerCase()
       );
     }
     if (userIndex === -1) {
