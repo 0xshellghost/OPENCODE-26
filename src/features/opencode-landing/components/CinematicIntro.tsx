@@ -121,7 +121,7 @@ export default function CinematicIntro() {
       document.documentElement.style.overflow = "";
     }
     if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
       window.dispatchEvent(new CustomEvent("landing-page-entered"));
     }
     setTimeout(() => {

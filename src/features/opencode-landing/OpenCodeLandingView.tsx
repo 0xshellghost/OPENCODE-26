@@ -5,7 +5,7 @@ import "./styles/fonts.css";
 import styles from "./styles/opencode-landing.module.css";
 import CinematicIntro from "./components/CinematicIntro";
 import HeroSection from "./components/HeroSection";
-import Navbar from "./components/Navbar";
+import SiteNavbar from "components/navbar/SiteNavbar";
 import BackgroundAudio from "./components/BackgroundAudio";
 import GlobalJourney from "./components/GlobalJourney";
 import StatsRibbon from "./components/StatsRibbon";
@@ -20,9 +20,7 @@ export default function OpenCodeLandingView() {
   return (
     <div className={`${styles.landingRoot} opencode-landing-root relative w-full overflow-x-hidden selection:bg-[#B8E5D5]/30 selection:text-[#F4F1E8]`}>
       <BackgroundAudio />
-      <div className="relative w-full flex items-center justify-center">
-        <Navbar />
-      </div>
+      <SiteNavbar />
       <main className="w-full">
         <CinematicIntro />
         <GlobalJourney />

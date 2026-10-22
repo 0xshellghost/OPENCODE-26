@@ -57,7 +57,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-[52rem] flex-col items-center justify-center overflow-hidden bg-[#07131F] pt-32 pb-20 sm:pt-36 sm:pb-24 lg:pb-28"
+      className="relative flex min-h-[52rem] flex-col items-center justify-center overflow-hidden bg-[#07131F] pt-36 pb-20 sm:pt-44 sm:pb-24 lg:pb-28"
     >
       {/* Cinematic Japanese Hero Entry Video Background with Smooth Organic Dissolve */}
       <div

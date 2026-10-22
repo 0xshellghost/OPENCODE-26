@@ -283,23 +283,25 @@ export default function SpecularButton({
     const canvas = canvasRef.current;
     if (!el || !canvas) return undefined;
 
-    let gl: WebGL2RenderingContext | null = null;
-    try {
-      gl = canvas.getContext('webgl2', {
-        alpha: true,
-        premultipliedAlpha: true,
-        antialias: false,
-        depth: false,
-        stencil: false
-      });
-    } catch {
-      gl = null;
-    }
-
-    if (!gl || gl.isContextLost()) {
+    const getGl = (): WebGL2RenderingContext | null => {
+      try {
+        return canvas.getContext('webgl2', {
+          alpha: true,
+          premultipliedAlpha: true,
+          antialias: false,
+          depth: false,
+          stencil: false
+        });
+      } catch {
+        return null;
+      }
+    };
+    const glInstance = getGl();
+    if (!glInstance || glInstance.isContextLost()) {
       canvas.style.display = 'none';
       return undefined;
     }
+    const gl = glInstance;
 
     const handleContextLost = (e: Event) => {
       e.preventDefault();
