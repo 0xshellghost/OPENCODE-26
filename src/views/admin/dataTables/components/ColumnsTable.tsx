@@ -20,7 +20,7 @@ import {
   PopoverBody,
   PopoverArrow,
 } from "@chakra-ui/react";
-import { FaTrophy, FaList, FaChartLine } from "react-icons/fa";
+import { FaTrophy, FaList, FaChartLine, FaGithub } from "react-icons/fa";
 import {
   createColumnHelper,
   flexRender,
@@ -78,6 +78,7 @@ function getCurrentGithubId(): string | undefined {
 function RankBadge({ position }: { position: string | number }) {
   const pos = typeof position === "string" ? parseInt(position, 10) : position;
   const isTop3 = typeof pos === "number" && !Number.isNaN(pos) && pos >= 1 && pos <= 3;
+  const isTop10 = typeof pos === "number" && !Number.isNaN(pos) && pos >= 4 && pos <= 10;
   const trophyColor = isTop3 ? TROPHY_COLORS[pos as 1 | 2 | 3] : undefined;
 
   if (isTop3 && trophyColor) {
@@ -91,31 +92,31 @@ function RankBadge({ position }: { position: string | number }) {
         borderRadius="full"
         bg={
           pos === 1
-            ? "rgba(245, 197, 66, 0.15)"
+            ? "rgba(245, 197, 66, 0.16)"
             : pos === 2
-            ? "rgba(148, 163, 184, 0.15)"
-            : "rgba(217, 119, 6, 0.15)"
+            ? "rgba(186, 215, 245, 0.16)"
+            : "rgba(235, 130, 60, 0.16)"
         }
         border="1px solid"
         borderColor={
           pos === 1
-            ? "rgba(245, 197, 66, 0.45)"
+            ? "rgba(245, 197, 66, 0.55)"
             : pos === 2
-            ? "rgba(148, 163, 184, 0.45)"
-            : "rgba(217, 119, 6, 0.45)"
+            ? "rgba(186, 215, 245, 0.5)"
+            : "rgba(235, 130, 60, 0.5)"
         }
         boxShadow={
           pos === 1
-            ? "0 0 12px rgba(245, 197, 66, 0.25)"
+            ? "0 0 16px rgba(245, 197, 66, 0.3)"
             : pos === 2
-            ? "0 0 12px rgba(148, 163, 184, 0.2)"
-            : "0 0 12px rgba(217, 119, 6, 0.2)"
+            ? "0 0 14px rgba(186, 215, 245, 0.25)"
+            : "0 0 14px rgba(235, 130, 60, 0.25)"
         }
       >
         <FaTrophy color={trophyColor} size={13} />
         <Text
           fontFamily="var(--f-mono), monospace"
-          fontWeight="800"
+          fontWeight="900"
           fontSize="13px"
           color={trophyColor}
         >
@@ -125,15 +126,45 @@ function RankBadge({ position }: { position: string | number }) {
     );
   }
 
+  if (isTop10) {
+    return (
+      <Flex
+        align="center"
+        justify="center"
+        minW="34px"
+        h="26px"
+        px="8px"
+        borderRadius="full"
+        bg="rgba(88, 185, 154, 0.12)"
+        border="1px solid rgba(88, 185, 154, 0.35)"
+        color="#58B99A"
+        fontFamily="var(--f-mono), monospace"
+        fontWeight="800"
+        fontSize="12.5px"
+        boxShadow="0 0 10px rgba(88, 185, 154, 0.15)"
+      >
+        #{pos}
+      </Flex>
+    );
+  }
+
   return (
-    <Text
+    <Flex
+      align="center"
+      justify="center"
+      minW="30px"
+      h="24px"
+      px="6px"
+      borderRadius="8px"
+      bg="rgba(255, 255, 255, 0.03)"
+      border="1px solid var(--border)"
+      color="var(--muted)"
       fontFamily="var(--f-mono), monospace"
       fontWeight="700"
-      fontSize="14px"
-      color="var(--muted)"
+      fontSize="12.5px"
     >
       {position}
-    </Text>
+    </Flex>
   );
 }
 
