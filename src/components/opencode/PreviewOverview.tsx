@@ -73,7 +73,7 @@ export default function PreviewOverview() {
           <p>Map: public-domain <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noreferrer">Natural Earth</a> 1:50m data via world-atlas, projected with d3-geo. Dataset islands are retained. Generalized de facto boundaries are illustrative, not an authoritative political map; confirm the required boundary convention before production use. No markers represent participant locations.</p>
         </div>
       </details>
-      <footer className={styles.footer}><a href="#opencode"><Flower2 size={21} aria-hidden="true" />OPENCODE <span>2026</span></a><p>Ideate. Build. Create.</p><a href="#opencode">Back to the beginning <ArrowUpRight size={16} aria-hidden="true" /></a></footer>
+      <footer className={styles.footer}><a href="#opencode"><Flower2 size={21} aria-hidden="true" />GEEKHAVEN <span>2026</span></a><p>Ideate. Build. Create.</p><a href="#opencode">Back to the beginning <ArrowUpRight size={16} aria-hidden="true" /></a></footer>
     </section>
   )
 }

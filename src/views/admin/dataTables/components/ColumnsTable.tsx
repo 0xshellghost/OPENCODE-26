@@ -20,7 +20,7 @@ import {
   PopoverBody,
   PopoverArrow,
 } from "@chakra-ui/react";
-import { FaTrophy, FaList, FaFlagCheckered } from "react-icons/fa";
+import { FaTrophy, FaList, FaChartLine } from "react-icons/fa";
 import {
   createColumnHelper,
   flexRender,
@@ -34,7 +34,7 @@ import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 
 import Card from "components/card/Card";
-import PersonalRaceTracker from "./PersonalRaceTracker";
+import LeaderboardGraph from "./LeadearboardGraph";
 import { NextAvatar } from "components/image/Avatar";
 import { isMaintainer } from "constants/Maintainers";
 
@@ -760,7 +760,7 @@ function ColumnTable({
           </Text>
         </Box>
 
-        {/* View Toggle: Rankings vs Race Tracker (OpenCode only) */}
+        {/* View Toggle: Rankings vs Points Graph (OpenCode only) */}
         {isOpencode && (
           <Flex
             align="center"
@@ -804,7 +804,7 @@ function ColumnTable({
               borderRadius="full"
               fontSize="13px"
               fontWeight={!showRankings ? "700" : "500"}
-              leftIcon={<FaFlagCheckered size={12} />}
+              leftIcon={<FaChartLine size={12} />}
               bg={!showRankings ? "var(--accent)" : "transparent"}
               color={!showRankings ? "var(--accent-ink)" : "var(--muted)"}
               boxShadow={
@@ -820,7 +820,7 @@ function ColumnTable({
               transition="all 0.2s ease"
               onClick={() => setShowRankings(false)}
             >
-              Race Tracker
+              Points Graph
             </Button>
           </Flex>
         )}
@@ -916,10 +916,13 @@ function ColumnTable({
           </Box>
         )
       ) : (
-        <PersonalRaceTracker
-          tableData={tableData}
-          eventName={cleanEventName}
-        />
+        <Box p={{ base: "12px", md: "20px" }}>
+          <LeaderboardGraph
+            eventName={cleanEventName}
+            topN={10}
+            startDate={process.env.NEXT_PUBLIC_EVENT_START_DATE || "2025-12-14"}
+          />
+        </Box>
       )}
     </Card>
   );
