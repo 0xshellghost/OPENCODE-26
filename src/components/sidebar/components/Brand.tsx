@@ -11,7 +11,7 @@ export function SidebarBrand() {
 
   return (
     <Flex align="center" direction="column" py="24px" px="16px">
-      <Link href="/user/home">
+      <Link href="/user/events">
         <Box cursor="pointer" textAlign="center">
           <Box mb="12px">
             <HorizonLogo h="70px" w="70px" color={textColor} />

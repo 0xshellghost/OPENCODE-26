@@ -38,7 +38,13 @@ const PALETTE = [
   '#60A5FA', // Marine Blue
 ];
 
+import { USE_SEED_DATA, seedProgressData } from 'constants/seedData';
+
 async function fetchProgress(eventName: string, topN: number = 10): Promise<ParticipantSeries[]> {
+  if (USE_SEED_DATA) {
+    return Promise.resolve(seedProgressData as ParticipantSeries[]);
+  }
+
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}&topN=${topN}`;
   const headers: Record<string, string> = {};

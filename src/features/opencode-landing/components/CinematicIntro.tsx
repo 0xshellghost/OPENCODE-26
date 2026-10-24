@@ -14,12 +14,24 @@ export function openCinematicLanding() {
 const SafeAnimatePresence = AnimatePresence as React.FC<React.PropsWithChildren<any>>;
 
 export default function CinematicIntro() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("opencode_intro_completed") !== "true";
+    }
+    return true;
+  });
   const [isExiting, setIsExiting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [controlsVisible, setControlsVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // If already completed in this session, ensure intro is closed
+    if (sessionStorage.getItem("opencode_intro_completed") === "true") {
+      setIsOpen(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Trigger smooth entrance of controls after mount
@@ -30,7 +42,7 @@ export default function CinematicIntro() {
   // Play with sound by default, with seamless gesture fallback for browser autoplay policy
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !isOpen) return;
 
     video.muted = false;
     video.play().then(() => {
@@ -58,7 +70,7 @@ export default function CinematicIntro() {
       window.removeEventListener("keydown", handleFirstGesture);
       window.removeEventListener("touchstart", handleFirstGesture);
     };
-  }, []);
+  }, [isOpen]);
 
   // Listen for replay requests from Hero / Navbar
   useEffect(() => {
@@ -78,9 +90,9 @@ export default function CinematicIntro() {
     return () => window.removeEventListener("open-cinematic-landing", handleOpen);
   }, []);
 
-  // Lock body scroll only while cinematic portal is active; reliably unlock on exit/unmount
+  // Lock body scroll only while cinematic portal is active; reliably unlock immediately on exit/skip/unmount
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isExiting) {
       if (typeof window !== "undefined") {
         if ("scrollRestoration" in window.history) {
           window.history.scrollRestoration = "manual";
@@ -90,46 +102,103 @@ export default function CinematicIntro() {
         }
         window.scrollTo(0, 0);
       }
+
+      // Prevent layout shift: compensate for scrollbar width
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+
       document.body.style.overflow = "hidden";
       document.documentElement.style.overflow = "hidden";
+
+      // Prevent mouse wheel, touch gesture, and keyboard-triggered scrolling
+      const preventDefault = (e: Event) => {
+        e.preventDefault();
+      };
+
+      const preventTouch = (e: TouchEvent) => {
+        e.preventDefault();
+      };
+
+      const preventScrollKeys = (e: KeyboardEvent) => {
+        const scrollKeys = [
+          "ArrowUp",
+          "ArrowDown",
+          "PageUp",
+          "PageDown",
+          "Home",
+          "End",
+          " ",
+        ];
+        if (scrollKeys.includes(e.key)) {
+          // Allow spacebar only when interacting with video control buttons
+          if (e.key === " " && (e.target as HTMLElement)?.tagName === "BUTTON") {
+            return;
+          }
+          e.preventDefault();
+        }
+      };
+
+      window.addEventListener("wheel", preventDefault, { passive: false });
+      window.addEventListener("touchmove", preventTouch, { passive: false });
+      window.addEventListener("keydown", preventScrollKeys, { passive: false });
+
       return () => {
         document.body.style.overflow = "";
         document.documentElement.style.overflow = "";
+        document.body.style.paddingRight = "";
+        window.removeEventListener("wheel", preventDefault);
+        window.removeEventListener("touchmove", preventTouch);
+        window.removeEventListener("keydown", preventScrollKeys);
       };
     } else {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.body.style.paddingRight = "";
     }
-  }, [isOpen]);
+  }, [isOpen, isExiting]);
 
   // Ensure scroll is restored on unmount
   useEffect(() => {
     return () => {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.body.style.paddingRight = "";
     };
   }, []);
 
   const handleEnter = () => {
     if (isExiting) return;
     setIsExiting(true);
+
+    // Save completion for the current browser session
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("opencode_intro_completed", "true");
+    }
+
     if (videoRef.current) {
       videoRef.current.pause();
     }
+
+    // Immediately restore normal page scrolling upon skip or completion
     if (typeof document !== "undefined") {
       document.body.style.overflow = "";
       document.documentElement.style.overflow = "";
+      document.body.style.paddingRight = "";
     }
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
       window.dispatchEvent(new CustomEvent("landing-page-entered"));
     }
+
     setTimeout(() => {
       setIsOpen(false);
       setIsExiting(false);
       if (typeof document !== "undefined") {
         document.body.style.overflow = "";
         document.documentElement.style.overflow = "";
+        document.body.style.paddingRight = "";
       }
     }, 700);
   };

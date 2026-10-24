@@ -76,7 +76,7 @@ export default function Addevent() {
       const payload = parseJwt(token);
       if (!payload?.roles?.isAdmin) {
         console.error('Only admin can create events');
-        router.push('/user/home');
+        router.push('/user/events');
       }
     }
   }, [isMounted, router]);

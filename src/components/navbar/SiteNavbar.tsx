@@ -309,7 +309,7 @@ export default function SiteNavbar() {
         aria-label="Mobile Navigation Menu"
         className={cn(
           "pointer-events-auto xl:hidden mt-3 w-full max-w-5xl mx-auto rounded-2xl backdrop-blur-2xl bg-[#0B1C2A]/95 border border-[#AEBCC7]/20 p-4 space-y-2 shadow-2xl transition-all duration-300 ease-out",
-          isMenucod
+          isMenuOpen
             ? "opacity-100 translate-y-0 visible pointer-events-auto"
             : "opacity-0 -translate-y-4 invisible pointer-events-none"
         )}

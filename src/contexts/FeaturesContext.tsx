@@ -35,17 +35,17 @@ const FeaturesContext = createContext<FeaturesContextType>({
 });
 
 export function FeaturesProvider({ children }: { children: ReactNode }) {
-  const [features, setFeatures] = useState<FeaturesConfig>(() => {
-    if (typeof window === 'undefined') return DEFAULT_FEATURES;
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? { ...DEFAULT_FEATURES, ...JSON.parse(stored) } : DEFAULT_FEATURES;
-    } catch {
-      return DEFAULT_FEATURES;
-    }
-  });
+  const [features, setFeatures] = useState<FeaturesConfig>(DEFAULT_FEATURES);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setFeatures((prev) => ({ ...prev, ...JSON.parse(stored) }));
+      }
+    } catch {
+      // localStorage unavailable
+    }
     fetch('/api/features')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {

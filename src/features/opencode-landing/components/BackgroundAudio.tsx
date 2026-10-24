@@ -97,9 +97,10 @@ export default function BackgroundAudio() {
       }
     };
 
-    // Check if cinematic landing trailer is currently active in the DOM
+    // Check if cinematic landing trailer is currently active in the DOM or completed in this session
     const landingPortal = document.getElementById("cinematic-landing-portal");
-    if (!landingPortal) {
+    const introCompleted = typeof window !== "undefined" && sessionStorage.getItem("opencode_intro_completed") === "true";
+    if (!landingPortal || introCompleted) {
       // Direct visit or trailer already dismissed
       startAudio();
     }

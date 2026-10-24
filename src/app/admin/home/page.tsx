@@ -83,7 +83,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isMounted) return;
     if (!isAdminUser()) {
-      router.push('/user/home');
+      router.push('/user/events');
     }
   }, [isMounted, router]);
 
