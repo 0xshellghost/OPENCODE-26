@@ -1,28 +1,7 @@
 import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
-import {
-  USE_SEED_DATA,
-  seedDefaultUser,
-  getSeedProfile,
-  seedColleges,
-} from 'constants/seedData';
 
 export async function fetchLoggedInBasicDetails() {
   if (typeof window === 'undefined') return null;
-
-  if (USE_SEED_DATA) {
-    const existing = localStorage.getItem('user');
-    if (existing) {
-      try {
-        const parsed = JSON.parse(existing);
-        if (parsed?.githubId) return parsed;
-      } catch {
-        // ignore
-      }
-    }
-    localStorage.setItem('token', 'seed-mock-jwt-token');
-    localStorage.setItem('user', JSON.stringify(seedDefaultUser));
-    return seedDefaultUser;
-  }
 
   const token = localStorage.getItem('token');
 
@@ -51,14 +30,6 @@ export async function fetchLoggedInBasicDetails() {
 }
 
 export async function sendRegData(formData: any) {
-  if (USE_SEED_DATA) {
-    return Promise.resolve({
-      success: true,
-      message: 'Registration successful (Seeded Mock)',
-      data: formData,
-    });
-  }
-
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const response = await fetch(
@@ -88,10 +59,6 @@ export async function sendRegData(formData: any) {
 }
 
 export async function getUserProfileByName(profileName: string) {
-  if (USE_SEED_DATA) {
-    const profile = getSeedProfile(profileName);
-    return Promise.resolve({ success: true, data: profile });
-  }
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
