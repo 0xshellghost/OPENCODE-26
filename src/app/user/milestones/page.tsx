@@ -50,7 +50,7 @@ export default function Milestones() {
 
   React.useEffect(() => {
     if (!features.showMilestones && !isAdminUser()) {
-      router.replace('/user/home');
+      router.replace('/user/events');
     }
   }, [features.showMilestones, router]);
 

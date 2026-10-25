@@ -65,7 +65,7 @@ export default function Viewevents() {
     // Redirect if not admin
     if (!payload?.roles?.isAdmin) {
       toast({ title: 'Only admin can view events', status: 'error', isClosable: true });
-      router.push('/user/home');
+      router.push('/user/events');
       return;
     }
 

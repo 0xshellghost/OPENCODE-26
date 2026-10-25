@@ -10,8 +10,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Skeleton } from '@chakra-ui/react';
-import PageHeading from './PageHeading';
-import ShinyText from '../reactbits/ShinyText';
 import ClickSpark from '../reactbits/ClickSpark';
 import AnimatedContent from '../reactbits/AnimatedContent';
 import { useFeatures } from 'contexts/FeaturesContext';
@@ -281,19 +279,6 @@ export default function EventCollection({
 
   return (
     <ClickSpark sparkColor="rgba(88, 185, 154, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
-      <PageHeading
-        eyebrow={leaderboard ? 'THE ARENA OF CREATORS' : 'EXPLORE · PARTICIPATE · CREATE'}
-        title={leaderboard ? 'Leaderboard' : 'Find your next beginning.'}
-        description={
-          leaderboard
-            ? 'Every contribution counts. Explore the rankings and celebrate the people moving open source forward.'
-            : 'Explore active tracks, follow participant leaderboards, and find real open-source events to build and learn.'
-        }
-      >
-        <ShinyText speed={5} shineColor="#D4F0E7">
-          <span lang="ja">{leaderboard ? '切磋琢磨' : '一期一会'}</span>
-        </ShinyText>
-      </PageHeading>
 
       {/* Loading Skeleton Grid */}
       {loading ? (

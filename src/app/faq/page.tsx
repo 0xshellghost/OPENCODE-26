@@ -36,6 +36,6 @@ export default function OpenCodeFAQ() {
       </header>
       <FAQAccordion items={faqs} />
     </main>
-    <footer className="oc-footer"><span>OPENCODE 2026 <span className="oc-footer-dot">/</span> Learn. Contribute. Belong.</span><Link href="/user/home">Explore events <ArrowUpRight size={14} /></Link></footer>
+    <footer className="oc-footer"><span>OPENCODE 2026 <span className="oc-footer-dot">/</span> Learn. Contribute. Belong.</span><Link href="/user/events">Explore events <ArrowUpRight size={14} /></Link></footer>
   </JapaneseBackground>;
 }

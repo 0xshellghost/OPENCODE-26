@@ -47,7 +47,7 @@ export default function Register() {
   };
   const registerMutation = useMutation({
     mutationFn: sendRegData,
-    onSuccess: () => router.push(`/user/home?token=${localStorage.getItem('token')}&avatar_url=${formData.avatarUrl}`),
+    onSuccess: () => router.push(`/user/events?token=${localStorage.getItem('token')}&avatar_url=${formData.avatarUrl}`),
     onError: () => toast({ title: 'Registration could not be completed', description: 'Please check your details and try again.', status: 'error', isClosable: true }),
   });
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

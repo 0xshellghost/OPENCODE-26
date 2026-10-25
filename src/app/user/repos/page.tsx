@@ -15,24 +15,13 @@ import { FaGithub, FaDiscord } from 'react-icons/fa';
 import {
   FolderGit2,
   ExternalLink,
-  Code2,
   GitBranch,
-  Star,
-  Sparkles,
-  Terminal,
-  Cpu,
-  Smartphone,
-  Globe,
-  Search,
-  Filter,
 } from 'lucide-react';
-import PageHeading from 'components/japanese/PageHeading';
-import { opencodeTokens } from '../../../theme/opencode-tokens';
+import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { useState, useMemo } from 'react';
 import { FetchedRepos, FetchedEvents } from 'api/events/events';
 import { useQuery } from '@tanstack/react-query';
 import { RingLoader } from 'react-spinners';
-import CountUp from 'components/reactbits/CountUp';
 import AnimatedContent from 'components/reactbits/AnimatedContent';
 
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -74,7 +63,6 @@ function detectPrimaryLanguage(repo: any): { name: string; color: string } {
 
 export default function ReposPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'web' | 'mobile' | 'ai' | 'systems'>('all');
 
   const textColor = 'var(--fg)';
   const mutedText = 'var(--muted)';
@@ -94,43 +82,18 @@ export default function ReposPage() {
 
   const repositories = data?.data || [];
 
-  const filterChips = [
-    { id: 'all', label: 'All Projects', icon: FolderGit2 },
-    { id: 'web', label: 'Web & Fullstack', icon: Globe },
-    { id: 'mobile', label: 'Mobile Apps', icon: Smartphone },
-    { id: 'ai', label: 'AI & Data', icon: Sparkles },
-    { id: 'systems', label: 'Systems & Security', icon: Cpu },
-  ];
-
   const filteredRepos = useMemo(() => {
     return repositories.filter((repo: any) => {
+      if (!searchQuery.trim()) return true;
+      const query = searchQuery.toLowerCase();
       const matchSearch =
-        (repo.name && repo.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (repo.tags && repo.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+        (repo.name && repo.name.toLowerCase().includes(query)) ||
+        (repo.description && repo.description.toLowerCase().includes(query)) ||
+        (repo.tags && repo.tags.some((tag: string) => tag.toLowerCase().includes(query)));
 
-      if (!matchSearch) return false;
-
-      const tagsStr = (repo.tags || []).join(' ').toLowerCase();
-      const descStr = (repo.description || '').toLowerCase();
-      const combined = `${tagsStr} ${descStr} ${repo.name.toLowerCase()}`;
-
-      if (activeFilter === 'web') {
-        return combined.includes('react') || combined.includes('next') || combined.includes('web') || combined.includes('node');
-      }
-      if (activeFilter === 'mobile') {
-        return combined.includes('mobile') || combined.includes('flutter') || combined.includes('native') || combined.includes('kotlin') || combined.includes('android');
-      }
-      if (activeFilter === 'ai') {
-        return combined.includes('python') || combined.includes('ai') || combined.includes('ml') || combined.includes('vision') || combined.includes('astronomy');
-      }
-      if (activeFilter === 'systems') {
-        return combined.includes('rust') || combined.includes('go') || combined.includes('security') || combined.includes('c++') || combined.includes('solidity');
-      }
-
-      return true;
+      return matchSearch;
     });
-  }, [repositories, searchQuery, activeFilter]);
+  }, [repositories, searchQuery]);
 
   if (isLoading || isLoadingEvents) {
     return (
@@ -142,97 +105,15 @@ export default function ReposPage() {
 
   return (
     <Box pt="0" px="0" maxW="1400px" mx="auto">
-      {/* Page Heading */}
-      <Flex direction="column" mb={{ base: '24px', md: '36px' }}>
-        <PageHeading
-          eyebrow="IDEAS INTO IMPACT"
-          title="Built in the open."
-          description="Explore this season’s open-source codebases. Find a project that matches your language of choice, connect with maintainers, and make verified contributions."
+      {/* Search Toolbar matching Leaderboard design */}
+      <Box mb={{ base: '24px', md: '32px' }}>
+        <SearchProfileBanner
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search repository or tech stack…"
+          w={{ base: '100%', sm: '320px', md: '360px' }}
         />
-
-        {/* Developer Toolbar: Category Pills + Search */}
-        <Flex
-          direction={{ base: 'column', lg: 'row' }}
-          justify="space-between"
-          align={{ base: 'stretch', lg: 'center' }}
-          gap="16px"
-          mt="12px"
-        >
-          {/* Filter Pills */}
-          <Flex wrap="wrap" gap="8px" align="center">
-            {filterChips.map((chip) => {
-              const IconComp = chip.icon;
-              const isActive = activeFilter === chip.id;
-              return (
-                <button
-                  key={chip.id}
-                  type="button"
-                  onClick={() => setActiveFilter(chip.id as any)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                    isActive
-                      ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_4px_16px_var(--accent-soft)]'
-                      : 'bg-[var(--card-soft)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--fg)]'
-                  }`}
-                >
-                  <IconComp size={13} />
-                  <span>{chip.label}</span>
-                </button>
-              );
-            })}
-          </Flex>
-
-          {/* Search Box */}
-          <Box position="relative" minW={{ base: '100%', md: '320px' }}>
-            <Flex
-              align="center"
-              gap="10px"
-              px="16px"
-              py="10px"
-              borderRadius="full"
-              bg="var(--surface)"
-              border="1px solid var(--border)"
-              _focusWithin={{ borderColor: 'var(--accent)', boxShadow: '0 0 16px var(--accent-soft)' }}
-              transition="all 0.25s ease"
-            >
-              <Search size={15} color="var(--accent)" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search repository or tech stack…"
-                style={{
-                  background: 'transparent',
-                  outline: 'none',
-                  border: 'none',
-                  color: 'var(--fg)',
-                  fontSize: '13px',
-                  width: '100%',
-                }}
-              />
-            </Flex>
-          </Box>
-        </Flex>
-
-        {/* Result Counter */}
-        <Flex justify="space-between" align="center" mt="16px" fontSize="12px" fontFamily="var(--f-mono)" color={mutedText}>
-          <Text>
-            Displaying{' '}
-            <Text as="span" color="var(--accent)" fontWeight="800">
-              <CountUp to={filteredRepos.length} duration={0.8} />
-            </Text>{' '}
-            open-source repositories
-          </Text>
-          {activeFilter !== 'all' && (
-            <button
-              type="button"
-              onClick={() => setActiveFilter('all')}
-              className="text-[var(--accent)] hover:underline cursor-pointer"
-            >
-              Show all ({repositories.length})
-            </button>
-          )}
-        </Flex>
-      </Flex>
+      </Box>
 
       {/* Empty State */}
       {filteredRepos.length === 0 ? (
@@ -247,20 +128,17 @@ export default function ReposPage() {
         >
           <Icon as={FolderGit2} color="var(--accent)" mb="16px" w="42px" h="42px" />
           <Text fontSize="xl" fontWeight="700" color={textColor}>
-            No repositories matched your filters
+            No repositories matched your search
           </Text>
           <Text color={mutedText} mt="8px" fontSize="14px">
-            Try adjusting your search keyword or switching categories.
+            Try adjusting your search keyword.
           </Text>
           <button
             type="button"
-            onClick={() => {
-              setSearchQuery('');
-              setActiveFilter('all');
-            }}
+            onClick={() => setSearchQuery('')}
             className="mt-4 px-4 py-2 rounded-full text-xs font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] transition-all"
           >
-            Reset search & filters
+            Clear search
           </button>
         </Flex>
       ) : (

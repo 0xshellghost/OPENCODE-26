@@ -15,6 +15,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/user',
+        destination: '/user/events',
+        permanent: false,
+      },
+      {
+        source: '/user/home',
+        destination: '/user/events',
+        permanent: false,
+      },
+      {
         source: '/leaderboard',
         destination: '/user/leaderboard/Opencode',
         permanent: false,

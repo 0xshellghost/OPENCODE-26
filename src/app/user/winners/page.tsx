@@ -476,7 +476,7 @@ export default function WinnersPodiumComparisonPage() {
 
   useEffect(() => {
     if (!features.showWinners && !isAdminUser()) {
-      router.replace('/user/home');
+      router.replace('/user/events');
     }
   }, [features.showWinners, router]);
 

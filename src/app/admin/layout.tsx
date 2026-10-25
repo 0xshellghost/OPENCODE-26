@@ -61,7 +61,7 @@ export default function AdminLayout(props: DashboardLayoutProps) {
     const payload = parseJwt(token);
     if (!payload?.roles?.isAdmin) {
       console.error('Only admin can access admin pages');
-      router.push('/user/home');
+      router.push('/user/events');
     }
   }, [isMounted, router]);
 

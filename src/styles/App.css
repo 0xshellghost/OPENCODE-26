@@ -447,10 +447,14 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .oc-faq-answer { padding: 0 26px 26px; color: var(--muted); font-size: 14px; font-family: var(--f-body); line-height: 1.9; }
 .oc-faq-answer a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .oc-pagination { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; font-family: var(--f-mono); margin-top: 22px; }
-.oc-pagination div { display: flex; gap: 8px; }
-.oc-pagination button { border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; background: var(--surface-2); color: var(--fg); font-family: var(--f-mono); font-size: 13px; transition: all .2s; cursor: pointer; }
-.oc-pagination button:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-.oc-pagination button:disabled { opacity: .35; cursor: not-allowed; }
+.oc-pagination-actions { display: flex; align-items: center; gap: 10px; }
+.oc-pagination-btn { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--border-strong); color: var(--fg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); transition: all .2s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; flex-shrink: 0; }
+.oc-pagination-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); transform: scale(1.08); box-shadow: 0 4px 18px var(--accent-soft); }
+.oc-pagination-btn:active:not(:disabled) { transform: scale(0.96); }
+.oc-pagination-btn:disabled { opacity: 0.35; border-color: var(--border); background: var(--surface-2); color: var(--muted); cursor: not-allowed; box-shadow: none; transform: none; pointer-events: none; }
+.oc-pagination button:not(.oc-pagination-btn) { border: 1px solid var(--border); border-radius: 999px; padding: 7px 16px; background: var(--surface-2); color: var(--fg); font-family: var(--f-mono); font-size: 13px; transition: all .2s; cursor: pointer; }
+.oc-pagination button:not(.oc-pagination-btn):hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.oc-pagination button:not(.oc-pagination-btn):disabled { opacity: .35; cursor: not-allowed; }
 .oc-auth-layout { width: 100%; max-width: 1248px; padding: 140px 48px 70px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 96px; flex: 1; min-height: calc(100vh - 86px); }
 .oc-auth-card { padding: 46px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 .oc-auth-card .oc-description { margin-bottom: 32px; }
