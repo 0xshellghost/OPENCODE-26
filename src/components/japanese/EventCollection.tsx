@@ -19,6 +19,7 @@ import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/ev
 
 type Event = {
   name: string;
+  isFlagship?: boolean;
   description?: string;
   startDate?: string;
   endDate?: string;
@@ -294,8 +295,10 @@ export default function EventCollection({
   const scenes = ['kyoto-evening', 'kyoto-garden', 'kyoto-torii'];
   const Icon = leaderboard ? Trophy : CalendarDays;
 
-  // Resolve flagship event from admin configuration
+  // Resolve flagship event: database isFlagship takes precedence, fallback to features config
   const flagship = useMemo(() => {
+    const dbFlagship = events.find((e) => e.isFlagship === true);
+    if (dbFlagship) return dbFlagship;
     if (!features?.flagshipEvent) return null;
     return (
       events.find(

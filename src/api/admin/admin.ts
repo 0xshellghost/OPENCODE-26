@@ -221,3 +221,27 @@ export async function uploadEventLeaderboard(eventName: string, file: File) {
   return await response.json();
 }
 
+export async function updateFlagshipEvent(eventName: string, isFlagship = true) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found. Please sign in as admin.');
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/events/${encodeURIComponent(eventName)}/flagship`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isFlagship }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || errorData?.error || 'Failed to update flagship event');
+  }
+
+  return await response.json();
+}

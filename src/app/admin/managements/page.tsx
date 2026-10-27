@@ -60,6 +60,7 @@ import {
   removeMentor,
   fetchMentors,
   uploadEventLeaderboard,
+  updateFlagshipEvent,
   MentorUser,
 } from 'api/admin/admin';
 import { useRouter } from 'next/navigation';
@@ -103,6 +104,11 @@ export default function ManagementPage() {
       toast({ title: 'Please select an event to make flagship.', status: 'warning', isClosable: true });
       return;
     }
+    try {
+      await updateFlagshipEvent(selectedFlagship, true);
+    } catch (e: any) {
+      console.warn('Backend flagship sync warning:', e?.message);
+    }
     const success = await setFlagshipEvent(selectedFlagship);
     if (success) {
       toast({
@@ -117,6 +123,13 @@ export default function ManagementPage() {
   };
 
   const handleRemoveFlagship = async () => {
+    try {
+      if (features.flagshipEvent) {
+        await updateFlagshipEvent(features.flagshipEvent, false);
+      }
+    } catch (e: any) {
+      console.warn('Backend flagship remove warning:', e?.message);
+    }
     const success = await setFlagshipEvent(null);
     if (success) {
       setSelectedFlagship('');
@@ -142,10 +155,18 @@ export default function ManagementPage() {
     }
   }, [isMounted, router]);
 
-  const { data: eventData, isLoading } = useQuery<{ data: Array<{ name: string }> }>({
+  const { data: eventData, isLoading } = useQuery<{ data: Array<{ name: string; isFlagship?: boolean }> }>({
     queryKey: ['EventInfo'],
     queryFn: FetchedEvents,
   });
+
+  useEffect(() => {
+    const dbFlagship = eventData?.data?.find((e) => e.isFlagship)?.name;
+    if (dbFlagship && dbFlagship !== features.flagshipEvent) {
+      setFlagshipEvent(dbFlagship);
+      setSelectedFlagship(dbFlagship);
+    }
+  }, [eventData, features.flagshipEvent, setFlagshipEvent]);
 
   // Repos in Selected Event query
   const { data: reposData, refetch: refetchRepos, isLoading: isLoadingRepos } = useQuery({
