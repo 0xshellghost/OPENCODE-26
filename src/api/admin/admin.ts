@@ -226,7 +226,8 @@ export async function updateFlagshipEvent(eventName: string, isFlagship = true) 
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found. Please sign in as admin.');
 
-  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com';
+  const baseUrl = rawBase.replace(/\/+$/, '');
   const url = `${baseUrl}/api/v1/admin/events/${encodeURIComponent(eventName)}/flagship`;
 
   console.log('[updateFlagshipEvent] Sending PUT request to:', url, { isFlagship });

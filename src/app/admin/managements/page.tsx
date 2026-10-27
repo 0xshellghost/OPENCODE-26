@@ -886,7 +886,7 @@ ON DUPLICATE KEY UPDATE
             colorScheme="brand"
             w="100%"
             leftIcon={<Icon as={Star} fill="currentColor" />}
-            isDisabled={!selectedFlagship || selectedFlagship === features.flagshipEvent}
+            isDisabled={!selectedFlagship || isUpdatingFlagship}
             isLoading={isUpdatingFlagship}
             onClick={handleSetFlagship}
           >

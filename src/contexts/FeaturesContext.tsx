@@ -25,7 +25,7 @@ const DEFAULT_FEATURES: FeaturesConfig = {
   showRepositories: true,
   showRPlace: true,
   showLeaderboard: true,
-  flagshipEvent: 'Opencode',
+  flagshipEvent: 'Rift CTF',
 };
 
 const FeaturesContext = createContext<FeaturesContextType>({
