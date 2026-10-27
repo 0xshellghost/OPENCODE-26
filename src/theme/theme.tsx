@@ -48,50 +48,17 @@ export default extendTheme(
 					}
 				}
 			},
-			Button: {
-				baseStyle: {
-					borderRadius: '9999px',
-					fontFamily: 'var(--f-body), sans-serif',
-					fontWeight: '500',
-					transition: 'transform 0.2s, background 0.2s, box-shadow 0.2s',
+			Skeleton: {
+				defaultProps: {
+					startColor: 'var(--card-soft)',
+					endColor: 'var(--border)',
 				},
-				variants: {
-					solid: {
-						bg: 'var(--accent)',
-						color: 'var(--accent-ink)',
-						borderRadius: '9999px',
-						boxShadow: '0 12px 36px -10px var(--accent)',
-						_hover: {
-							bg: 'var(--accent)',
-							transform: 'translateY(-2px)',
-							boxShadow: '0 16px 40px -8px var(--accent)',
-						}
-					},
-					ghost: {
-						borderRadius: '9999px',
-						color: 'var(--muted)',
-						_hover: {
-							bg: 'var(--surface-2)',
-							color: 'var(--fg)',
-							transform: 'translateY(-1px)',
-						}
-					},
-					outline: {
-						borderRadius: '9999px',
-						border: '1px solid',
-						borderColor: 'var(--border)',
-						bg: 'var(--surface)',
-						color: 'var(--fg)',
-						backdropFilter: 'blur(14px)',
-						_hover: {
-							bg: 'var(--accent-soft)',
-							borderColor: 'var(--accent)',
-							color: 'var(--accent)',
-							transform: 'translateY(-1px)',
-						}
-					}
-				}
-			}
+				baseStyle: {
+					borderRadius: 'var(--r)',
+					startColor: 'var(--card-soft)',
+					endColor: 'var(--border)',
+				},
+			},
 		}
 	},
 	globalStyles,

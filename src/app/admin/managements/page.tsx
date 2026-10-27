@@ -9,7 +9,6 @@ import {
   Input,
   Select,
   Text,
-  useColorModeValue,
   useToast,
   VStack,
   Heading,
@@ -22,17 +21,17 @@ import {
   Switch,
 } from '@chakra-ui/react';
 import {
-  MdAdd,
-  MdDelete,
-  MdEdit,
-  MdPersonAdd,
-  MdUploadFile,
-  MdFileDownload,
-  MdCloudUpload,
-  MdTableChart,
-  MdCheckCircle,
-  MdStar,
-} from 'react-icons/md';
+  CheckCircle2,
+  CloudUpload,
+  Download,
+  Pencil,
+  Plus,
+  Star,
+  Table,
+  Trash2,
+  Upload,
+  UserPlus,
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { FetchedEvents } from 'api/events/events';
@@ -48,9 +47,9 @@ export default function ManagementPage() {
   const [isMounted, setIsMounted] = useState(false);
   const { features, toggleFeature, setFlagshipEvent } = useFeatures();
   
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const shadowSoft = useColorModeValue('0 10px 24px rgba(0,0,0,0.08)', '0 10px 24px rgba(0,0,0,0.35)');
+  const textColor = 'var(--fg)';
+  const cardBg = 'var(--surface)';
+  const shadowSoft = 'var(--shadow)';
 
   // State
   const [selectedEvent, setSelectedEvent] = useState('');
@@ -298,7 +297,7 @@ ON DUPLICATE KEY UPDATE
   if (isLoading || !isMounted) {
     return (
       <Flex minH="100vh" align="center" justify="center">
-        <RingLoader color="#755FFF" size={52} />
+        <RingLoader color="var(--accent)" size={52} />
       </Flex>
     );
   }
@@ -309,7 +308,7 @@ ON DUPLICATE KEY UPDATE
         Management Tools
       </Text>
 
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+      <Box bg={cardBg} p={{ base: '18px', md: '30px' }} borderRadius="20px" border="1px solid var(--border)" boxShadow={shadowSoft} mb="24px">
         <Heading size="md" mb="16px" color={textColor}>Tab Visibility</Heading>
         <Text fontSize="sm" mb="20px" color="gray.500">
           Toggle visibility of community tabs in the navigation.
@@ -320,8 +319,8 @@ ON DUPLICATE KEY UPDATE
             p="20px"
             borderRadius="16px"
             border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
             align="center"
             justify="space-between"
           >
@@ -355,8 +354,8 @@ ON DUPLICATE KEY UPDATE
             p="20px"
             borderRadius="16px"
             border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
             align="center"
             justify="space-between"
           >
@@ -389,8 +388,8 @@ ON DUPLICATE KEY UPDATE
             p="20px"
             borderRadius="16px"
             border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
             align="center"
             justify="space-between"
           >
@@ -423,8 +422,8 @@ ON DUPLICATE KEY UPDATE
             p="20px"
             borderRadius="16px"
             border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
             align="center"
             justify="space-between"
           >
@@ -457,8 +456,8 @@ ON DUPLICATE KEY UPDATE
             p="20px"
             borderRadius="16px"
             border="1px solid"
-            borderColor={useColorModeValue('gray.200', 'gray.700')}
-            bg={useColorModeValue('gray.50', 'whiteAlpha.50')}
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
             align="center"
             justify="space-between"
           >
@@ -491,11 +490,11 @@ ON DUPLICATE KEY UPDATE
       </Box>
 
       {/* ─── FLAGSHIP EVENT CONTROL ─── */}
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+      <Box bg={cardBg} p={{ base: '18px', md: '30px' }} borderRadius="20px" border="1px solid var(--border)" boxShadow={shadowSoft} mb="24px">
         <Flex justify="space-between" align={{ base: 'flex-start', sm: 'center' }} mb="8px" flexWrap="wrap" gap="10px">
           <Flex align="center" gap="10px">
             <Box p="8px" borderRadius="10px" bg="yellow.50" color="yellow.600">
-              <Icon as={MdStar} boxSize={6} />
+              <Icon as={Star} boxSize={6} fill="currentColor" />
             </Box>
             <Heading size="md" color={textColor}>Flagship Event</Heading>
           </Flex>
@@ -531,7 +530,7 @@ ON DUPLICATE KEY UPDATE
           <Button
             colorScheme="brand"
             w="100%"
-            leftIcon={<Icon as={MdStar} />}
+            leftIcon={<Icon as={Star} fill="currentColor" />}
             isDisabled={!selectedFlagship || selectedFlagship === features.flagshipEvent}
             onClick={handleSetFlagship}
           >
@@ -551,20 +550,28 @@ ON DUPLICATE KEY UPDATE
       </Box>
 
       {/* ─── EVENT LEADERBOARD UPLOAD (SQL) ─── */}
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+      <Box bg={cardBg} p={{ base: '18px', md: '30px' }} borderRadius="20px" border="1px solid var(--border)" boxShadow={shadowSoft} mb="24px">
         <Flex justify="space-between" align={{ base: 'flex-start', sm: 'center' }} mb="8px" flexWrap="wrap" gap="10px">
           <Flex align="center" gap="10px">
-            <Box p="8px" borderRadius="10px" bg="purple.50" color="purple.600">
-              <Icon as={MdTableChart} boxSize={6} />
+            <Box p="8px" borderRadius="10px" bg="var(--accent-soft)" color="var(--accent)">
+              <Icon as={Table} boxSize={6} />
             </Box>
             <Heading size="md" color={textColor}>Upload Event Leaderboard</Heading>
           </Flex>
-          <Badge colorScheme="purple" px="10px" py="4px" borderRadius="full" fontSize="12px">
+          <Badge
+            bg="var(--accent-soft)"
+            color="var(--accent)"
+            border="1px solid var(--border-accent)"
+            px="10px"
+            py="4px"
+            borderRadius="full"
+            fontSize="12px"
+          >
             SQL
           </Badge>
         </Flex>
         
-        <Text fontSize="sm" mb="20px" color="gray.500">
+        <Text fontSize="sm" mb="20px" color="var(--fg-muted)">
           Upload official rankings and scores via SQL for non-OpenCode events (Hackathons, Contests, Design Sprints).
           Rankings uploaded via SQL script will be executed and displayed to users when selecting this event in the Leaderboard.
         </Text>
@@ -594,17 +601,17 @@ ON DUPLICATE KEY UPDATE
         <VStack align="stretch" spacing="18px">
           <Box
             border="2px dashed"
-            borderColor={selectedFile ? "purple.400" : "gray.300"}
+            borderColor={selectedFile ? "var(--accent)" : "var(--border)"}
             borderRadius="16px"
-            p="24px"
+            p={{ base: '16px', sm: '24px' }}
             textAlign="center"
-            bg={selectedFile ? "purple.50" : "transparent"}
+            bg={selectedFile ? "var(--accent-soft)" : "transparent"}
             transition="all 0.2s ease"
             cursor="pointer"
             onClick={() => fileInputRef.current?.click()}
             _hover={{
-              borderColor: "purple.400",
-              bg: "purple.50",
+              borderColor: "var(--accent)",
+              bg: "var(--surface-2)",
             }}
           >
             <input
@@ -617,16 +624,16 @@ ON DUPLICATE KEY UPDATE
 
             <Flex direction="column" align="center" gap="10px">
               <Icon
-                as={selectedFile ? MdCheckCircle : MdCloudUpload}
+                as={selectedFile ? CheckCircle2 : CloudUpload}
                 boxSize={10}
-                color={selectedFile ? "green.500" : "purple.500"}
+                color={selectedFile ? "var(--accent)" : "var(--fg-muted)"}
               />
               {selectedFile ? (
                 <Box>
                   <Text fontWeight="700" color={textColor} fontSize="15px">
                     {selectedFile.name}
                   </Text>
-                  <Text fontSize="12px" color="gray.500" mt="2px">
+                  <Text fontSize="12px" color="var(--fg-muted)" mt="2px">
                     {(selectedFile.size / 1024).toFixed(1)} KB · Ready to execute & upload
                   </Text>
                 </Box>
@@ -635,7 +642,7 @@ ON DUPLICATE KEY UPDATE
                   <Text fontWeight="600" color={textColor} fontSize="14px">
                     Click to browse or drag and drop SQL script
                   </Text>
-                  <Text fontSize="12px" color="gray.500" mt="4px">
+                  <Text fontSize="12px" color="var(--fg-muted)" mt="4px">
                     Supports SQL scripts (.sql) containing LeaderboardEntry / User records
                   </Text>
                 </Box>
@@ -648,7 +655,7 @@ ON DUPLICATE KEY UPDATE
             <Button
               variant="outline"
               size="sm"
-              leftIcon={<Icon as={MdFileDownload} />}
+              leftIcon={<Icon as={Download} />}
               onClick={handleDownloadTemplate}
               colorScheme="gray"
             >
@@ -661,7 +668,7 @@ ON DUPLICATE KEY UPDATE
                   size="sm"
                   variant="ghost"
                   colorScheme="red"
-                  leftIcon={<Icon as={MdDelete} />}
+                  leftIcon={<Icon as={Trash2} />}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedFile(null);
@@ -672,8 +679,8 @@ ON DUPLICATE KEY UPDATE
                 </Button>
               )}
               <Button
-                colorScheme="purple"
-                leftIcon={<Icon as={MdUploadFile} />}
+                variant="brand"
+                leftIcon={<Icon as={Upload} />}
                 onClick={handleUploadLeaderboard}
                 isLoading={isUploading}
                 loadingText="Executing SQL..."
@@ -687,9 +694,9 @@ ON DUPLICATE KEY UPDATE
       </Box>
 
       {/* ─── REPOSITORY MANAGEMENT ─── */}
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px">
+      <Box bg={cardBg} p={{ base: '18px', md: '30px' }} borderRadius="20px" border="1px solid var(--border)" boxShadow={shadowSoft} mb="24px">
         <Heading size="md" mb="16px" color={textColor}>Repository Management</Heading>
-        <Text fontSize="sm" mb="20px" color="gray.500">
+        <Text fontSize="sm" mb="20px" color="var(--fg-muted)">
           Manage repositories associated with specific events.
         </Text>
         
@@ -709,7 +716,7 @@ ON DUPLICATE KEY UPDATE
             <Text fontSize="sm" fontWeight="600" mb="8px" color={textColor}>Add Repository</Text>
             <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap="15px">
               <Input placeholder="Repository Name" variant="auth" value={addRepoName} onChange={(e) => setAddRepoName(e.target.value)} />
-              <Button colorScheme="brand" w="100%" leftIcon={<Icon as={MdAdd} />} onClick={handleAddRepo}>Add Repo</Button>
+              <Button variant="brand" w="100%" leftIcon={<Icon as={Plus} />} onClick={handleAddRepo}>Add Repo</Button>
             </Grid>
           </Box>
           
@@ -717,7 +724,7 @@ ON DUPLICATE KEY UPDATE
             <Text fontSize="sm" fontWeight="600" mb="8px" color={textColor}>Delete Repository</Text>
             <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap="15px">
               <Input placeholder="Repository Name to Delete" variant="auth" value={deleteRepoName} onChange={(e) => setDeleteRepoName(e.target.value)} />
-              <Button colorScheme="red" w="100%" leftIcon={<Icon as={MdDelete} />} onClick={handleDeleteRepo}>Delete Repo</Button>
+              <Button colorScheme="red" w="100%" leftIcon={<Icon as={Trash2} />} onClick={handleDeleteRepo}>Delete Repo</Button>
             </Grid>
           </Box>
 
@@ -726,20 +733,20 @@ ON DUPLICATE KEY UPDATE
             <Grid templateColumns={{ base: '1fr', md: '1.5fr 1.5fr 1fr' }} gap="15px">
               <Input placeholder="Current Name" variant="auth" value={renameTargetRepo} onChange={(e) => setRenameTargetRepo(e.target.value)} />
               <Input placeholder="New Name" variant="auth" value={renameNewRepo} onChange={(e) => setRenameNewRepo(e.target.value)} />
-              <Button bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED" w="100%" leftIcon={<Icon as={MdEdit} />} onClick={handleRenameRepo}>Rename</Button>
+              <Button variant="brand" w="100%" leftIcon={<Icon as={Pencil} />} onClick={handleRenameRepo}>Rename</Button>
             </Grid>
           </Box>
         </VStack>
       </Box>
 
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft}>
+      <Box bg={cardBg} border="1px solid var(--border)" p={{ base: '20px', md: '30px' }} borderRadius="20px" boxShadow={shadowSoft}>
         <Heading size="md" mb="16px" color={textColor}>Mentor Management</Heading>
-        <Text fontSize="sm" mb="20px" color="gray.500">
+        <Text fontSize="sm" mb="20px" color="var(--fg-muted)">
           Promote a user to Mentor role so they can review PRs and access this panel.
         </Text>
         <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap="15px">
           <Input placeholder="User's GitHub ID" variant="auth" value={mentorGithubId} onChange={(e) => setMentorGithubId(e.target.value)} />
-          <Button colorScheme="purple" w="100%" leftIcon={<Icon as={MdPersonAdd} />} onClick={handleAddMentor}>Add Mentor</Button>
+          <Button variant="brand" w="100%" leftIcon={<Icon as={UserPlus} />} onClick={handleAddMentor}>Add Mentor</Button>
         </Grid>
       </Box>
     </Box>

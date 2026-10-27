@@ -2,7 +2,7 @@
 
 import { Box, IconButton } from '@chakra-ui/react';
 import { ReactNode, useRef } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Navigation } from 'swiper/modules';
@@ -49,7 +49,7 @@ const swiperStyles = `
   }
 
   .swiper-slide {
-    width: 420px;
+    width: min(420px, 85vw);
     will-change: transform;
     transition: opacity 0.25s ease;
   }
@@ -89,7 +89,7 @@ export function AutoCarousel({ children }: AutoCarouselProps) {
   if (children.length === 1) {
     return (
       <Box py="40px" display="flex" justifyContent="center">
-        <Box maxW="420px" w="100%">
+        <Box maxW="min(420px, 85vw)" w="100%">
           {children[0]}
         </Box>
       </Box>
@@ -105,35 +105,41 @@ export function AutoCarousel({ children }: AutoCarouselProps) {
       <IconButton
         ref={prevRef}
         aria-label="Previous"
-        icon={<FaChevronLeft />}
+        icon={<ChevronLeft size={18} />}
         position="absolute"
-        left={{ base: '6px', md: '6%' }}
+        left={{ base: '6px', md: '4%' }}
         top="50%"
         transform="translateY(-50%)"
         zIndex={20}
-        size="lg"
+        size={{ base: 'md', md: 'lg' }}
         isRound
-        colorScheme="purple"
-        boxShadow="lg"
-        _focus={{ boxShadow: '0 0 0 3px #9D767E' }}
-        _focusVisible={{ boxShadow: '0 0 0 3px #9D767E', outline: 'none' }}
+        bg="var(--surface)"
+        color="var(--fg)"
+        border="1px solid var(--border)"
+        boxShadow="0 4px 14px 0 rgba(0, 0, 0, 0.4)"
+        _hover={{ bg: 'var(--surface-2)', color: 'var(--accent)', borderColor: 'var(--accent)' }}
+        _active={{ bg: 'var(--surface)' }}
+        _focusVisible={{ boxShadow: '0 0 0 2px var(--accent)', outline: 'none' }}
       />
 
       <IconButton
         ref={nextRef}
         aria-label="Next"
-        icon={<FaChevronRight />}
+        icon={<ChevronRight size={18} />}
         position="absolute"
-        right={{ base: '6px', md: '6%' }}
+        right={{ base: '6px', md: '4%' }}
         top="50%"
         transform="translateY(-50%)"
         zIndex={20}
-        size="lg"
+        size={{ base: 'md', md: 'lg' }}
         isRound
-        colorScheme="purple"
-        boxShadow="lg"
-        _focus={{ boxShadow: '0 0 0 3px #9D767E' }}
-        _focusVisible={{ boxShadow: '0 0 0 3px #9D767E', outline: 'none' }}
+        bg="var(--surface)"
+        color="var(--fg)"
+        border="1px solid var(--border)"
+        boxShadow="0 4px 14px 0 rgba(0, 0, 0, 0.4)"
+        _hover={{ bg: 'var(--surface-2)', color: 'var(--accent)', borderColor: 'var(--accent)' }}
+        _active={{ bg: 'var(--surface)' }}
+        _focusVisible={{ boxShadow: '0 0 0 2px var(--accent)', outline: 'none' }}
       />
 
       <Swiper

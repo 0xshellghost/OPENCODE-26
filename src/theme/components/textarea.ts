@@ -1,53 +1,57 @@
-import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools";
+import { StyleFunctionProps } from "@chakra-ui/theme-tools";
+
 export const textareaStyles = {
   components: {
     Textarea: {
       baseStyle: {
-        field: {
-          fontWeight: 400,
-          borderRadius: "8px",
+        fontWeight: 400,
+        borderRadius: "14px",
+        bg: "var(--surface-2)",
+        color: "var(--fg)",
+        border: "1px solid var(--border)",
+        _placeholder: { color: "var(--muted)" },
+        _focus: {
+          borderColor: "var(--accent)",
+          boxShadow: "0 0 0 1px var(--accent)",
         },
       },
 
       variants: {
         main: (props: StyleFunctionProps) => ({
-          field: {
-            bg: mode("transparent", "navy.800")(props),
-            border: "1px solid !important",
-            color: mode("secondaryGray.900", "white")(props),
-            borderColor: mode("secondaryGray.100", "whiteAlpha.100")(props),
-            borderRadius: "16px",
-            fontSize: "sm",
-            p: "20px",
-            _placeholder: { color: "secondaryGray.400" },
+          bg: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          color: "var(--fg)",
+          borderRadius: "14px",
+          fontSize: "sm",
+          p: "16px",
+          _placeholder: { color: "var(--muted)" },
+          _hover: {
+            borderColor: "var(--accent)",
+          },
+          _focus: {
+            borderColor: "var(--accent)",
+            boxShadow: "0 0 12px var(--accent-soft)",
           },
         }),
         auth: () => ({
-          field: {
-            bg: "white",
-            border: "1px solid",
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
-          },
+          bg: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          borderRadius: "14px",
+          color: "var(--fg)",
+          _placeholder: { color: "var(--muted)" },
         }),
         authSecondary: () => ({
-          field: {
-            bg: "white",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
-          },
+          bg: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          borderRadius: "14px",
+          color: "var(--fg)",
+          _placeholder: { color: "var(--muted)" },
         }),
         search: () => ({
-          field: {
-            border: "none",
-            py: "11px",
-            borderRadius: "inherit",
-            _placeholder: { color: "secondaryGray.600" },
-          },
+          border: "none",
+          py: "11px",
+          borderRadius: "inherit",
+          _placeholder: { color: "var(--muted)" },
         }),
       },
     },

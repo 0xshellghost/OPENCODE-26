@@ -1,48 +1,67 @@
-import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools";
+import { StyleFunctionProps } from "@chakra-ui/theme-tools";
+
 export const inputStyles = {
   components: {
     Input: {
       baseStyle: {
         field: {
           fontWeight: 400,
-          borderRadius: "8px",
+          borderRadius: "14px",
+          color: "var(--fg)",
+          _placeholder: { color: "var(--muted)" },
         },
       },
 
       variants: {
         main: (props: StyleFunctionProps) => ({
           field: {
-            bg: mode("transparent", "navy.800")(props),
-            border: "1px solid",
-            color: mode("secondaryGray.900", "white")(props),
-            borderColor: mode("secondaryGray.100", "whiteAlpha.100")(props),
-            borderRadius: "16px",
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            color: "var(--fg)",
+            borderRadius: "14px",
             fontSize: "sm",
-            p: "20px",
-            _placeholder: { color: "secondaryGray.400" },
+            p: "16px",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         auth: (props: StyleFunctionProps) => ({
           field: {
             fontWeight: "500",
-            color: mode("navy.700", "white")(props),
-            bg: mode("transparent", "transparent")(props),
-            border: "1px solid",
-            borderColor: mode(
-              "secondaryGray.100",
-              "rgba(135, 140, 189, 0.3)"
-            )(props),
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600", fontWeight: "400" },
+            color: "var(--fg)",
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            _placeholder: { color: "var(--muted)", fontWeight: "400" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         authSecondary: () => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         search: () => ({
@@ -50,7 +69,8 @@ export const inputStyles = {
             border: "none",
             py: "11px",
             borderRadius: "inherit",
-            _placeholder: { color: "secondaryGray.600" },
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
           },
         }),
       },
@@ -59,38 +79,58 @@ export const inputStyles = {
       baseStyle: {
         field: {
           fontWeight: 400,
+          color: "var(--fg)",
+          borderRadius: "14px",
         },
       },
 
       variants: {
         main: () => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         auth: () => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         authSecondary: () => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         search: () => ({
@@ -98,7 +138,8 @@ export const inputStyles = {
             border: "none",
             py: "11px",
             borderRadius: "inherit",
-            _placeholder: { color: "secondaryGray.600" },
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
           },
         }),
       },
@@ -107,33 +148,42 @@ export const inputStyles = {
       baseStyle: {
         field: {
           fontWeight: 400,
+          color: "var(--fg)",
+          borderRadius: "14px",
         },
       },
 
       variants: {
         main: (props: StyleFunctionProps) => ({
           field: {
-            bg: mode("transparent", "navy.800")(props),
-            border: "1px solid",
-            color: "secondaryGray.600",
-            borderColor: mode("secondaryGray.100", "whiteAlpha.100")(props),
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            color: "var(--fg)",
+            borderRadius: "14px",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
           icon: {
-            color: "secondaryGray.600",
+            color: "var(--fg-muted)",
           },
         }),
         mini: (props: StyleFunctionProps) => ({
           field: {
-            bg: mode("transparent", "navy.800")(props),
+            bg: "var(--surface-2)",
             border: "0px solid transparent",
             fontSize: "0px",
             p: "10px",
-            _placeholder: { color: "secondaryGray.600" },
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
           },
           icon: {
-            color: "secondaryGray.600",
+            color: "var(--fg-muted)",
           },
         }),
         subtle: () => ({
@@ -143,13 +193,13 @@ export const inputStyles = {
           field: {
             bg: "transparent",
             border: "0px solid",
-            color: "secondaryGray.600",
+            color: "var(--fg-muted)",
             borderColor: "transparent",
             width: "max-content",
-            _placeholder: { color: "secondaryGray.600" },
+            _placeholder: { color: "var(--muted)" },
           },
           icon: {
-            color: "secondaryGray.600",
+            color: "var(--fg-muted)",
           },
         }),
         transparent: (props: StyleFunctionProps) => ({
@@ -157,41 +207,53 @@ export const inputStyles = {
             bg: "transparent",
             border: "0px solid",
             width: "min-content",
-            color: mode("secondaryGray.600", "secondaryGray.600")(props),
+            color: "var(--fg)",
             borderColor: "transparent",
             padding: "0px",
             paddingLeft: "8px",
             paddingRight: "20px",
             fontWeight: "700",
             fontSize: "14px",
-            _placeholder: { color: "secondaryGray.600" },
+            _placeholder: { color: "var(--muted)" },
           },
           icon: {
             transform: "none !important",
             position: "unset !important",
             width: "unset",
-            color: "secondaryGray.600",
+            color: "var(--fg-muted)",
             right: "0px",
           },
         }),
         auth: () => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         authSecondary: (props: StyleFunctionProps) => ({
           field: {
-            bg: "transparent",
-            border: "1px solid",
-
-            borderColor: "secondaryGray.100",
-            borderRadius: "16px",
-            _placeholder: { color: "secondaryGray.600" },
+            bg: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            borderRadius: "14px",
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
+            _hover: {
+              borderColor: "var(--accent)",
+            },
+            _focus: {
+              borderColor: "var(--accent)",
+              boxShadow: "0 0 12px var(--accent-soft)",
+            },
           },
         }),
         search: (props: StyleFunctionProps) => ({
@@ -199,7 +261,8 @@ export const inputStyles = {
             border: "none",
             py: "11px",
             borderRadius: "inherit",
-            _placeholder: { color: "secondaryGray.600" },
+            color: "var(--fg)",
+            _placeholder: { color: "var(--muted)" },
           },
         }),
       },

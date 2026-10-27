@@ -14,22 +14,33 @@ import {
   SimpleGrid,
   Text,
   chakra,
+  useColorMode,
 } from '@chakra-ui/react';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import {
+  Building2,
+  Calendar,
+  Check,
+  ChevronDown,
+  Crown,
+  SearchX,
+  Trophy,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { FaBuilding, FaCalendarAlt, FaCheck, FaCrown, FaSearchMinus, FaTrophy } from 'react-icons/fa';
-import { MdClear } from 'react-icons/md';
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
   type RowObj,
 } from 'views/admin/dataTables/components/ColumnsTable';
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
+import DecryptedText from 'components/reactbits/DecryptedText';
+import PageHeading from 'components/japanese/PageHeading';
+import ContributorAvatar from 'components/common/ContributorAvatar';
+import { isMaintainer } from 'constants/Maintainers';
 import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
 import { FetchedEvents } from '../../../../api/events/events';
 
-const SERIF = "Georgia, 'Times New Roman', serif";
 const CONTROL_H = '44px';
 
 const MEDALS = {
@@ -49,7 +60,7 @@ function safeDecode(value: string | undefined): string {
 /* Shared look for every control in the toolbar so heights, borders and hover states match. */
 const controlStyle = {
   h: CONTROL_H,
-  px: '14px',
+  px: { base: '10px', sm: '14px' },
   bg: 'var(--surface)',
   border: '1px solid var(--border)',
   borderRadius: '12px',
@@ -128,21 +139,24 @@ export default function EventName() {
     enabled: !!eventName,
   });
 
-  const tableDataColumns: RowObj[] = useMemo(
-    () =>
-      (LeadData || []).map((item) => ({
-        position: String(item.position),
-        name: item.name,
-        prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
-        githubid: item.githubid ?? undefined,
-        points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
-        avatarUrl: item.avatarUrl,
-        prDetailsURL: item.prDetailsURL,
-        college: item.collegeName ?? '',
-        graduationYear: item.graduationYear ?? '',
-      })),
-    [LeadData],
-  );
+  const tableDataColumns: RowObj[] = useMemo(() => {
+    const rawList = LeadData || [];
+    const eligibleList = isOpencode
+      ? rawList.filter((item) => !item.githubid || !isMaintainer(item.githubid))
+      : rawList;
+
+    return eligibleList.map((item, index) => ({
+      position: isOpencode ? String(index + 1) : String(item.position ?? index + 1),
+      name: item.name,
+      prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+      githubid: item.githubid ?? undefined,
+      points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
+      avatarUrl: item.githubid ? `https://github.com/${item.githubid}.png` : item.avatarUrl,
+      prDetailsURL: item.prDetailsURL,
+      college: item.collegeName ?? '',
+      graduationYear: item.graduationYear ?? '',
+    }));
+  }, [LeadData, isOpencode]);
 
   const hasPoints = useMemo(() => {
     if (isOpencode) return true;
@@ -187,11 +201,6 @@ export default function EventName() {
   const participantCount = filteredTableData.length;
   const totalCount = tableDataColumns.length;
 
-  const topScore = useMemo(
-    () => tableDataColumns.reduce((max, r) => Math.max(max, Number(r.points) || 0), 0),
-    [tableDataColumns],
-  );
-
   // Top 3 overall (not affected by filters) for the spotlight cards
   const topThree = useMemo(
     () =>
@@ -229,24 +238,32 @@ export default function EventName() {
 
   return (
     <Flex direction="column" gap="24px" w="100%" maxW="1400px" mx="auto">
+      {/* ─── 1. PAGE HEADER ─── */}
+      <PageHeading
+        title={`${eventLabel || 'Opencode'} Standings`}
+        description="Official rankings and live contribution metrics. Track merged pull requests, total points earned, and community progress across all participants."
+        asideColor="var(--secondary)"
+        hideBorder
+      >
+        順位表
+      </PageHeading>
+
       {/* ─── 2. TOOLBAR ─── */}
-      {/* position + zIndex keep the college dropdown above the table card below it
-          (both cards use backdrop-filter, which creates stacking contexts) */}
       <Flex
-        className="glass-panel"
         position="relative"
         zIndex={30}
-        p={{ base: '12px', md: '14px 16px' }}
         gap="12px"
-        flexWrap="wrap"
-        align="center"
+        flexDirection={{ base: 'column', md: 'row' }}
+        align={{ base: 'stretch', md: 'center' }}
+        justify="space-between"
       >
-        <Box flex="1 1 260px" minW="220px">
-          <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} />
+        <Box flex={{ base: '1', md: '1 1 260px' }} minW={{ base: '100%', sm: '220px' }}>
+          <SearchProfileBanner value={searchQuery} onChange={setSearchQuery} w="100%" />
         </Box>
 
-        {/* Event selector dropdown */}
-        <Box onMouseEnter={() => setIsEventHovered(true)} onFocus={() => setIsEventHovered(true)}>
+        <Flex gap="10px" align="center" flexWrap="wrap" justify={{ base: 'flex-start', md: 'flex-end' }}>
+          {/* Event selector dropdown */}
+          <Box onMouseEnter={() => setIsEventHovered(true)} onFocus={() => setIsEventHovered(true)}>
           <Menu isLazy={!isEventHovered}>
             <MenuButton
               {...controlStyle}
@@ -256,10 +273,15 @@ export default function EventName() {
             >
               <Flex align="center" gap="8px">
                 <Box display="flex" color="var(--accent)">
-                  <FaTrophy size={14} />
+                  <Trophy size={14} />
                 </Box>
                 <Text noOfLines={1} maxW={{ base: '110px', md: '170px' }} fontSize="13px" fontWeight="600">
-                  {eventLabel || 'Select Event'}
+                  <DecryptedText
+                    text={eventLabel || 'Select Event'}
+                    animateOn="view"
+                    speed={35}
+                    maxIterations={10}
+                  />
                 </Text>
                 <Box display="flex" color="var(--subtle)">
                   <ChevronDown size={14} />
@@ -305,7 +327,7 @@ export default function EventName() {
                     >
                       <Flex w="100%" justify="space-between" align="center" gap="10px">
                         <Text noOfLines={1}>{name}</Text>
-                        {isSelected && <FaCheck size={12} />}
+                        {isSelected && <Check size={12} />}
                       </Flex>
                     </MenuItem>
                   );
@@ -331,7 +353,7 @@ export default function EventName() {
                   display="flex"
                   color={selectedCollege !== 'All' ? 'var(--accent)' : 'var(--subtle)'}
                 >
-                  <FaBuilding size={14} />
+                  <Building2 size={14} />
                 </Box>
                 <Text noOfLines={1} maxW={{ base: '110px', md: '170px' }} fontSize="13px" fontWeight="600">
                   {selectedCollege === 'All' ? 'All Colleges' : selectedCollege}
@@ -392,7 +414,7 @@ export default function EventName() {
                     >
                       <Flex w="100%" justify="space-between" align="center" gap="10px">
                         <Text noOfLines={1}>{college === 'All' ? 'All Colleges' : college}</Text>
-                        {selected && <FaCheck size={12} />}
+                        {selected && <Check size={12} />}
                       </Flex>
                     </MenuItem>
                   );
@@ -416,7 +438,7 @@ export default function EventName() {
           borderColor={firstYearOnly ? 'var(--accent)' : 'var(--border)'}
         >
           <Box display="flex" color={firstYearOnly ? 'var(--accent)' : 'var(--subtle)'}>
-            <FaCalendarAlt size={14} />
+            <Calendar size={14} />
           </Box>
           <span>1st Years Only</span>
           <Box
@@ -460,10 +482,11 @@ export default function EventName() {
             _hover={{ bg: 'var(--accent-hover)', transform: 'translateY(-1px)' }}
             _focusVisible={{ outline: '2px solid var(--accent)', outlineOffset: '2px' }}
           >
-            <MdClear size={15} />
+            <X size={15} />
             Clear
           </chakra.button>
         )}
+        </Flex>
 
       </Flex>
 
@@ -488,21 +511,26 @@ export default function EventName() {
       {/* ─── 3. TOP 3 SPOTLIGHT ─── */}
       {showSpotlight && (
         <Box>
-          <Flex align="center" justify="space-between" mb="12px" px="4px">
-            <HStack spacing="8px">
-              <Box w="6px" h="6px" borderRadius="full" bg="var(--secondary)" />
-              <Text fontSize="xs" fontWeight="700" letterSpacing="0.1em" textTransform="uppercase" color="var(--secondary)" fontFamily="var(--f-mono)">
-                Podium of Honor · Top Standings
-              </Text>
-            </HStack>
-            <Text fontSize="11px" color="var(--subtle)" fontFamily="var(--f-mono)">
-              Verified Seasonal Results
-            </Text>
-          </Flex>
+          <Text
+            fontSize="11px"
+            fontWeight="700"
+            letterSpacing="0.16em"
+            textTransform="uppercase"
+            color="var(--muted)"
+            fontFamily="var(--f-mono)"
+            mb="16px"
+            px="4px"
+          >
+            TOP STANDINGS
+          </Text>
 
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '14px', md: '20px' }} alignItems="end">
-            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
+          <SimpleGrid
+            columns={{ base: 1, md: 3 }}
+            spacing={{ base: '16px', md: '20px' }}
+            alignItems={{ base: 'stretch', md: 'flex-end' }}
+          >
             <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
             <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} hasPoints={hasPoints} />
           </SimpleGrid>
         </Box>
@@ -527,9 +555,9 @@ export default function EventName() {
             mb="18px"
             boxShadow="0 10px 30px var(--accent-soft)"
           >
-            <FaSearchMinus size={32} />
+            <SearchX size={32} />
           </Box>
-          <Text fontFamily={SERIF} fontSize={{ base: '22px', md: '26px' }} color="var(--text)" mb="6px">
+          <Text fontFamily="var(--f-display)" fontSize={{ base: '22px', md: '26px' }} color="var(--text)" mb="6px">
             No contributors found
           </Text>
           <Text fontSize="14px" color="var(--muted)" maxW="380px" lineHeight="1.7">
@@ -589,11 +617,13 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
         _hover={{ bg: 'var(--surface-2)' }}
         _focusVisible={{ outline: '2px solid var(--accent)' }}
       >
-        <MdClear size={13} />
+        <X size={13} />
       </chakra.button>
     </HStack>
   );
 }
+
+
 
 function SpotlightCard({
   row,
@@ -606,189 +636,261 @@ function SpotlightCard({
   isOpencode: boolean;
   hasPoints?: boolean;
 }) {
-  const medal = MEDALS[rank];
   const isFirst = rank === 1;
   const isSecond = rank === 2;
   const isThird = rank === 3;
   const college = String(row.college ?? '').trim();
-  const hasPoints = hasPointsProp ?? (row.points !== undefined && row.points !== null);
+  const { colorMode } = useColorMode();
+  const isLight = colorMode === 'light';
 
-  const cardClass = isFirst
-    ? 'podium-card podium-card-gold'
-    : isSecond
-    ? 'podium-card podium-card-silver'
-    : 'podium-card podium-card-bronze';
+  // Distinct circle backgrounds matching the design:
+  // Champion #1: Maroon / Deep Coral circle (#853D3D)
+  // Runner-up #2: Teal / Slate circle (#2A5A68)
+  // Third place #3: Terracotta / Orange circle (#BD5319)
+  const avatarBg = isFirst ? '#853D3D' : isSecond ? '#2A5A68' : '#BD5319';
 
-  const avatarHaloClass = isFirst
-    ? 'avatar-halo-gold'
+  // Stepped heights: 1st (430px) > 2nd (380px) > 3rd (340px)
+  const cardHeight = isFirst
+    ? { base: 'auto', md: '430px' }
     : isSecond
-    ? 'avatar-halo-silver'
-    : 'avatar-halo-bronze';
+    ? { base: 'auto', md: '380px' }
+    : { base: 'auto', md: '340px' };
 
-  const rankTag = isFirst
-    ? 'CHAMPION · #1'
+  const cardMinHeight = isFirst
+    ? { base: '320px', md: '430px' }
     : isSecond
-    ? 'RUNNER UP · #2'
-    : 'THIRD PLACE · #3';
+    ? { base: '290px', md: '380px' }
+    : { base: '270px', md: '340px' };
 
-  const accentColor = isFirst
-    ? '#F5C542'
-    : isSecond
-    ? '#BAD7F5'
-    : '#FDBA74';
-
-  const scoreTextShadow = isFirst
-    ? '0 0 25px rgba(245, 197, 66, 0.45)'
-    : isSecond
-    ? '0 0 20px rgba(186, 215, 245, 0.35)'
-    : '0 0 20px rgba(253, 186, 116, 0.35)';
+  // Substantially larger avatar sizes to fill empty space heroically
+  const avatarSize = isFirst ? '96px' : isSecond ? '82px' : '72px';
+  const avatarFontSize = isFirst ? '26px' : isSecond ? '22px' : '19px';
 
   const cardContent = (
     <Box
-      className={cardClass}
       position="relative"
       textAlign="center"
-      overflow="hidden"
-      p={{ base: '22px 16px', md: isFirst ? '36px 24px 32px' : '26px 20px 26px' }}
-      order={{ base: rank, md: isFirst ? 2 : isSecond ? 1 : 3 }}
+      borderRadius="24px"
+      bg="var(--surface)"
+      backdropFilter="blur(20px)"
+      border={isFirst ? '1.5px solid var(--secondary)' : '1px solid var(--border)'}
+      boxShadow={
+        isFirst
+          ? '0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 28px -4px rgba(245, 197, 66, 0.3)'
+          : 'var(--shadow)'
+      }
+      pt={{ base: '26px', md: isFirst ? '34px' : isSecond ? '28px' : '24px' }}
+      pb={{ base: '24px', md: isFirst ? '32px' : isSecond ? '26px' : '22px' }}
+      px={{ base: '18px', md: '24px' }}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="space-between"
+      h={cardHeight}
+      minH={cardMinHeight}
+      w="100%"
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+      _hover={{
+        transform: 'translateY(-4px)',
+        borderColor: isFirst ? 'var(--secondary)' : 'var(--accent)',
+        boxShadow: isFirst
+          ? '0 20px 48px -8px rgba(245, 197, 66, 0.4)'
+          : 'var(--shadow), 0 0 20px var(--accent-soft)',
+      }}
       cursor={row.githubid ? 'pointer' : 'default'}
     >
-      {/* Light spotlight cone / ambient beam from top */}
-      <Box
-        position="absolute"
-        top="0"
-        left="50%"
-        transform="translateX(-50%)"
-        w="90%"
-        h="100px"
-        bg={
-          isFirst
-            ? 'radial-gradient(ellipse at top, rgba(245, 197, 66, 0.22) 0%, transparent 70%)'
-            : isSecond
-            ? 'radial-gradient(ellipse at top, rgba(186, 215, 245, 0.16) 0%, transparent 70%)'
-            : 'radial-gradient(ellipse at top, rgba(253, 186, 116, 0.16) 0%, transparent 70%)'
-        }
-        pointerEvents="none"
-      />
-
-      {/* Podium rank / crown header */}
-      <Flex justify="center" align="center" gap="7px" color={accentColor} mb={isFirst ? '12px' : '10px'}>
+      {/* Top section: Rank Badge, Large Avatar, Name, Handle, College */}
+      <Flex direction="column" align="center" w="100%">
+        {/* Rank Header Badge */}
         {isFirst ? (
-          <Box className="podium-crown-icon" display="flex" alignItems="center" gap="6px">
-            <FaCrown size={22} color="#F5C542" />
+          <Box
+            px="12px"
+            py="3px"
+            borderRadius="full"
+            bg="var(--secondary-soft)"
+            border="1px solid var(--secondary-border)"
+            mb="16px"
+          >
             <Text
-              fontSize="11px"
-              fontWeight="900"
-              letterSpacing="0.16em"
-              textTransform="uppercase"
+              fontSize="12.5px"
+              fontWeight="700"
               fontFamily="var(--f-mono)"
-              color="#F5C542"
+              color="var(--secondary)"
+              letterSpacing="0.06em"
             >
-              {rankTag}
+              Champion · #1
+            </Text>
+          </Box>
+        ) : isSecond ? (
+          <Box
+            px="11px"
+            py="2.5px"
+            borderRadius="full"
+            bg={isLight ? 'rgba(3, 105, 161, 0.1)' : 'rgba(148, 163, 184, 0.1)'}
+            border={isLight ? '1px solid rgba(3, 105, 161, 0.3)' : '1px solid rgba(148, 163, 184, 0.25)'}
+            mb="14px"
+          >
+            <Text
+              fontSize="12px"
+              fontWeight="600"
+              fontFamily="var(--f-mono)"
+              color={isLight ? '#0369A1' : '#BAE6FD'}
+              letterSpacing="0.05em"
+            >
+              Runner-up · #2
             </Text>
           </Box>
         ) : (
-          <Text
-            fontSize="10.5px"
-            fontWeight="800"
-            letterSpacing="0.14em"
-            textTransform="uppercase"
-            fontFamily="var(--f-mono)"
-            color={accentColor}
+          <Box
+            px="11px"
+            py="2.5px"
+            borderRadius="full"
+            bg={isLight ? 'rgba(194, 65, 12, 0.1)' : 'rgba(217, 119, 6, 0.1)'}
+            border={isLight ? '1px solid rgba(194, 65, 12, 0.3)' : '1px solid rgba(217, 119, 6, 0.25)'}
+            mb="12px"
           >
-            {rankTag}
+            <Text
+              fontSize="12px"
+              fontWeight="600"
+              fontFamily="var(--f-mono)"
+              color={isLight ? '#C2410C' : '#FDBA74'}
+              letterSpacing="0.05em"
+            >
+              Third place · #3
+            </Text>
+          </Box>
+        )}
+
+        {/* Heroic Avatar Circle with GitHub profile image & clean initials fallback */}
+        <ContributorAvatar
+          name={row.name}
+          githubid={row.githubid}
+          avatarUrl={row.avatarUrl}
+          size={avatarSize}
+          fontSize={avatarFontSize}
+          bg={avatarBg}
+          boxShadow={
+            isFirst
+              ? '0 8px 24px rgba(245, 197, 66, 0.25), 0 4px 12px rgba(0,0,0,0.4)'
+              : '0 6px 18px rgba(0,0,0,0.3)'
+          }
+          border={
+            isFirst
+              ? '2px solid var(--secondary)'
+              : isSecond
+              ? isLight
+                ? '1.5px solid rgba(3, 105, 161, 0.4)'
+                : '1.5px solid rgba(186, 230, 253, 0.35)'
+              : isLight
+              ? '1.5px solid rgba(194, 65, 12, 0.4)'
+              : '1.5px solid rgba(253, 186, 116, 0.35)'
+          }
+          mb={isFirst ? '16px' : isSecond ? '14px' : '12px'}
+        />
+
+        {/* Contributor Name - scaled up to command presence */}
+        <Text
+          fontFamily="var(--f-display)"
+          fontSize={{
+            base: '22px',
+            md: isFirst ? '28px' : isSecond ? '24px' : '22px',
+            lg: isFirst ? '30px' : isSecond ? '26px' : '24px',
+          }}
+          fontWeight={isFirst ? '700' : '600'}
+          color="var(--fg)"
+          lineHeight="1.2"
+          noOfLines={1}
+          mb="4px"
+        >
+          {row.name}
+        </Text>
+
+        {/* Github Handle */}
+        {row.githubid && (
+          <Text
+            fontSize={isFirst ? '14px' : '13px'}
+            color="var(--accent)"
+            fontWeight={isFirst ? '600' : '500'}
+            noOfLines={1}
+            mb="4px"
+          >
+            @{row.githubid}
+          </Text>
+        )}
+
+        {/* College Name */}
+        {college && (
+          <Text
+            fontSize={isFirst ? '13px' : isSecond ? '12.5px' : '12px'}
+            color="var(--muted)"
+            noOfLines={2}
+            maxW="260px"
+            lineHeight="1.35"
+          >
+            {college}
           </Text>
         )}
       </Flex>
 
-      {/* Avatar with dynamic glowing halo ring */}
-      <Box position="relative" display="inline-block" my={isFirst ? '6px' : '4px'}>
-        <Box className={avatarHaloClass} borderRadius="full" p="4px">
-          <Avatar
-            src={row.avatarUrl as string}
-            name={row.name}
-            size={isFirst ? 'xl' : 'lg'}
-            border="3px solid"
-            borderColor={medal.ring}
-            boxShadow={
-              isFirst
-                ? '0 0 28px rgba(245, 197, 66, 0.45)'
-                : isSecond
-                ? '0 0 20px rgba(186, 215, 245, 0.35)'
-                : '0 0 20px rgba(253, 186, 116, 0.35)'
-            }
-          />
-        </Box>
-        <Box
-          position="absolute"
-          bottom="-5px"
-          left="50%"
-          transform="translateX(-50%)"
-          px="12px"
-          py="2px"
-          borderRadius="full"
-          fontSize="11px"
-          fontWeight="900"
-          bg={medal.bg}
-          color={medal.ink}
-          boxShadow="0 4px 12px rgba(0,0,0,0.35)"
-          letterSpacing="0.04em"
+      {/* Bottom section: Bold Points and Merged PRs */}
+      <Box w="100%" mt={isThird ? '10px' : '14px'}>
+        <Flex align="baseline" justify="center" gap="6px">
+          <Text
+            fontFamily="var(--f-display)"
+            fontSize={{
+              base: '38px',
+              md: isFirst ? '52px' : isSecond ? '44px' : '38px',
+              lg: isFirst ? '58px' : isSecond ? '48px' : '42px',
+            }}
+            fontWeight="700"
+            color={isFirst ? 'var(--secondary)' : 'var(--fg)'}
+            lineHeight="1"
+            style={{ fontVariantNumeric: 'tabular-nums' }}
+          >
+            {Number(row.points || 0).toLocaleString()}
+          </Text>
+          <Text
+            fontSize={isFirst ? '14px' : '13px'}
+            color={isFirst ? 'var(--secondary)' : 'var(--muted)'}
+            fontFamily="var(--f-body)"
+            fontWeight="600"
+          >
+            pts
+          </Text>
+        </Flex>
+
+        <Text
+          fontSize={isFirst ? '14px' : isSecond ? '13px' : '12.5px'}
+          color={isFirst ? 'var(--fg)' : 'var(--muted)'}
+          mt="6px"
+          fontFamily="var(--f-body)"
+          fontWeight={isFirst ? '600' : '500'}
         >
-          #{rank}
-        </Box>
+          {Number(row.prmerged || 0).toLocaleString()} PRs merged
+        </Text>
       </Box>
-
-      {/* Name and GitHub handle */}
-      <Text
-        fontFamily={SERIF}
-        fontSize={{ base: '20px', md: isFirst ? '25px' : '20px' }}
-        fontWeight={isFirst ? '700' : '600'}
-        color="var(--text)"
-        noOfLines={1}
-        mt="16px"
-        transition="color 0.2s ease"
-        _hover={{ color: 'var(--accent)' }}
-      >
-        {row.name}
-      </Text>
-      <Text fontSize="12px" color="var(--subtle)" noOfLines={1}>
-        @{row.githubid}
-      </Text>
-      {college && (
-        <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} mt="3px" px="10px">
-          {college}
-        </Text>
-      )}
-
-      <Text
-        fontFamily={SERIF}
-        fontSize={{ base: '30px', md: isFirst ? '44px' : '32px' }}
-        fontWeight={isFirst ? '800' : '600'}
-        color={isFirst ? 'var(--secondary)' : 'var(--text)'}
-        lineHeight="1.1"
-        mt="14px"
-        style={{ fontVariantNumeric: 'tabular-nums' }}
-      >
-        {Number(row.points).toLocaleString()}{' '}
-        <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="12px" color="var(--muted)">
-          {isOpencode ? 'pts' : 'score'}
-        </Text>
-      </Text>
-      <Text fontSize="12px" color="var(--muted)" mt="2px">
-        {isOpencode
-          ? `${Number(row.prmerged).toLocaleString()} PRs merged`
-          : 'Official Ranking'}
-      </Text>
     </Box>
   );
 
   if (row.githubid) {
     return (
-      <Link href={`/user/profile/${row.githubid}`} style={{ textDecoration: 'none', display: 'contents' }}>
+      <Link
+        href={`/user/profile/${row.githubid}`}
+        style={{
+          textDecoration: 'none',
+          display: 'flex',
+          width: '100%',
+          alignSelf: 'flex-end',
+        }}
+      >
         {cardContent}
       </Link>
     );
   }
 
-  return cardContent;
+  return (
+    <Box w="100%" alignSelf="flex-end">
+      {cardContent}
+    </Box>
+  );
 }

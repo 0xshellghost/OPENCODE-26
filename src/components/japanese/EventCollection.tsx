@@ -12,6 +12,8 @@ import {
 import { Skeleton } from '@chakra-ui/react';
 import ClickSpark from '../reactbits/ClickSpark';
 import AnimatedContent from '../reactbits/AnimatedContent';
+import GradientText from '../reactbits/GradientText';
+import PageHeading from './PageHeading';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 
@@ -140,8 +142,8 @@ function FlagshipCard({
   const Icon = leaderboard ? Trophy : CalendarDays;
 
   return (
-    <div className="mb-12">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex items-center gap-2 mb-2.5">
         <span className="w-2 h-2 rounded-full bg-[var(--secondary)] animate-ping" />
         <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)] font-mono">
           Featured Flagship Arena
@@ -149,15 +151,15 @@ function FlagshipCard({
       </div>
 
       <article
-        className="group relative flex flex-col rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl"
+        className="group relative flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl"
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',
           boxShadow: 'var(--shadow)',
         }}
       >
-        {/* Full-width banner image */}
-        <div className="relative w-full h-60 sm:h-72 md:h-80 lg:h-96 overflow-hidden bg-[var(--bg)]">
+        {/* Generous Banner image giving the cover artwork maximum spotlight */}
+        <div className="relative w-full h-48 sm:h-56 md:h-64 lg:h-72 overflow-hidden bg-[var(--bg)]">
           <Image
             src={bannerUrl}
             alt={event.name ? `${event.name} banner` : 'Event banner'}
@@ -166,76 +168,107 @@ function FlagshipCard({
             priority
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-transparent to-black/30 opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/25 pointer-events-none" />
 
-          {/* Badges */}
-          <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 flex flex-wrap items-center gap-2">
-            <span className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-[var(--surface)]/90 backdrop-blur-md text-[var(--fg)] border border-[var(--border)] shadow-md">
+          {/* Floating Category & Status Badges */}
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-5 z-10 flex flex-wrap items-center gap-2">
+            <span className="px-3 py-1 rounded-lg text-xs font-bold bg-slate-950/75 text-slate-100 border border-white/20 shadow-md backdrop-blur-md">
               {track}
             </span>
-            <span
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md backdrop-blur-md"
-              style={{
-                backgroundColor: 'var(--status-live-bg)',
-                color: 'var(--status-live-text)',
-                borderColor: 'var(--status-live-border)',
-                borderWidth: '1px',
-              }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ backgroundColor: 'var(--status-live-text)' }}
-              />
-              {status.label}
-            </span>
+            {status.type === 'live' ? (
+              <span className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md backdrop-blur-md bg-emerald-950/85 text-emerald-300 border border-emerald-500/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live Now
+              </span>
+            ) : status.type === 'upcoming' ? (
+              <span className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md backdrop-blur-md bg-amber-950/85 text-amber-300 border border-amber-500/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                Upcoming
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md backdrop-blur-md bg-slate-900/85 text-slate-200 border border-slate-700/60">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                Concluded
+              </span>
+            )}
           </div>
+        </div>
 
-          {/* Logo badge in bottom-left */}
-          <div className="absolute -bottom-8 left-6 sm:left-10 z-20">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[var(--surface)] border-4 border-[var(--surface)] shadow-2xl overflow-hidden flex items-center justify-center p-1.5">
+        {/* Compact, streamlined event info bar - minimizes vertical space for maximum banner presence */}
+        <div className="p-3.5 sm:px-6 sm:py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            {/* Logo */}
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] shadow-md overflow-hidden flex items-center justify-center p-1 shrink-0">
               {logoUrl ? (
                 <img
                   src={logoUrl}
                   alt={title}
-                  className="w-full h-full object-cover rounded-xl"
+                  className="w-full h-full object-cover rounded-lg"
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
                   }}
                 />
               ) : (
-                <Icon size={32} className="text-[var(--accent)]" />
+                <Icon size={20} className="text-[var(--accent)]" />
               )}
             </div>
-          </div>
-        </div>
 
-        {/* Name and description below banner */}
-        <div className="pt-12 sm:pt-14 px-6 sm:px-10 pb-8 sm:pb-10 flex flex-col justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 text-xs text-[var(--muted)] mb-3 font-mono">
-              <CalendarDays size={14} className="text-[var(--accent)]" />
-              <span>{dates}</span>
+            {/* Title, Dates & One-line Description */}
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mb-0.5">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-extrabold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors leading-tight">
+                  <GradientText
+                    colors={['#B8E5D5', '#F4F1E8', '#58B99A', '#B8E5D5']}
+                    lightColors={['#0F766E', '#134E4A', '#0D9488', '#0F766E']}
+                    animationSpeed={8}
+                  >
+                    {title}
+                  </GradientText>
+                </h3>
+                <span className="flex items-center gap-1 text-[11px] sm:text-xs text-[var(--muted)] font-mono">
+                  <CalendarDays size={12} className="text-[var(--accent)]" />
+                  <span>{dates}</span>
+                </span>
+              </div>
+              <p className="text-xs text-[var(--muted)] line-clamp-1 max-w-2xl">
+                {event.description ||
+                  'Join thousands of student developers in the premier seasonal open-source sprint.'}
+              </p>
             </div>
-            <h3 className="text-2xl sm:text-4xl font-extrabold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors mb-3 leading-tight">
-              {title}
-            </h3>
-            <p className="text-sm sm:text-base text-[var(--muted)] leading-relaxed max-w-4xl">
-              {event.description ||
-                'Join thousands of student developers in the premier seasonal open-source sprint. Collaborate with maintainers, submit pull requests, and climb the official standings.'}
-            </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-[var(--border)]">
-            <div className="flex items-center gap-2 text-xs text-[var(--muted)] font-mono">
-              <span className="inline-block w-2 h-2 rounded-full bg-[var(--accent)]" />
-              <span>Active Community Sprint</span>
+          {/* Action Button & Sprint Indicator */}
+          <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t border-[var(--border)] md:border-t-0">
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-mono hidden lg:flex">
+              {status.type === 'live' ? (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[var(--fg)] font-semibold">Active Sprint</span>
+                </>
+              ) : status.type === 'upcoming' ? (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
+                  <span className="text-[var(--muted)]">Upcoming Sprint</span>
+                </>
+              ) : (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-slate-400" />
+                  <span className="text-[var(--muted)]">Sprint Concluded</span>
+                </>
+              )}
             </div>
             <Link
               href={`/user/leaderboard/${encodeURIComponent(event.name)}`}
-              className="px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-md group-hover:scale-[1.02]"
+              className="px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-md group-hover:scale-[1.02] shrink-0"
             >
-              <span>{leaderboard ? 'View Arena Standings' : 'Enter Arena & Leaderboard'}</span>
-              <ChevronRight size={16} />
+              <span>
+                {leaderboard
+                  ? 'View Arena Standings'
+                  : status.type === 'concluded'
+                  ? 'View Final Standings'
+                  : 'Enter Arena & Leaderboard'}
+              </span>
+              <ChevronRight size={15} />
             </Link>
           </div>
         </div>
@@ -279,6 +312,17 @@ export default function EventCollection({
 
   return (
     <ClickSpark sparkColor="rgba(88, 185, 154, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>
+      <PageHeading
+        eyebrow={leaderboard ? "STANDINGS BY ARENA" : "COMPETITIONS & TRACKS"}
+        title={leaderboard ? "Leaderboard Arenas" : "Active Arenas & Challenges"}
+        description={
+          leaderboard
+            ? "Select an arena to view official standings, merged contributions, and top performers."
+            : "Explore seasonal open-source sprints, collaborate with maintainers, and climb the official standings across specialized tracks."
+        }
+      >
+        競技会
+      </PageHeading>
 
       {/* Loading Skeleton Grid */}
       {loading ? (
@@ -288,8 +332,8 @@ export default function EventCollection({
               key={n}
               height="380px"
               borderRadius="20px"
-              startColor="rgba(11, 28, 42, 0.6)"
-              endColor="rgba(16, 37, 53, 0.4)"
+              startColor="var(--card-soft)"
+              endColor="var(--border)"
             />
           ))}
         </div>
@@ -315,12 +359,12 @@ export default function EventCollection({
           {flagship && <FlagshipCard event={flagship} leaderboard={leaderboard} />}
 
           {flagship && gridEvents.length > 0 && (
-            <div className="flex items-center gap-4 mt-10 mb-6">
-              <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--muted)] font-mono">
+            <div className="flex items-center gap-4 mt-8 mb-5">
+              <h4 className="text-xs font-bold tracking-wider uppercase text-[var(--fg)] font-mono opacity-80">
                 All Active & Upcoming Tracks
               </h4>
               <div className="flex-1 h-[1px] bg-[var(--border)]" />
-              <span className="text-xs text-[var(--subtle)] font-mono">
+              <span className="text-xs text-[var(--muted)] font-mono font-medium">
                 {gridEvents.length} more {gridEvents.length === 1 ? 'track' : 'tracks'}
               </span>
             </div>
@@ -359,50 +403,26 @@ export default function EventCollection({
                     {/* Visual Banner Header */}
                     <div className="relative h-40 w-full overflow-hidden bg-[var(--bg)]">
                       <EventCardImage event={event} fallbackScene={scenes[index % scenes.length]} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/15 pointer-events-none" />
 
                       {/* Top Status & Track Badges */}
                       <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between z-10">
-                        <span className="px-2.5 py-1 rounded-md text-[11px] font-medium tracking-wide bg-[var(--surface)]/85 text-[var(--fg)] border border-[var(--border)] shadow-sm backdrop-blur-md">
+                        <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide bg-slate-950/75 text-slate-100 border border-white/20 shadow-sm backdrop-blur-md">
                           {track}
                         </span>
 
                         {status.type === 'live' ? (
-                          <span
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
-                            style={{
-                              backgroundColor: 'var(--status-live-bg)',
-                              color: 'var(--status-live-text)',
-                              borderColor: 'var(--status-live-border)',
-                              borderWidth: '1px',
-                            }}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--status-live-text)' }} />
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md bg-emerald-950/85 text-emerald-300 border border-emerald-500/40">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                             Live Now
                           </span>
                         ) : status.type === 'upcoming' ? (
-                          <span
-                            className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md"
-                            style={{
-                              backgroundColor: 'var(--status-upcoming-bg)',
-                              color: 'var(--status-upcoming-text)',
-                              borderColor: 'var(--status-upcoming-border)',
-                              borderWidth: '1px',
-                            }}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--status-upcoming-text)' }} />
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1.5 shadow-sm backdrop-blur-md bg-amber-950/85 text-amber-300 border border-amber-500/40">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                             Upcoming
                           </span>
                         ) : (
-                          <span
-                            className="px-2.5 py-1 rounded-md text-[11px] font-medium shadow-sm backdrop-blur-md"
-                            style={{
-                              backgroundColor: 'var(--status-concluded-bg)',
-                              color: 'var(--status-concluded-text)',
-                              borderColor: 'var(--status-concluded-border)',
-                              borderWidth: '1px',
-                            }}
-                          >
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold shadow-sm backdrop-blur-md bg-slate-900/85 text-slate-200 border border-slate-700/60">
                             Concluded
                           </span>
                         )}

@@ -7,6 +7,7 @@ import {
   FormLabel,
   Input,
   Text,
+  Textarea,
   useColorModeValue,
   useToast,
   VStack,
@@ -28,12 +29,6 @@ interface JWTPayload {
 export default function Addevent() {
   const router = useRouter();
   const toast = useToast();
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const cardBg = useColorModeValue('white', 'gray.800');
-  const shadowSoft = useColorModeValue(
-    '0 10px 24px rgba(0,0,0,0.08)',
-    '0 10px 24px rgba(0,0,0,0.35)'
-  );
   const calendarIconFilter = useColorModeValue('none', 'invert(1)');
 
   const [eventData, setEventData] = useState({
@@ -99,7 +94,9 @@ export default function Addevent() {
     }
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setEventData({
       ...eventData,
       [event.target.name]: event.target.value,
@@ -172,23 +169,32 @@ export default function Addevent() {
   };
 
   return (
-    <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px="20px">
-      <Text color={textColor} fontSize="2xl" mb="24px" fontWeight="700">
+    <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px={{ base: '12px', sm: '20px' }}>
+      <Text color="var(--fg)" fontSize="2xl" mb="24px" fontWeight="700">
         Add New Event
       </Text>
 
-      <Box bg={cardBg} p="30px" borderRadius="20px" boxShadow={shadowSoft} mb="24px" maxW="800px" mx="auto">
-        <Heading size="md" mb="16px" color={textColor}>
+      <Box
+        bg="var(--surface)"
+        border="1px solid var(--border)"
+        p={{ base: '18px', sm: '30px' }}
+        borderRadius="20px"
+        boxShadow="var(--shadow)"
+        mb="24px"
+        maxW="800px"
+        mx="auto"
+      >
+        <Heading size="md" mb="12px" color="var(--fg)">
           Event Details
         </Heading>
-        <Text fontSize="sm" mb="24px" color="gray.500">
+        <Text fontSize="sm" mb="24px" color="var(--fg-muted)">
           Create a new event by filling out the information below.
         </Text>
 
         <form onSubmit={handleSubmit}>
           <VStack align="stretch" spacing="24px">
             <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+              <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                 Event Title
               </FormLabel>
               <Input
@@ -202,14 +208,14 @@ export default function Addevent() {
             </FormControl>
 
             <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+              <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                 Event Description
               </FormLabel>
-              <Input
-                type="text"
+              <Textarea
                 name="description"
                 variant="auth"
-                placeholder="Enter event description"
+                rows={4}
+                placeholder="Enter event description..."
                 value={eventData.description}
                 onChange={handleChange}
               />
@@ -217,7 +223,7 @@ export default function Addevent() {
 
             <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="24px">
               <FormControl isRequired>
-                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                   Start Date
                 </FormLabel>
                 <Input
@@ -235,7 +241,7 @@ export default function Addevent() {
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                   End Date
                 </FormLabel>
                 <Input
@@ -255,7 +261,7 @@ export default function Addevent() {
 
             <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="24px">
               <FormControl isRequired>
-                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                   Logo Image
                 </FormLabel>
                 <Input
@@ -268,7 +274,7 @@ export default function Addevent() {
               </FormControl>
 
               <FormControl>
-                <FormLabel fontSize="sm" fontWeight="600" color={textColor}>
+                <FormLabel fontSize="sm" fontWeight="600" color="var(--fg)">
                   Banner Image (Cover)
                 </FormLabel>
                 <Input
@@ -279,7 +285,7 @@ export default function Addevent() {
                   onChange={coverUpload}
                 />
                 {coverFiles.length > 0 && (
-                  <Text fontSize="xs" color="gray.500" mt="2">
+                  <Text fontSize="xs" color="var(--fg-muted)" mt="2">
                     {coverFiles[0].name} selected
                   </Text>
                 )}
@@ -288,7 +294,7 @@ export default function Addevent() {
 
             <Box textAlign="right" mt="16px">
               <Button
-                bg="#9D767E" _hover={{ bg: "#785255" }} color="#FEF3ED"
+                variant="brand"
                 type="submit"
                 isLoading={isSubmitting}
                 loadingText="Creating..."

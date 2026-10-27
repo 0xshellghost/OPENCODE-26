@@ -1,18 +1,18 @@
 'use client';
 
-import { Box, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Icon, Text } from '@chakra-ui/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cloneElement, isValidElement, ReactElement } from 'react';
 import {
-  MdAnalytics,
-  MdCalendarToday,
-  MdDashboard,
-  MdHome,
-  MdLeaderboard,
-  MdPerson,
-  MdSettings,
-} from 'react-icons/md';
+  BarChart2,
+  Calendar,
+  Home,
+  LayoutDashboard,
+  Settings,
+  Trophy,
+  User,
+} from 'lucide-react';
 import { IRoute } from 'types/navigation';
 
 interface MobileMenuBarProps {
@@ -28,34 +28,28 @@ const getFallbackIcon = (routeName: string, routePath: string) => {
     name.includes('dashboard') ||
     path.includes('default')
   )
-    return MdHome;
-  if (name.includes('event') || path.includes('event')) return MdCalendarToday;
-  if (name.includes('leader') || path.includes('leader')) return MdLeaderboard;
-  if (name.includes('profile') || path.includes('profile')) return MdPerson;
+    return Home;
+  if (name.includes('event') || path.includes('event')) return Calendar;
+  if (name.includes('leader') || path.includes('leader')) return Trophy;
+  if (name.includes('profile') || path.includes('profile')) return User;
   if (name.includes('analytic') || path.includes('analytic'))
-    return MdAnalytics;
-  if (name.includes('setting') || path.includes('setting')) return MdSettings;
+    return BarChart2;
+  if (name.includes('setting') || path.includes('setting')) return Settings;
 
-  return MdDashboard;
+  return LayoutDashboard;
 };
 
 export default function MobileMenuBar(props: MobileMenuBarProps) {
   const { routes } = props;
   const pathname = usePathname();
 
-  const bgColor = useColorModeValue(
-    'rgba(255, 255, 255, 0.85)',
-    'rgba(15, 23, 42, 0.85)',
-  );
-  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  const activeColor = 'purple.500';
-  const inactiveColor = useColorModeValue('gray.500', 'gray.400');
-  const hoverBg = useColorModeValue('gray.50', 'whiteAlpha.50');
-  const activeBg = useColorModeValue('purple.50', 'rgba(157, 118, 126, 0.1)');
-  const shadow = useColorModeValue(
-    '0px -4px 20px rgba(0, 0, 0, 0.08)',
-    '0px -4px 20px rgba(0, 0, 0, 0.3)',
-  );
+  const bgColor = 'var(--nav-bg)';
+  const borderColor = 'var(--border)';
+  const activeColor = 'var(--accent)';
+  const inactiveColor = 'var(--fg-muted)';
+  const hoverBg = 'var(--surface-2)';
+  const activeBg = 'var(--accent-soft)';
+  const shadow = 'var(--shadow)';
 
   const isActive = (routePath: string) => {
     if (routePath.includes('leaderboard')) {
@@ -115,7 +109,7 @@ export default function MobileMenuBar(props: MobileMenuBarProps) {
                     h="4px"
                     bg={activeColor}
                     borderRadius="full"
-                    boxShadow="0 0 8px rgba(159, 122, 234, 0.6)"
+                    boxShadow="0 0 8px var(--accent-glow)"
                   />
                 )}
 

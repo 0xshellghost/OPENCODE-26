@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useColorMode } from '@chakra-ui/react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -13,6 +14,7 @@ import {
 } from 'recharts';
 import RingLoader from 'react-spinners/RingLoader';
 import { FaCalendarAlt, FaClock, FaTrophy, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { isMaintainer } from 'constants/Maintainers';
 
 export type ParticipantSeries = {
   participantId: string;
@@ -91,6 +93,9 @@ const genTenMinSlots = (dayIso: string) => {
  * Custom Rich Tooltip
  * ------------------------------------------------------------- */
 function CustomTooltip({ active, payload, label }: any) {
+  const { colorMode } = useColorMode();
+  const isLight = colorMode === 'light';
+
   if (!active || !payload || !payload.length) return null;
 
   // Filter valid positive points and sort descending by score
@@ -110,15 +115,17 @@ function CustomTooltip({ active, payload, label }: any) {
   return (
     <div
       style={{
-        background: 'rgba(8, 20, 32, 0.95)',
-        border: '1px solid rgba(88, 185, 154, 0.35)',
+        background: isLight ? 'rgba(255, 255, 255, 0.98)' : 'rgba(8, 20, 32, 0.95)',
+        border: isLight ? '1px solid rgba(88, 185, 154, 0.5)' : '1px solid rgba(88, 185, 154, 0.35)',
         borderRadius: '16px',
         padding: '12px 16px',
-        boxShadow: '0 16px 40px rgba(0,0,0,0.7)',
+        boxShadow: isLight
+          ? '0 16px 36px rgba(0,0,0,0.12), 0 0 16px rgba(88,185,154,0.1)'
+          : '0 16px 40px rgba(0,0,0,0.7)',
         backdropFilter: 'blur(20px)',
         minWidth: '240px',
         maxWidth: '320px',
-        color: '#F4F1E8',
+        color: isLight ? '#0F172A' : '#F4F1E8',
       }}
     >
       <div
@@ -128,21 +135,21 @@ function CustomTooltip({ active, payload, label }: any) {
           alignItems: 'center',
           marginBottom: '10px',
           paddingBottom: '8px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          borderBottom: isLight ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        <span style={{ fontSize: '12px', fontWeight: 800, color: '#58B99A', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '12px', fontWeight: 800, color: isLight ? '#0D9488' : '#58B99A', fontFamily: 'monospace' }}>
           {label}
         </span>
         {formattedDate && (
-          <span style={{ fontSize: '11px', color: '#AEBCC7' }}>
+          <span style={{ fontSize: '11px', color: isLight ? '#64748B' : '#AEBCC7' }}>
             {formattedDate}
           </span>
         )}
       </div>
 
       {validEntries.length === 0 ? (
-        <div style={{ fontSize: '12px', color: '#AEBCC7', padding: '6px 0' }}>
+        <div style={{ fontSize: '12px', color: isLight ? '#64748B' : '#AEBCC7', padding: '6px 0' }}>
           No recorded points at this milestone
         </div>
       ) : (
@@ -161,7 +168,7 @@ function CustomTooltip({ active, payload, label }: any) {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                   {isLeader ? (
-                    <FaTrophy size={11} color="#F5C542" style={{ flexShrink: 0 }} />
+                    <FaTrophy size={11} color={isLight ? '#D97706' : '#F5C542'} style={{ flexShrink: 0 }} />
                   ) : (
                     <span
                       style={{
@@ -178,7 +185,7 @@ function CustomTooltip({ active, payload, label }: any) {
                     style={{
                       fontSize: '12.5px',
                       fontWeight: isLeader ? 700 : 500,
-                      color: isLeader ? '#F5C542' : '#E2E8F0',
+                      color: isLeader ? (isLight ? '#B45309' : '#F5C542') : (isLight ? '#1E293B' : '#E2E8F0'),
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -193,7 +200,7 @@ function CustomTooltip({ active, payload, label }: any) {
                     fontFamily: 'monospace',
                     fontSize: '12.5px',
                     fontWeight: 800,
-                    color: entry.stroke || entry.color,
+                    color: isLight && (entry.stroke === '#F5C542' || entry.color === '#F5C542') ? '#B45309' : (entry.stroke || entry.color),
                     flexShrink: 0,
                   }}
                 >
@@ -222,6 +229,10 @@ export default function LeaderboardGraph({
   startDate?: string;
   endDate?: string;
 }) {
+  const { colorMode } = useColorMode();
+  const isLight = colorMode === 'light';
+  const isOpencode = (eventName || '').toLowerCase().includes('opencode');
+
   const defaultStartDate = process.env.NEXT_PUBLIC_EVENT_START_DATE || '2025-12-14';
 
   const { data, isLoading, isError, error } = useQuery({
@@ -257,11 +268,16 @@ export default function LeaderboardGraph({
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [contributorLimit, setContributorLimit] = useState<number>(5);
 
-
-  // Sort participants by official total points from database
+  // Sort participants by official total points from database (excluding mentors if OpenCode)
   const sortedParticipants = useMemo(() => {
     if (!data || !Array.isArray(data)) return [];
     return [...data]
+      .filter((p) => {
+        if (isOpencode && p.participantId && isMaintainer(p.participantId)) {
+          return false;
+        }
+        return true;
+      })
       .map((p) => {
         const lastEntry = p.data && p.data.length ? p.data[p.data.length - 1] : null;
         const maxPoints = p.data?.reduce((m, d) => Math.max(m, d.points || 0), 0) || 0;
@@ -272,7 +288,7 @@ export default function LeaderboardGraph({
         };
       })
       .sort((a, b) => b.latestPoints - a.latestPoints);
-  }, [data]);
+  }, [data, isOpencode]);
 
   // Display subset based on contributor limit filter (Top 5 / All)
   const activeParticipants = useMemo(() => {
@@ -398,7 +414,7 @@ export default function LeaderboardGraph({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '380px', gap: '16px' }}>
         <RingLoader color="#58B99A" size={48} />
-        <span style={{ fontSize: '13px', color: '#AEBCC7', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '13px', color: isLight ? '#475569' : '#AEBCC7', fontFamily: 'monospace' }}>
           Loading Points Telemetry...
         </span>
       </div>
@@ -407,7 +423,7 @@ export default function LeaderboardGraph({
 
   if (isError) {
     return (
-      <div style={{ color: '#FC8181', padding: '32px 0', textAlign: 'center', fontSize: '14px' }}>
+      <div style={{ color: '#E53E3E', padding: '32px 0', textAlign: 'center', fontSize: '14px' }}>
         Failed to load telemetry: {(error as Error).message}
       </div>
     );
@@ -415,7 +431,7 @@ export default function LeaderboardGraph({
 
   if (!data || data.length === 0) {
     return (
-      <div style={{ color: '#AEBCC7', padding: '40px 0', textAlign: 'center', fontSize: '14px' }}>
+      <div style={{ color: isLight ? '#64748B' : '#AEBCC7', padding: '40px 0', textAlign: 'center', fontSize: '14px' }}>
         No points telemetry recorded yet for this event.
       </div>
     );
@@ -448,10 +464,10 @@ export default function LeaderboardGraph({
             style={{
               display: 'flex',
               padding: '3px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
               borderRadius: '9999px',
-              border: '1px solid rgba(88, 185, 154, 0.22)',
-              boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.4)',
+              border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid rgba(88, 185, 154, 0.22)',
+              boxShadow: isLight ? 'inset 0 1px 3px rgba(0, 0, 0, 0.05)' : 'inset 0 2px 6px rgba(0, 0, 0, 0.4)',
             }}
           >
             <button
@@ -463,13 +479,13 @@ export default function LeaderboardGraph({
                 gap: '6px',
                 padding: '6px 16px',
                 background: mode === 'daily' ? 'linear-gradient(135deg, #58B99A 0%, #389578 100%)' : 'transparent',
-                color: mode === 'daily' ? '#0C1C2C' : '#AEBCC7',
+                color: mode === 'daily' ? '#0C1C2C' : (isLight ? '#475569' : '#AEBCC7'),
                 border: 'none',
                 borderRadius: '9999px',
-                fontWeight: mode === 'daily' ? 700 : 500,
+                fontWeight: mode === 'daily' ? 700 : 600,
                 fontSize: '12.5px',
                 cursor: 'pointer',
-                boxShadow: mode === 'daily' ? '0 2px 10px rgba(88, 185, 154, 0.4)' : 'none',
+                boxShadow: mode === 'daily' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -486,13 +502,13 @@ export default function LeaderboardGraph({
                 gap: '6px',
                 padding: '6px 16px',
                 background: mode === 'tenMin' ? 'linear-gradient(135deg, #58B99A 0%, #389578 100%)' : 'transparent',
-                color: mode === 'tenMin' ? '#0C1C2C' : '#AEBCC7',
+                color: mode === 'tenMin' ? '#0C1C2C' : (isLight ? '#475569' : '#AEBCC7'),
                 border: 'none',
                 borderRadius: '9999px',
-                fontWeight: mode === 'tenMin' ? 700 : 500,
+                fontWeight: mode === 'tenMin' ? 700 : 600,
                 fontSize: '12.5px',
                 cursor: 'pointer',
-                boxShadow: mode === 'tenMin' ? '0 2px 10px rgba(88, 185, 154, 0.4)' : 'none',
+                boxShadow: mode === 'tenMin' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -506,9 +522,9 @@ export default function LeaderboardGraph({
             style={{
               display: 'flex',
               padding: '3px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
               borderRadius: '9999px',
-              border: '1px solid var(--border)',
+              border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid var(--border)',
             }}
           >
             <button
@@ -516,11 +532,11 @@ export default function LeaderboardGraph({
               onClick={() => setContributorLimit(5)}
               style={{
                 padding: '5px 12px',
-                background: contributorLimit === 5 ? 'rgba(88, 185, 154, 0.15)' : 'transparent',
-                color: contributorLimit === 5 ? '#58B99A' : '#AEBCC7',
-                border: contributorLimit === 5 ? '1px solid rgba(88, 185, 154, 0.4)' : '1px solid transparent',
+                background: contributorLimit === 5 ? (isLight ? 'rgba(88, 185, 154, 0.2)' : 'rgba(88, 185, 154, 0.15)') : 'transparent',
+                color: contributorLimit === 5 ? (isLight ? '#0D9488' : '#58B99A') : (isLight ? '#475569' : '#AEBCC7'),
+                border: contributorLimit === 5 ? (isLight ? '1px solid rgba(88, 185, 154, 0.5)' : '1px solid rgba(88, 185, 154, 0.4)') : '1px solid transparent',
                 borderRadius: '9999px',
-                fontWeight: contributorLimit === 5 ? 700 : 500,
+                fontWeight: contributorLimit === 5 ? 700 : 600,
                 fontSize: '11.5px',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -533,11 +549,11 @@ export default function LeaderboardGraph({
               onClick={() => setContributorLimit(0)}
               style={{
                 padding: '5px 12px',
-                background: contributorLimit === 0 ? 'rgba(88, 185, 154, 0.15)' : 'transparent',
-                color: contributorLimit === 0 ? '#58B99A' : '#AEBCC7',
-                border: contributorLimit === 0 ? '1px solid rgba(88, 185, 154, 0.4)' : '1px solid transparent',
+                background: contributorLimit === 0 ? (isLight ? 'rgba(88, 185, 154, 0.2)' : 'rgba(88, 185, 154, 0.15)') : 'transparent',
+                color: contributorLimit === 0 ? (isLight ? '#0D9488' : '#58B99A') : (isLight ? '#475569' : '#AEBCC7'),
+                border: contributorLimit === 0 ? (isLight ? '1px solid rgba(88, 185, 154, 0.5)' : '1px solid rgba(88, 185, 154, 0.4)') : '1px solid transparent',
                 borderRadius: '9999px',
-                fontWeight: contributorLimit === 0 ? 700 : 500,
+                fontWeight: contributorLimit === 0 ? 700 : 600,
                 fontSize: '11.5px',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -551,20 +567,20 @@ export default function LeaderboardGraph({
         {/* Right: Date Picker when in Single Day mode */}
         {mode === 'tenMin' && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#AEBCC7', fontWeight: 600 }}>Date:</span>
+            <span style={{ fontSize: '12px', color: isLight ? '#475569' : '#AEBCC7', fontWeight: 600 }}>Date:</span>
             <input
               type="date"
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
               style={{
-                background: 'rgba(10, 24, 38, 0.8)',
-                color: '#F4F1E8',
-                border: '1px solid rgba(88, 185, 154, 0.35)',
+                background: isLight ? '#FFFFFF' : 'rgba(10, 24, 38, 0.8)',
+                color: isLight ? '#0F172A' : '#F4F1E8',
+                border: isLight ? '1px solid rgba(0, 0, 0, 0.15)' : '1px solid rgba(88, 185, 154, 0.35)',
                 borderRadius: '10px',
                 padding: '6px 12px',
                 fontSize: '12.5px',
                 outline: 'none',
-                colorScheme: 'dark',
+                colorScheme: isLight ? 'light' : 'dark',
               }}
             />
           </div>
@@ -581,7 +597,7 @@ export default function LeaderboardGraph({
           padding: '8px 4px',
         }}
       >
-        {activeParticipants.map((p, idx) => {
+        {activeParticipants.map((p) => {
           const color = participantColorMap.get(p.participantId) || '#58B99A';
           const isHidden = hiddenIds.has(p.participantId);
           const isHovered = hoveredParticipantId === p.participantId;
@@ -599,17 +615,35 @@ export default function LeaderboardGraph({
                 padding: '5px 12px',
                 borderRadius: '9999px',
                 background: isHovered
-                  ? 'rgba(255, 255, 255, 0.08)'
+                  ? isLight
+                    ? 'rgba(0, 0, 0, 0.07)'
+                    : 'rgba(255, 255, 255, 0.08)'
                   : isHidden
-                  ? 'rgba(255, 255, 255, 0.02)'
+                  ? isLight
+                    ? 'rgba(0, 0, 0, 0.02)'
+                    : 'rgba(255, 255, 255, 0.02)'
+                  : isLight
+                  ? 'rgba(0, 0, 0, 0.04)'
                   : 'rgba(255, 255, 255, 0.04)',
                 border: isHovered
                   ? `1.5px solid ${color}`
-                  : `1px solid ${isHidden ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.12)'}`,
+                  : `1px solid ${
+                      isHidden
+                        ? isLight
+                          ? 'rgba(0, 0, 0, 0.06)'
+                          : 'rgba(255, 255, 255, 0.06)'
+                        : isLight
+                        ? 'rgba(0, 0, 0, 0.12)'
+                        : 'rgba(255, 255, 255, 0.12)'
+                    }`,
                 cursor: 'pointer',
-                opacity: isHidden ? 0.4 : isHovered ? 1 : 0.85,
+                opacity: isHidden ? 0.45 : isHovered ? 1 : 0.95,
                 transform: isHovered ? 'translateY(-2px)' : 'none',
-                boxShadow: isHovered ? `0 4px 14px ${color}33` : 'none',
+                boxShadow: isHovered
+                  ? isLight
+                    ? `0 4px 12px ${color}25`
+                    : `0 4px 14px ${color}33`
+                  : 'none',
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
               title={isHidden ? `Click to show ${p.name}` : `Click to hide ${p.name}`}
@@ -628,7 +662,7 @@ export default function LeaderboardGraph({
                 style={{
                   fontSize: '12px',
                   fontWeight: 600,
-                  color: isHidden ? '#718096' : '#F4F1E8',
+                  color: isHidden ? (isLight ? '#94A3B8' : '#718096') : (isLight ? '#0F172A' : '#F4F1E8'),
                   maxWidth: '140px',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
@@ -642,8 +676,8 @@ export default function LeaderboardGraph({
                   fontSize: '11px',
                   fontFamily: 'monospace',
                   fontWeight: 700,
-                  color: color,
-                  background: 'rgba(0,0,0,0.3)',
+                  color: isLight && color === '#F5C542' ? '#B45309' : color,
+                  background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.3)',
                   padding: '1px 6px',
                   borderRadius: '6px',
                 }}
@@ -651,9 +685,9 @@ export default function LeaderboardGraph({
                 {Number(p.latestPoints).toLocaleString()}
               </span>
               {isHidden ? (
-                <FaEyeSlash size={10} color="#718096" />
+                <FaEyeSlash size={10} color={isLight ? '#94A3B8' : '#718096'} />
               ) : (
-                <FaEye size={10} color="#A0AEC0" opacity={0.5} />
+                <FaEye size={10} color={isLight ? '#64748B' : '#A0AEC0'} opacity={0.6} />
               )}
             </div>
           );
@@ -665,7 +699,9 @@ export default function LeaderboardGraph({
         style={{
           width: '100%',
           height: '460px',
-          background: 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.05) 0%, transparent 80%)',
+          background: isLight
+            ? 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.08) 0%, transparent 80%)'
+            : 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.05) 0%, transparent 80%)',
           borderRadius: '16px',
           padding: '12px 6px 0 0',
         }}
@@ -686,16 +722,16 @@ export default function LeaderboardGraph({
 
             <CartesianGrid
               strokeDasharray="4 4"
-              stroke="rgba(88, 185, 154, 0.09)"
+              stroke={isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(88, 185, 154, 0.09)'}
               vertical={false}
             />
 
             <XAxis
               dataKey="day"
-              stroke="#718096"
-              tick={{ fill: '#AEBCC7', fontSize: 11, fontFamily: 'monospace' }}
+              stroke={isLight ? '#94A3B8' : '#718096'}
+              tick={{ fill: isLight ? '#475569' : '#AEBCC7', fontSize: 11, fontFamily: 'monospace', fontWeight: 600 }}
               tickLine={false}
-              axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+              axisLine={{ stroke: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.1)' }}
               interval={mode === 'daily' ? 1 : 3}
               angle={-25}
               textAnchor="end"
@@ -703,10 +739,10 @@ export default function LeaderboardGraph({
             />
 
             <YAxis
-              stroke="#718096"
-              tick={{ fill: '#AEBCC7', fontSize: 11, fontFamily: 'monospace' }}
+              stroke={isLight ? '#94A3B8' : '#718096'}
+              tick={{ fill: isLight ? '#475569' : '#AEBCC7', fontSize: 11, fontFamily: 'monospace', fontWeight: 600 }}
               tickLine={false}
-              axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+              axisLine={{ stroke: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.1)' }}
               tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val)}
               domain={['auto', 'auto']}
             />
@@ -759,7 +795,7 @@ export default function LeaderboardGraph({
           alignItems: 'center',
           gap: '8px',
           fontSize: '12px',
-          color: '#AEBCC7',
+          color: isLight ? '#64748B' : '#AEBCC7',
           padding: '6px 0',
         }}
       >

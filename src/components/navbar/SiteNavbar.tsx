@@ -95,9 +95,24 @@ export default function SiteNavbar() {
     }
   };
 
-  // Close mobile navigation on click outside or escape key
+  // Close mobile navigation on click outside or escape key, and trap focus
   useEffect(() => {
     if (!isMenuOpen) return;
+
+    // Body scroll lock on mobile when menu is active
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Auto-focus first focusable element inside mobile menu
+    const timer = setTimeout(() => {
+      if (mobileMenuRef.current) {
+        const firstFocusable = mobileMenuRef.current.querySelector<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      }
+    }, 50);
+
     const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
       const target = e.target as Node;
       if (
@@ -109,16 +124,43 @@ export default function SiteNavbar() {
         setIsMenuOpen(false);
       }
     };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsMenuOpen(false);
         toggleButtonRef.current?.focus();
+        return;
+      }
+
+      if (e.key === 'Tab' && mobileMenuRef.current) {
+        const focusable = Array.from(
+          mobileMenuRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => el.offsetParent !== null); // only visible elements
+
+        if (focusable.length > 0) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
+
     document.addEventListener('mousedown', handleOutsideClick);
     document.addEventListener('touchstart', handleOutsideClick);
     document.addEventListener('keydown', handleKeyDown);
+
     return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = originalOverflow;
       document.removeEventListener('mousedown', handleOutsideClick);
       document.removeEventListener('touchstart', handleOutsideClick);
       document.removeEventListener('keydown', handleKeyDown);
@@ -139,8 +181,8 @@ export default function SiteNavbar() {
           className={cn(
             "pointer-events-auto flex items-center justify-between transition-all duration-300 oc-capsule-navbar min-w-0",
             scrolled
-              ? "flex-1 max-w-5xl rounded-full px-3.5 sm:px-5 py-2 shadow-[0_0_30px_rgba(7,19,31,0.8)]"
-              : "flex-1 max-w-6xl rounded-[2.75rem] px-4 sm:px-6 py-2.5 sm:py-3 shadow-[0_20px_80px_-50px_rgba(7,19,31,0.7)]"
+              ? "flex-1 max-w-5xl rounded-full px-3.5 sm:px-5 py-2 shadow-2xl"
+              : "flex-1 max-w-6xl rounded-[2.75rem] px-4 sm:px-6 py-2.5 sm:py-3 shadow-xl"
           )}
         >
           {/* Left: Brand Title with Logo */}
@@ -155,8 +197,8 @@ export default function SiteNavbar() {
             }}
           >
             <OpenCodeLogo width={24} height={24} className="oc-brand-mark transition-transform group-hover:scale-105 shrink-0" />
-            <span className="text-base sm:text-lg font-bold tracking-tight text-[#F4F1E8] group-hover:opacity-90 transition-opacity whitespace-nowrap">
-              OpenCode<span className="text-[#B8E5D5]">&apos;26</span>
+            <span className="text-base sm:text-lg font-bold tracking-tight text-[var(--fg)] group-hover:opacity-90 transition-opacity whitespace-nowrap">
+              OpenCode<span className="text-[var(--accent)]">&apos;26</span>
             </span>
           </Link>
 
@@ -170,10 +212,10 @@ export default function SiteNavbar() {
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    "relative z-10 px-2 xl:px-2.5 2xl:px-3 py-1 text-xs xl:text-[13px] font-medium rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58B99A]/50 oc-capsule-link whitespace-nowrap shrink-0",
+                    "relative z-10 px-2 xl:px-2.5 2xl:px-3 py-1 text-xs xl:text-[13px] font-medium rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 oc-capsule-link whitespace-nowrap shrink-0",
                     isActive
-                      ? "text-[#F4F1E8] bg-[#102535] border border-[#58B99A]/40 shadow-sm shadow-[#58B99A]/20 font-semibold"
-                      : "text-[#AEBCC7] hover:text-[#F4F1E8] hover:bg-[#102535]/50 border border-transparent"
+                      ? "text-[var(--fg)] bg-[var(--surface-2)] border border-[var(--border-accent)] shadow-sm shadow-[var(--accent-soft)] font-semibold"
+                      : "text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)] border border-transparent"
                   )}
                 >
                   {item.label === 'RPlace Canvas' ? (
@@ -201,22 +243,22 @@ export default function SiteNavbar() {
               <ThemeToggle />
             </div>
 
-            <div className="hidden sm:block w-[1px] h-4 bg-[#AEBCC7]/20 mx-0.5 shrink-0" />
+            <div className="hidden sm:block w-[1px] h-4 bg-[var(--border)] mx-0.5 shrink-0" />
 
             {/* Dynamic Sign In / Profile action pill */}
             <Link
               href={mounted && isLoggedIn ? "/user/profile" : "/auth/sign-in"}
               aria-current={pathname?.startsWith('/user/profile') || pathname?.startsWith('/auth') ? 'page' : undefined}
               className={cn(
-                "relative z-10 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58B99A]/50 shrink-0 whitespace-nowrap",
+                "relative z-10 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0 whitespace-nowrap",
                 mounted && isLoggedIn
-                  ? "bg-[#58B99A]/15 text-[#B8E5D5] border border-[#58B99A]/30 hover:bg-[#58B99A]/25"
-                  : "bg-[#B8E5D5] text-[#0C1C2C] hover:bg-[#A3DAC7] shadow-md shadow-[#58B99A]/20"
+                  ? "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border-accent)] hover:bg-[var(--accent-soft)]/80"
+                  : "bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] shadow-md shadow-[var(--accent-soft)]"
               )}
             >
               {mounted && isLoggedIn ? (
                 <>
-                  <UserRound className="w-3.5 h-3.5 text-[#B8E5D5]" />
+                  <UserRound className="w-3.5 h-3.5 text-[var(--accent)]" />
                   <span>Profile</span>
                 </>
               ) : (
@@ -232,13 +274,13 @@ export default function SiteNavbar() {
               <button
                 ref={toggleButtonRef}
                 onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="text-[#AEBCC7] hover:text-[#F4F1E8] p-1.5 sm:p-2 rounded-full bg-[#102535]/55 border border-[#AEBCC7]/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58B99A]/50 transition-colors cursor-pointer"
+                className="text-[var(--muted)] hover:text-[var(--fg)] p-1.5 sm:p-2 rounded-full bg-[var(--surface)] border border-[var(--border)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 transition-colors cursor-pointer"
                 aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-nav-menu"
               >
                 {isMenuOpen ? (
-                  <X className="h-5 w-5 text-[#F4F1E8]" />
+                  <X className="h-5 w-5 text-[var(--fg)]" />
                 ) : (
                   <Menu className="h-5 w-5" />
                 )}
@@ -255,15 +297,15 @@ export default function SiteNavbar() {
               type="button"
               onClick={openTrailer}
               className={cn(
-                "group flex items-center gap-2 rounded-full border border-[#AEBCC7]/20 bg-[#102535]/70 hover:bg-[#102535]/95 text-xs sm:text-sm font-semibold text-[#F4F1E8] backdrop-blur-md shadow-lg shadow-[#07131F]/80 hover:border-[#58B99A]/45 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58B99A]/50 shrink-0",
+                "group flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-xs sm:text-sm font-semibold text-[var(--fg)] backdrop-blur-md shadow-lg hover:border-[var(--border-accent)] transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0",
                 scrolled
                   ? "px-2.5 sm:px-3 py-2"
                   : "px-3 sm:px-3.5 py-2.5"
               )}
               title="Play cinematic trailer"
             >
-              <Film className="w-4 h-4 text-[#58B99A] transition-transform duration-300 group-hover:scale-110 shrink-0" />
-              <span className="hidden xl:inline text-[#F4F1E8] whitespace-nowrap">Play Trailer</span>
+              <Film className="w-4 h-4 text-[var(--accent-bold)] transition-transform duration-300 group-hover:scale-110 shrink-0" />
+              <span className="hidden xl:inline text-[var(--fg)] whitespace-nowrap">Play Trailer</span>
             </button>
 
             {/* Sound Switch Button */}
@@ -271,7 +313,7 @@ export default function SiteNavbar() {
               type="button"
               onClick={toggleHeroSound}
               className={cn(
-                "group flex items-center gap-2 rounded-full border border-[#AEBCC7]/20 bg-[#102535]/70 hover:bg-[#102535]/95 text-xs sm:text-sm font-semibold text-[#F4F1E8] backdrop-blur-md shadow-lg shadow-[#07131F]/80 hover:border-[#58B99A]/45 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#58B99A]/50 shrink-0",
+                "group flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-xs sm:text-sm font-semibold text-[var(--fg)] backdrop-blur-md shadow-lg hover:border-[var(--border-accent)] transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0",
                 scrolled
                   ? "px-2.5 sm:px-3 py-2"
                   : "px-3 sm:px-3.5 py-2.5"
@@ -280,19 +322,19 @@ export default function SiteNavbar() {
             >
               {heroMuted ? (
                 <>
-                  <VolumeX className="w-4 h-4 text-[#718394] transition-colors group-hover:text-[#58B99A] shrink-0" />
-                  <span className="hidden xl:inline text-[#AEBCC7] group-hover:text-[#F4F1E8] transition-colors whitespace-nowrap">
+                  <VolumeX className="w-4 h-4 text-[var(--subtle)] transition-colors group-hover:text-[var(--accent)] shrink-0" />
+                  <span className="hidden xl:inline text-[var(--muted)] group-hover:text-[var(--fg)] transition-colors whitespace-nowrap">
                     Sound Off
                   </span>
                 </>
               ) : (
                 <>
-                  <Volume2 className="w-4 h-4 text-[#58B99A] animate-pulse shrink-0" />
-                  <span className="hidden xl:inline text-[#F4F1E8] whitespace-nowrap">Sound On</span>
+                  <Volume2 className="w-4 h-4 text-[var(--accent-bold)] animate-pulse shrink-0" />
+                  <span className="hidden xl:inline text-[var(--fg)] whitespace-nowrap">Sound On</span>
                   <span className="hidden xl:flex items-end gap-0.5 h-3 ml-0.5">
-                    <span className="w-0.5 bg-[#58B99A] animate-pulse h-2.5" />
-                    <span className="w-0.5 bg-[#58B99A] animate-pulse h-1.5" />
-                    <span className="w-0.5 bg-[#58B99A] animate-pulse h-3" />
+                    <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-2.5" />
+                    <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-1.5" />
+                    <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-3" />
                   </span>
                 </>
               )}
@@ -308,14 +350,14 @@ export default function SiteNavbar() {
         role="dialog"
         aria-label="Mobile Navigation Menu"
         className={cn(
-          "pointer-events-auto xl:hidden mt-3 w-full max-w-5xl mx-auto rounded-2xl backdrop-blur-2xl bg-[#0B1C2A]/95 border border-[#AEBCC7]/20 p-4 space-y-2 shadow-2xl transition-all duration-300 ease-out",
+          "pointer-events-auto xl:hidden mt-3 w-full max-w-5xl mx-auto rounded-2xl backdrop-blur-2xl bg-[var(--bg-2)]/95 border border-[var(--border)] p-4 space-y-2 shadow-2xl transition-all duration-300 ease-out",
           isMenuOpen
             ? "opacity-100 translate-y-0 visible pointer-events-auto"
             : "opacity-0 -translate-y-4 invisible pointer-events-none"
         )}
       >
-        <div className="flex items-center justify-between pb-2 border-b border-[#AEBCC7]/15 mb-2 sm:hidden">
-          <span className="text-xs font-mono uppercase tracking-widest text-[#AEBCC7]">Controls</span>
+        <div className="flex items-center justify-between pb-2 border-b border-[var(--line)] mb-2 sm:hidden">
+          <span className="text-xs font-mono uppercase tracking-widest text-[var(--muted)]">Controls</span>
           <div className="flex items-center gap-2">
             <SakuraToggle />
             <ThemeToggle />
@@ -333,20 +375,20 @@ export default function SiteNavbar() {
                 className={cn(
                   "w-full text-left rounded-xl px-4 py-2.5 text-sm sm:text-base font-medium transition-all cursor-pointer flex items-center justify-between",
                   isActive
-                    ? "text-[#F4F1E8] bg-[#102535] border border-[#58B99A]/40 font-semibold"
-                    : "text-[#AEBCC7] hover:text-[#F4F1E8] hover:bg-[#102535]/60"
+                    ? "text-[var(--fg)] bg-[var(--surface-2)] border border-[var(--border-accent)] font-semibold"
+                    : "text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)]"
                 )}
               >
                 <span>{item.label}</span>
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#58B99A]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-bold)]" />
                 )}
               </Link>
             );
           })}
         </div>
 
-        <div className="h-px bg-[#AEBCC7]/15 my-2" />
+        <div className="h-px bg-[var(--line)] my-2" />
 
         <div className="space-y-2 pt-1">
           {pathname === "/" && (
@@ -357,24 +399,24 @@ export default function SiteNavbar() {
                   setIsMenuOpen(false);
                   openTrailer();
                 }}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2 px-3 text-xs font-semibold text-[#F4F1E8] bg-[#102535]/80 border border-[#AEBCC7]/20"
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2 px-3 text-xs font-semibold text-[var(--fg)] bg-[var(--surface-2)] border border-[var(--border)]"
               >
-                <Film className="w-3.5 h-3.5 text-[#58B99A]" />
+                <Film className="w-3.5 h-3.5 text-[var(--accent-bold)]" />
                 <span>Play Trailer</span>
               </button>
               <button
                 type="button"
                 onClick={toggleHeroSound}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2 px-3 text-xs font-semibold text-[#F4F1E8] bg-[#102535]/80 border border-[#AEBCC7]/20"
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2 px-3 text-xs font-semibold text-[var(--fg)] bg-[var(--surface-2)] border border-[var(--border)]"
               >
                 {heroMuted ? (
                   <>
-                    <VolumeX className="w-3.5 h-3.5 text-[#718394]" />
+                    <VolumeX className="w-3.5 h-3.5 text-[var(--subtle)]" />
                     <span>Sound Off</span>
                   </>
                 ) : (
                   <>
-                    <Volume2 className="w-3.5 h-3.5 text-[#58B99A]" />
+                    <Volume2 className="w-3.5 h-3.5 text-[var(--accent-bold)]" />
                     <span>Sound On</span>
                   </>
                 )}
@@ -388,8 +430,8 @@ export default function SiteNavbar() {
             className={cn(
               "w-full text-left rounded-xl px-4 py-2.5 text-sm sm:text-base font-semibold transition-all flex items-center justify-between",
               mounted && isLoggedIn
-                ? "bg-[#58B99A]/15 text-[#B8E5D5] border border-[#58B99A]/30 hover:bg-[#58B99A]/25"
-                : "bg-[#B8E5D5] text-[#0C1C2C] hover:bg-[#A3DAC7] shadow-md shadow-[#58B99A]/20"
+                ? "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border-accent)] hover:bg-[var(--accent-soft)]/80"
+                : "bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] shadow-md shadow-[var(--accent-soft)]"
             )}
           >
             <div className="flex items-center gap-2.5">

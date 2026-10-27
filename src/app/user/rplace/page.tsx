@@ -18,12 +18,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Canvas from '../../../components/Canvas/Canvas';
+import BlurText from 'components/reactbits/BlurText';
+import PageHeading from 'components/japanese/PageHeading';
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // ─── Theme constants ───
-const SERIF = "Georgia, 'Times New Roman', serif";
-const LIVE_GREEN = '#7fcf9f';
+const SERIF = 'var(--f-display)';
+const LIVE_GREEN = 'var(--status-live-text)';
 
 const statTile = {
   p: { base: '14px 16px', md: '18px 20px' },
@@ -112,44 +114,29 @@ export default function RPlaceCanvasPage() {
   return (
     <VStack spacing="24px" align="stretch" w="100%">
       {/* ─── 1. HEADER ─── */}
-      <div className="oc-page-heading" style={{ marginBottom: 0, width: '100%' }}>
-        <Flex
-          direction={{ base: 'column', md: 'row' }}
-          align={{ base: 'stretch', md: 'center' }}
-          justify="space-between"
-          gap={{ base: '16px', md: '24px' }}
-          w="100%"
-        >
-          <Box flex="1" minW={0}>
-            <p className="oc-eyebrow">
-              <span />
-              Community Canvas · OpenCode 2026
-            </p>
-
-            <Flex align="center" gap="14px" flexWrap="wrap" mb="14px">
-              <h1 style={{ marginBottom: 0 }}>R/Place Canvas</h1>
-              <HStack
-                spacing="6px"
-                px="10px"
-                py="4px"
-                bg="rgba(127, 207, 159, 0.12)"
-                border="1px solid rgba(127, 207, 159, 0.35)"
-                borderRadius="full"
-              >
-                <Box w="7px" h="7px" borderRadius="full" bg={LIVE_GREEN} className="pulse-live-dot" />
-                <Text fontSize="11px" fontWeight="700" color={LIVE_GREEN} letterSpacing="0.1em">
-                  LIVE
-                </Text>
-              </HStack>
-            </Flex>
-
-            <p className="oc-description">
-              Every contribution leaves its mark. Place pixels directly on the live community canvas below,
-              collaborate with other contributors, and use your OpenCode PR points to unlock faster cooldowns and bigger pixel bursts.
-            </p>
-          </Box>
-        </Flex>
-      </div>
+      <PageHeading
+        eyebrow="COMMUNITY CANVAS · OPENCODE 2026"
+        title="R/Place Canvas"
+        description="Every contribution leaves its mark. Place pixels directly on the live community canvas below, collaborate with other contributors, and use your OpenCode PR points to unlock faster cooldowns and bigger pixel bursts."
+        badge={
+          <HStack
+            spacing="7px"
+            px="12px"
+            py="5px"
+            bg="var(--status-live-bg)"
+            border="1px solid var(--status-live-border)"
+            borderRadius="full"
+            backdropFilter="blur(12px)"
+          >
+            <Box w="8px" h="8px" borderRadius="full" bg={LIVE_GREEN} className="pulse-live-dot" />
+            <Text fontSize="11px" fontWeight="700" color={LIVE_GREEN} letterSpacing="0.12em" fontFamily="var(--f-mono)">
+              LIVE NOW
+            </Text>
+          </HStack>
+        }
+      >
+        巨大画布
+      </PageHeading>
 
       {/* ─── 2. INTERACTIVE HERO CANVAS ─── */}
       <Canvas userTier={userTier} userHandle={userHandle} />
@@ -205,7 +192,7 @@ export default function RPlaceCanvasPage() {
             </Flex>
             <Text fontFamily={SERIF} fontSize="34px" color="var(--text)" letterSpacing="-0.02em" lineHeight="1.2">
               {maxPixels}{' '}
-              <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="14px" color="var(--muted)">
+              <Text as="span" fontFamily="var(--f-body)" fontSize="14px" color="var(--muted)">
                 {maxPixels === 1 ? 'pixel' : 'pixels'}
               </Text>
             </Text>
@@ -224,7 +211,7 @@ export default function RPlaceCanvasPage() {
             </Flex>
             <Text fontFamily={SERIF} fontSize="34px" color="var(--text)" letterSpacing="-0.02em" lineHeight="1.2">
               {cooldown}
-              <Text as="span" fontFamily="'DM Sans', sans-serif" fontSize="14px" color="var(--muted)">
+              <Text as="span" fontFamily="var(--f-body)" fontSize="14px" color="var(--muted)">
                 {' '}
                 sec
               </Text>

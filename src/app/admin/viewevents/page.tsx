@@ -4,7 +4,7 @@ import { Box, Button, SimpleGrid, useToast, Text, Flex, Badge, Icon } from '@cha
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { MdStar, MdStarBorder } from 'react-icons/md';
+import { CalendarDays, Star } from 'lucide-react';
 import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
@@ -152,16 +152,20 @@ export default function Viewevents() {
   if (isLoading)
     return (
       <Flex minH="100vh" align="center" justify="center">
-        <RingLoader color="#755FFF" size={52} />
+        <RingLoader color="var(--accent)" size={52} />
       </Flex>
     );
 
   if (events.length === 0) {
     return (
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }} textAlign="center">
-        <Text fontSize="2xl" fontWeight="700" color="gray.500">
-          No Events Found
-        </Text>
+      <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px="20px" maxW="560px" mx="auto">
+        <div className="glass-panel oc-empty">
+          <CalendarDays size={32} />
+          <h2 style={{ fontFamily: 'var(--f-display)', fontSize: '1.25rem', fontWeight: 600 }}>
+            No Events Found
+          </h2>
+          <p>There are currently no active or archived events in the system.</p>
+        </div>
       </Box>
     );
   }
@@ -172,7 +176,7 @@ export default function Viewevents() {
         columns={{ base: 1, md: 2, lg: 3 }}
         spacing={{ base: '20px', md: '28px', lg: '36px' }}
         justifyItems="center"
-        px={{ base: '12px', md: '20px', lg: '40px' }}
+        px={{ base: '8px', sm: '16px', md: '20px', lg: '40px' }}
       >
         {events.map((item, i) => {
           const isFlagship = features?.flagshipEvent?.toLowerCase() === item.name?.toLowerCase();
@@ -183,7 +187,7 @@ export default function Viewevents() {
           const logoImg = resolveImageUrl(getEventLogoImage(item));
 
           return (
-            <Box key={i} w={{ base: '320px', md: '360px', lg: '420px' }} position="relative">
+            <Box key={i} w="100%" maxW={{ base: '100%', sm: '360px', lg: '420px' }} position="relative">
               {isFlagship && (
                 <Badge
                   colorScheme="yellow"
@@ -201,7 +205,7 @@ export default function Viewevents() {
                   alignItems="center"
                   gap="4px"
                 >
-                  <Icon as={MdStar} boxSize={3.5} /> Flagship Event
+                  <Icon as={Star} boxSize={3.5} fill="currentColor" /> Flagship Event
                 </Badge>
               )}
 
@@ -213,13 +217,13 @@ export default function Viewevents() {
                 download={`/user/leaderboard/${encodeURIComponent(item.name)}`}
               />
 
-              <Flex mt={3} gap={2} justify="center" align="center">
+              <Flex mt={3} gap={2} justify="center" align="center" wrap="wrap">
                 {isFlagship ? (
                   <Button
                     size="sm"
                     colorScheme="yellow"
                     variant="solid"
-                    leftIcon={<Icon as={MdStar} />}
+                    leftIcon={<Icon as={Star} fill="currentColor" />}
                     onClick={() => handleRemoveFlagship(item.name)}
                   >
                     Remove Flagship
@@ -227,9 +231,8 @@ export default function Viewevents() {
                 ) : (
                   <Button
                     size="sm"
-                    colorScheme="brand"
                     variant="outline"
-                    leftIcon={<Icon as={MdStarBorder} />}
+                    leftIcon={<Icon as={Star} />}
                     onClick={() => handleSetFlagship(item.name)}
                   >
                     Make Flagship

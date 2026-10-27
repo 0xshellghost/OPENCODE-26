@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { Flex } from '@chakra-ui/react';
+import { RingLoader } from 'react-spinners';
 
 export interface PullRequest {
   prNumber: number;
@@ -30,11 +32,26 @@ export interface ProfileData {
 }
 
 export default function ProfileSelf() {
+  const router = useRouter();
+
   useEffect(() => {
-    const cached = JSON.parse(localStorage.getItem('user') ?? '{}');
-    const githubID = cached?.githubId;
-    if (githubID) redirect(`/user/profile/${githubID}`);
-    else redirect('/auth/sign-in');
-  }, []);
+    try {
+      const cached = JSON.parse(localStorage.getItem('user') ?? '{}');
+      const githubID = cached?.githubId;
+      if (githubID) {
+        router.replace(`/user/profile/${encodeURIComponent(githubID)}`);
+      } else {
+        router.replace('/auth/sign-in');
+      }
+    } catch {
+      router.replace('/auth/sign-in');
+    }
+  }, [router]);
+
+  return (
+    <Flex minH="60vh" align="center" justify="center">
+      <RingLoader color="var(--accent)" size={48} />
+    </Flex>
+  );
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Portal, useColorModeValue } from '@chakra-ui/react';
+import { Box, Portal } from '@chakra-ui/react';
 import Footer from 'components/footer/FooterAdmin';
 import Navbar from 'components/navbar/NavbarAdmin';
 import MobileMenuBar from 'components/sidebar/MobileMenuBar';
@@ -65,10 +65,8 @@ export default function AdminLayout(props: DashboardLayoutProps) {
     }
   }, [isMounted, router]);
 
-  const bg = useColorModeValue('secondaryGray.300', 'navy.900');
-
   return (
-    <Box minH="100vh" w="100%" bg={bg}>
+    <Box minH="100vh" w="100%" bg="var(--bg)" color="var(--fg)">
       <Sidebar routes={routes} {...rest} />
 
       <MobileMenuBar routes={routes} />

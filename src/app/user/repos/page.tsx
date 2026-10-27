@@ -23,6 +23,8 @@ import { FetchedRepos, FetchedEvents } from 'api/events/events';
 import { useQuery } from '@tanstack/react-query';
 import { RingLoader } from 'react-spinners';
 import AnimatedContent from 'components/reactbits/AnimatedContent';
+import SpotlightCard from 'components/reactbits/SpotlightCard';
+import PageHeading from 'components/japanese/PageHeading';
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: '#3178c6',
@@ -105,6 +107,11 @@ export default function ReposPage() {
 
   return (
     <Box pt="0" px="0" maxW="1400px" mx="auto">
+      <PageHeading
+        eyebrow="THE PROJECTS WE BUILD TOGETHER"
+        title="Open Source Repositories"
+        description="Explore our community projects — browse code, find issues, and start contributing."
+      />
       {/* Search Toolbar matching Leaderboard design */}
       <Box mb={{ base: '24px', md: '32px' }}>
         <SearchProfileBanner
@@ -117,30 +124,18 @@ export default function ReposPage() {
 
       {/* Empty State */}
       {filteredRepos.length === 0 ? (
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          py="70px"
-          borderRadius="24px"
-          bg="var(--surface)"
-          border="1px solid var(--border)"
-        >
-          <Icon as={FolderGit2} color="var(--accent)" mb="16px" w="42px" h="42px" />
-          <Text fontSize="xl" fontWeight="700" color={textColor}>
-            No repositories matched your search
-          </Text>
-          <Text color={mutedText} mt="8px" fontSize="14px">
-            Try adjusting your search keyword.
-          </Text>
+        <div className="glass-panel oc-empty">
+          <FolderGit2 size={36} />
+          <h2>No repositories found</h2>
+          <p>We couldn&apos;t find any repositories matching your search. Try adjusting your keyword.</p>
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="mt-4 px-4 py-2 rounded-full text-xs font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] transition-all"
+            className="oc-button oc-button-secondary mt-2"
           >
             Clear search
           </button>
-        </Flex>
+        </div>
       ) : (
         /* Human-Crafted Developer Repository Grid */
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="24px" mb="40px">
@@ -149,25 +144,14 @@ export default function ReposPage() {
 
             return (
               <AnimatedContent key={repo.name || idx} delay={idx * 0.03}>
-                <Box
-                  position="relative"
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="space-between"
-                  h="100%"
-                  p="22px"
-                  borderRadius="20px"
-                  bg="var(--surface)"
-                  backdropFilter="blur(20px)"
-                  border="1px solid var(--border)"
-                  boxShadow="var(--shadow)"
-                  transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
-                  _hover={{
-                    transform: 'translateY(-4px)',
-                    borderColor: 'var(--accent)',
-                    boxShadow: 'var(--shadow), 0 0 20px var(--accent-soft)',
+                <SpotlightCard
+                  className="group flex flex-col justify-between h-full p-[22px] rounded-[20px] border border-[var(--border)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent)] hover:shadow-[var(--shadow),0_0_20px_var(--accent-soft)]"
+                  spotlightColor="rgba(88, 185, 154, 0.12)"
+                  style={{
+                    background: 'var(--surface)',
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: 'var(--shadow)',
                   }}
-                  className="group"
                 >
                   {/* Top Header: GitHub Org + Project Title + External Icon */}
                   <div>
@@ -298,7 +282,7 @@ export default function ReposPage() {
                       <span>Browse Code & Issues</span>
                     </a>
                   </Box>
-                </Box>
+                </SpotlightCard>
               </AnimatedContent>
             );
           })}

@@ -1,7 +1,7 @@
 import { Box, Icon } from '@chakra-ui/react';
 import NextImage from 'next/image';
 import { useState, useEffect } from 'react';
-import { MdImageNotSupported } from 'react-icons/md';
+import { ImageOff } from 'lucide-react';
 
 export const Image = (props: any) => {
   const { src, alt, fallbackSrc, onError, ...rest } = props;
@@ -29,13 +29,13 @@ export const Image = (props: any) => {
       <Box
         overflow="hidden"
         position="relative"
-        bg="whiteAlpha.100"
+        bg="var(--card-soft)"
         display="flex"
         alignItems="center"
         justifyContent="center"
         {...rest}
       >
-        <Icon as={MdImageNotSupported} color="gray.500" boxSize="28px" />
+        <Icon as={ImageOff} color="var(--fg-muted)" boxSize="28px" />
       </Box>
     );
   }

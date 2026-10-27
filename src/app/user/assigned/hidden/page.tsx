@@ -17,6 +17,8 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getUserIssueDetails } from 'api/events/events';
 import { RingLoader } from 'react-spinners';
+import PageHeading from 'components/japanese/PageHeading';
+import AnimatedContent from 'components/reactbits/AnimatedContent';
 // avoid next/navigation useSearchParams to prevent CSR bailout during prerender
 
 export default function Dashboard() {
@@ -67,38 +69,49 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <RingLoader color="#36d7b7" />
+        <RingLoader color="var(--accent)" />
       </div>
     );
   }
 
   return (
-    <>
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
-        <TableContainer>
+    <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px={{ base: '12px', md: '24px' }} maxW="1200px" mx="auto">
+      <PageHeading
+        eyebrow="CONTRIBUTION DETAILS"
+        title="Issue Tracker"
+        description="A detailed view of all pull requests and issue assignments for this contributor."
+      />
+      <AnimatedContent distance={20} duration={0.5} delay={0.1}>
+        <TableContainer
+          bg="var(--surface)"
+          border="1px solid var(--border)"
+          borderRadius="16px"
+          boxShadow="var(--shadow)"
+          p="12px"
+        >
           <Table variant="simple">
-            <TableCaption>All PR Details</TableCaption>
+            <TableCaption color="var(--muted)">All PR Details</TableCaption>
             <Thead>
               <Tr>
-                <Th>Issue Title</Th>
-                <Th>Issue Number</Th>
-                <Th>Status</Th>
-                <Th>Current Points</Th>
+                <Th color="var(--muted)" borderColor="var(--border)">Issue Title</Th>
+                <Th color="var(--muted)" borderColor="var(--border)">Issue Number</Th>
+                <Th color="var(--muted)" borderColor="var(--border)">Status</Th>
+                <Th color="var(--muted)" borderColor="var(--border)">Current Points</Th>
               </Tr>
             </Thead>
             <Tbody>
               {userIssueDetails?.issues?.map((pr, index) => (
-                <Tr key={index}>
-                  <Td>{pr.title}</Td>
-                  <Td>{pr.issueNumber}</Td>
-                  <Td>{pr.status}</Td>
-                  <Td>{pr.currentPoints}</Td>
+                <Tr key={index} _hover={{ bg: 'var(--surface-2)' }}>
+                  <Td borderColor="var(--border)">{pr.title}</Td>
+                  <Td borderColor="var(--border)">{pr.issueNumber}</Td>
+                  <Td borderColor="var(--border)">{pr.status}</Td>
+                  <Td borderColor="var(--border)">{pr.currentPoints}</Td>
                 </Tr>
               ))}
             </Tbody>
           </Table>
         </TableContainer>
-      </Box>
-    </>
+      </AnimatedContent>
+    </Box>
   );
 }

@@ -4,7 +4,7 @@ import logoWhite from 'img/layout/logoWhite.png';
 
 export default function SidebarDocs() {
   const bgColor = 'linear-gradient(135deg, #58B99A 0%, #2D8B6F 100%)';
-  const borderColor = useColorModeValue('white', 'navy.800');
+  const borderColor = 'var(--border)';
   const currentDate = new Date();
   const targetDate = new Date(currentDate.getFullYear(), 11, 14);
   //alert(currentDate<=targetDate)
@@ -35,7 +35,7 @@ export default function SidebarDocs() {
           top="-47px"
           transform="translate(-50%, 0%)"
         >
-          <Image alt="gh-white-logo" src={logoWhite} w="40px" h="40px" />
+          <Image alt="Geek Haven Logo" src={logoWhite} w="40px" h="40px" />
         </Flex>
         <Flex
           direction="column"

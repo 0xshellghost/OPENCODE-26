@@ -26,6 +26,7 @@ import ColumnsTable, {
 import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBanner';
 import { FetchedLeaderboard, type LeaderboardEntry } from 'api/leaderboard/leaderboard';
 import { FetchedEvents } from 'api/events/events';
+import { isMaintainer } from 'constants/Maintainers';
 
 interface LeaderboardViewProps {
   initialEventName?: string;
@@ -92,17 +93,26 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
     router.push(`/user/leaderboard/${encodeURIComponent(newEvent)}`);
   };
 
-  const tableDataColumns: RowObj[] = useMemo(() => (LeadData || []).map((item) => ({
-    position: String(item.position),
-    name: item.name,
-    prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
-    githubid: item.githubid ?? undefined,
-    points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
-    avatarUrl: item.avatarUrl,
-    prDetailsURL: item.prDetailsURL,
-    college: item.collegeName ?? '',
-    graduationYear: item.graduationYear ?? '',
-  })), [LeadData]);
+  const isOpencode = (activeEvent || '').toLowerCase().includes('opencode');
+
+  const tableDataColumns: RowObj[] = useMemo(() => {
+    const rawList = LeadData || [];
+    const eligibleList = isOpencode
+      ? rawList.filter((item) => !item.githubid || !isMaintainer(item.githubid))
+      : rawList;
+
+    return eligibleList.map((item, index) => ({
+      position: isOpencode ? String(index + 1) : String(item.position ?? index + 1),
+      name: item.name,
+      prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+      githubid: item.githubid ?? undefined,
+      points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
+      avatarUrl: item.avatarUrl,
+      prDetailsURL: item.prDetailsURL,
+      college: item.collegeName ?? '',
+      graduationYear: item.graduationYear ?? '',
+    }));
+  }, [LeadData, isOpencode]);
 
   // Extract unique filter options from the data
   const collegeOptions = useMemo(() => {

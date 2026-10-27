@@ -13,6 +13,7 @@ import {
   TabPanels,
   Text,
 } from '@chakra-ui/react';
+import { Trophy } from 'lucide-react';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -196,7 +197,7 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
   );
 }
 
-function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrations: string } }) {
+function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrations: number } }) {
   const glass = 'var(--surface)';
   const text = opencodeTokens.colors.text.primary;
   const muted = opencodeTokens.colors.text.secondary;
@@ -209,7 +210,7 @@ function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrat
   }: {
     icon: any;
     title: string;
-    statsList: { value: string; label: string }[];
+    statsList: { value: number; label: string }[];
     side: 'left' | 'right';
   }) => (
     <Box
@@ -239,9 +240,9 @@ function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrat
     >
       <Box
         fontSize="28px"
-        color="#F5C542"
+        color="var(--secondary)"
         mb="4px"
-        filter="drop-shadow(0 0 12px rgba(245,197,66,0.35))"
+        filter="drop-shadow(0 0 12px var(--secondary-soft))"
       >
         <Icon />
       </Box>
@@ -259,7 +260,7 @@ function OverallSideStats({ stats }: { stats: { totalPRs: string; totalRegistrat
       {statsList.map((s) => (
         <Box key={s.label}>
           <Text fontSize="22px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
-            {s.value}
+            <CountUp to={s.value} separator="," duration={1.2} />
           </Text>
           <Text fontSize="11px" color={muted}>
             {s.label}
@@ -315,14 +316,11 @@ function Podium({
 
   if (winners.length === 0) {
     return (
-      <Box textAlign="center" py="50px">
-        <Text fontSize="16px" fontWeight="700" color="var(--fg)">
-          No winners recorded yet for this category.
-        </Text>
-        <Text fontSize="13px" color="var(--muted)" mt="4px">
-          Leaderboard entries will appear here once contributions are scored.
-        </Text>
-      </Box>
+      <div className="glass-panel oc-empty" style={{ margin: '32px 0' }}>
+        <Trophy size={36} />
+        <h2>No winners recorded yet</h2>
+        <p>Leaderboard entries and winners will appear here once contributions are scored for this category.</p>
+      </div>
     );
   }
 
@@ -342,13 +340,12 @@ function Podium({
 
   return (
     <Box
-      width="100vw"
+      width="100%"
       position="relative"
-      left="50%"
-      marginLeft="-50vw"
-      overflow="hidden"
+      overflowX="auto"
+      py="8px"
     >
-      <Box display="flex" justifyContent="center" px={{ base: '8px', sm: '16px' }} maxW="100vw" overflowX="auto">
+      <Box display="flex" justifyContent="center" px={{ base: '8px', sm: '16px' }} minW="fit-content">
         <Box
           display="grid"
           gridTemplateColumns={{
@@ -420,7 +417,7 @@ function Podium({
                     POINTS
                   </Text>
                   <Text fontSize={{ base: '12px', md: '18px' }} fontWeight="900" color={text} fontFamily="var(--f-mono)">
-                    {w.points.toLocaleString()}
+                    <CountUp to={w.points} separator="," duration={1} />
                   </Text>
 
                   <Box h={{ base: '2px', md: '6px' }} />
@@ -429,7 +426,7 @@ function Podium({
                     PRs
                   </Text>
                   <Text fontSize={{ base: '12px', md: '18px' }} fontWeight="900" color={text} fontFamily="var(--f-mono)">
-                    {w.prmerged.toLocaleString()}
+                    <CountUp to={w.prmerged} separator="," duration={1} />
                   </Text>
                 </Flex>
               </Box>
@@ -443,11 +440,11 @@ function Podium({
 
 function WinnersHeader() {
   return (
-    <header className="oc-page-heading" style={{ justifyContent: 'center', textAlign: 'center', marginBottom: '12px', maxWidth: '100%', overflow: 'hidden' }}>
+    <header style={{ textAlign: 'center', marginBottom: '32px', paddingBottom: '28px', borderBottom: '1px solid var(--line)', maxWidth: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%', width: '100%' }}>
         <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px', maxWidth: '100%' }}>
           <span />
-          <ShinyText text="HALL OF FAME" speed={5} shineColor="#ffded2" />
+          <ShinyText text="HALL OF FAME" speed={5} />
           <span />
         </p>
         <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)', maxWidth: '100%', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
@@ -537,7 +534,7 @@ export default function WinnersPodiumComparisonPage() {
   // 5. Derive Live Community & Contribution Stats
   const stats = useMemo(() => {
     if (!leaderboardData || leaderboardData.length === 0) {
-      return { totalPRs: '0', totalRegistrations: '0' };
+      return { totalPRs: 0, totalRegistrations: 0 };
     }
     const totalPRs = leaderboardData.reduce(
       (acc, curr) => acc + (Number(curr.prmerged) || 0),
@@ -545,8 +542,8 @@ export default function WinnersPodiumComparisonPage() {
     );
     const count = leaderboardData.length;
     return {
-      totalPRs: totalPRs.toLocaleString(),
-      totalRegistrations: count >= 1000 ? `${(count / 1000).toFixed(1)}k+` : count.toLocaleString(),
+      totalPRs,
+      totalRegistrations: count,
     };
   }, [leaderboardData]);
 

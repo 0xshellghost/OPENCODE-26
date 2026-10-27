@@ -1,4 +1,3 @@
-import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools";
 export const switchStyles = {
   components: {
     Switch: {
@@ -8,7 +7,11 @@ export const switchStyles = {
           borderRadius: "50%",
           w: "16px",
           h: "16px",
-          _checked: { transform: "translate(20px, 0px)" },
+          bg: "white",
+          _checked: {
+            transform: "translate(20px, 0px)",
+            bg: "var(--accent-ink, #07131F)",
+          },
         },
         track: {
           display: "flex",
@@ -18,16 +21,25 @@ export const switchStyles = {
           h: "20px",
           p: "2px",
           ps: "2px",
+          bg: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          _checked: {
+            bg: "var(--accent)",
+            borderColor: "var(--accent)",
+          },
           _focus: {
-            boxShadow: "none",
+            boxShadow: "0 0 0 2px var(--accent-soft)",
           },
         },
       },
 
       variants: {
-        main: (props: StyleFunctionProps) => ({
+        main: () => ({
           track: {
-            bg: mode("gray.300", "navy.700")(props),
+            bg: "var(--surface-2)",
+            _checked: {
+              bg: "var(--accent)",
+            },
           },
         }),
       },
