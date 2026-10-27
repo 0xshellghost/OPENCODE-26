@@ -43,7 +43,37 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Security: '#e53e3e',
 };
 
+function getRepoMentors(repo: any): string[] {
+  if (Array.isArray(repo.mentors) && repo.mentors.length > 0) {
+    return repo.mentors.filter(Boolean);
+  }
+  if (Array.isArray(repo.maintainers) && repo.maintainers.length > 0) {
+    return repo.maintainers.map((m: any) => (typeof m === 'string' ? m : m.name)).filter(Boolean);
+  }
+  return [];
+}
+
+
+function getRepoDomains(repo: any): string[] {
+  // Domain tags strictly from the database
+  if (Array.isArray(repo.tags) && repo.tags.length > 0) {
+    const list = [...repo.tags];
+    if (repo.isFirstYrOnly && !list.includes('Freshers only')) {
+      list.push('Freshers only');
+    }
+    return list;
+  }
+  if (repo.isFirstYrOnly) {
+    return ['Freshers only'];
+  }
+  return [];
+}
+
 function detectPrimaryLanguage(repo: any): { name: string; color: string } {
+  // 1. Prioritize language stored in DB or GitHub API
+  if (repo.language && LANGUAGE_COLORS[repo.language]) {
+    return { name: repo.language, color: LANGUAGE_COLORS[repo.language] };
+  }
   const tags = repo.tags || [];
   for (const tag of tags) {
     if (LANGUAGE_COLORS[tag]) {
@@ -51,20 +81,28 @@ function detectPrimaryLanguage(repo: any): { name: string; color: string } {
     }
   }
   const name = repo.name?.toLowerCase() || '';
-  if (name.includes('rust') || name.includes('ding')) return { name: 'Rust', color: '#dea584' };
-  if (name.includes('go')) return { name: 'Go', color: '#00ADD8' };
-  if (name.includes('python') || name.includes('vision') || name.includes('planet'))
+  const desc = repo.description?.toLowerCase() || '';
+  const text = `${name} ${desc}`;
+
+  if (text.includes('rust')) return { name: 'Rust', color: '#dea584' };
+  if (name.includes('gogit') || text.includes('golang') || text.includes('written in go'))
+    return { name: 'Go', color: '#00ADD8' };
+  if (text.includes('python') || text.includes('vision') || text.includes('planet') || text.includes('django') || text.includes('flask'))
     return { name: 'Python', color: '#3572A5' };
-  if (name.includes('compose') || name.includes('frontend') && name.includes('alum'))
+  if (text.includes('dart') || text.includes('flutter') || name.includes('nommetric') || name.includes('appcosmos'))
+    return { name: 'Dart', color: '#02569B' };
+  if (text.includes('kotlin') || text.includes('compose') || name.includes('alum-x'))
     return { name: 'Kotlin', color: '#A97BFF' };
-  if (name.includes('cp') || name.includes('chronicles')) return { name: 'C++', color: '#f34b7d' };
-  if (name.includes('nommetric')) return { name: 'Dart', color: '#02569B' };
-  if (name.includes('loktantra') || name.includes('eventchain')) return { name: 'Solidity', color: '#aa66cc' };
+  if (text.includes('cp-') || text.includes('chronicles') || text.includes('c++'))
+    return { name: 'C++', color: '#f34b7d' };
+  if (text.includes('loktantra') || text.includes('eventchain') || text.includes('solidity'))
+    return { name: 'Solidity', color: '#aa66cc' };
   return { name: 'TypeScript', color: '#3178c6' };
 }
 
 export default function ReposPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDomain, setSelectedDomain] = useState<string>('All');
 
   const textColor = 'var(--fg)';
   const mutedText = 'var(--muted)';
@@ -84,18 +122,63 @@ export default function ReposPage() {
 
   const repositories = data?.data || [];
 
+  // Dynamically compute domain filter options from repositories in DB
+  const domainOptions = useMemo(() => {
+    const counts: Record<string, number> = {};
+    repositories.forEach((repo: any) => {
+      const domains = getRepoDomains(repo);
+      domains.forEach((d: string) => {
+        counts[d] = (counts[d] || 0) + 1;
+      });
+    });
+
+    const standardOrder = [
+      'WebD',
+      'AppDev',
+      'UI-UX',
+      'AI-ML',
+      'Blockchain',
+      'GameDev',
+      'Competitive Programming',
+      'GitBasics',
+      'Freshers only',
+      'Cybersecurity',
+    ];
+
+    const sortedDomains = Object.keys(counts).sort((a, b) => {
+      const idxA = standardOrder.indexOf(a);
+      const idxB = standardOrder.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    return ['All', ...sortedDomains];
+  }, [repositories]);
+
   const filteredRepos = useMemo(() => {
     return repositories.filter((repo: any) => {
+      // 1. Domain Filter
+      if (selectedDomain !== 'All') {
+        const domains = getRepoDomains(repo);
+        if (!domains.includes(selectedDomain)) {
+          return false;
+        }
+      }
+
+      // 2. Search Query Filter
       if (!searchQuery.trim()) return true;
       const query = searchQuery.toLowerCase();
       const matchSearch =
         (repo.name && repo.name.toLowerCase().includes(query)) ||
         (repo.description && repo.description.toLowerCase().includes(query)) ||
+        (getRepoDomains(repo).some((d: string) => d.toLowerCase().includes(query))) ||
         (repo.tags && repo.tags.some((tag: string) => tag.toLowerCase().includes(query)));
 
       return matchSearch;
     });
-  }, [repositories, searchQuery]);
+  }, [repositories, searchQuery, selectedDomain]);
 
   if (isLoading || isLoadingEvents) {
     return (
@@ -112,14 +195,67 @@ export default function ReposPage() {
         title="Open Source Repositories"
         description="Explore our community projects — browse code, find issues, and start contributing."
       />
-      {/* Search Toolbar matching Leaderboard design */}
+
+      {/* Search Toolbar & Domain Filter Bar */}
       <Box mb={{ base: '24px', md: '32px' }}>
-        <SearchProfileBanner
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search repository or tech stack…"
-          w={{ base: '100%', sm: '320px', md: '360px' }}
-        />
+        <Flex
+          direction={{ base: 'column', md: 'row' }}
+          align={{ base: 'stretch', md: 'center' }}
+          justify="space-between"
+          gap="16px"
+          mb="16px"
+        >
+          <SearchProfileBanner
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search repository, tech stack, or domain…"
+            w={{ base: '100%', sm: '320px', md: '360px' }}
+          />
+
+          <Text
+            fontSize="12px"
+            fontFamily="var(--f-mono)"
+            color="var(--muted)"
+            display={{ base: 'none', md: 'block' }}
+          >
+            Showing {filteredRepos.length} of {repositories.length} repositories
+          </Text>
+        </Flex>
+
+        {/* Domain Filter Pills matching exact mockup design */}
+        <Flex
+          align="center"
+          gap="8px"
+          overflowX="auto"
+          maxW="100%"
+          py="4px"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          {domainOptions.map((domain) => {
+            const isSelected = selectedDomain === domain;
+            const count = domain === 'All'
+              ? repositories.length
+              : repositories.filter((r: any) => getRepoDomains(r).includes(domain)).length;
+
+            return (
+              <button
+                key={domain}
+                type="button"
+                onClick={() => setSelectedDomain(domain)}
+                className={`px-4 py-1.5 rounded-full text-[13px] font-mono font-medium transition-all duration-200 cursor-pointer whitespace-nowrap select-none flex items-center ${
+                  isSelected
+                    ? 'bg-[#49dec6] text-[#09111e] font-bold shadow-[0_0_14px_rgba(73,222,198,0.35)]'
+                    : 'bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] hover:border-[#49dec6]/60 hover:text-[var(--fg)]'
+                }`}
+              >
+                {domain === 'All' ? `All  (${count})` : domain}
+              </button>
+            );
+          })}
+        </Flex>
       </Box>
 
       {/* Empty State */}
@@ -127,20 +263,29 @@ export default function ReposPage() {
         <div className="glass-panel oc-empty">
           <FolderGit2 size={36} />
           <h2>No repositories found</h2>
-          <p>We couldn&apos;t find any repositories matching your search. Try adjusting your keyword.</p>
+          <p>
+            {selectedDomain !== 'All'
+              ? `No repositories found in domain "${selectedDomain}"${searchQuery ? ` matching "${searchQuery}"` : ''}. Try selecting another filter or clearing your search.`
+              : `We couldn't find any repositories matching your search. Try adjusting your keyword.`}
+          </p>
           <button
             type="button"
-            onClick={() => setSearchQuery('')}
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedDomain('All');
+            }}
             className="oc-button oc-button-secondary mt-2"
           >
-            Clear search
+            Clear filters
           </button>
         </div>
       ) : (
-        /* Human-Crafted Developer Repository Grid */
         <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing="24px" mb="40px">
           {filteredRepos.map((repo: any, idx: number) => {
             const lang = detectPrimaryLanguage(repo);
+            const repoDomains = getRepoDomains(repo);
+            const description = repo.description || 'Open source project under OpenCode.';
+            const mentors = getRepoMentors(repo);
 
             return (
               <AnimatedContent key={repo.name || idx} delay={idx * 0.03}>
@@ -153,11 +298,9 @@ export default function ReposPage() {
                     boxShadow: 'var(--shadow)',
                   }}
                 >
-                  {/* Top Header: GitHub Org + Project Title + External Icon */}
                   <div>
                     <Flex justify="space-between" align="start" mb="12px">
                       <Box minW="0" flex="1">
-                        {/* Org handle */}
                         <Text
                           fontSize="11px"
                           fontFamily="var(--f-mono)"
@@ -168,7 +311,6 @@ export default function ReposPage() {
                         >
                           opencodeiiita /
                         </Text>
-                        {/* Repo Name */}
                         <Text
                           fontSize="19px"
                           fontWeight="800"
@@ -181,7 +323,6 @@ export default function ReposPage() {
                         </Text>
                       </Box>
 
-                      {/* GitHub direct link button */}
                       <a
                         href={repo.githubLink || `https://github.com/opencodeiiita/${repo.name}`}
                         target="_blank"
@@ -193,8 +334,8 @@ export default function ReposPage() {
                       </a>
                     </Flex>
 
-                    {/* Developer Meta: Language Dot */}
-                    <Flex align="center" gap="10px" mb="14px" flexWrap="wrap">
+                    {/* Tags */}
+                    <Flex align="center" gap="8px" mb="14px" flexWrap="wrap">
                       <Flex
                         align="center"
                         gap="6px"
@@ -211,51 +352,71 @@ export default function ReposPage() {
                         <Box w="7px" h="7px" borderRadius="full" bg={lang.color} />
                         <span>{lang.name}</span>
                       </Flex>
+
+                      {repoDomains.map((d: string) => (
+                        <span
+                          key={d}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold tracking-wide border ${
+                            d === 'Freshers only'
+                              ? 'bg-[#49dec6]/15 text-[#0d9488] dark:text-[#49dec6] border-[#49dec6]/30'
+                              : 'bg-[var(--card-soft)] text-[var(--muted)] border-[var(--border)]'
+                          }`}
+                        >
+                          {d}
+                        </span>
+                      ))}
                     </Flex>
 
                     {/* Project Description */}
                     <Text
                       color={mutedText}
                       fontSize="13px"
-                      mb="18px"
+                      mb="20px"
                       lineHeight="1.65"
                       noOfLines={3}
                     >
-                      {repo.description}
+                      {description}
                     </Text>
-
-                    {/* Tech Stack Pills */}
-                    <Flex flexWrap="wrap" gap="6px" mb="20px">
-                      {repo.tags?.map((tag: string) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[var(--card-soft)] border border-[var(--border)] text-[var(--muted)] hover:border-[var(--border-strong)] transition-colors"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </Flex>
                   </div>
 
-                  {/* Footer: Maintainers & Community Discord Action */}
+                  {/* Card footer */}
                   <Box pt="14px" borderTop="1px solid var(--line)">
                     <Flex justify="space-between" align="center" gap="10px">
-                      {/* Maintainers Avatars */}
-                      <Flex align="center" gap="6px">
+                      <Flex align="center" gap="8px">
                         <Text fontSize="11px" fontWeight="700" color="var(--subtle)" textTransform="uppercase" letterSpacing="0.05em">
                           Team:
                         </Text>
-                        <AvatarGroup size="xs" max={3}>
-                          {repo.maintainers?.map((m: any) => (
-                            <Tooltip key={m.name} label={`Maintainer: @${m.name}`} placement="top">
-                              <Avatar
-                                name={m.name}
-                                src={`https://github.com/${m.name}.png`}
-                                border="1.5px solid var(--border)"
-                              />
-                            </Tooltip>
-                          ))}
-                        </AvatarGroup>
+                        {mentors.length > 0 ? (
+                          <AvatarGroup size="xs" max={4} spacing="-8px">
+                            {mentors.map((rawHandle: string) => {
+                              const handle = typeof rawHandle === 'string' ? rawHandle.replace(/^@/, '').trim() : '';
+                              if (!handle) return null;
+                              return (
+                                <Tooltip key={handle} label={`Mentor: @${handle}`} placement="top" hasArrow>
+                                  <Avatar
+                                    name={handle}
+                                    src={`https://github.com/${handle}.png`}
+                                    border="1.5px solid var(--border)"
+                                    w="24px"
+                                    h="24px"
+                                    cursor="pointer"
+                                    transition="transform 0.15s ease"
+                                    _hover={{ transform: 'scale(1.15)', zIndex: 10 }}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      window.open(`https://github.com/${handle}`, '_blank');
+                                    }}
+                                  />
+                                </Tooltip>
+                              );
+                            })}
+                          </AvatarGroup>
+                        ) : (
+                          <Text fontSize="11px" color="var(--muted)" fontStyle="italic">
+                            Open for mentors
+                          </Text>
+                        )}
                       </Flex>
 
                       {/* Community Discord Link */}

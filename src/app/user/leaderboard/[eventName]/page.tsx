@@ -142,7 +142,7 @@ export default function EventName() {
   const tableDataColumns: RowObj[] = useMemo(() => {
     const rawList = LeadData || [];
     const eligibleList = isOpencode
-      ? rawList.filter((item) => !item.githubid || !isMaintainer(item.githubid))
+      ? rawList.filter((item) => !item.isMentor && (!item.githubid || !isMaintainer(item.githubid)))
       : rawList;
 
     return eligibleList.map((item, index) => ({

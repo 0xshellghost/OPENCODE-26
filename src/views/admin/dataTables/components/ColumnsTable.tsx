@@ -48,6 +48,7 @@ export type RowObj = {
   prDetailsURL?: string;
   college?: string;
   graduationYear?: string | number;
+  isMentor?: boolean;
 };
 
 const columnHelper = createColumnHelper<RowObj>();
@@ -145,7 +146,7 @@ function ContributorHoverCard({
   children: React.ReactNode;
 }) {
   const isYou = Boolean(row.githubid && row.githubid === currentGithubId);
-  const maintainer = Boolean(row.githubid && isMaintainer(row.githubid));
+  const maintainer = Boolean(row.githubid && (isMaintainer(row.githubid) || row.isMentor));
 
   if (!row.githubid) {
     return <>{children}</>;
@@ -650,7 +651,7 @@ function ColumnTable({
                 const row = info.row.original;
                 if (!row.githubid) return <Text color="var(--muted)">—</Text>;
                 const isYou = Boolean(currentGithubId && row.githubid === currentGithubId);
-                const maintainer = isMaintainer(row.githubid);
+                const maintainer = Boolean(isMaintainer(row.githubid) || row.isMentor);
 
                 return (
                   <ContributorHoverCard
@@ -786,7 +787,7 @@ function ColumnTable({
   // Keep logged in user prominently at top if present (applicable for OpenCode)
   const reorderedData = useMemo(() => {
     const baseData = isOpencode
-      ? tableData.filter((u) => !u.githubid || !isMaintainer(u.githubid))
+      ? tableData.filter((u) => !u.githubid || (!isMaintainer(u.githubid) && !u.isMentor))
       : tableData;
 
     if (!currentGithubId || !isOpencode) return baseData;

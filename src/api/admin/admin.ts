@@ -51,16 +51,56 @@ export async function EditPRPoints(prUpdateData: any) {
   }
 }
 
-export async function addRepo(eventName: string, repoName: string) {
+export async function addRepo(
+  eventName: string,
+  repoName: string,
+  options?: {
+    tags?: string[];
+    mentors?: string[];
+    isFirstYrOnly?: boolean;
+    isGirlsOnly?: boolean;
+    description?: string;
+  }
+) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ repoName }),
+    body: JSON.stringify({
+      repoName,
+      tags: options?.tags,
+      mentors: options?.mentors,
+      isFirstYrOnly: options?.isFirstYrOnly,
+      isGirlsOnly: options?.isGirlsOnly,
+      description: options?.description,
+    }),
   });
   if (!response.ok) throw new Error('Failed to add repo');
+  return await response.json();
+}
+
+export async function updateRepoTags(
+  eventName: string,
+  repoName: string,
+  data: {
+    tags?: string[];
+    mentors?: string[];
+    isFirstYrOnly?: boolean;
+    isGirlsOnly?: boolean;
+    description?: string;
+  }
+) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/${repoName}/update`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to update repo');
   return await response.json();
 }
 
@@ -89,15 +129,67 @@ export async function renameRepo(eventName: string, repoName: string, newRepoNam
   return await response.json();
 }
 
+export interface MentorUser {
+  id: string;
+  githubId: string;
+  name: string;
+  avatarUrl?: string;
+  isAdmin?: boolean;
+  isMentor?: boolean;
+}
+
+export async function fetchMentors(): Promise<MentorUser[]> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const url = token
+    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/mentors`
+    : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/mentors`;
+
+  try {
+    const response = await fetch(url, { headers });
+    if (response.ok) {
+      const data = await response.json();
+      return data.data || [];
+    }
+  } catch {}
+
+  const fallbackRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/mentors`);
+  if (!fallbackRes.ok) throw new Error('Failed to fetch mentors');
+  const fallbackData = await fallbackRes.json();
+  return fallbackData.data || [];
+}
+
 export async function addMentor(userId: string) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/${userId}/addAdmin`, {
+  const cleanId = userId.trim().replace(/^@/, '');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/${encodeURIComponent(cleanId)}/addMentor`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
-  if (!response.ok) throw new Error('Failed to add mentor/admin');
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || errorData?.error || 'Failed to add mentor');
+  }
+  return await response.json();
+}
+
+export async function removeMentor(userId: string) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+  const cleanId = userId.trim().replace(/^@/, '');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/${encodeURIComponent(cleanId)}/removeMentor`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || errorData?.error || 'Failed to remove mentor');
+  }
   return await response.json();
 }
 
