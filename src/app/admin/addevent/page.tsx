@@ -140,8 +140,9 @@ export default function Addevent() {
     }
 
     try {
+      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
       await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/create`,
+        `${baseUrl}/api/v1/admin/create`,
         formData,
         {
           headers: {
@@ -157,10 +158,16 @@ export default function Addevent() {
         'Error creating event:',
         error?.response?.data || error.message
       );
+      const errorDetail =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error.message ||
+        'Internal server error';
       toast({ 
         title: 'Failed to create event', 
-        description: error?.response?.data?.message || error.message,
+        description: errorDetail,
         status: 'error', 
+        duration: 7000,
         isClosable: true 
       });
     } finally {

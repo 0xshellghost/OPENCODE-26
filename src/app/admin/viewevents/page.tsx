@@ -9,6 +9,7 @@ import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
+import { updateFlagshipEvent } from 'api/admin/admin';
 
 // 1. Define Types
 interface EventItem {
@@ -29,6 +30,7 @@ export default function Viewevents() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [updatingEventName, setUpdatingEventName] = useState<string | null>(null);
   const router = useRouter();
   const toast = useToast();
   const { features, setFlagshipEvent } = useFeatures();
@@ -72,8 +74,9 @@ export default function Viewevents() {
     // Fetch Data
     const fetchData = async () => {
       try {
+        const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/`
+          `${baseUrl}/api/v1/events/`
         );
         setEvents(response.data.data || []);
       } catch (error) {
@@ -93,8 +96,9 @@ export default function Viewevents() {
     const token = localStorage.getItem('token');
 
     try {
+      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/delete/${eventName}`,
+        `${baseUrl}/api/v1/admin/delete/${encodeURIComponent(eventName)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -111,8 +115,16 @@ export default function Viewevents() {
   };
 
   const handleSetFlagship = async (eventName: string) => {
-    const success = await setFlagshipEvent(eventName);
-    if (success) {
+    setUpdatingEventName(eventName);
+    try {
+      await updateFlagshipEvent(eventName, true);
+      await setFlagshipEvent(eventName);
+      setEvents((prev) =>
+        prev.map((e) => ({
+          ...e,
+          isFlagship: e.name.toLowerCase() === eventName.toLowerCase(),
+        }))
+      );
       toast({
         title: 'Flagship Event Updated',
         description: `"${eventName}" is now the active flagship event.`,
@@ -120,18 +132,28 @@ export default function Viewevents() {
         duration: 3000,
         isClosable: true,
       });
-    } else {
+    } catch (error: any) {
+      console.error('Failed to update flagship event:', error);
       toast({
         title: 'Failed to update flagship event',
+        description: error?.message || 'Could not communicate with backend server.',
         status: 'error',
+        duration: 5000,
         isClosable: true,
       });
+    } finally {
+      setUpdatingEventName(null);
     }
   };
 
   const handleRemoveFlagship = async (eventName: string) => {
-    const success = await setFlagshipEvent(null);
-    if (success) {
+    setUpdatingEventName(eventName);
+    try {
+      await updateFlagshipEvent(eventName, false);
+      await setFlagshipEvent(null);
+      setEvents((prev) =>
+        prev.map((e) => (e.name.toLowerCase() === eventName.toLowerCase() ? { ...e, isFlagship: false } : e))
+      );
       toast({
         title: 'Flagship Event Removed',
         description: `"${eventName}" is no longer the flagship event.`,
@@ -139,12 +161,17 @@ export default function Viewevents() {
         duration: 3000,
         isClosable: true,
       });
-    } else {
+    } catch (error: any) {
+      console.error('Failed to remove flagship event:', error);
       toast({
         title: 'Failed to remove flagship event',
+        description: error?.message || 'Could not communicate with backend server.',
         status: 'error',
+        duration: 5000,
         isClosable: true,
       });
+    } finally {
+      setUpdatingEventName(null);
     }
   };
 
@@ -179,7 +206,7 @@ export default function Viewevents() {
         px={{ base: '8px', sm: '16px', md: '20px', lg: '40px' }}
       >
         {events.map((item, i) => {
-          const isFlagship = features?.flagshipEvent?.toLowerCase() === item.name?.toLowerCase();
+          const isFlagship = item.isFlagship === true || features?.flagshipEvent?.toLowerCase() === item.name?.toLowerCase();
           const bannerImg = resolveImageUrl(
             getEventCoverImage(item),
             resolveImageUrl(getEventLogoImage(item), '/images/kyoto-evening.png'),
@@ -224,6 +251,8 @@ export default function Viewevents() {
                     colorScheme="yellow"
                     variant="solid"
                     leftIcon={<Icon as={Star} fill="currentColor" />}
+                    isLoading={updatingEventName === item.name}
+                    isDisabled={updatingEventName !== null}
                     onClick={() => handleRemoveFlagship(item.name)}
                   >
                     Remove Flagship
@@ -233,6 +262,8 @@ export default function Viewevents() {
                     size="sm"
                     variant="outline"
                     leftIcon={<Icon as={Star} />}
+                    isLoading={updatingEventName === item.name}
+                    isDisabled={updatingEventName !== null}
                     onClick={() => handleSetFlagship(item.name)}
                   >
                     Make Flagship
