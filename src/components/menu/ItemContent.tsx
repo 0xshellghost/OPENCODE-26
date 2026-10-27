@@ -1,8 +1,8 @@
-import { Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
-import { MdUpgrade } from 'react-icons/md';
+import { Flex, Icon, Text } from '@chakra-ui/react';
+import { ArrowUpCircle } from 'lucide-react';
 
 export function ItemContent(props: { info: string }) {
-  const textColor = useColorModeValue('navy.700', 'white');
+  const textColor = 'var(--fg)';
   return (
     <>
       <Flex
@@ -16,7 +16,7 @@ export function ItemContent(props: { info: string }) {
         me="14px"
         bg="linear-gradient(135deg, #7ECDB5 0%, #2D8B6F 100%)"
       >
-        <Icon as={MdUpgrade} color="white" w={8} h={14} />
+        <Icon as={ArrowUpCircle} color="white" w={8} h={8} />
       </Flex>
       <Flex flexDirection="column">
         <Text

@@ -1,10 +1,10 @@
 // Chakra imports
-import { Avatar, Flex, Icon, Text, useColorModeValue } from '@chakra-ui/react';
+import { Avatar, Flex, Icon, Text } from '@chakra-ui/react';
 // Custom components
 import Card from 'components/card/Card';
 import TransparentMenu from 'components/menu/TransparentMenu';
 // Custom icons
-import { IoEllipsisVertical } from 'react-icons/io5';
+import { MoreVertical } from 'lucide-react';
 
 export default function Default(props: {
   avatar: string;
@@ -12,15 +12,11 @@ export default function Default(props: {
   job: string;
 }) {
   const { avatar, name, job, ...rest } = props;
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const bg = useColorModeValue('white', '#1B254B');
-  const shadow = useColorModeValue(
-    '0px 18px 40px rgba(112, 144, 176, 0.12)',
-    'none',
-  );
+  const textColor = 'var(--fg)';
+  const bg = 'var(--surface)';
 
   return (
-    <Card boxShadow={shadow} py="10px" bg={bg} {...rest}>
+    <Card py="10px" bg={bg} {...rest}>
       <Flex align="center">
         <Flex justifyContent="center" alignItems="center">
           <Avatar
@@ -38,7 +34,7 @@ export default function Default(props: {
               {name}
             </Text>
             <Text
-              color="secondaryGray.600"
+              color="var(--fg-muted)"
               textAlign="left"
               fontSize={{ base: 'sm', xl: 'xs', '3xl': 'sm' }}
               fontWeight="400"
@@ -52,7 +48,7 @@ export default function Default(props: {
           ms="auto"
           mb="0px"
           icon={
-            <Icon as={IoEllipsisVertical} w="24px" h="24px" color={textColor} />
+            <Icon as={MoreVertical} w="20px" h="20px" color={textColor} />
           }
         />
       </Flex>

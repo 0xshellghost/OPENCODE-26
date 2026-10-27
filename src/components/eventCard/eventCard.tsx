@@ -1,7 +1,6 @@
 'use client';
 
 import { Box } from '@chakra-ui/react';
-import { Card, CardBody, CardHeader } from '@material-tailwind/react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 interface EventCardProps {
@@ -21,24 +20,20 @@ const EventCard = ({
 }: EventCardProps) => {
   return (
     <Box w="100%">
-      <Card
-        shadow={false}
+      <div
         className="
           relative
           w-full
           h-[420px]
           overflow-hidden
           rounded-2xl
-          bg-black
+          border
+          border-[var(--border)]
+          bg-[var(--surface)]
         "
       >
         {/* Background Image */}
-        <CardHeader
-          floated={false}
-          shadow={false}
-          color="transparent"
-          className="absolute inset-0 m-0 h-full w-full"
-        >
+        <div className="absolute inset-0 m-0 h-full w-full">
           <LazyLoadImage
             alt={name}
             effect="opacity"
@@ -47,14 +42,14 @@ const EventCard = ({
           />
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
-        </CardHeader>
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[var(--bg)]/60 to-transparent" />
+        </div>
 
         {/* Content */}
-        <CardBody className="relative z-10 flex h-full flex-col justify-end px-6 pb-6 text-left">
-          <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
+        <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-6 text-left">
+          <h3 className="text-2xl font-bold text-[var(--fg)] mb-2 tracking-tight">{name}</h3>
 
-          <p className="text-sm text-gray-300 line-clamp-3 mb-4">{des}</p>
+          <p className="text-sm text-[var(--fg-muted)] line-clamp-3 mb-4">{des}</p>
 
           {/* Actions */}
           <div className="flex gap-3">
@@ -62,15 +57,18 @@ const EventCard = ({
               type="button"
               className="
                 rounded-full
-                bg-white/10
+                border
+                border-[var(--border)]
+                bg-[var(--surface-2)]
                 px-4
                 py-2
                 text-sm
                 font-medium
-                text-white
+                text-[var(--fg)]
                 backdrop-blur
                 transition
-                hover:bg-white/20
+                hover:border-[var(--accent)]
+                hover:text-[var(--accent)]
               "
             >
               {btnStatus}
@@ -81,21 +79,22 @@ const EventCard = ({
               onClick={() => onLeaderboardClick(name)}
               className="
                 rounded-full
-                bg-[#9D767E]
+                bg-[var(--accent)]
                 px-4
                 py-2
                 text-sm
-                font-medium
-                text-white
+                font-semibold
+                text-[var(--accent-ink)]
                 transition
-                hover:bg-[#785255]
+                hover:opacity-90
+                hover:shadow-[0_0_15px_var(--accent-glow)]
               "
             >
               Leaderboard
             </button>
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
     </Box>
   );
 };

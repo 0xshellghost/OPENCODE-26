@@ -13,13 +13,16 @@ import {
   fetchEventWinners,
   fetchWeeklyLeaderboards,
 } from 'api/milestones/milestones';
-import { MdEmojiEvents, MdLeaderboard } from 'react-icons/md';
+import { Award, BarChart2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { isAdminUser } from 'utils/jwt';
 import { EventWinnersCard } from './components/EventWinnerCard';
 import { WeeklyLeaderboardCard } from './components/WeeklyLeaderboard';
 import { tabIndicatorTransition } from './components/leaderboardMotion';
+import AnimatedContent from 'components/reactbits/AnimatedContent';
+import BlurText from 'components/reactbits/BlurText';
+import ShinyText from 'components/reactbits/ShinyText';
 
 interface EventWinner {
   name: string;
@@ -38,8 +41,8 @@ interface EventData {
 }
 
 const TABS = [
-  { key: 'weekly', label: 'Weekly Leaders', icon: MdLeaderboard },
-  { key: 'events', label: 'Event Winners', icon: MdEmojiEvents },
+  { key: 'weekly', label: 'Weekly Leaders', icon: BarChart2 },
+  { key: 'events', label: 'Event Winners', icon: Award },
 ];
 
 export default function Milestones() {
@@ -87,22 +90,22 @@ export default function Milestones() {
       {/* 1. Header: use oc-page-heading markup with visible eyebrow and Georgia stat tiles on the right */}
       <Box
         as="header"
-        className="oc-page-heading"
         display="flex"
         flexDirection={{ base: 'column', lg: 'row' }}
         alignItems={{ base: 'flex-start', lg: 'center' }}
         justifyContent="space-between"
         gap={{ base: '20px', md: '28px' }}
         mb="24px"
-        p={{ base: '22px 20px', sm: '28px 32px', md: '34px 44px' }}
+        pb="28px"
+        borderBottom="1px solid var(--line)"
       >
         <Box flex="1" minW="0">
           <p className="oc-eyebrow" style={{ marginBottom: '12px' }}>
             <span />
-            Highlights · OpenCode 2026
+            <ShinyText text="Highlights · OpenCode 2026" speed={5} />
           </p>
           <h1 style={{ marginBottom: '12px' }}>
-            Moments that matter.
+            <BlurText text="Moments that matter." delay={45} animateBy="words" direction="top" />
           </h1>
           <p className="oc-description">
             A living record of standout contributions, weekly excellence, and the little victories that bring us together.

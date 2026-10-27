@@ -1,55 +1,42 @@
-/*eslint-disable*/
+'use client';
 
-import {
-  Flex,
-  Link,
-  List,
-  ListItem,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Flex, Link, Text } from '@chakra-ui/react';
 
 export default function Footer() {
-  const textColor = useColorModeValue('gray.400', 'white');
   return (
     <Flex
       zIndex="3"
-      flexDirection={{
-        base: 'column',
-        xl: 'row',
-      }}
-      alignItems={{
-        base: 'center',
-        xl: 'start',
-      }}
+      flexDirection={{ base: 'column', xl: 'row' }}
+      alignItems="center"
       justifyContent="space-between"
-      px={{ base: '30px', md: '50px' }}
-      pb="30px"
+      px={{ base: '20px', md: '40px' }}
+      py="24px"
+      borderTop="1px solid var(--border)"
+      color="var(--fg-muted)"
+      fontSize="13px"
     >
-      <Text
-        color={textColor}
-        textAlign={{
-          base: 'center',
-          xl: 'start',
-        }}
-        mb={{ base: '20px', xl: '0px' }}
-      >
-        {' '}
-        &copy; {new Date().getFullYear()}
-        <Text as="span" fontWeight="500" ms="4px">
-        Made with ❤️ by 
-          <Link
-            mx="3px"
-            color={textColor}
-            href="https://geekhaven.iiita.ac.in/"
-            target="_blank"
-            fontWeight="700"
-          >
-            Geekhaven!
-          </Link>
-        </Text>
+      <Text textAlign="center">
+        &copy; {new Date().getFullYear()}{' '}
+        <span>Made with ❤️ by </span>
+        <Link
+          href="https://geekhaven.iiita.ac.in/"
+          target="_blank"
+          rel="noopener noreferrer"
+          color="var(--accent)"
+          fontWeight="600"
+          _hover={{ textDecoration: 'underline' }}
+        >
+          Geekhaven
+        </Link>
       </Text>
-     
+      <Link
+        href="/user/events"
+        color="var(--fg-muted)"
+        _hover={{ color: 'var(--accent)' }}
+        mt={{ base: '8px', xl: '0' }}
+      >
+        Return to Portal →
+      </Link>
     </Flex>
   );
 }

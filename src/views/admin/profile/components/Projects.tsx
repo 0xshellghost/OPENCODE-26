@@ -9,8 +9,7 @@ import {
 } from '@chakra-ui/react';
 import Project from 'views/admin/profile/components/Project';
 import { PullRequest } from 'app/user/profile/page';
-import { FaInbox } from 'react-icons/fa';
-import { Star } from 'lucide-react';
+import { Inbox } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Projects(props: { PRs: PullRequest[] }) {
@@ -55,7 +54,7 @@ export default function Projects(props: { PRs: PullRequest[] }) {
           overflow="hidden"
         >
           <Icon
-            as={FaInbox}
+            as={Inbox}
             boxSize="36px"
             color="var(--accent)"
             mb="14px"

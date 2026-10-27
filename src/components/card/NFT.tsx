@@ -7,14 +7,11 @@ import {
   Flex,
   Link,
   Text,
-  useColorModeValue,
 } from '@chakra-ui/react';
 // Custom components
 import Card from 'components/card/Card';
 
 import { Image } from 'components/image/Image';
-// Assets
-import { useState } from 'react';
 
 export default function NFT(props: {
   image: string;
@@ -24,22 +21,25 @@ export default function NFT(props: {
   logoImage?: string;
 }) {
   const { image, name, des, download, logoImage } = props;
-  const [like, setLike] = useState(false);
-  const textColor = useColorModeValue('navy.700', 'white');
-  const textColorBid = useColorModeValue('brand.500', 'white');
-  const logoBorderColor = useColorModeValue('white', 'gray.800');
+  const textColor = 'var(--fg)';
+  const logoBorderColor = 'var(--border)';
 
   return (
     <Card
-      p="20px"
+      p={{ base: '16px', sm: '20px' }}
       className="shadow-lg"
-      maxW={{ base: '340px', md: '360px', lg: '420px' }}
+      maxW={{ base: '100%', sm: '360px', lg: '420px' }}
       w="100%"
     >
       <Flex direction={{ base: 'column' }} justify="center" align="center">
         <Box mb={{ base: '18px', md: '20px' }} position="relative" w="100%">
           <AspectRatio ratio={16 / 9}>
-            <Image src={image} w={'100%'} borderRadius="20px" alt="" />
+            <Image
+              src={image}
+              w={'100%'}
+              borderRadius="16px"
+              alt={name ? decodeURIComponent(name) : 'Event cover image'}
+            />
           </AspectRatio>
           {logoImage && (
             <Box
@@ -50,13 +50,19 @@ export default function NFT(props: {
               h="48px"
               borderRadius="14px"
               overflow="hidden"
-              border="3px solid"
+              border="2px solid"
               borderColor={logoBorderColor}
-              bg="white"
-              boxShadow="0 4px 12px rgba(0,0,0,0.15)"
+              bg="var(--surface-2)"
+              boxShadow="0 4px 12px rgba(0,0,0,0.3)"
               zIndex={2}
             >
-              <Image src={logoImage} w="100%" h="100%" objectFit="cover" alt="" />
+              <Image
+                src={logoImage}
+                w="100%"
+                h="100%"
+                objectFit="cover"
+                alt={name ? `${decodeURIComponent(name)} logo` : 'Event logo'}
+              />
             </Box>
           )}
         </Box>
@@ -71,7 +77,7 @@ export default function NFT(props: {
           <Flex direction="column" align="center" justify="center" mb="12px">
             <Text
               color={textColor}
-              fontSize={{ base: '2xl', md: 'xl', lg: '2xl' }}
+              fontSize={{ base: 'xl', md: '2xl' }}
               mb="6px"
               fontWeight="700"
             >
@@ -84,7 +90,7 @@ export default function NFT(props: {
               })()}
             </Text>
             <Text
-              color="secondaryGray.700"
+              color="var(--fg-muted)"
               fontSize={{ base: 'sm', md: 'md' }}
               fontWeight="400"
               maxW="90%"
@@ -96,14 +102,8 @@ export default function NFT(props: {
           <Flex mt="8px" justify="center" w="100%">
             <Link href={download}>
               <Button
-                className="confet"
-                variant="darkBrand"
-                color="white"
-                fontSize="sm"
-                fontWeight="500"
-                borderRadius="70px"
-                px="26px"
-                py="6px"
+                variant="brand"
+                size="md"
               >
                 Leaderboard
               </Button>

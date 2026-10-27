@@ -8,7 +8,6 @@ import {
   Grid,
   Icon,
   Text,
-  useBreakpointValue,
   useDisclosure,
 } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -27,6 +26,7 @@ import { getRoleTags, RoleBadgesGroup } from 'views/admin/profile/components/Rol
 import { ProfileData } from '../page';
 import { opencodeTokens } from '../../../../theme/opencode-tokens';
 import PageHeading from 'components/japanese/PageHeading';
+import AnimatedContent from 'components/reactbits/AnimatedContent';
 import { getEligibleBadges, BadgeDefinition } from 'constants/badges';
 import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
 
@@ -108,8 +108,6 @@ export default function ProfileOverviewOther() {
   const roleTags = getRoleTags(profile, profileName);
   const roleLabel = roleTags.map((t) => t.label).join(' • ');
 
-  const isDesktop = useBreakpointValue({ base: false, lg: true });
-
   // Panel styling matching the Kyoto cherry blossom & dusk plum theme
   const glassPanel = {
     bg: "var(--surface)",
@@ -146,70 +144,34 @@ export default function ProfileOverviewOther() {
       {/* Discord Banner */}
       <DiscordBanner />
 
-      {/* ─── MOBILE LAYOUT ─── */}
-      {!isDesktop && (
-        <>
-          {/* User Identity Card */}
+      {/* Row 1: 3-column responsive grid */}
+      <AnimatedContent distance={20} duration={0.5} delay={0.1}>
+        <Grid
+          templateColumns={{ base: '1fr', lg: '1fr 1.15fr 1.45fr' }}
+          gap="20px"
+          mb="20px"
+        >
+          {/* User Identity */}
           <Box
             {...glassPanel}
             borderRadius="22px"
-            p="24px"
-            mb="20px"
+            p={{ base: '20px', md: '24px' }}
           >
-            <Flex direction="column" align="center">
-              <Avatar
-                src={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
-                size="xl"
-                border="3.5px solid var(--border-strong)"
-                boxShadow="var(--shadow)"
-                mb="14px"
-              />
-              <Text fontSize="22px" fontWeight="800" color="var(--fg)">
-                {profile?.name || profileName}
-              </Text>
-              <Text fontSize="13px" color="var(--muted)">
-                @{profile?.githubId || profileName}
-              </Text>
-
-              {roleTags.length > 0 && (
-                <RoleBadgesGroup tags={roleTags} mt="10px" />
-              )}
-
-              {isOwnProfile && (
-                <Button
-                  leftIcon={<Pencil size={14} />}
-                  size="sm"
-                  w="100%"
-                  maxW="260px"
-                  bg="var(--accent-soft)"
-                  color="var(--fg)"
-                  border="1px solid var(--border)"
-                  borderRadius="full"
-                  fontWeight="700"
-                  fontSize="13px"
-                  py="18px"
-                  mt="14px"
-                  _hover={{
-                    bg: 'var(--accent-soft)',
-                    borderColor: 'var(--accent)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: 'var(--shadow)',
-                  }}
-                  transition="all 0.3s ease"
-                  onClick={onOpen}
-                >
-                  Edit Profile
-                </Button>
-              )}
-            </Flex>
+            <Banner
+              avatar={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
+              name={profile?.name || profileName}
+              githubUrl={profile?.githubId || profileName}
+              tags={roleTags}
+              showEdit={isOwnProfile}
+              onEdit={onOpen}
+            />
           </Box>
 
           {/* Community Metrics */}
           <Box
             {...glassPanel}
-            borderRadius="20px"
-            p="20px"
-            mb="20px"
+            borderRadius="22px"
+            p={{ base: '20px', md: '24px' }}
           >
             <CommunityMetrics
               prMerged={profile?.prMerged || 0}
@@ -223,9 +185,8 @@ export default function ProfileOverviewOther() {
           {/* General Information */}
           <Box
             {...glassPanel}
-            borderRadius="20px"
-            p="20px"
-            mb="20px"
+            borderRadius="22px"
+            p={{ base: '20px', md: '24px' }}
           >
             <General
               name={profile?.name || profileName}
@@ -238,121 +199,36 @@ export default function ProfileOverviewOther() {
               role={roleLabel}
             />
           </Box>
+        </Grid>
+      </AnimatedContent>
 
-          {/* Badges */}
-          {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box {...glassPanel} borderRadius="20px" p="20px" mb="20px">
-              <Flex justify="space-between" align="center" mb="14px">
-                <Text fontWeight="800" color="var(--fg)">
-                  Unlocked Badges
-                </Text>
-                <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
-                  {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
-                </Text>
-              </Flex>
-              <Grid templateColumns="1fr" gap="12px">
-                {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
-                  <BadgeCard key={idx} badge={badge} />
-                ))}
-              </Grid>
-            </Box>
-          )}
-
-          {/* Recent Contributions */}
-          <Box {...glassPanel} borderRadius="20px" p="20px">
-            <Projects PRs={profile?.PR || []} />
-          </Box>
-        </>
-      )}
-
-      {/* ─── DESKTOP LAYOUT ─── */}
-      {isDesktop && (
-        <>
-          {/* Row 1: 3-column grid */}
-          <Grid
-            templateColumns={{ base: '1fr', lg: '1fr 1.15fr 1.45fr' }}
-            gap="20px"
-            mb="20px"
-          >
-            {/* User Identity */}
-            <Box
-              {...glassPanel}
-              borderRadius="22px"
-              p="24px"
-            >
-              <Banner
-                avatar={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
-                name={profile?.name || profileName}
-                githubUrl={profile?.githubId || profileName}
-                tags={roleTags}
-                showEdit={isOwnProfile}
-                onEdit={onOpen}
-              />
-            </Box>
-
-            {/* Community Metrics */}
-            <Box
-              {...glassPanel}
-              borderRadius="22px"
-              p="24px"
-            >
-              <CommunityMetrics
-                prMerged={profile?.prMerged || 0}
-                pointsEarned={profile?.points || 0}
-                rank={resolvedRank}
-                totalParticipants={totalParticipants}
-                totalPRsSubmitted={profile?.PR?.length || profile?.prMerged || 0}
-              />
-            </Box>
-
-            {/* General Information */}
-            <Box
-              {...glassPanel}
-              borderRadius="22px"
-              p="24px"
-            >
-              <General
-                name={profile?.name || profileName}
-                githubId={profile?.githubId || profileName}
-                college={profile?.college}
-                discordId={profile?.discordId}
-                email={profile?.email}
-                gender={profile?.gender}
-                year={profile?.year}
-                role={roleLabel}
-              />
-            </Box>
+      {/* Badges Row (if any) */}
+      {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
+        <Box {...glassPanel} borderRadius="22px" p={{ base: '20px', md: '24px' }} mb="20px">
+          <Flex justify="space-between" align="center" mb="16px">
+            <Text fontSize="18px" fontWeight="800" color="var(--fg)">
+              Unlocked Badges
+            </Text>
+            <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
+              {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
+            </Text>
+          </Flex>
+          <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="16px">
+            {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
+              <BadgeCard key={idx} badge={badge} />
+            ))}
           </Grid>
-
-          {/* Badges Row (if any) */}
-          {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
-            <Box {...glassPanel} borderRadius="22px" p="24px" mb="20px">
-              <Flex justify="space-between" align="center" mb="16px">
-                <Text fontSize="18px" fontWeight="800" color="var(--fg)">
-                  Unlocked Badges
-                </Text>
-                <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
-                  {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
-                </Text>
-              </Flex>
-              <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="16px">
-                {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
-                  <BadgeCard key={idx} badge={badge} />
-                ))}
-              </Grid>
-            </Box>
-          )}
-
-          {/* Row 2: Recent Contributions - Full width */}
-          <Box
-            {...glassPanel}
-            borderRadius="22px"
-            p="24px"
-          >
-            <Projects PRs={profile?.PR || []} />
-          </Box>
-        </>
+        </Box>
       )}
+
+      {/* Row 2: Recent Contributions - Full width */}
+      <Box
+        {...glassPanel}
+        borderRadius="22px"
+        p={{ base: '20px', md: '24px' }}
+      >
+        <Projects PRs={profile?.PR || []} />
+      </Box>
 
       {isOwnProfile && (
         <EditProfileModal

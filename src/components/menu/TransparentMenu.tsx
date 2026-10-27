@@ -7,28 +7,22 @@ import {
 	MenuItem,
 	MenuList,
 	useDisclosure,
-	useColorModeValue,
 	Flex,
 	Icon,
 	Text
 } from '@chakra-ui/react';
 // Assets
-import { MdOutlinePerson, MdOutlineCardTravel, MdOutlineLightbulb, MdOutlineSettings } from 'react-icons/md';
+import { Briefcase, Lightbulb, Settings, User } from 'lucide-react';
+
 export default function Banner(props: { icon: JSX.Element | string; [x: string]: any }) {
 	const { icon, ...rest } = props;
 
 	// Ellipsis modals
 	const { isOpen: isOpen1, onOpen: onOpen1, onClose: onClose1 } = useDisclosure();
 
-	// Chakra color mode
-
-	const textColor = useColorModeValue('secondaryGray.500', 'white');
-	const textHover = useColorModeValue(
-		{ color: 'secondaryGray.900', bg: 'unset' },
-		{ color: 'secondaryGray.500', bg: 'unset' }
-	);
-	const bgList = useColorModeValue('white', 'whiteAlpha.100');
-	const bgShadow = useColorModeValue('14px 17px 40px 4px rgba(112, 144, 176, 0.08)', 'unset');
+	const textColor = 'var(--fg-muted)';
+	const textHover = { color: 'var(--fg)', bg: 'var(--surface-2)' };
+	const bgList = 'var(--surface-2)';
 
 	return (
 		<Menu isOpen={isOpen1} onClose={onClose1}>
@@ -36,71 +30,59 @@ export default function Banner(props: { icon: JSX.Element | string; [x: string]:
 				{icon}
 			</MenuButton>
 			<MenuList
-				w='150px'
+				w='160px'
 				minW='unset'
-				maxW='150px !important'
-				border='transparent'
-				backdropFilter='blur(63px)'
+				maxW='160px'
+				border='1px solid var(--border)'
+				backdropFilter='blur(20px)'
 				bg={bgList}
-				boxShadow={bgShadow}
-				borderRadius='20px'
-				p='15px'>
+				boxShadow='0 10px 30px rgba(0,0,0,0.3)'
+				borderRadius='14px'
+				p='8px'>
 				<MenuItem
 					transition='0.2s linear'
 					color={textColor}
 					_hover={textHover}
-					p='0px'
+					px='8px'
+					py='6px'
 					borderRadius='8px'
-					_active={{
-						bg: 'transparent'
-					}}
-					_focus={{
-						bg: 'transparent'
-					}}
-					mb='10px'>
+					bg='transparent'
+					mb='4px'>
 					<Flex align='center'>
-						<Icon as={MdOutlinePerson} h='16px' w='16px' me='8px' />
-						<Text fontSize='sm' fontWeight='400'>
+						<Icon as={User} h='15px' w='15px' me='8px' />
+						<Text fontSize='sm' fontWeight='500'>
 							Panel 1
 						</Text>
 					</Flex>
 				</MenuItem>
 				<MenuItem
 					transition='0.2s linear'
-					p='0px'
+					px='8px'
+					py='6px'
 					borderRadius='8px'
 					color={textColor}
 					_hover={textHover}
-					_active={{
-						bg: 'transparent'
-					}}
-					_focus={{
-						bg: 'transparent'
-					}}
-					mb='10px'>
+					bg='transparent'
+					mb='4px'>
 					<Flex align='center'>
-						<Icon as={MdOutlineCardTravel} h='16px' w='16px' me='8px' />
-						<Text fontSize='sm' fontWeight='400'>
+						<Icon as={Briefcase} h='15px' w='15px' me='8px' />
+						<Text fontSize='sm' fontWeight='500'>
 							Panel 2
 						</Text>
 					</Flex>
 				</MenuItem>
 				<MenuItem
 					transition='0.2s linear'
-					p='0px'
+					px='8px'
+					py='6px'
 					borderRadius='8px'
 					color={textColor}
 					_hover={textHover}
-					_active={{
-						bg: 'transparent'
-					}}
-					_focus={{
-						bg: 'transparent'
-					}}
-					mb='10px'>
+					bg='transparent'
+					mb='4px'>
 					<Flex align='center'>
-						<Icon as={MdOutlineLightbulb} h='16px' w='16px' me='8px' />
-						<Text fontSize='sm' fontWeight='400'>
+						<Icon as={Lightbulb} h='15px' w='15px' me='8px' />
+						<Text fontSize='sm' fontWeight='500'>
 							Panel 3
 						</Text>
 					</Flex>
@@ -109,17 +91,13 @@ export default function Banner(props: { icon: JSX.Element | string; [x: string]:
 					transition='0.2s linear'
 					color={textColor}
 					_hover={textHover}
-					p='0px'
+					px='8px'
+					py='6px'
 					borderRadius='8px'
-					_active={{
-						bg: 'transparent'
-					}}
-					_focus={{
-						bg: 'transparent'
-					}}>
+					bg='transparent'>
 					<Flex align='center'>
-						<Icon as={MdOutlineSettings} h='16px' w='16px' me='8px' />
-						<Text fontSize='sm' fontWeight='400'>
+						<Icon as={Settings} h='15px' w='15px' me='8px' />
+						<Text fontSize='sm' fontWeight='500'>
 							Panel 4
 						</Text>
 					</Flex>

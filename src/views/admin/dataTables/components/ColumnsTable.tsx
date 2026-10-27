@@ -12,7 +12,6 @@ import {
   Thead,
   Tr,
   Link,
-  Button,
   useBreakpointValue,
   Popover,
   PopoverTrigger,
@@ -20,7 +19,7 @@ import {
   PopoverBody,
   PopoverArrow,
 } from "@chakra-ui/react";
-import { FaTrophy, FaList, FaChartLine, FaGithub } from "react-icons/fa";
+import { Trophy, List, LineChart, Building2, ExternalLink } from "lucide-react";
 import {
   createColumnHelper,
   flexRender,
@@ -33,9 +32,8 @@ import {
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 
-import Card from "components/card/Card";
 import LeaderboardGraph from "./LeadearboardGraph";
-import { NextAvatar } from "components/image/Avatar";
+import ContributorAvatar from "components/common/ContributorAvatar";
 import { isMaintainer } from "constants/Maintainers";
 
 gsap.registerPlugin(Flip);
@@ -55,7 +53,7 @@ export type RowObj = {
 const columnHelper = createColumnHelper<RowObj>();
 
 const TROPHY_COLORS: Record<number, string> = {
-  1: "#F5C542", // Gold (Warm Amber)
+  1: "var(--secondary)", // Gold (Theme Adaptive)
   2: "#94A3B8", // Silver (Slate Silver)
   3: "#D97706", // Bronze (Warm Bronze)
 };
@@ -72,186 +70,92 @@ function getCurrentGithubId(): string | undefined {
   }
 }
 
+
+
 /**
  * Top 3 trophy and numeric position badge used by both desktop and mobile views.
  */
 function RankBadge({ position }: { position: string | number }) {
   const pos = typeof position === "string" ? parseInt(position, 10) : position;
   const isTop3 = typeof pos === "number" && !Number.isNaN(pos) && pos >= 1 && pos <= 3;
-  const isTop10 = typeof pos === "number" && !Number.isNaN(pos) && pos >= 4 && pos <= 10;
-  const trophyColor = isTop3 ? TROPHY_COLORS[pos as 1 | 2 | 3] : undefined;
 
-  if (isTop3 && trophyColor) {
+  if (isTop3) {
+    const trophyColor = TROPHY_COLORS[pos as 1 | 2 | 3];
     return (
       <Flex
         align="center"
         justify="center"
-        gap="6px"
-        px="12px"
-        py="4px"
+        gap="4px"
+        px="8px"
+        py="2px"
         borderRadius="full"
         bg={
           pos === 1
-            ? "rgba(245, 197, 66, 0.16)"
+            ? "var(--secondary-soft)"
             : pos === 2
-            ? "rgba(186, 215, 245, 0.16)"
-            : "rgba(235, 130, 60, 0.16)"
+            ? "rgba(148, 163, 184, 0.12)"
+            : "rgba(217, 119, 6, 0.12)"
         }
         border="1px solid"
         borderColor={
           pos === 1
-            ? "rgba(245, 197, 66, 0.55)"
+            ? "var(--secondary-border)"
             : pos === 2
-            ? "rgba(186, 215, 245, 0.5)"
-            : "rgba(235, 130, 60, 0.5)"
-        }
-        boxShadow={
-          pos === 1
-            ? "0 0 16px rgba(245, 197, 66, 0.3)"
-            : pos === 2
-            ? "0 0 14px rgba(186, 215, 245, 0.25)"
-            : "0 0 14px rgba(235, 130, 60, 0.25)"
+            ? "rgba(148, 163, 184, 0.3)"
+            : "rgba(217, 119, 6, 0.3)"
         }
       >
-        <FaTrophy color={trophyColor} size={13} />
         <Text
           fontFamily="var(--f-mono), monospace"
-          fontWeight="900"
-          fontSize="13px"
+          fontWeight="800"
+          fontSize="12.5px"
           color={trophyColor}
         >
-          {pos}
+          #{pos}
         </Text>
       </Flex>
     );
   }
 
-  if (isTop10) {
-    return (
-      <Flex
-        align="center"
-        justify="center"
-        minW="34px"
-        h="26px"
-        px="8px"
-        borderRadius="full"
-        bg="rgba(88, 185, 154, 0.12)"
-        border="1px solid rgba(88, 185, 154, 0.35)"
-        color="#58B99A"
-        fontFamily="var(--f-mono), monospace"
-        fontWeight="800"
-        fontSize="12.5px"
-        boxShadow="0 0 10px rgba(88, 185, 154, 0.15)"
-      >
-        #{pos}
-      </Flex>
-    );
-  }
-
   return (
-    <Flex
-      align="center"
-      justify="center"
-      minW="30px"
-      h="24px"
-      px="6px"
-      borderRadius="8px"
-      bg="rgba(255, 255, 255, 0.03)"
-      border="1px solid var(--border)"
-      color="var(--muted)"
+    <Text
       fontFamily="var(--f-mono), monospace"
-      fontWeight="700"
-      fontSize="12.5px"
+      fontWeight="600"
+      fontSize="13px"
+      color="var(--muted)"
+      textAlign="center"
     >
-      {position}
-    </Flex>
+      #{position}
+    </Text>
   );
 }
 
 /**
- * Interactive User Popover displaying avatar, maintainer/self badges, and quick stats.
+ * Rich, interactive Contributor Hover Card displaying quick dossier and stats.
  */
-function UserCell({
-  rowData,
+function ContributorHoverCard({
+  row,
   currentGithubId,
   isOpencode,
+  children,
 }: {
-  rowData: RowObj;
+  row: RowObj;
   currentGithubId?: string;
   isOpencode: boolean;
+  children: React.ReactNode;
 }) {
-  const isYou = Boolean(rowData.githubid && rowData.githubid === currentGithubId);
-  const maintainer = Boolean(rowData.githubid && isMaintainer(rowData.githubid));
+  const isYou = Boolean(row.githubid && row.githubid === currentGithubId);
+  const maintainer = Boolean(row.githubid && isMaintainer(row.githubid));
+
+  if (!row.githubid) {
+    return <>{children}</>;
+  }
 
   return (
-    <Popover trigger="hover" placement="right" openDelay={0} isLazy>
+    <Popover trigger="hover" placement="right-start" openDelay={120} closeDelay={150} isLazy>
       <PopoverTrigger>
-        <Box display="inline-block">
-          <Link
-            href={`/user/profile/${rowData.githubid}`}
-            _hover={{ textDecoration: "none" }}
-          >
-            <Flex align="center" gap="10px">
-              <Box position="relative">
-                <Box
-                  borderRadius="full"
-                  p="2px"
-                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.45), rgba(45, 139, 111, 0.25))"
-                  transition="transform 0.2s ease"
-                  _hover={{ transform: "scale(1.06)" }}
-                >
-                  <NextAvatar src={rowData.avatarUrl} h="40px" w="40px" />
-                </Box>
-
-                {maintainer && (
-                  <Box
-                    position="absolute"
-                    top="-8px"
-                    right="-14px"
-                    bg="var(--secondary)"
-                    color="#0C1C2C"
-                    fontSize="9px"
-                    fontWeight="900"
-                    px="6px"
-                    py="1px"
-                    borderRadius="full"
-                    boxShadow="0 2px 6px rgba(0,0,0,0.3)"
-                    letterSpacing="0.05em"
-                  >
-                    MENTOR
-                  </Box>
-                )}
-              </Box>
-
-              <Flex align="center" gap="8px">
-                <Text
-                  fontWeight="700"
-                  fontSize="14px"
-                  color="var(--fg)"
-                  transition="color 0.2s ease"
-                  _hover={{ color: "var(--accent)" }}
-                >
-                  {rowData.githubid}
-                </Text>
-
-                {isYou && (
-                  <Box
-                    bg="var(--accent)"
-                    color="var(--accent-ink)"
-                    fontSize="10px"
-                    fontWeight="900"
-                    px="8px"
-                    py="2px"
-                    borderRadius="full"
-                    boxShadow="0 2px 8px var(--accent-soft)"
-                    letterSpacing="0.06em"
-                  >
-                    YOU
-                  </Box>
-                )}
-              </Flex>
-            </Flex>
-          </Link>
+        <Box display="inline-flex" alignItems="center" cursor="pointer">
+          {children}
         </Box>
       </PopoverTrigger>
 
@@ -259,80 +163,136 @@ function UserCell({
         bg="var(--card-strong)"
         color="var(--fg)"
         border="1px solid var(--border-strong)"
-        borderRadius="16px"
-        w="auto"
-        minW="220px"
-        boxShadow="var(--shadow)"
-        backdropFilter="blur(20px)"
+        borderRadius="18px"
+        w="280px"
+        p="0"
+        boxShadow="0 16px 40px -10px rgba(0,0,0,0.8), 0 0 24px -4px rgba(88,185,154,0.18)"
+        backdropFilter="blur(24px)"
         _focus={{ outline: "none" }}
-        zIndex="popover"
+        zIndex={1400}
       >
         <PopoverArrow bg="var(--card-strong)" />
         <PopoverBody p="16px">
-          <Text
-            fontWeight="800"
-            fontSize="md"
-            mb="3"
-            color="var(--fg)"
-            fontFamily="var(--f-sans)"
-          >
-            {rowData.name}
-          </Text>
-
-          <Flex justify="space-between" align="center" mb="2">
-            <Text fontSize="sm" color="var(--muted)" fontWeight="500">
-              {isOpencode ? "Points" : "Score"}
-            </Text>
-            <Text
-              fontSize="sm"
-              fontWeight="800"
-              color="var(--accent)"
-              fontFamily="var(--f-mono), monospace"
-            >
-              {rowData.points}
-            </Text>
+          {/* Header: Avatar, Name, Handle, Badges */}
+          <Flex align="center" gap="12px" mb="12px">
+            <ContributorAvatar
+              name={row.name}
+              githubid={row.githubid}
+              avatarUrl={row.avatarUrl}
+              size="46px"
+              fontSize="16px"
+            />
+            <Box minW={0} flex={1}>
+              <Flex align="center" gap="6px" flexWrap="wrap">
+                <Text
+                  fontWeight="700"
+                  fontSize="15px"
+                  color="var(--fg)"
+                  fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
+                  lineHeight="1.2"
+                  noOfLines={1}
+                >
+                  {row.name}
+                </Text>
+                {maintainer && (
+                  <Box
+                    bg="var(--secondary)"
+                    color="#0C1C2C"
+                    fontSize="9px"
+                    fontWeight="900"
+                    px="6px"
+                    py="1px"
+                    borderRadius="full"
+                    letterSpacing="0.05em"
+                  >
+                    MENTOR
+                  </Box>
+                )}
+                {isYou && (
+                  <Box
+                    bg="var(--accent)"
+                    color="var(--accent-ink)"
+                    fontSize="9.5px"
+                    fontWeight="900"
+                    px="6px"
+                    py="1px"
+                    borderRadius="full"
+                    letterSpacing="0.06em"
+                  >
+                    YOU
+                  </Box>
+                )}
+              </Flex>
+              <Text fontSize="12.5px" color="var(--accent)" fontWeight="600" mt="2px">
+                @{row.githubid}
+              </Text>
+            </Box>
           </Flex>
 
-          {isOpencode ? (
-            <Flex justify="space-between" align="center" mb="4">
-              <Text fontSize="sm" color="var(--muted)" fontWeight="500">
-                PRs Merged
-              </Text>
-              <Text
-                fontSize="sm"
-                fontWeight="800"
-                color="var(--fg)"
-                fontFamily="var(--f-mono), monospace"
-              >
-                {rowData.prmerged}
+          {/* College badge if available */}
+          {row.college && (
+            <Flex align="center" gap="6px" mb="12px" px="10px" py="6px" borderRadius="10px" bg="var(--surface-2)">
+              <Building2 size={13} color="var(--muted)" />
+              <Text fontSize="11.5px" color="var(--muted)" noOfLines={1}>
+                {row.college}
               </Text>
             </Flex>
-          ) : rowData.college ? (
-            <Flex justify="space-between" align="center" mb="4">
-              <Text fontSize="sm" color="var(--muted)" fontWeight="500">
-                College
-              </Text>
-              <Text
-                fontSize="sm"
-                fontWeight="700"
-                color="var(--fg)"
-                noOfLines={1}
-                maxW="140px"
-              >
-                {rowData.college}
-              </Text>
-            </Flex>
-          ) : null}
+          )}
 
-          <Text
-            fontSize="xs"
-            color="var(--accent)"
-            fontWeight="700"
-            align="center"
-            letterSpacing="0.04em"
+          {/* Quick Stats Grid */}
+          <Flex
+            justify="space-between"
+            p="10px 14px"
+            borderRadius="12px"
+            bg="var(--surface-2)"
+            border="1px solid var(--border)"
+            mb="12px"
           >
-            Click to view profile &rarr;
-          </Text>
+            <Box textAlign="center">
+              <Text fontSize="10px" color="var(--muted)" fontWeight="600" textTransform="uppercase" letterSpacing="0.08em">
+                Rank
+              </Text>
+              <Text fontSize="14px" fontWeight="800" color="var(--fg)" fontFamily="var(--f-mono)">
+                #{row.position}
+              </Text>
+            </Box>
+
+            <Box textAlign="center">
+              <Text fontSize="10px" color="var(--muted)" fontWeight="600" textTransform="uppercase" letterSpacing="0.08em">
+                {isOpencode ? "PRs Merged" : "PRs"}
+              </Text>
+              <Text fontSize="14px" fontWeight="800" color="var(--fg)" fontFamily="var(--f-mono)">
+                {row.prmerged ?? 0}
+              </Text>
+            </Box>
+
+            <Box textAlign="center">
+              <Text fontSize="10px" color="var(--muted)" fontWeight="600" textTransform="uppercase" letterSpacing="0.08em">
+                Points
+              </Text>
+              <Text fontSize="14px" fontWeight="800" color="var(--secondary)" fontFamily="var(--f-display)">
+                {Number(row.points || 0).toLocaleString()}
+              </Text>
+            </Box>
+          </Flex>
+
+          {/* Footer action link */}
+          <Link
+            href={`/user/profile/${row.githubid}`}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap="5px"
+            fontSize="12px"
+            fontWeight="600"
+            color="var(--accent)"
+            pt="2px"
+            transition="all 0.15s ease"
+            _hover={{ textDecoration: "none", color: "var(--fg)", transform: "translateX(2px)" }}
+          >
+            <span>View Full Profile</span>
+            <ExternalLink size={12} />
+          </Link>
         </PopoverBody>
       </PopoverContent>
     </Popover>
@@ -349,6 +309,7 @@ function TablePagination({
   onNext,
   canPrevious,
   canNext,
+  totalLabel,
   isMobile = false,
 }: {
   pageIndex: number;
@@ -357,79 +318,68 @@ function TablePagination({
   onNext: () => void;
   canPrevious: boolean;
   canNext: boolean;
+  totalLabel?: string;
   isMobile?: boolean;
 }) {
-  const btnStyle = {
-    size: "sm" as const,
-    h: "34px",
-    borderRadius: "full",
-    fontSize: "13px",
-    fontWeight: "700",
-    bg: "var(--accent-soft)",
-    border: "1px solid var(--border)",
-    color: "var(--fg)",
-    _hover: {
-      bg: "var(--accent-soft)",
-      borderColor: "var(--accent)",
-      boxShadow: "0 0 12px var(--accent-soft)",
-    },
-    _disabled: {
-      opacity: 0.35,
-      cursor: "not-allowed",
-      borderColor: "var(--border)",
-      bg: "transparent",
-    },
-  };
-
-  if (isMobile) {
-    return (
-      <Flex direction="column" gap="10px" mt="10px">
-        <Text
-          fontSize="12px"
-          color="var(--muted)"
-          textAlign="center"
-          fontFamily="var(--f-mono), monospace"
-        >
-          Page {pageIndex + 1} of {Math.max(1, pageCount)}
-        </Text>
-        <Flex gap="10px">
-          <Button flex="1" {...btnStyle} onClick={onPrevious} isDisabled={!canPrevious}>
-            Prev
-          </Button>
-          <Button flex="1" {...btnStyle} onClick={onNext} isDisabled={!canNext}>
-            Next
-          </Button>
-        </Flex>
-      </Flex>
-    );
-  }
-
   return (
     <Flex
-      px="18px"
+      px={{ base: "14px", md: "18px" }}
       py="16px"
       justify="space-between"
       align="center"
       borderTop="1px solid var(--line)"
-      bg="var(--card-soft)"
       flexWrap="wrap"
       gap="12px"
+      mt="10px"
     >
       <Text
-        fontSize="13px"
+        fontSize="12.5px"
         color="var(--muted)"
         fontFamily="var(--f-mono), monospace"
-        fontWeight="600"
       >
-        Page {pageIndex + 1} of {Math.max(1, pageCount)}
+        {totalLabel || `Page ${pageIndex + 1} of ${Math.max(1, pageCount)}`}
       </Text>
-      <Flex gap="10px">
-        <Button px="18px" {...btnStyle} onClick={onPrevious} isDisabled={!canPrevious}>
-          Prev
-        </Button>
-        <Button px="18px" {...btnStyle} onClick={onNext} isDisabled={!canNext}>
+      <Flex gap="8px">
+        <button
+          type="button"
+          onClick={onPrevious}
+          disabled={!canPrevious}
+          style={{
+            padding: "6px 16px",
+            fontSize: "12px",
+            fontFamily: "var(--f-body)",
+            fontWeight: "600",
+            borderRadius: "8px",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            color: "var(--fg)",
+            cursor: canPrevious ? "pointer" : "not-allowed",
+            opacity: canPrevious ? 1 : 0.35,
+            transition: "all 0.2s ease",
+          }}
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!canNext}
+          style={{
+            padding: "6px 16px",
+            fontSize: "12px",
+            fontFamily: "var(--f-body)",
+            fontWeight: "600",
+            borderRadius: "8px",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            color: "var(--fg)",
+            cursor: canNext ? "pointer" : "not-allowed",
+            opacity: canNext ? 1 : 0.35,
+            transition: "all 0.2s ease",
+          }}
+        >
           Next
-        </Button>
+        </button>
       </Flex>
     </Flex>
   );
@@ -442,47 +392,53 @@ function MobileLeaderboard({
   table,
   isOpencode,
   hasPoints,
+  currentGithubId,
 }: {
   table: ReturnType<typeof useReactTable<RowObj>>;
   isOpencode: boolean;
   hasPoints: boolean;
+  currentGithubId?: string;
 }) {
   if (!table) return null;
   const rows = table.getPaginationRowModel().rows;
+  const totalCount = table.getPrePaginationRowModel().rows.length;
+  const pageIndex = table.getState().pagination.pageIndex;
+  const pageSize = table.getState().pagination.pageSize;
+  const startCount = rows.length > 0 ? pageIndex * pageSize + 1 : 0;
+  const endCount = rows.length > 0 ? Math.min(startCount + rows.length - 1, totalCount) : 0;
+  const totalLabel = totalCount > 0
+    ? `Showing ${startCount}-${endCount} of ${totalCount.toLocaleString()} contributors`
+    : `Showing 0 contributors`;
 
   return (
-    <Flex direction="column" gap="14px">
+    <Flex direction="column" gap="10px">
       {rows.map((row, index) => {
         const user = row.original;
         const rowKey = user.githubid || `${user.name}-${user.position}-${index}`;
-
         const content = (
-          <Flex align="center" gap="12px">
-            <Flex align="center" justify="center" minW="32px">
+          <Flex align="center" gap="10px">
+            <Flex align="center" justify="center" minW="26px">
               <RankBadge position={user.position} />
             </Flex>
 
-            {user.avatarUrl && (
-              <Box
-                borderRadius="full"
-                p="2px"
-                bg="linear-gradient(135deg, rgba(88, 185, 154, 0.4), rgba(45, 139, 111, 0.2))"
-                flexShrink={0}
-              >
-                <NextAvatar src={user.avatarUrl} h="42px" w="42px" />
-              </Box>
-            )}
+            <ContributorAvatar
+              name={user.name}
+              githubid={user.githubid}
+              avatarUrl={user.avatarUrl}
+              size="36px"
+              fontSize="12.5px"
+            />
 
-            <Box>
-              <Text fontWeight="700" fontSize="14px" color="var(--fg)">
+            <Box minW={0}>
+              <Text fontWeight="600" fontSize="13.5px" color="var(--fg)" noOfLines={1}>
                 {user.name}
               </Text>
               {isOpencode && user.githubid ? (
-                <Text fontSize="12px" color="var(--muted)">
+                <Text fontSize="11.5px" color="var(--muted)">
                   @{user.githubid}
                 </Text>
               ) : user.college ? (
-                <Text fontSize="12px" color="var(--muted)" noOfLines={1} maxW="160px">
+                <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} maxW="150px">
                   {user.college}
                 </Text>
               ) : null}
@@ -495,8 +451,8 @@ function MobileLeaderboard({
             key={rowKey}
             align="center"
             justify="space-between"
-            p="14px"
-            borderRadius="18px"
+            p="12px 14px"
+            borderRadius="14px"
             bg="var(--surface)"
             border="1px solid var(--border)"
             backdropFilter="blur(16px)"
@@ -508,46 +464,47 @@ function MobileLeaderboard({
             }}
           >
             {isOpencode && user.githubid ? (
-              <Link
-                href={`/user/profile/${user.githubid}`}
-                _hover={{ textDecoration: "none" }}
+              <ContributorHoverCard
+                row={user}
+                currentGithubId={currentGithubId}
+                isOpencode={isOpencode}
               >
-                {content}
-              </Link>
+                <Link
+                  href={`/user/profile/${user.githubid}`}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  {content}
+                </Link>
+              </ContributorHoverCard>
             ) : (
               content
             )}
 
             <Flex align="center" gap="10px">
               {isOpencode && user.prmerged !== undefined ? (
-                <Flex
-                  align="center"
-                  justify="center"
-                  px="10px"
-                  py="3px"
-                  borderRadius="full"
-                  bg="var(--accent-soft)"
-                  border="1px solid var(--border)"
-                  color="var(--fg)"
-                  fontFamily="var(--f-mono), monospace"
-                  fontWeight="700"
+                <Text
                   fontSize="12px"
+                  color="var(--muted)"
+                  fontFamily="var(--f-mono), monospace"
                 >
                   {user.prmerged} PRs
-                </Flex>
+                </Text>
               ) : null}
 
               {(isOpencode || hasPoints) && user.points !== undefined && user.points !== null ? (
-                <Flex align="center" gap="6px">
+                <Flex align="baseline" gap="3px">
                   <Text
-                    fontWeight="800"
-                    fontFamily="var(--f-mono), monospace"
-                    color="var(--accent)"
-                    fontSize="15px"
+                    fontWeight="700"
+                    fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
+                    color="var(--secondary)"
+                    fontSize="16px"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
                   >
-                    {user.points}
+                    {Number(user.points).toLocaleString()}
                   </Text>
-                  <FaTrophy color="var(--secondary)" size={12} />
+                  <Text fontSize="11px" color="var(--muted)">
+                    pts
+                  </Text>
                 </Flex>
               ) : null}
             </Flex>
@@ -562,6 +519,7 @@ function MobileLeaderboard({
         onNext={() => table.nextPage()}
         canPrevious={table.getCanPreviousPage()}
         canNext={table.getCanNextPage()}
+        totalLabel={totalLabel}
         isMobile
       />
     </Flex>
@@ -621,45 +579,28 @@ function ColumnTable({
       columnHelper.accessor("name", {
         header: () => (
           <Text textAlign="left" letterSpacing="0.14em">
-            NAME
+            CONTRIBUTOR
           </Text>
         ),
         cell: (info) => {
           const row = info.row.original;
-          if (isOpencode) {
-            return (
-              <Box textAlign="left">
-                <Text fontWeight="700" fontSize="15px" color="var(--fg)">
-                  {info.getValue()}
-                </Text>
-                {row.college && (
-                  <Text
-                    fontSize="12px"
-                    color="var(--muted)"
-                    noOfLines={1}
-                    maxW="240px"
-                  >
-                    {row.college}
-                  </Text>
-                )}
-              </Box>
-            );
-          }
 
-          return (
-            <Flex align="center" gap="10px" textAlign="left">
-              {row.avatarUrl && (
-                <Box
-                  borderRadius="full"
-                  p="2px"
-                  bg="linear-gradient(135deg, rgba(88, 185, 154, 0.45), rgba(45, 139, 111, 0.25))"
-                  flexShrink={0}
+          const cellContent = (
+            <Flex align="center" gap="12px" textAlign="left">
+              <ContributorAvatar
+                name={info.getValue()}
+                githubid={row.githubid}
+                avatarUrl={row.avatarUrl}
+                size="38px"
+                fontSize="13px"
+              />
+              <Box minW={0}>
+                <Text
+                  fontWeight="600"
+                  fontSize="14.5px"
+                  color="var(--fg)"
+                  noOfLines={1}
                 >
-                  <NextAvatar src={row.avatarUrl} h="36px" w="36px" />
-                </Box>
-              )}
-              <Box>
-                <Text fontWeight="700" fontSize="15px" color="var(--fg)">
                   {info.getValue()}
                 </Text>
                 {row.college && (
@@ -667,7 +608,7 @@ function ColumnTable({
                     fontSize="12px"
                     color="var(--muted)"
                     noOfLines={1}
-                    maxW="240px"
+                    maxW={{ base: "180px", lg: "300px" }}
                   >
                     {row.college}
                   </Text>
@@ -675,6 +616,25 @@ function ColumnTable({
               </Box>
             </Flex>
           );
+
+          if (row.githubid) {
+            return (
+              <ContributorHoverCard
+                row={row}
+                currentGithubId={currentGithubId}
+                isOpencode={isOpencode}
+              >
+                <Link
+                  href={`/user/profile/${row.githubid}`}
+                  _hover={{ textDecoration: "none" }}
+                >
+                  {cellContent}
+                </Link>
+              </ContributorHoverCard>
+            );
+          }
+
+          return cellContent;
         },
       }),
 
@@ -686,13 +646,61 @@ function ColumnTable({
                   GITHUB
                 </Text>
               ),
-              cell: (info) => (
-                <UserCell
-                  rowData={info.row.original}
-                  currentGithubId={currentGithubId}
-                  isOpencode={isOpencode}
-                />
-              ),
+              cell: (info) => {
+                const row = info.row.original;
+                if (!row.githubid) return <Text color="var(--muted)">—</Text>;
+                const isYou = Boolean(currentGithubId && row.githubid === currentGithubId);
+                const maintainer = isMaintainer(row.githubid);
+
+                return (
+                  <ContributorHoverCard
+                    row={row}
+                    currentGithubId={currentGithubId}
+                    isOpencode={isOpencode}
+                  >
+                    <Flex align="center" gap="8px">
+                      <Link
+                        href={`/user/profile/${row.githubid}`}
+                        fontSize="13.5px"
+                        fontWeight="500"
+                        color="var(--muted)"
+                        _hover={{ color: "var(--accent)", textDecoration: "none" }}
+                        transition="color 0.2s ease"
+                      >
+                        {row.githubid}
+                      </Link>
+                      {maintainer && (
+                        <Box
+                          bg="var(--secondary)"
+                          color="#0C1C2C"
+                          fontSize="9px"
+                          fontWeight="900"
+                          px="6px"
+                          py="1px"
+                          borderRadius="full"
+                          letterSpacing="0.05em"
+                        >
+                          MENTOR
+                        </Box>
+                      )}
+                      {isYou && (
+                        <Box
+                          bg="var(--accent)"
+                          color="var(--accent-ink)"
+                          fontSize="9.5px"
+                          fontWeight="900"
+                          px="6px"
+                          py="1px"
+                          borderRadius="full"
+                          letterSpacing="0.06em"
+                        >
+                          YOU
+                        </Box>
+                      )}
+                    </Flex>
+                  </ContributorHoverCard>
+                );
+              },
             }),
 
             columnHelper.accessor("prmerged", {
@@ -703,23 +711,14 @@ function ColumnTable({
               ),
               cell: (info) => (
                 <Flex justify="center">
-                  <Flex
-                    align="center"
-                    justify="center"
-                    minW="42px"
-                    h="32px"
-                    px="12px"
-                    borderRadius="full"
-                    bg="var(--accent-soft)"
-                    border="1px solid var(--border)"
-                    color="var(--fg)"
+                  <Text
                     fontFamily="var(--f-mono), monospace"
-                    fontWeight="800"
-                    fontSize="13px"
-                    boxShadow="inset 0 0 8px var(--accent-soft)"
+                    fontWeight="600"
+                    fontSize="13.5px"
+                    color="var(--fg)"
                   >
-                    {info.getValue()}
-                  </Flex>
+                    {info.getValue() ?? 0}
+                  </Text>
                 </Flex>
               ),
             }),
@@ -734,19 +733,29 @@ function ColumnTable({
                   <Text letterSpacing="0.14em">POINTS</Text>
                 </Flex>
               ),
-              cell: (info) => (
-                <Flex justify="flex-end" align="center" gap="8px">
-                  <Text
-                    fontFamily="var(--f-mono), monospace"
-                    fontWeight="800"
-                    fontSize="15px"
-                    color="var(--accent)"
-                  >
-                    {info.getValue()}
-                  </Text>
-                  <FaTrophy color="var(--secondary)" size={14} />
-                </Flex>
-              ),
+              cell: (info) => {
+                const val = Number(info.getValue() || 0);
+                return (
+                  <Flex justify="flex-end" align="baseline" gap="4px">
+                    <Text
+                      fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
+                      fontWeight="700"
+                      fontSize="18px"
+                      color="var(--secondary)"
+                      style={{ fontVariantNumeric: "tabular-nums" }}
+                    >
+                      {val.toLocaleString()}
+                    </Text>
+                    <Text
+                      fontSize="11.5px"
+                      color="var(--muted)"
+                      fontFamily="var(--f-body)"
+                    >
+                      pts
+                    </Text>
+                  </Flex>
+                );
+              },
             }),
           ]
         : []),
@@ -776,11 +785,18 @@ function ColumnTable({
 
   // Keep logged in user prominently at top if present (applicable for OpenCode)
   const reorderedData = useMemo(() => {
-    if (!currentGithubId || !isOpencode) return tableData;
-    const currentUser = tableData.find((u) => u.githubid === currentGithubId);
-    if (!currentUser) return tableData;
+    const baseData = isOpencode
+      ? tableData.filter((u) => !u.githubid || !isMaintainer(u.githubid))
+      : tableData;
 
-    return [currentUser, ...tableData.filter((u) => u.githubid !== currentGithubId)];
+    if (!currentGithubId || !isOpencode) return baseData;
+    // Mentors themselves are not competitors and should not be pinned to the leaderboard
+    if (isMaintainer(currentGithubId)) return baseData;
+
+    const currentUser = baseData.find((u) => u.githubid === currentGithubId);
+    if (!currentUser) return baseData;
+
+    return [currentUser, ...baseData.filter((u) => u.githubid !== currentGithubId)];
   }, [tableData, currentGithubId, isOpencode]);
 
   const table = useReactTable({
@@ -798,16 +814,23 @@ function ColumnTable({
   const isCurrentUser = (row: any) =>
     Boolean(isOpencode && currentGithubId && row.original.githubid === currentGithubId);
 
+  const currentRows = table.getPaginationRowModel().rows;
+  const totalCount = reorderedData.length;
+  const startCount = currentRows.length > 0 ? pagination.pageIndex * pagination.pageSize + 1 : 0;
+  const endCount = currentRows.length > 0 ? Math.min(startCount + currentRows.length - 1, totalCount) : 0;
+  const totalLabel = totalCount > 0
+    ? `Showing ${startCount}-${endCount} of ${totalCount.toLocaleString()} contributors`
+    : `Showing 0 contributors`;
+
   return (
-    <Card
-      flexDirection="column"
+    <Box
       w="100%"
-      px={{ base: "14px", md: "24px" }}
-      py={{ base: "18px", md: "24px" }}
-      borderRadius="24px"
+      px={{ base: "16px", md: "24px" }}
+      py={{ base: "20px", md: "26px" }}
+      borderRadius="20px"
       bg="var(--surface)"
       border="1px solid var(--border)"
-      backdropFilter="blur(24px)"
+      backdropFilter="blur(20px)"
       boxShadow="var(--shadow)"
       zIndex={1}
     >
@@ -817,22 +840,22 @@ function ColumnTable({
         justify="space-between"
         align={{ base: "flex-start", sm: "center" }}
         gap="16px"
-        mb="22px"
-        pb="18px"
+        mb="20px"
+        pb="16px"
         borderBottom="1px solid var(--line)"
       >
         <Box>
           <Text
             fontFamily="var(--f-display), 'Cormorant Garamond', Georgia, serif"
-            fontSize={{ base: "24px", md: "30px" }}
-            fontWeight="700"
+            fontSize={{ base: "22px", md: "26px" }}
+            fontWeight="600"
             color="var(--fg)"
             letterSpacing="0.02em"
             lineHeight="1.2"
           >
             {isOpencode ? "Contributor Rankings" : `${cleanEventName} Leaderboard`}
           </Text>
-          <Text fontSize="13px" color="var(--muted)" mt="4px" fontWeight="500">
+          <Text fontSize="13px" color="var(--muted)" mt="4px" fontWeight="400">
             {isOpencode
               ? "Every merged PR shapes the season. Find your standing among open source creators."
               : `Official participant standings and scores for ${cleanEventName}.`}
@@ -841,66 +864,51 @@ function ColumnTable({
 
         {/* View Toggle: Rankings vs Points Graph (OpenCode only) */}
         {isOpencode && (
-          <Flex
-            align="center"
-            p="3px"
-            bg="var(--card-soft)"
-            borderRadius="full"
-            border="1px solid var(--border)"
-            boxShadow="inset 0 2px 6px rgba(0,0,0,0.4)"
-            alignSelf={{ base: "stretch", sm: "auto" }}
-          >
-            <Button
-              size="sm"
-              h="34px"
-              px="16px"
-              borderRadius="full"
-              fontSize="13px"
-              fontWeight={showRankings ? "700" : "500"}
-              leftIcon={<FaList size={12} />}
-              bg={showRankings ? "var(--accent)" : "transparent"}
-              color={showRankings ? "var(--accent-ink)" : "var(--muted)"}
-              boxShadow={
-                showRankings ? "0 2px 8px var(--accent-soft)" : "none"
-              }
-              _hover={{
-                color: showRankings ? "var(--accent-ink)" : "var(--fg)",
-                bg: showRankings
-                  ? "var(--accent-hover)"
-                  : "var(--accent-soft)",
-              }}
-              _active={{ transform: "scale(0.98)" }}
-              transition="all 0.2s ease"
+          <Flex align="center" gap="6px" alignSelf={{ base: "flex-start", sm: "center" }}>
+            <button
+              type="button"
               onClick={() => setShowRankings(true)}
-            >
-              Rankings
-            </Button>
-
-            <Button
-              size="sm"
-              h="34px"
-              px="16px"
-              borderRadius="full"
-              fontSize="13px"
-              fontWeight={!showRankings ? "700" : "500"}
-              leftIcon={<FaChartLine size={12} />}
-              bg={!showRankings ? "var(--accent)" : "transparent"}
-              color={!showRankings ? "var(--accent-ink)" : "var(--muted)"}
-              boxShadow={
-                !showRankings ? "0 2px 8px var(--accent-soft)" : "none"
-              }
-              _hover={{
-                color: !showRankings ? "var(--accent-ink)" : "var(--fg)",
-                bg: !showRankings
-                  ? "var(--accent-hover)"
-                  : "var(--accent-soft)",
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "7px 14px",
+                fontSize: "13px",
+                fontWeight: showRankings ? "600" : "500",
+                fontFamily: "var(--f-body)",
+                borderRadius: "8px",
+                background: showRankings ? "var(--surface-2)" : "transparent",
+                border: showRankings ? "1px solid var(--border)" : "1px solid transparent",
+                color: showRankings ? "var(--fg)" : "var(--muted)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
               }}
-              _active={{ transform: "scale(0.98)" }}
-              transition="all 0.2s ease"
-              onClick={() => setShowRankings(false)}
             >
+              <List size={14} color={showRankings ? "var(--accent)" : "currentColor"} />
+              Rankings
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRankings(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "7px 14px",
+                fontSize: "13px",
+                fontWeight: !showRankings ? "600" : "500",
+                fontFamily: "var(--f-body)",
+                borderRadius: "8px",
+                background: !showRankings ? "var(--surface-2)" : "transparent",
+                border: !showRankings ? "1px solid var(--border)" : "1px solid transparent",
+                color: !showRankings ? "var(--fg)" : "var(--muted)",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              <LineChart size={14} color={!showRankings ? "var(--accent)" : "currentColor"} />
               Points Graph
-            </Button>
+            </button>
           </Flex>
         )}
       </Flex>
@@ -908,30 +916,27 @@ function ColumnTable({
       {/* Main Table or Analytics View */}
       {showRankings || !isOpencode ? (
         isMobile ? (
-          <MobileLeaderboard table={table} isOpencode={isOpencode} hasPoints={hasPoints} />
+          <MobileLeaderboard
+            table={table}
+            isOpencode={isOpencode}
+            hasPoints={hasPoints}
+            currentGithubId={currentGithubId}
+          />
         ) : (
-          <Box
-            overflowX="auto"
-            borderRadius="18px"
-            border="1px solid var(--border)"
-            bg="var(--card-soft)"
-          >
+          <Box overflowX="auto">
             <Table variant="unstyled" minW="720px">
-              <Thead
-                bg="var(--card-soft)"
-                borderBottom="1px solid var(--border)"
-              >
+              <Thead borderBottom="1px solid var(--border)">
                 {table.getHeaderGroups().map((hg) => (
                   <Tr key={hg.id}>
                     {hg.headers.map((header) => (
                       <Th
                         key={header.id}
-                        py="14px"
-                        px="18px"
+                        py="12px"
+                        px="16px"
                         fontFamily="var(--f-mono), monospace"
-                        fontSize="12px"
+                        fontSize="11.5px"
                         letterSpacing="0.14em"
-                        fontWeight="700"
+                        fontWeight="600"
                         color="var(--muted)"
                         textTransform="uppercase"
                         borderColor="transparent"
@@ -951,28 +956,24 @@ function ColumnTable({
                   <Tr
                     key={row.id}
                     data-row-id={row.id}
+                    className="group"
                     bg={
                       isCurrentUser(row)
-                        ? "linear-gradient(90deg, rgba(88, 185, 154, 0.18) 0%, rgba(45, 139, 111, 0.14) 100%)"
+                        ? "rgba(88, 185, 154, 0.08)"
                         : "transparent"
                     }
                     color="var(--fg)"
-                    boxShadow={
-                      isCurrentUser(row)
-                        ? "inset 3px 0 0 var(--accent), 0 0 20px var(--accent-soft)"
-                        : "none"
-                    }
                     _hover={{
                       bg: isCurrentUser(row)
-                        ? "linear-gradient(90deg, rgba(88, 185, 154, 0.25) 0%, rgba(45, 139, 111, 0.20) 100%)"
-                        : "var(--accent-soft)",
+                        ? "rgba(88, 185, 154, 0.14)"
+                        : "rgba(255, 255, 255, 0.02)",
                     }}
                     borderBottom="1px solid"
                     borderColor="var(--line)"
-                    transition="all 0.2s ease"
+                    transition="background 0.15s ease"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <Td key={cell.id} py="16px" px="18px">
+                      <Td key={cell.id} py="14px" px="16px">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -991,6 +992,7 @@ function ColumnTable({
               onNext={() => table.nextPage()}
               canPrevious={table.getCanPreviousPage()}
               canNext={table.getCanNextPage()}
+              totalLabel={totalLabel}
             />
           </Box>
         )
@@ -1003,7 +1005,7 @@ function ColumnTable({
           />
         </Box>
       )}
-    </Card>
+    </Box>
   );
 }
 

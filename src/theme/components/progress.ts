@@ -1,40 +1,43 @@
-import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools";
+import { StyleFunctionProps } from "@chakra-ui/theme-tools";
+
 export const progressStyles = {
   components: {
     Progress: {
       baseStyle: {
-        field: {
-          fontWeight: 400,
-          w: "16px",
-          h: "16px",
-          borderRadius: "20px",
-          _checked: { transform: "translate(20px, 0px)" },
-        },
         track: {
-          w: "40px",
-          h: "20px",
-          borderRadius: "20px",
-          _focus: {
-            boxShadow: "none",
-          },
+          bg: "var(--surface-2)",
+          borderRadius: "9999px",
+          overflow: "hidden",
+        },
+        filledTrack: {
+          bg: "var(--accent)",
+          borderRadius: "9999px",
+          transition: "all 0.3s ease",
         },
       },
 
       variants: {
         table: (props: StyleFunctionProps) => ({
-          field: {
-            bg: "brand.500",
-            borderRadius: "16px",
-            fontSize: "sm",
-          },
           track: {
-            borderRadius: "20px",
-            bg: mode("#6B8F83", "whiteAlpha.50")(props),
+            bg: "var(--border)",
+            borderRadius: "9999px",
             h: "8px",
-            w: "54px",
           },
-          thumb: {
-            w: "250px",
+          filledTrack: {
+            bg: "var(--accent)",
+            borderRadius: "9999px",
+          },
+        }),
+        neon: () => ({
+          track: {
+            bg: "var(--surface-2)",
+            borderRadius: "9999px",
+            border: "1px solid var(--border)",
+          },
+          filledTrack: {
+            bg: "linear-gradient(90deg, var(--accent) 0%, var(--secondary) 100%)",
+            boxShadow: "0 0 12px var(--accent-soft)",
+            borderRadius: "9999px",
           },
         }),
       },

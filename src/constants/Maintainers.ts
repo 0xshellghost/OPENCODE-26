@@ -41,5 +41,12 @@ export const MAINTAINERS = new Set<string>([
   "Goddbott",
 ]);
 
-export const isMaintainer = (githubId: string) =>
-  MAINTAINERS.has(githubId);
+const MAINTAINERS_LOWER = new Set(
+  Array.from(MAINTAINERS).map((id) => id.trim().toLowerCase())
+);
+
+export const isMaintainer = (githubId?: string | null): boolean => {
+  if (!githubId) return false;
+  const clean = githubId.trim().toLowerCase();
+  return MAINTAINERS.has(githubId.trim()) || MAINTAINERS_LOWER.has(clean);
+};

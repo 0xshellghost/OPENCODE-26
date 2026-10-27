@@ -18,7 +18,7 @@ import { useAuth } from 'contexts/AuthContext';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { IoMdMoon, IoMdSunny } from 'react-icons/io';
+import { Moon, Sun } from 'lucide-react';
 
 export default function HeaderLinks(props: { secondary: boolean }) {
   const { secondary } = props;
@@ -27,9 +27,9 @@ export default function HeaderLinks(props: { secondary: boolean }) {
   const auth = useAuth();
   const router = useRouter();
 
-  const iconColor = useColorModeValue('gray.600', 'gray.300');
-  const menuBg = useColorModeValue('white', 'gray.800');
-  const menuHover = useColorModeValue('gray.100', 'gray.700');
+  const iconColor = 'var(--fg-muted)';
+  const menuBg = 'var(--surface-2)';
+  const menuHover = 'var(--surface)';
 
   const handleLogout = async () => {
     await auth.logout();
@@ -57,12 +57,18 @@ export default function HeaderLinks(props: { secondary: boolean }) {
   return (
     <Flex align="center" gap="12px">
       {/* Theme toggle */}
-      <Button variant="ghost" p="0" minW="unset" onClick={toggleColorMode}>
+      <Button
+        aria-label="Toggle theme"
+        variant="ghost"
+        p="0"
+        minW="unset"
+        onClick={toggleColorMode}
+      >
         <Icon
           h="18px"
           w="18px"
           color={iconColor}
-          as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
+          as={colorMode === 'light' ? Moon : Sun}
         />
       </Button>
 
@@ -71,19 +77,19 @@ export default function HeaderLinks(props: { secondary: boolean }) {
           as={NextLink}
           href="/auth/sign-in"
           size="sm"
-          colorScheme="purple"
+          variant="brand"
         >
           Sign in
         </Button>
       ) : (
         <Menu>
-          <MenuButton>
+          <MenuButton aria-label="User profile menu">
             <Box
               w="36px"
               h="36px"
               borderRadius="full"
-              bg="purple.500"
-              color="white"
+              bg="var(--accent)"
+              color="var(--accent-ink)"
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -96,22 +102,24 @@ export default function HeaderLinks(props: { secondary: boolean }) {
 
           <MenuList
             bg={menuBg}
-            border="none"
+            border="1px solid var(--border)"
             borderRadius="14px"
             p="6px"
             minW="180px"
-            boxShadow="0 10px 30px rgba(0,0,0,0.15)"
+            boxShadow="0 10px 30px rgba(0,0,0,0.3)"
           >
             <MenuItem
               as={NextLink}
               href="/user/profile"
+              bg="transparent"
               _hover={{ bg: menuHover }}
               borderRadius="8px"
             >
-              <Text fontSize="sm">Profile Settings</Text>
+              <Text fontSize="sm" color="var(--fg)">Profile Settings</Text>
             </MenuItem>
 
             <MenuItem
+              bg="transparent"
               _hover={{ bg: menuHover }}
               borderRadius="8px"
               color="red.400"

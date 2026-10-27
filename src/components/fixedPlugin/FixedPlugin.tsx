@@ -1,40 +1,37 @@
 import { Button, Icon, useColorMode } from '@chakra-ui/react';
-import { IoMdMoon, IoMdSunny } from 'react-icons/io';
+import { Moon, Sun } from 'lucide-react';
 
 export default function FixedPlugin(props: { [x: string]: any }) {
   const { ...rest } = props;
   const { colorMode, toggleColorMode } = useColorMode();
-  let bgButton = 'linear-gradient(135deg, #58B99A 0%, #2D8B6F 100%)';
-
-  let left = '';
-  let right = '35px';
 
   return (
     <Button
       {...rest}
-      h="60px"
-      w="60px"
-      bg={bgButton}
+      aria-label="Toggle color theme"
+      h="52px"
+      w="52px"
+      bg="var(--accent)"
+      color="var(--accent-ink)"
       zIndex="99"
       position="fixed"
-      variant="no-effects"
-      left={left}
-      right={right}
-      bottom="30px"
-      border="1px solid"
-      borderColor="#58B99A"
-      borderRadius="50px"
+      right={{ base: '20px', md: '35px' }}
+      bottom={{ base: '80px', md: '30px' }}
+      border="1px solid var(--border)"
+      boxShadow="0 4px 14px 0 rgba(0, 0, 0, 0.4)"
+      borderRadius="full"
       onClick={toggleColorMode}
-      display="flex"
+      display={{ base: 'none', md: 'flex' }}
       p="0px"
       alignItems="center"
       justifyContent="center"
+      _hover={{ bg: 'var(--accent-glow)' }}
+      _active={{ transform: 'scale(0.95)' }}
     >
       <Icon
-        h="24px"
-        w="24px"
-        color="white"
-        as={colorMode === 'light' ? IoMdMoon : IoMdSunny}
+        h="22px"
+        w="22px"
+        as={colorMode === 'light' ? Moon : Sun}
       />
     </Button>
   );

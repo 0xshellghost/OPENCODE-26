@@ -3,9 +3,9 @@
 }
 
 .light {
-  border-color: var(--chakra-colors-dark);
+  border-color: var(--border);
 }
 
 .dark {
-  border-color: var(--chakra-colors-white);
+  border-color: var(--border-strong);
 }

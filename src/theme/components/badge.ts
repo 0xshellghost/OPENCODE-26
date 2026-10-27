@@ -1,37 +1,39 @@
-import { mode, StyleConfig, StyleFunctionProps } from "@chakra-ui/theme-tools";
+import { StyleConfig, StyleFunctionProps } from "@chakra-ui/theme-tools";
+
 export const badgeStyles: { components: { Badge: StyleConfig } } = {
   components: {
     Badge: {
       baseStyle: {
-        borderRadius: "10px",
+        borderRadius: "8px",
         lineHeight: "100%",
-        padding: "7px",
-        paddingLeft: "12px",
-        paddingRight: "12px",
+        padding: "6px 12px",
+        fontFamily: "var(--f-body), sans-serif",
+        fontWeight: "600",
+        letterSpacing: "0.04em",
       },
       variants: {
         outline: () => ({
-          borderRadius: "16px",
+          bg: "transparent",
+          color: "var(--fg)",
+          border: "1px solid var(--border)",
+          borderRadius: "8px",
         }),
-        brand: (props: StyleFunctionProps) => ({
-          bg: mode("brand.500", "brand.400")(props),
-          color: "white",
-          _focus: {
-            bg: mode("brand.500", "brand.400")(props),
-          },
-          _active: {
-            bg: mode("brand.500", "brand.400")(props),
-          },
-          _hover: {
-            bg: mode("brand.600", "brand.400")(props),
-          },
+        solid: () => ({
+          bg: "var(--accent)",
+          color: "var(--accent-ink)",
+          borderRadius: "8px",
+        }),
+        brand: () => ({
+          bg: "var(--accent-soft)",
+          color: "var(--accent)",
+          border: "1px solid var(--border-accent)",
+          borderRadius: "8px",
         }),
         secondary: () => ({
           bg: "var(--secondary-soft)",
           color: "var(--secondary)",
           border: "1px solid var(--secondary-border)",
           borderRadius: "8px",
-          fontWeight: "600",
         }),
       },
     },
