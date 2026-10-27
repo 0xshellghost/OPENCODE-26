@@ -94,6 +94,7 @@ export default function ManagementPage() {
 
   // Flagship Event State
   const [selectedFlagship, setSelectedFlagship] = useState(features.flagshipEvent || '');
+  const [isUpdatingFlagship, setIsUpdatingFlagship] = useState(false);
 
   useEffect(() => {
     setSelectedFlagship(features.flagshipEvent || '');
@@ -104,43 +105,57 @@ export default function ManagementPage() {
       toast({ title: 'Please select an event to make flagship.', status: 'warning', isClosable: true });
       return;
     }
+    setIsUpdatingFlagship(true);
     try {
       await updateFlagshipEvent(selectedFlagship, true);
-    } catch (e: any) {
-      console.warn('Backend flagship sync warning:', e?.message);
-    }
-    const success = await setFlagshipEvent(selectedFlagship);
-    if (success) {
+      await setFlagshipEvent(selectedFlagship);
       toast({
         title: 'Flagship Event Updated',
-        description: `"${selectedFlagship}" is now set as the Flagship Event.`,
+        description: `"${selectedFlagship}" is now set as the Flagship Event in database.`,
         status: 'success',
+        duration: 3000,
         isClosable: true,
       });
-    } else {
-      toast({ title: 'Failed to update flagship event', status: 'error', isClosable: true });
+    } catch (e: any) {
+      console.error('Failed to update flagship event:', e);
+      toast({
+        title: 'Failed to update flagship event',
+        description: e?.message || 'Could not communicate with backend server.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsUpdatingFlagship(false);
     }
   };
 
   const handleRemoveFlagship = async () => {
+    setIsUpdatingFlagship(true);
     try {
       if (features.flagshipEvent) {
         await updateFlagshipEvent(features.flagshipEvent, false);
       }
-    } catch (e: any) {
-      console.warn('Backend flagship remove warning:', e?.message);
-    }
-    const success = await setFlagshipEvent(null);
-    if (success) {
+      await setFlagshipEvent(null);
       setSelectedFlagship('');
       toast({
         title: 'Flagship Event Removed',
         description: 'No event is currently set as flagship.',
         status: 'info',
+        duration: 3000,
         isClosable: true,
       });
-    } else {
-      toast({ title: 'Failed to remove flagship event', status: 'error', isClosable: true });
+    } catch (e: any) {
+      console.error('Failed to remove flagship event:', e);
+      toast({
+        title: 'Failed to remove flagship event',
+        description: e?.message || 'Could not communicate with backend server.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsUpdatingFlagship(false);
     }
   };
 
@@ -872,6 +887,7 @@ ON DUPLICATE KEY UPDATE
             w="100%"
             leftIcon={<Icon as={Star} fill="currentColor" />}
             isDisabled={!selectedFlagship || selectedFlagship === features.flagshipEvent}
+            isLoading={isUpdatingFlagship}
             onClick={handleSetFlagship}
           >
             Set Flagship
@@ -882,6 +898,7 @@ ON DUPLICATE KEY UPDATE
             colorScheme="red"
             w="100%"
             isDisabled={!features.flagshipEvent}
+            isLoading={isUpdatingFlagship}
             onClick={handleRemoveFlagship}
           >
             Remove Flagship
