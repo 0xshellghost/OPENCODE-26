@@ -112,41 +112,34 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   const [isError, setIsError] = useState<boolean>(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
 
-  // Viewport transforms
-  const MIN_ZOOM = 0.05;
-  const MAX_ZOOM = 60.0;
+  // Viewport transforms: 1.0 (100%) fills the frame completely edge-to-edge
+  const DEFAULT_ZOOM = 1.0;
+  const MIN_ZOOM = 1.0;
+  const MAX_ZOOM = 40.0;
 
-  // Calculate the ideal fit zoom based on viewport container dimensions
-  const getInitialZoom = useCallback(() => {
-    if (!viewportRef.current) return 1.0;
-    const { clientWidth, clientHeight } = viewportRef.current;
-    if (clientWidth === 0 || clientHeight === 0) return 1.0;
-
-    const padding = 48; // breathing room around the canvas
-    const availW = Math.max(100, clientWidth - padding);
-    const availH = Math.max(100, clientHeight - padding);
-
-    const scaleX = availW / CANVAS_WIDTH;
-    const scaleY = availH / CANVAS_HEIGHT;
-    const fitScale = Math.min(scaleX, scaleY);
-
-    return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(fitScale * 100) / 100));
-  }, []);
-
-  const [zoom, setZoom] = useState<number>(1.0);
+  const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  // Auto-fit canvas on initial mount and fullscreen toggle
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      setZoom(getInitialZoom());
-      setPan({ x: 0, y: 0 });
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [getInitialZoom, isFullscreen]);
+  // Clamp pan so the user cannot drag the canvas edges inside the frame
+  const clampPan = useCallback(
+    (nextPanX: number, nextPanY: number, currentZoom: number) => {
+      if (!viewportRef.current || currentZoom <= 1) {
+        return { x: 0, y: 0 };
+      }
+      const { clientWidth, clientHeight } = viewportRef.current;
+      const maxPanX = ((currentZoom - 1) * clientWidth) / 2;
+      const maxPanY = ((currentZoom - 1) * clientHeight) / 2;
+
+      return {
+        x: Math.max(-maxPanX, Math.min(maxPanX, nextPanX)),
+        y: Math.max(-maxPanY, Math.min(maxPanY, nextPanY)),
+      };
+    },
+    []
+  );
 
   // Set initial remaining pixels when userTier changes
   useEffect(() => {
@@ -273,13 +266,11 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         if (wsRef.current === ws) {
           setConnected(false);
           wsRef.current = null;
-          // Attempt automatic reconnect after 4 seconds
           reconnectTimerRef.current = setTimeout(connectWebSocket, 4000);
         }
       };
 
       ws.onmessage = async (event) => {
-        // Text payload (JSON responses)
         if (typeof event.data === 'string') {
           try {
             const data = JSON.parse(event.data) as {
@@ -315,7 +306,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           return;
         }
 
-        // Binary payload (live pixel broadcasts)
         let buffer: ArrayBuffer | null = null;
         if (event.data instanceof ArrayBuffer) {
           buffer = event.data;
@@ -358,7 +348,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     };
   }, [fetchBoardSnapshot, connectWebSocket]);
 
-  // Wheel zoom handler with smooth proportional scaling
+  // Wheel zoom handler with pan clamping so edges stay flush with frame
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -366,20 +356,23 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       setZoom((prev) => {
-        const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
-        const next = Math.round(prev * factor * 100) / 100;
-        return Math.min(Math.max(next, MIN_ZOOM), MAX_ZOOM);
+        const delta = e.deltaY < 0 ? 0.25 : -0.25;
+        const next = Math.min(Math.max(Math.round((prev + delta) * 100) / 100, MIN_ZOOM), MAX_ZOOM);
+        setPan((currentPan) => clampPan(currentPan.x, currentPan.y, next));
+        return next;
       });
     };
 
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
-  }, []);
+  }, [clampPan]);
 
   // Listen to fullscreen exit via Esc
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(Boolean(document.fullscreenElement));
+      setZoom(DEFAULT_ZOOM);
+      setPan({ x: 0, y: 0 });
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -429,7 +422,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         }
       }
 
-      // Decrement remaining pixel count locally if known
       setRemainingPixels((prev) => (prev && prev > 0 ? prev - 1 : 0));
     },
     [cooldown, selectedColorId, toast]
@@ -448,21 +440,22 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    // Handle dragging/panning
     if (dragStartRef.current) {
       const dx = e.clientX - dragStartRef.current.startX;
       const dy = e.clientY - dragStartRef.current.startY;
       if (Math.hypot(dx, dy) > 4) {
         dragStartRef.current.moved = true;
         setIsDragging(true);
-        setPan({
-          x: dragStartRef.current.initialPanX + dx,
-          y: dragStartRef.current.initialPanY + dy,
-        });
+        setPan(
+          clampPan(
+            dragStartRef.current.initialPanX + dx,
+            dragStartRef.current.initialPanY + dy,
+            zoom
+          )
+        );
       }
     }
 
-    // Handle hover coordinates mapping on the canvas
     const canvas = canvasRef.current;
     if (canvas) {
       const rect = canvas.getBoundingClientRect();
@@ -490,7 +483,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
 
   const handleMouseUp = () => {
     if (dragStartRef.current && !dragStartRef.current.moved && hoverCoords) {
-      // Intentional single-click without drag -> place pixel!
       placePixel(hoverCoords.x, hoverCoords.y);
     }
     dragStartRef.current = null;
@@ -504,9 +496,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   };
 
   const handleDoubleClick = useCallback(() => {
-    setZoom(getInitialZoom());
+    setZoom(DEFAULT_ZOOM);
     setPan({ x: 0, y: 0 });
-  }, [getInitialZoom]);
+  }, []);
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(() => {
@@ -594,7 +586,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       >
         {/* Status badges */}
         <HStack spacing="8px" flexWrap="wrap" rowGap="6px">
-          {/* WebSocket Status */}
           <HStack
             {...pillStyle}
             spacing="7px"
@@ -632,7 +623,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             )}
           </HStack>
 
-          {/* Cooldown or Ready indicator */}
           {cooldown > 0 ? (
             <HStack
               {...pillStyle}
@@ -659,7 +649,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             </HStack>
           )}
 
-          {/* Burst / Remaining Pixels */}
           <HStack {...pillStyle} spacing="6px">
             <PaletteIcon size={12} color="var(--accent)" />
             <Text fontSize="12px" color="var(--subtle)">
@@ -670,7 +659,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             </Text>
           </HStack>
 
-          {/* Last synced time */}
           <HStack {...pillStyle} spacing="6px" display={{ base: 'none', md: 'flex' }}>
             <Text fontSize="12px" color="var(--subtle)">
               Synced:
@@ -683,7 +671,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
 
         {/* Viewport Action Controls */}
         <HStack spacing="8px" flexWrap="wrap" rowGap="6px">
-          {/* Zoom controls */}
           <HStack
             bg="rgba(255,255,255,0.04)"
             p="3px 8px"
@@ -700,7 +687,11 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 color="var(--text)"
                 _hover={{ bg: 'var(--accent-soft)' }}
                 onClick={() =>
-                  setZoom((z) => Math.max(MIN_ZOOM, Math.round((z / 1.25) * 100) / 100))
+                  setZoom((z) => {
+                    const next = Math.max(MIN_ZOOM, Math.round((z - 0.25) * 100) / 100);
+                    setPan((p) => clampPan(p.x, p.y, next));
+                    return next;
+                  })
                 }
                 isDisabled={zoom <= MIN_ZOOM}
                 h="28px"
@@ -719,14 +710,14 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 color="var(--text)"
                 _hover={{ bg: 'var(--accent-soft)' }}
                 onClick={() =>
-                  setZoom((z) => Math.min(MAX_ZOOM, Math.round(z * 1.25 * 100) / 100))
+                  setZoom((z) => Math.min(MAX_ZOOM, Math.round((z + 0.25) * 100) / 100))
                 }
                 isDisabled={zoom >= MAX_ZOOM}
                 h="28px"
                 minW="28px"
               />
             </Tooltip>
-            <Tooltip label="Reset zoom & pan to fit" hasArrow>
+            <Tooltip label="Reset zoom (100%)" hasArrow>
               <IconButton
                 aria-label="Reset zoom"
                 icon={<RotateCcw size={13} />}
@@ -741,7 +732,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             </Tooltip>
           </HStack>
 
-          {/* Fullscreen */}
           <Tooltip label={isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen canvas'} hasArrow>
             <IconButton
               aria-label="Toggle fullscreen"
@@ -753,7 +743,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             />
           </Tooltip>
 
-          {/* Save PNG */}
           <Tooltip label="Save canvas snapshot as PNG" hasArrow>
             <Button
               aria-label="Save snapshot"
@@ -768,7 +757,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             </Button>
           </Tooltip>
 
-          {/* Manual Snapshot Refresh */}
           <Tooltip label="Fetch latest board snapshot" hasArrow>
             <IconButton
               aria-label="Sync board"
@@ -783,35 +771,22 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         </HStack>
       </Flex>
 
-      {/* ─── 2. INTERACTIVE CANVAS VIEWPORT ─── */}
+      {/* ─── 2. INTERACTIVE CANVAS VIEWPORT (Exact Frame Fit) ─── */}
       <Box
         ref={viewportRef}
         w="100%"
-        h={isFullscreen ? 'calc(100vh - 140px)' : { base: '420px', sm: '540px', md: '660px' }}
+        maxH={isFullscreen ? 'calc(100vh - 140px)' : '75vh'}
+        aspectRatio={`${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`}
+        mx="auto"
         borderRadius="16px"
-        border="1px solid rgba(255,255,255,0.06)"
-        background="radial-gradient(circle at 50% 50%, rgba(99,102,241,0.06) 0%, transparent 60%), radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / 24px 24px, var(--card-strong)"
-        sx={{
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '16px',
-            padding: '1px',
-            background:
-              'linear-gradient(135deg, rgba(99,102,241,0.2), transparent 40%, transparent 60%, rgba(168,85,247,0.15))',
-            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            maskComposite: 'xor',
-            WebkitMaskComposite: 'xor',
-            pointerEvents: 'none',
-            zIndex: 0,
-          },
-        }}
+        border="1px solid rgba(255,255,255,0.1)"
+        bg="var(--card-strong)"
         position="relative"
         overflow="hidden"
         display="flex"
         alignItems="center"
         justifyContent="center"
+        p="0"
         userSelect="none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -822,7 +797,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       >
         {/* Loading state */}
         {isLoading && !isLoadedRef.current && (
-          <Flex direction="column" align="center" justify="center" minH="380px" w="100%">
+          <Flex direction="column" align="center" justify="center" w="100%" h="100%">
             <VStack spacing="14px">
               <Spinner size="lg" color="var(--accent)" thickness="3px" />
               <Text fontSize="13px" fontWeight="500" color="var(--muted)">
@@ -838,7 +813,8 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             direction="column"
             align="center"
             justify="center"
-            minH="360px"
+            w="100%"
+            h="100%"
             gap="14px"
             textAlign="center"
             p="20px"
@@ -858,26 +834,19 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           </Flex>
         )}
 
-        {/* The Canvas Element */}
+        {/* The Canvas Element — fills 100% of the frame at zoom = 1.0 */}
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           style={{
             display: isError || (isLoading && !isLoadedRef.current) ? 'none' : 'block',
-            width: `${CANVAS_WIDTH}px`,
-            height: `${CANVAS_HEIGHT}px`,
-            aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`,
-            flexShrink: 0,
-            maxWidth: 'none',
-            maxHeight: 'none',
+            width: '100%',
+            height: '100%',
             imageRendering: 'pixelated',
-            borderRadius: '4px',
             transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
             transformOrigin: 'center center',
             transition: isDragging ? 'none' : 'transform 0.1s ease-out',
-            boxShadow:
-              '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.12), 0 0 80px rgba(99,102,241,0.08)',
             willChange: 'transform',
           }}
         />
@@ -886,9 +855,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         {!isError && (
           <HStack
             spacing="6px"
-            bg="rgba(0,0,0,0.6)"
+            bg="rgba(0,0,0,0.65)"
             backdropFilter="blur(16px)"
-            border="1px solid rgba(255,255,255,0.1)"
+            border="1px solid rgba(255,255,255,0.12)"
             borderRadius="full"
             px="14px"
             py="6px"
@@ -899,7 +868,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             zIndex={10}
           >
             <Crosshair size={12} color="var(--accent)" />
-            <Text fontSize="12px" fontWeight="600" fontFamily="mono" color="var(--text)">
+            <Text fontSize="12px" fontWeight="600" fontFamily="mono" color="#FFFFFF">
               {hoverCoords !== null ? `X: ${hoverCoords.x} · Y: ${hoverCoords.y}` : 'Hover canvas'}
             </Text>
             {hoverCoords !== null && (
@@ -908,7 +877,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 h="9px"
                 borderRadius="full"
                 bg={activeColor.hex}
-                border="1px solid var(--border-strong)"
+                border="1px solid rgba(255,255,255,0.4)"
                 ml="2px"
               />
             )}
@@ -919,9 +888,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         {!isError && (
           <HStack
             spacing="6px"
-            bg="rgba(0,0,0,0.6)"
+            bg="rgba(0,0,0,0.65)"
             backdropFilter="blur(16px)"
-            border="1px solid rgba(255,255,255,0.1)"
+            border="1px solid rgba(255,255,255,0.12)"
             borderRadius="full"
             px="12px"
             py="5px"
@@ -932,7 +901,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             display={{ base: 'none', md: 'flex' }}
             zIndex={10}
           >
-            <Text fontSize="11px" color="var(--subtle)">
+            <Text fontSize="11px" color="rgba(255,255,255,0.8)">
               Click to place · Drag to pan · Scroll to zoom · Double-click to reset
             </Text>
           </HStack>
@@ -953,7 +922,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           justify="space-between"
           gap="12px"
         >
-          {/* Active color info preview */}
           <HStack spacing="12px" minW={{ md: '180px' }}>
             <Box
               w="32px"
@@ -980,7 +948,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             </VStack>
           </HStack>
 
-          {/* 16 Palette Swatches */}
           <Flex
             align="center"
             justify={{ base: 'flex-start', md: 'center' }}
@@ -1039,7 +1006,6 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             })}
           </Flex>
 
-          {/* Status clue */}
           <Box minW={{ md: '170px' }} textAlign={{ base: 'left', md: 'right' }}>
             <Text fontSize="12px" color="var(--subtle)">
               {cooldown > 0 ? (
