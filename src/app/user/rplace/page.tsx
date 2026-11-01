@@ -21,7 +21,10 @@ import Canvas from '../../../components/Canvas/Canvas';
 import BlurText from 'components/reactbits/BlurText';
 import PageHeading from 'components/japanese/PageHeading';
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const BACKEND_API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  'http://localhost:4000';
 
 // ─── Theme constants ───
 const SERIF = 'var(--f-display)';
