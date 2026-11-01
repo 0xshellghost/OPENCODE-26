@@ -23,7 +23,6 @@ import {
   RotateCcw,
   Crosshair,
   Clock,
-  Zap,
   Palette as PaletteIcon,
   ShieldAlert,
   Sparkles,
@@ -113,16 +112,41 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   const [isError, setIsError] = useState<boolean>(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
 
-  // Viewport transforms (zoomed-in by default so individual pixels are clearly visible)
-  const DEFAULT_ZOOM = 1.0;
-  const MIN_ZOOM = 0.04;
-  const MAX_ZOOM = 300.0;
+  // Viewport transforms
+  const MIN_ZOOM = 0.05;
+  const MAX_ZOOM = 60.0;
 
-  const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
+  // Calculate the ideal fit zoom based on viewport container dimensions
+  const getInitialZoom = useCallback(() => {
+    if (!viewportRef.current) return 1.0;
+    const { clientWidth, clientHeight } = viewportRef.current;
+    if (clientWidth === 0 || clientHeight === 0) return 1.0;
+
+    const padding = 48; // breathing room around the canvas
+    const availW = Math.max(100, clientWidth - padding);
+    const availH = Math.max(100, clientHeight - padding);
+
+    const scaleX = availW / CANVAS_WIDTH;
+    const scaleY = availH / CANVAS_HEIGHT;
+    const fitScale = Math.min(scaleX, scaleY);
+
+    return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(fitScale * 100) / 100));
+  }, []);
+
+  const [zoom, setZoom] = useState<number>(1.0);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  // Auto-fit canvas on initial mount and fullscreen toggle
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      setZoom(getInitialZoom());
+      setPan({ x: 0, y: 0 });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [getInitialZoom, isFullscreen]);
 
   // Set initial remaining pixels when userTier changes
   useEffect(() => {
@@ -334,16 +358,16 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     };
   }, [fetchBoardSnapshot, connectWebSocket]);
 
-  // Wheel zoom handler with smooth dampening
+  // Wheel zoom handler with smooth proportional scaling
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const delta = e.deltaY < 0 ? 0.25 : -0.25;
       setZoom((prev) => {
-        const next = Math.round((prev + delta) * 100) / 100;
+        const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        const next = Math.round(prev * factor * 100) / 100;
         return Math.min(Math.max(next, MIN_ZOOM), MAX_ZOOM);
       });
     };
@@ -446,6 +470,8 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       const clientY = e.clientY;
 
       if (
+        rect.width > 0 &&
+        rect.height > 0 &&
         clientX >= rect.left &&
         clientX <= rect.right &&
         clientY >= rect.top &&
@@ -477,10 +503,10 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     setHoverCoords(null);
   };
 
-  const handleDoubleClick = () => {
-    setZoom(DEFAULT_ZOOM);
+  const handleDoubleClick = useCallback(() => {
+    setZoom(getInitialZoom());
     setPan({ x: 0, y: 0 });
-  };
+  }, [getInitialZoom]);
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(() => {
@@ -673,14 +699,16 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 variant="ghost"
                 color="var(--text)"
                 _hover={{ bg: 'var(--accent-soft)' }}
-                onClick={() => setZoom((z) => Math.max(MIN_ZOOM, Math.round((z - 0.25) * 100) / 100))}
+                onClick={() =>
+                  setZoom((z) => Math.max(MIN_ZOOM, Math.round((z / 1.25) * 100) / 100))
+                }
                 isDisabled={zoom <= MIN_ZOOM}
                 h="28px"
                 minW="28px"
               />
             </Tooltip>
-            <Text fontSize="12px" fontWeight="700" minW="42px" textAlign="center" color="var(--text)">
-              {zoom >= 1 ? Math.round(zoom * 100) : Math.round(zoom * 100)}%
+            <Text fontSize="12px" fontWeight="700" minW="48px" textAlign="center" color="var(--text)">
+              {Math.round(zoom * 100)}%
             </Text>
             <Tooltip label="Zoom in" hasArrow>
               <IconButton
@@ -690,13 +718,15 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 variant="ghost"
                 color="var(--text)"
                 _hover={{ bg: 'var(--accent-soft)' }}
-                onClick={() => setZoom((z) => Math.min(MAX_ZOOM, Math.round((z + 0.25) * 100) / 100))}
+                onClick={() =>
+                  setZoom((z) => Math.min(MAX_ZOOM, Math.round(z * 1.25 * 100) / 100))
+                }
                 isDisabled={zoom >= MAX_ZOOM}
                 h="28px"
                 minW="28px"
               />
             </Tooltip>
-            <Tooltip label="Reset zoom & pan (250%)" hasArrow>
+            <Tooltip label="Reset zoom & pan to fit" hasArrow>
               <IconButton
                 aria-label="Reset zoom"
                 icon={<RotateCcw size={13} />}
@@ -757,8 +787,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       <Box
         ref={viewportRef}
         w="100%"
-        h={isFullscreen ? 'calc(100vh - 140px)' : 'auto'}
-        minH={{ base: '400px', sm: '520px', md: '700px' }}
+        h={isFullscreen ? 'calc(100vh - 140px)' : { base: '420px', sm: '540px', md: '660px' }}
         borderRadius="16px"
         border="1px solid rgba(255,255,255,0.06)"
         background="radial-gradient(circle at 50% 50%, rgba(99,102,241,0.06) 0%, transparent 60%), radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / 24px 24px, var(--card-strong)"
@@ -769,7 +798,8 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             inset: 0,
             borderRadius: '16px',
             padding: '1px',
-            background: 'linear-gradient(135deg, rgba(99,102,241,0.2), transparent 40%, transparent 60%, rgba(168,85,247,0.15))',
+            background:
+              'linear-gradient(135deg, rgba(99,102,241,0.2), transparent 40%, transparent 60%, rgba(168,85,247,0.15))',
             mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
             maskComposite: 'xor',
             WebkitMaskComposite: 'xor',
@@ -782,22 +812,13 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         display="flex"
         alignItems="center"
         justifyContent="center"
-        p={{ base: '8px', sm: '12px', md: '16px' }}
         userSelect="none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onDoubleClick={handleDoubleClick}
-        cursor={
-          isDragging
-            ? 'grabbing'
-            : cooldown > 0
-            ? 'not-allowed'
-            : zoom > 1
-            ? 'crosshair'
-            : 'crosshair'
-        }
+        cursor={isDragging ? 'grabbing' : cooldown > 0 ? 'not-allowed' : 'crosshair'}
       >
         {/* Loading state */}
         {isLoading && !isLoadedRef.current && (
@@ -831,12 +852,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             <Text fontSize="13px" color="var(--muted)" maxW="440px">
               Could not reach the R/Place server. Check your connection or verify that the canvas service is running.
             </Text>
-            <Button
-              className="oc-button"
-              onClick={fetchBoardSnapshot}
-              size="sm"
-              mt="6px"
-            >
+            <Button className="oc-button" onClick={fetchBoardSnapshot} size="sm" mt="6px">
               Retry Connection
             </Button>
           </Flex>
@@ -848,16 +864,20 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           width={CANVAS_WIDTH}
           height={CANVAS_HEIGHT}
           style={{
-            display: isError ? 'none' : 'block',
+            display: isError || (isLoading && !isLoadedRef.current) ? 'none' : 'block',
             width: `${CANVAS_WIDTH}px`,
             height: `${CANVAS_HEIGHT}px`,
+            aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`,
+            flexShrink: 0,
             maxWidth: 'none',
+            maxHeight: 'none',
             imageRendering: 'pixelated',
-            borderRadius: '6px',
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+            borderRadius: '4px',
+            transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
             transformOrigin: 'center center',
-            transition: isDragging ? 'none' : 'transform 0.12s ease-out',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.08), 0 0 80px rgba(99,102,241,0.08)',
+            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+            boxShadow:
+              '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.12), 0 0 80px rgba(99,102,241,0.08)',
             willChange: 'transform',
           }}
         />
@@ -945,7 +965,13 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
               flexShrink={0}
             />
             <VStack align="start" spacing="0">
-              <Text fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="0.08em" color="var(--subtle)">
+              <Text
+                fontSize="11px"
+                fontWeight="700"
+                textTransform="uppercase"
+                letterSpacing="0.08em"
+                color="var(--subtle)"
+              >
                 Selected
               </Text>
               <Text fontSize="13px" fontWeight="600" color="var(--text)">
@@ -983,7 +1009,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                     justifyContent="center"
                     cursor="pointer"
                     transition="all 0.15s ease"
-                    border={color.id === 0 ? '1px solid var(--border-strong)' : '1px solid rgba(0,0,0,0.2)'}
+                    border={
+                      color.id === 0 ? '1px solid var(--border-strong)' : '1px solid rgba(0,0,0,0.2)'
+                    }
                     boxShadow={
                       isSelected
                         ? `0 0 0 2px var(--bg), 0 0 0 4px var(--accent)`
