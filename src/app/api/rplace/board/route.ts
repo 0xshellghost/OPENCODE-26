@@ -13,7 +13,7 @@ interface CachedSnapshot {
 
 // In-memory server-side cache for high-concurrency throttling (5s TTL)
 let memoryCache: CachedSnapshot | null = null;
-const CACHE_TTL_MS = 5000;
+const CACHE_TTL_MS = 1000;
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,7 +61,9 @@ export async function GET(req: NextRequest) {
         headers: {
           ETag: etag,
           'X-Canvas-Sequence': sequence,
-          'Cache-Control': 'public, max-age=60, stale-while-revalidate=240',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
         },
       });
     }
@@ -72,7 +74,9 @@ export async function GET(req: NextRequest) {
         'Content-Type': 'application/octet-stream',
         'X-Canvas-Sequence': sequence,
         ETag: etag,
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=240',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     });
   } catch (error) {

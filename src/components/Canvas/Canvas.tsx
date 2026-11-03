@@ -181,9 +181,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         const colorId = view.getUint8(offset + 4);
         const sequence = view.getUint32(offset + 5, true);
 
-        if (sequence <= currentSeqRef.current) continue;
-
-        currentSeqRef.current = sequence;
+        if (sequence > currentSeqRef.current) {
+          currentSeqRef.current = sequence;
+        }
         drawPixel(ctx, x, y, colorId);
       }
     },
@@ -201,6 +201,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       try {
         const res = await fetch(url, {
           credentials: 'include',
+          cache: 'no-store',
           signal: controller.signal,
         });
         if (!res.ok) {
