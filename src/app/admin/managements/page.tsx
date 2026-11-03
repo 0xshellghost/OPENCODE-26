@@ -47,7 +47,11 @@ import {
   UserCheck,
   ShieldCheck,
   X,
+  Palette,
+  Eye,
+  Sparkles,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { FetchedEvents, FetchedRepos } from 'api/events/events';
@@ -61,8 +65,15 @@ import {
   fetchMentors,
   uploadEventLeaderboard,
   updateFlagshipEvent,
+  uploadRPlaceBoardSnapshot,
   MentorUser,
 } from 'api/admin/admin';
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  encodeImageToSnapshot,
+  renderSnapshotToCanvas,
+} from 'utils/rplaceProtocol';
 import { useRouter } from 'next/navigation';
 import { RingLoader } from 'react-spinners';
 import { isAdminUser } from 'utils/jwt';
@@ -91,6 +102,15 @@ export default function ManagementPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // R/Place Canvas Snapshot Upload State
+  const [canvasSnapshotFile, setCanvasSnapshotFile] = useState<File | null>(null);
+  const [canvasBufferToUpload, setCanvasBufferToUpload] = useState<ArrayBuffer | null>(null);
+  const [isProcessingCanvasImage, setIsProcessingCanvasImage] = useState(false);
+  const [isUploadingCanvas, setIsUploadingCanvas] = useState(false);
+  const [canvasPreviewInfo, setCanvasPreviewInfo] = useState<{ name: string; size: string; type: string } | null>(null);
+  const canvasFileInputRef = useRef<HTMLInputElement | null>(null);
+  const canvasPreviewRef = useRef<HTMLCanvasElement | null>(null);
 
   // Flagship Event State
   const [selectedFlagship, setSelectedFlagship] = useState(features.flagshipEvent || '');
@@ -649,6 +669,139 @@ ON DUPLICATE KEY UPDATE
     }
   };
 
+  const handleCanvasFileSelected = async (file: File) => {
+    setCanvasSnapshotFile(file);
+    setIsProcessingCanvasImage(true);
+    try {
+      if (file.name.endsWith('.bin') || file.name.endsWith('.dat')) {
+        const buffer = await file.arrayBuffer();
+        if (buffer.byteLength !== 300000) {
+          toast({
+            title: 'Invalid Binary Snapshot Size',
+            description: `Expected exactly 300,000 bytes (got ${buffer.byteLength.toLocaleString()} bytes).`,
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+          });
+          setCanvasSnapshotFile(null);
+          setCanvasBufferToUpload(null);
+          setCanvasPreviewInfo(null);
+          return;
+        }
+        setCanvasBufferToUpload(buffer);
+        setCanvasPreviewInfo({
+          name: file.name,
+          size: `${(buffer.byteLength / 1024).toFixed(1)} KB (Exact 300 KB binary)`,
+          type: 'Raw 4-bit Binary Snapshot',
+        });
+        if (canvasPreviewRef.current) {
+          renderSnapshotToCanvas(canvasPreviewRef.current, buffer);
+        }
+      } else {
+        // Image file: PNG, JPG, WebP, etc.
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          try {
+            const packedBuffer = encodeImageToSnapshot(img, canvasPreviewRef.current);
+            setCanvasBufferToUpload(packedBuffer);
+            setCanvasPreviewInfo({
+              name: file.name,
+              size: `${img.naturalWidth}×${img.naturalHeight} px → Quantized to 1000×600 (300 KB)`,
+              type: '16-Color Quantized Image',
+            });
+          } catch (err: any) {
+            toast({
+              title: 'Image Processing Failed',
+              description: err.message || 'Could not quantize image to canvas snapshot',
+              status: 'error',
+              isClosable: true,
+            });
+          } finally {
+            setIsProcessingCanvasImage(false);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          toast({
+            title: 'Image Load Error',
+            description: 'Could not decode image file.',
+            status: 'error',
+            isClosable: true,
+          });
+          setIsProcessingCanvasImage(false);
+        };
+        img.src = objectUrl;
+        return;
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Error reading file',
+        description: err?.message || 'Could not read selected file.',
+        status: 'error',
+        isClosable: true,
+      });
+    } finally {
+      setIsProcessingCanvasImage(false);
+    }
+  };
+
+  const handleGenerateBlankCanvas = () => {
+    const blank = new ArrayBuffer(300000); // 300,000 zero bytes = color 0 (white)
+    setCanvasBufferToUpload(blank);
+    setCanvasSnapshotFile(null);
+    setCanvasPreviewInfo({
+      name: 'blank-canvas.bin',
+      size: '300.0 KB (All White)',
+      type: 'Reset / Blank Snapshot',
+    });
+    if (canvasPreviewRef.current) {
+      renderSnapshotToCanvas(canvasPreviewRef.current, blank);
+    }
+    toast({
+      title: 'Blank Canvas Generated',
+      description: 'Click "Deploy Snapshot to Canvas" below to wipe the live board.',
+      status: 'info',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const handleUploadCanvasSnapshot = async () => {
+    if (!canvasBufferToUpload) {
+      toast({
+        title: 'No Snapshot Prepared',
+        description: 'Please select an image/binary file or generate a blank board first.',
+        status: 'warning',
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsUploadingCanvas(true);
+    try {
+      const res = await uploadRPlaceBoardSnapshot(canvasBufferToUpload);
+      toast({
+        title: 'Board Snapshot Deployed!',
+        description: `New canvas snapshot is now live! Sequence: ${res?.sequence ?? 'updated'}.`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Upload Failed',
+        description: err?.message || 'Failed to deploy snapshot to R/Place backend.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsUploadingCanvas(false);
+    }
+  };
+
   if (isLoading || !isMounted) {
     return (
       <Flex minH="100vh" align="center" justify="center">
@@ -1044,6 +1197,177 @@ ON DUPLICATE KEY UPDATE
                 isDisabled={!selectedFile || !uploadEvent}
               >
                 Upload Leaderboard
+              </Button>
+            </HStack>
+          </Flex>
+        </VStack>
+      </Box>
+
+      {/* ─── R/PLACE CANVAS SNAPSHOT MANAGEMENT ─── */}
+      <Box bg={cardBg} p={{ base: '18px', md: '30px' }} borderRadius="20px" border="1px solid var(--border)" boxShadow={shadowSoft} mb="24px">
+        <Flex justify="space-between" align={{ base: 'flex-start', sm: 'center' }} mb="8px" flexWrap="wrap" gap="10px">
+          <Flex align="center" gap="10px">
+            <Box p="8px" borderRadius="10px" bg="var(--accent-soft)" color="var(--accent)">
+              <Icon as={Palette} boxSize={6} />
+            </Box>
+            <Heading size="md" color={textColor}>R/Place Canvas Snapshot</Heading>
+          </Flex>
+          <HStack spacing="8px">
+            <Badge
+              bg="rgba(127, 207, 159, 0.14)"
+              color="var(--status-live-text)"
+              border="1px solid rgba(127, 207, 159, 0.3)"
+              px="10px"
+              py="4px"
+              borderRadius="full"
+              fontSize="12px"
+            >
+              1000 × 600 · 300 KB
+            </Badge>
+            <Button
+              as={Link}
+              href="/user/rplace"
+              target="_blank"
+              size="sm"
+              variant="outline"
+              borderColor="var(--border)"
+              color="var(--muted)"
+              _hover={{ color: 'var(--text)', borderColor: 'var(--accent)' }}
+              leftIcon={<Icon as={Eye} size={14} />}
+            >
+              View Live Canvas
+            </Button>
+          </HStack>
+        </Flex>
+
+        <Text fontSize="sm" mb="20px" color="var(--fg-muted)">
+          Upload a new snapshot to update or wipe the live community canvas. You can upload an image (PNG, JPG, WebP)
+          which will be automatically quantized to the 16-color palette and packed to 300 KB, or provide a raw 300,000-byte 
+          binary snapshot (<Text as="span" fontFamily="var(--f-mono)">.bin</Text>).
+        </Text>
+
+        <VStack align="stretch" spacing="18px">
+          {/* File Dropzone */}
+          <Box
+            border="2px dashed"
+            borderColor={canvasBufferToUpload ? "var(--accent)" : "var(--border)"}
+            borderRadius="16px"
+            p={{ base: '16px', sm: '24px' }}
+            textAlign="center"
+            bg={canvasBufferToUpload ? "var(--accent-soft)" : "transparent"}
+            transition="all 0.2s ease"
+            cursor="pointer"
+            onClick={() => canvasFileInputRef.current?.click()}
+            _hover={{
+              borderColor: "var(--accent)",
+              bg: "var(--accent-soft)",
+            }}
+          >
+            <Input
+              type="file"
+              ref={canvasFileInputRef}
+              display="none"
+              accept=".png,.jpg,.jpeg,.webp,.bin,.dat"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleCanvasFileSelected(file);
+              }}
+            />
+            <Icon as={CloudUpload} boxSize={10} color="var(--accent)" mb="8px" />
+            <Text fontWeight="600" fontSize="sm" color={textColor}>
+              {canvasSnapshotFile ? canvasSnapshotFile.name : 'Choose an image (.png, .jpg, .webp) or snapshot file (.bin)'}
+            </Text>
+            <Text fontSize="xs" color="var(--fg-muted)" mt="4px">
+              Images will be automatically scaled to 1000×600 and quantized to 16 colors.
+            </Text>
+          </Box>
+
+          {/* Quantized Live Preview Canvas */}
+          <Box
+            borderRadius="16px"
+            border="1px solid var(--border)"
+            bg="var(--surface-2)"
+            p="16px"
+            display={canvasBufferToUpload ? 'block' : 'none'}
+          >
+            <Flex justify="space-between" align="center" mb="12px" flexWrap="wrap" gap="8px">
+              <HStack spacing="8px">
+                <Icon as={Sparkles} size={15} color="var(--accent)" />
+                <Text fontSize="xs" fontWeight="700" color={textColor} textTransform="uppercase" letterSpacing="0.08em">
+                  Quantized 16-Color Snapshot Preview
+                </Text>
+              </HStack>
+              {canvasPreviewInfo && (
+                <Badge variant="subtle" fontSize="11px" px="8px" py="2px" borderRadius="md">
+                  {canvasPreviewInfo.size}
+                </Badge>
+              )}
+            </Flex>
+
+            <Box
+              w="100%"
+              aspectRatio={`${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`}
+              borderRadius="12px"
+              overflow="hidden"
+              border="1px solid rgba(255,255,255,0.08)"
+              bg="#000"
+            >
+              <canvas
+                ref={canvasPreviewRef}
+                width={CANVAS_WIDTH}
+                height={CANVAS_HEIGHT}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  imageRendering: 'pixelated',
+                  display: 'block',
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Action Footer */}
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap="12px" pt="4px">
+            <Button
+              size="sm"
+              variant="outline"
+              borderColor="var(--border)"
+              color="var(--muted)"
+              _hover={{ color: 'var(--text)', borderColor: 'var(--border-strong)' }}
+              onClick={handleGenerateBlankCanvas}
+              isDisabled={isUploadingCanvas || isProcessingCanvasImage}
+            >
+              Generate Blank Board (All White)
+            </Button>
+
+            <HStack spacing="10px">
+              {canvasBufferToUpload && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  colorScheme="red"
+                  leftIcon={<Icon as={Trash2} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCanvasSnapshotFile(null);
+                    setCanvasBufferToUpload(null);
+                    setCanvasPreviewInfo(null);
+                    if (canvasFileInputRef.current) canvasFileInputRef.current.value = '';
+                  }}
+                  isDisabled={isUploadingCanvas}
+                >
+                  Clear
+                </Button>
+              )}
+              <Button
+                variant="brand"
+                leftIcon={<Icon as={Upload} />}
+                onClick={handleUploadCanvasSnapshot}
+                isLoading={isUploadingCanvas || isProcessingCanvasImage}
+                loadingText={isProcessingCanvasImage ? 'Processing Image...' : 'Deploying to Board...'}
+                isDisabled={!canvasBufferToUpload}
+              >
+                Deploy Snapshot to Canvas
               </Button>
             </HStack>
           </Flex>

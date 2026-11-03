@@ -248,3 +248,32 @@ export async function updateFlagshipEvent(eventName: string, isFlagship = true) 
 
   return await response.json();
 }
+
+/**
+ * Uploads a 300,000-byte board snapshot to R/Place backend via /api/rplace/board proxy
+ */
+export async function uploadRPlaceBoardSnapshot(buffer: ArrayBuffer) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found. Please sign in as admin.');
+
+  if (buffer.byteLength !== 300000) {
+    throw new Error(`Snapshot buffer must be exactly 300,000 bytes (got ${buffer.byteLength})`);
+  }
+
+  const response = await fetch('/api/rplace/board', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      Authorization: `Bearer ${token}`,
+    },
+    body: buffer,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error || errorData?.message || `Failed to upload canvas snapshot (HTTP ${response.status})`);
+  }
+
+  return await response.json();
+}

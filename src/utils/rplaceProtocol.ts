@@ -100,6 +100,74 @@ export function renderSnapshotToCanvas(
 }
 
 /**
+ * Finds the closest palette color index (0-15) for an RGB triple using euclidean distance.
+ */
+export function findClosestPaletteColor(r: number, g: number, b: number): number {
+  let closestIndex = 0;
+  let minDistance = Infinity;
+
+  for (let i = 0; i < BACKEND_PALETTE.length; i++) {
+    const [pr, pg, pb] = BACKEND_PALETTE[i];
+    // Weighted Euclidean distance for better perceptual color matching
+    const dr = r - pr;
+    const dg = g - pg;
+    const db = b - pb;
+    const dist = 0.3 * dr * dr + 0.59 * dg * dg + 0.11 * db * db;
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestIndex = i;
+    }
+  }
+
+  return closestIndex;
+}
+
+/**
+ * Encodes an image (HTMLImageElement, HTMLCanvasElement, or ImageBitmap)
+ * into a strictly sized 300,000-byte 4-bit nibble packed snapshot buffer.
+ */
+export function encodeImageToSnapshot(
+  source: CanvasImageSource,
+  previewCanvas?: HTMLCanvasElement | null
+): ArrayBuffer {
+  const offscreen = previewCanvas || document.createElement('canvas');
+  offscreen.width = CANVAS_WIDTH;
+  offscreen.height = CANVAS_HEIGHT;
+  const ctx = offscreen.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    throw new Error('Failed to acquire 2D canvas context');
+  }
+
+  // Draw image scaled to 1000x600
+  ctx.drawImage(source, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  const imgData = ctx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  const data = imgData.data;
+
+  const snapshot = new Uint8Array(EXPECTED_SNAPSHOT_BYTES);
+  let sIdx = 0;
+
+  for (let i = 0; i < TOTAL_PIXELS; i += 2) {
+    const p0 = i * 4;
+    const c0 = findClosestPaletteColor(data[p0], data[p0 + 1], data[p0 + 2]);
+
+    let c1 = 0;
+    if (i + 1 < TOTAL_PIXELS) {
+      const p1 = (i + 1) * 4;
+      c1 = findClosestPaletteColor(data[p1], data[p1 + 1], data[p1 + 2]);
+    }
+
+    snapshot[sIdx++] = ((c0 & 0x0f) << 4) | (c1 & 0x0f);
+  }
+
+  // If a preview canvas was provided, render the quantized snapshot back onto it
+  if (previewCanvas) {
+    renderSnapshotToCanvas(previewCanvas, snapshot.buffer);
+  }
+
+  return snapshot.buffer;
+}
+
+/**
  * Draws a single pixel directly onto canvas using pre-cached CSS palette strings.
  */
 export function drawPixel(

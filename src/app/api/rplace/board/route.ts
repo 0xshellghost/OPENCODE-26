@@ -93,3 +93,41 @@ export async function GET(req: NextRequest) {
     return new NextResponse(`Internal Server Error: ${message}`, { status: 500 });
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('authorization');
+    const cookieHeader = req.headers.get('cookie');
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/octet-stream',
+    };
+    if (authHeader) headers['Authorization'] = authHeader;
+    if (cookieHeader) headers['Cookie'] = cookieHeader;
+
+    const bodyBuffer = await req.arrayBuffer();
+
+    const res = await fetch(`${RPLACE_INTERNAL_API_URL}/api/board`, {
+      method: 'PUT',
+      headers,
+      body: bodyBuffer,
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      return NextResponse.json(
+        data || { error: `Backend upload failed with status ${res.status}` },
+        { status: res.status }
+      );
+    }
+
+    // Invalidate cached snapshot so subsequent GET requests fetch the updated board
+    memoryCache = null;
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown proxy error';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
