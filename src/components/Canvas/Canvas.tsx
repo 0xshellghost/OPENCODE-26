@@ -101,6 +101,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     moved: boolean;
   } | null>(null);
 
+  const userTierRef = useRef(userTier);
+  userTierRef.current = userTier;
+
   const toast = useToast();
 
   // Board state
@@ -156,6 +159,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       setCooldown((current) => {
         if (current <= 1) {
           clearInterval(timer);
+          if (userTier?.maxPixels) {
+            setRemainingPixels(userTier.maxPixels);
+          }
           return 0;
         }
         return current - 1;
@@ -163,7 +169,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [cooldown]);
+  }, [cooldown, userTier?.maxPixels]);
 
   // Helper to process 9-byte binary updates: [x: u16, y: u16, colorId: u8, sequence: u32]
   const processBinaryUpdate = useCallback(
@@ -318,14 +324,22 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
 
             if (data.type === 'PLACED') {
               if (typeof data.remaining === 'number') {
-                setRemainingPixels(Math.max(0, data.remaining));
+                const rem = Math.max(0, data.remaining);
+                setRemainingPixels(rem);
+                // If user exhausted their burst, trigger cooldown timer if not already running
+                if (rem === 0 && userTierRef.current?.cooldown) {
+                  setCooldown((c) => (c > 0 ? c : userTierRef.current!.cooldown));
+                }
               }
               return;
             }
 
             if (data.type === 'ERROR') {
-              if (data.error === 'RATE_LIMITED' && typeof data.ttl === 'number') {
-                setCooldown(Math.max(0, data.ttl));
+              if (data.error === 'RATE_LIMITED') {
+                setRemainingPixels(0);
+                if (typeof data.ttl === 'number') {
+                  setCooldown(Math.max(0, data.ttl));
+                }
               } else {
                 toast({
                   title: 'Placement Error',
@@ -440,6 +454,17 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         return;
       }
 
+      if (remainingPixels !== null && remainingPixels <= 0) {
+        toast({
+          title: 'No Pixels Left',
+          description: 'You have used all available pixels for this cooldown window. Please wait for reload.',
+          status: 'warning',
+          duration: 2000,
+          isClosable: true,
+        });
+        return;
+      }
+
       const payload = new ArrayBuffer(9);
       const view = new DataView(payload);
       view.setUint16(0, x, true);
@@ -460,7 +485,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
 
       setRemainingPixels((prev) => (prev && prev > 0 ? prev - 1 : 0));
     },
-    [cooldown, selectedColorId, toast]
+    [cooldown, remainingPixels, selectedColorId, toast]
   );
 
   // Mouse pan & click calculations
@@ -671,6 +696,18 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                 Cooldown: {cooldown}s
               </Text>
             </HStack>
+          ) : remainingPixels !== null && remainingPixels <= 0 ? (
+            <HStack
+              {...pillStyle}
+              spacing="6px"
+              bg="rgba(245, 158, 11, 0.12)"
+              borderColor="rgba(245, 158, 11, 0.35)"
+            >
+              <Clock size={12} color="#F59E0B" />
+              <Text fontSize="12px" fontWeight="700" color="#F59E0B">
+                No pixels left
+              </Text>
+            </HStack>
           ) : (
             <HStack
               {...pillStyle}
@@ -829,7 +866,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onDoubleClick={handleDoubleClick}
-        cursor={isDragging ? 'grabbing' : cooldown > 0 ? 'not-allowed' : 'crosshair'}
+        cursor={isDragging ? 'grabbing' : (cooldown > 0 || (remainingPixels !== null && remainingPixels <= 0)) ? 'not-allowed' : 'crosshair'}
       >
         {/* Loading state */}
         {isLoading && !isLoadedRef.current && (
@@ -1047,6 +1084,10 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
               {cooldown > 0 ? (
                 <Text as="span" color="#F59E0B" fontWeight="600">
                   Cooldown active ({cooldown}s)
+                </Text>
+              ) : remainingPixels !== null && remainingPixels <= 0 ? (
+                <Text as="span" color="#F59E0B" fontWeight="600">
+                  No pixels left (reloading)
                 </Text>
               ) : (
                 <Text as="span" color="var(--muted)">
