@@ -184,42 +184,57 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
     []
   );
 
-  // Fetch initial board snapshot from API proxy or direct backend
+  // Fetch initial board snapshot with timeout and multi-route fallback
   const fetchBoardSnapshot = useCallback(async () => {
     setIsLoading(true);
     setIsError(false);
 
-    try {
-      const primaryUrl = process.env.NEXT_PUBLIC_RPLACE_API_URL
-        ? `${process.env.NEXT_PUBLIC_RPLACE_API_URL}/api/board`
-        : '/api/rplace/board';
-
-      let response: Response;
+    const fetchBufferWithTimeout = async (url: string, timeoutMs: number = 8000) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        response = await fetch(primaryUrl, { credentials: 'include' });
-        if (!response.ok && primaryUrl !== '/api/rplace/board') {
-          response = await fetch('/api/rplace/board', { credentials: 'include' });
+        const res = await fetch(url, {
+          credentials: 'include',
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
         }
-      } catch (primaryErr) {
-        if (primaryUrl !== '/api/rplace/board') {
-          response = await fetch('/api/rplace/board', { credentials: 'include' });
+        const buffer = await res.arrayBuffer();
+        const sequence = res.headers.get('X-Canvas-Sequence');
+        return { buffer, sequence };
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    try {
+      let result: { buffer: ArrayBuffer; sequence: string | null } | null = null;
+
+      // 1. Try Vercel edge proxy (/api/rplace/board) first: same-origin, edge-cached, immune to proxy stream drops
+      try {
+        result = await fetchBufferWithTimeout('/api/rplace/board', 8000);
+      } catch (proxyErr) {
+        console.warn('Vercel edge proxy snapshot failed, attempting direct backend:', proxyErr);
+        // 2. Fall back to direct backend URL if proxy failed
+        const backendBase = process.env.NEXT_PUBLIC_RPLACE_API_URL;
+        if (backendBase) {
+          result = await fetchBufferWithTimeout(`${backendBase}/api/board`, 10000);
         } else {
-          throw primaryErr;
+          throw proxyErr;
         }
       }
 
-      if (!response.ok) {
-        throw new Error(`Board request failed: ${response.status}`);
+      if (!result || !result.buffer) {
+        throw new Error('Received empty board snapshot buffer');
       }
 
-      const seqHeader = response.headers.get('X-Canvas-Sequence');
-      if (seqHeader) {
-        currentSeqRef.current = Number(seqHeader);
+      if (result.sequence) {
+        currentSeqRef.current = Number(result.sequence);
       }
 
-      const boardBuffer = await response.arrayBuffer();
       if (canvasRef.current) {
-        renderSnapshotToCanvas(canvasRef.current, boardBuffer);
+        renderSnapshotToCanvas(canvasRef.current, result.buffer);
       }
 
       isLoadedRef.current = true;
