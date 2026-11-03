@@ -64,16 +64,16 @@ function parseJwt(token: string) {
 }
 
 function calculateTier(points: number) {
-  if (points >= 100) return { maxPixels: 10, cooldown: 5 };
-  if (points >= 50) return { maxPixels: 5, cooldown: 10 };
-  if (points >= 20) return { maxPixels: 3, cooldown: 15 };
-  if (points >= 10) return { maxPixels: 2, cooldown: 30 };
-  return { maxPixels: 1, cooldown: 60 };
+  if (points >= 400) return { maxPixels: 32, cooldown: 60 };
+  if (points >= 300) return { maxPixels: 16, cooldown: 60 };
+  if (points >= 150) return { maxPixels: 8, cooldown: 60 };
+  if (points >= 50) return { maxPixels: 4, cooldown: 60 };
+  return { maxPixels: 2, cooldown: 60 };
 }
 
 export default function RPlaceCanvasPage() {
   const [userPoints, setUserPoints] = useState<number | null>(null);
-  const [maxPixels, setMaxPixels] = useState<number>(1);
+  const [maxPixels, setMaxPixels] = useState<number>(2);
   const [cooldown, setCooldown] = useState<number>(60);
   const [userHandle, setUserHandle] = useState<string | null>(null);
 
@@ -93,7 +93,7 @@ export default function RPlaceCanvasPage() {
     fetch(`${BACKEND_API_URL}/api/v1/participant/${encodeURIComponent(username)}/pr-points`)
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
-        if (body && body.data) {
+        if (body && body.data !== undefined) {
           const points = typeof body.data === 'number' ? body.data : (body.data.points ?? 0);
           setUserPoints(points);
           const tier = calculateTier(points);
@@ -106,9 +106,9 @@ export default function RPlaceCanvasPage() {
       });
   }, []);
 
-  // Points progress calculation towards max tier (100 pts)
+  // Points progress calculation towards max tier (400 pts)
   const points = userPoints ?? 0;
-  const targetPoints = 100;
+  const targetPoints = 400;
   const isMaxBoost = points >= targetPoints;
   const progressPercent = Math.min(100, Math.max(0, Math.round((points / targetPoints) * 100)));
 
@@ -164,8 +164,8 @@ export default function RPlaceCanvasPage() {
           Canvas Powers &amp; Participant Status
         </h2>
         <p className="oc-description">
-          OpenCode PR points boost your canvas capabilities. Reach 100+ points to unlock the maximum placement burst
-          of 10 pixels with a rapid 5-second cooldown.
+          OpenCode PR points boost your canvas capabilities. Reach 400+ points to unlock the maximum placement burst
+          of 32 pixels with a 60-second cooldown window.
         </p>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: '12px', md: '16px' }} my="24px" w="100%">
@@ -220,7 +220,7 @@ export default function RPlaceCanvasPage() {
               </Text>
             </Text>
             <Text fontSize="12px" color="var(--subtle)" mt="4px">
-              Cooldown duration per pixel drop
+              Cooldown window duration
             </Text>
           </Box>
         </SimpleGrid>
@@ -237,7 +237,7 @@ export default function RPlaceCanvasPage() {
           <Flex justify="space-between" align="center" mb="12px" flexWrap="wrap" gap="8px">
             <HStack spacing="10px" flexWrap="wrap">
               <Text fontSize="13px" fontWeight="600" color="var(--text)">
-                {isMaxBoost ? 'Max boost unlocked' : `${points} / ${targetPoints} points to unlock 10 pixels`}
+                {isMaxBoost ? 'Max boost unlocked' : `${points} / ${targetPoints} points to unlock 32 pixels`}
               </Text>
               <Box
                 px="10px"
@@ -255,7 +255,7 @@ export default function RPlaceCanvasPage() {
               </Box>
             </HStack>
             <Text fontSize="12px" color="var(--subtle)">
-              {isMaxBoost ? '10 pixels · 5s cooldown active' : 'Target: 10 pixels · 5s cooldown'}
+              {isMaxBoost ? '32 pixels · 60s cooldown active' : 'Target: 32 pixels · 60s cooldown'}
             </Text>
           </Flex>
 

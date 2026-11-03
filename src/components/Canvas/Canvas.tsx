@@ -249,7 +249,9 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       'ws://localhost:3001/ws';
 
     try {
-      const ws = new WebSocket(wsUrl);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const fullUrl = token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl;
+      const ws = new WebSocket(fullUrl);
       ws.binaryType = 'arraybuffer';
       wsRef.current = ws;
 
@@ -279,6 +281,13 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
               ttl?: number;
               remaining?: number;
             };
+
+            if (data.type === 'TIER_INFO') {
+              if (typeof data.maxPixels === 'number') {
+                setRemainingPixels((prev) => (prev === null ? data.maxPixels : prev));
+              }
+              return;
+            }
 
             if (data.type === 'PLACED') {
               if (typeof data.remaining === 'number') {
