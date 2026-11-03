@@ -194,9 +194,18 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         ? `${process.env.NEXT_PUBLIC_RPLACE_API_URL}/api/board`
         : '/api/rplace/board';
 
-      let response = await fetch(primaryUrl, { credentials: 'include' });
-      if (!response.ok && primaryUrl !== '/api/rplace/board') {
-        response = await fetch('/api/rplace/board', { credentials: 'include' });
+      let response: Response;
+      try {
+        response = await fetch(primaryUrl, { credentials: 'include' });
+        if (!response.ok && primaryUrl !== '/api/rplace/board') {
+          response = await fetch('/api/rplace/board', { credentials: 'include' });
+        }
+      } catch (primaryErr) {
+        if (primaryUrl !== '/api/rplace/board') {
+          response = await fetch('/api/rplace/board', { credentials: 'include' });
+        } else {
+          throw primaryErr;
+        }
       }
 
       if (!response.ok) {
