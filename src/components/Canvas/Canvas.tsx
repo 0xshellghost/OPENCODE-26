@@ -280,11 +280,14 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
               error?: string;
               ttl?: number;
               remaining?: number;
+              maxPixels?: number;
+              cooldown?: number;
             };
 
             if (data.type === 'TIER_INFO') {
-              if (typeof data.maxPixels === 'number') {
-                setRemainingPixels((prev) => (prev === null ? data.maxPixels : prev));
+              const max = data.maxPixels;
+              if (typeof max === 'number') {
+                setRemainingPixels((prev) => (prev === null ? max : prev));
               }
               return;
             }
