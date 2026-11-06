@@ -18,17 +18,21 @@ export interface PullRequest {
 
 export interface ProfileData {
   name: string;
-  email: string;
-  college: string;
-  avatarUrl: string;
+  email?: string;
+  college?: string;
+  avatarUrl?: string;
   githubId: string;
-  discordId: string;
+  discordId?: string;
   gender?: string;
   year?: string;
+  graduationYear?: number | string;
+  isMentor?: boolean;
+  isAdmin?: boolean;
   PR: PullRequest[]; 
   prMerged: number;
   points: number;
-  rank: number;
+  totalPRs?: number;
+  rank?: number | null;
 }
 
 export default function ProfileSelf() {

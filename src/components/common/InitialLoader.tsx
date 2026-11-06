@@ -319,22 +319,24 @@ export default function InitialLoader({ isExiting = false, onComplete }: Initial
             animation={`${spinReverse} 18s linear infinite`}
           />
 
-          {/* The glow lives on a PARENT: `filter` on the masked element itself is applied before
-              the mask, so its drop-shadow got masked away and never showed. */}
-          <Box filter={`drop-shadow(0 0 14px ${rose(0.55)})`}>
-            <Box
-              w="clamp(62px, 7.5vw, 82px)"
-              h="clamp(62px, 7.5vw, 82px)"
-              bg={SAKURA}
+          {/* OpenCode '26 Logo centered inside the ensō ring */}
+          <Box
+            position="relative"
+            zIndex={2}
+            w="clamp(64px, 7.8vw, 86px)"
+            h="clamp(64px, 7.8vw, 86px)"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <img
+              src="/Logo/opencode-logo.png"
+              alt="OpenCode '26 Logo"
               style={{
-                maskImage: "url('/Logo/opencodelogo.png')",
-                WebkitMaskImage: "url('/Logo/opencodelogo.png')",
-                maskSize: 'contain',
-                WebkitMaskSize: 'contain',
-                maskRepeat: 'no-repeat',
-                WebkitMaskRepeat: 'no-repeat',
-                maskPosition: 'center',
-                WebkitMaskPosition: 'center',
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
               }}
             />
           </Box>

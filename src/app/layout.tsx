@@ -9,7 +9,10 @@ export const metadata: Metadata = {
   title: { default: 'OpenCode 2026 — Learn. Contribute. Belong.', template: '%s | OpenCode 2026' },
   description: 'Discover OpenCode 2026 by GeekHaven. Explore open-source events, meet fellow contributors, follow the leaderboards, and build something that matters.',
   manifest: '/manifest.json',
-  icons: { icon: '/favicon.ico' },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/Logo/opencode-logo.png',
+  },
   openGraph: {
     title: 'OpenCode 2026 — Guided by Yuzuki',
     description: 'A month-long open-source celebration where students collaborate with maintainers to build, fix, and improve real-world projects.',
@@ -17,10 +20,10 @@ export const metadata: Metadata = {
     siteName: 'OpenCode 2026',
     images: [
       {
-        url: '/Logo/OpenCode-White.png', // Fallback until a dedicated OG banner is designed
-        width: 1200,
-        height: 630,
-        alt: 'OpenCode 2026 Banner',
+        url: '/Logo/opencode-logo.png',
+        width: 925,
+        height: 964,
+        alt: "OpenCode '26 Logo",
       },
     ],
     locale: 'en_US',
@@ -31,6 +34,7 @@ export const metadata: Metadata = {
     title: 'OpenCode 2026',
     description: 'A month-long open-source celebration where students collaborate with maintainers to build, fix, and improve real-world projects.',
     creator: '@GeekHaven',
+    images: ['/Logo/opencode-logo.png'],
   },
 };
 

@@ -11,6 +11,7 @@ export type LeaderboardEntry = {
   prDetailsURL?: string;
   collegeName?: string;
   graduationYear?: string | number;
+  year?: string;
   isMentor?: boolean;
 };
 

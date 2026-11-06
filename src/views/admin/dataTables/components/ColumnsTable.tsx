@@ -48,6 +48,7 @@ export type RowObj = {
   prDetailsURL?: string;
   college?: string;
   graduationYear?: string | number;
+  year?: string;
   isMentor?: boolean;
 };
 
