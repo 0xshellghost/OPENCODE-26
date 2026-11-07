@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import {
   Box,
   Flex,
@@ -14,7 +15,7 @@ interface Props {
   w?: any;
 }
 
-export default function SearchProfileBanner({
+function SearchProfileBanner({
   value,
   onChange,
   placeholder = 'Search name or GitHub ID',
@@ -62,5 +63,7 @@ export default function SearchProfileBanner({
     </Flex>
   );
 }
+
+export default React.memo(SearchProfileBanner);
 
 

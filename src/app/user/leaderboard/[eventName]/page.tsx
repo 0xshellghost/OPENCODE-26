@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useDeferredValue, useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -73,6 +73,13 @@ const controlStyle = {
   _focusVisible: { outline: '2px solid var(--accent)', outlineOffset: '2px' },
 } as const;
 
+// Pure helper to determine whether an entry belongs to the first year (hoisted to avoid churn)
+function isFirstYear(item: { graduationYear?: string | number; year?: string }): boolean {
+  const grad = String(item.graduationYear ?? '').trim();
+  const yr = String(item.year ?? '').trim().toLowerCase();
+  return grad === '2029' || yr.includes('1st') || yr === '1';
+}
+
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const router = useRouter();
@@ -81,6 +88,10 @@ export default function EventName() {
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
   const [isEventHovered, setIsEventHovered] = useState(false);
+
+  // React concurrent deferred search value for immediate keystroke responsiveness
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const isStale = searchQuery !== deferredSearchQuery;
 
   const eventLabel = safeDecode(eventName);
   const isOpencode = eventLabel.toLowerCase().includes('opencode');
@@ -154,16 +165,6 @@ export default function EventName() {
     return [...new Set(colleges)].sort();
   }, [eligibleList]);
 
-  const hasActiveFilters =
-    selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
-
-  // Helper to determine whether an entry belongs to the first year
-  const isFirstYear = useCallback((item: { graduationYear?: string | number; year?: string }) => {
-    const grad = String(item.graduationYear ?? '').trim();
-    const yr = String(item.year ?? '').trim().toLowerCase();
-    return grad === '2029' || yr.includes('1st') || yr === '1';
-  }, []);
-
   // Filter cohort based on active cohort filters (College and/or 1st Years)
   const activeCohort = useMemo(() => {
     const collegeLower = selectedCollege !== 'All' ? selectedCollege.toLowerCase() : null;
@@ -177,7 +178,7 @@ export default function EventName() {
       }
       return true;
     });
-  }, [eligibleList, selectedCollege, firstYearOnly, isFirstYear]);
+  }, [eligibleList, selectedCollege, firstYearOnly]);
 
   // Recalculate ranks within the active filtered cohort starting at 1 (1 to N)
   // Preserves existing sorting order (points desc, createdAt asc) and tie-breaking policies
@@ -223,9 +224,22 @@ export default function EventName() {
     );
   }, [isOpencode, rankedCohortData]);
 
-  // Apply search query filter on top of the ranked cohort (preserving each user's cohort rank)
+  // Top 3 of the active cohort for spotlight podium cards (respects firstYearOnly & college filters)
+  const topThree = useMemo(() => {
+    return rankedCohortData.slice(0, 3);
+  }, [rankedCohortData]);
+
+  // Memoized set of spotlight IDs for O(1) table row deduplication
+  const topThreeIdSet = useMemo(() => {
+    return new Set(
+      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    );
+  }, [topThree]);
+
+  // Apply search query filter using DEFERRED search value on top of the ranked cohort
+  // Preserves each user's cohort rank and allows uninterrupted UI typing
   const searchFilteredData = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = deferredSearchQuery.trim().toLowerCase();
     if (!q) return rankedCohortData;
 
     return rankedCohortData.filter((row) => {
@@ -234,17 +248,10 @@ export default function EventName() {
         row.name?.toLowerCase().includes(q);
       return Boolean(matchesUser);
     });
-  }, [searchQuery, rankedCohortData, isOpencode]);
+  }, [deferredSearchQuery, rankedCohortData, isOpencode]);
 
-  const deferredTableData = useDeferredValue(searchFilteredData);
-  const isStale = deferredTableData !== searchFilteredData;
   const participantCount = searchFilteredData.length;
   const totalCount = eligibleList.length;
-
-  // Top 3 of the active cohort for spotlight podium cards (respects firstYearOnly & college filters)
-  const topThree = useMemo(() => {
-    return rankedCohortData.slice(0, 3);
-  }, [rankedCohortData]);
 
   const clearAllFilters = useCallback(() => {
     setSelectedCollege('All');
@@ -252,20 +259,40 @@ export default function EventName() {
     setSearchQuery('');
   }, []);
 
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
+
+  const handleClearCollege = useCallback(() => {
+    setSelectedCollege('All');
+  }, []);
+
+  const handleClearFirstYear = useCallback(() => {
+    setFirstYearOnly(false);
+  }, []);
+
+  const handleToggleFirstYear = useCallback(() => {
+    setFirstYearOnly((prev) => !prev);
+  }, []);
+
+  const handleSelectCollege = useCallback((college: string) => {
+    setSelectedCollege(college);
+  }, []);
+
   // Display spotlight podium whenever top 3 are available and not actively searching
-  const showSpotlight = !searchQuery.trim() && topThree.length === 3;
+  const showSpotlight = !deferredSearchQuery.trim() && topThree.length === 3;
 
   // When spotlight cards are visible, don't repeat those three people in the table below.
   // When spotlight is hidden (e.g. during a search), show everyone who matches.
   const tableRows = useMemo(() => {
-    if (!showSpotlight) return deferredTableData;
-    const spotlightIds = new Set(
-      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    if (!showSpotlight) return searchFilteredData;
+    return searchFilteredData.filter(
+      (r) => !topThreeIdSet.has(r.githubid || `${r.name}-${r.position}`)
     );
-    return deferredTableData.filter(
-      (r) => !spotlightIds.has(r.githubid || `${r.name}-${r.position}`)
-    );
-  }, [showSpotlight, deferredTableData, topThree]);
+  }, [showSpotlight, searchFilteredData, topThreeIdSet]);
+
+  const hasActiveFilters =
+    selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
 
   if (isLoading) {
     return <LeaderboardLoader />;
@@ -436,7 +463,7 @@ export default function EventName() {
                   return (
                     <MenuItem
                       key={college}
-                      onClick={() => setSelectedCollege(college)}
+                      onClick={() => handleSelectCollege(college)}
                       bg="transparent"
                       _hover={{ bg: 'var(--accent-soft)' }}
                       _focus={{ bg: 'var(--accent-soft)' }}
@@ -467,7 +494,7 @@ export default function EventName() {
           role="switch"
           aria-checked={firstYearOnly}
           aria-label="Show first years only"
-          onClick={() => setFirstYearOnly((prev) => !prev)}
+          onClick={handleToggleFirstYear}
           display="flex"
           alignItems="center"
           gap="10px"
@@ -534,13 +561,13 @@ export default function EventName() {
             Showing {participantCount.toLocaleString()} of {totalCount.toLocaleString()}
           </Text>
           {searchQuery.trim() && (
-            <FilterChip label={`Search: ${searchQuery.trim()}`} onRemove={() => setSearchQuery('')} />
+            <FilterChip label={`Search: ${searchQuery.trim()}`} onRemove={handleClearSearch} />
           )}
           {selectedCollege !== 'All' && (
-            <FilterChip label={selectedCollege} onRemove={() => setSelectedCollege('All')} />
+            <FilterChip label={selectedCollege} onRemove={handleClearCollege} />
           )}
           {firstYearOnly && (
-            <FilterChip label="1st years only" onRemove={() => setFirstYearOnly(false)} />
+            <FilterChip label="1st years only" onRemove={handleClearFirstYear} />
           )}
         </Flex>
       )}
@@ -627,7 +654,13 @@ export default function EventName() {
 
 /* ------------------ Helpers ------------------ */
 
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+const FilterChip = React.memo(function FilterChip({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
   return (
     <HStack
       spacing="4px"
@@ -660,9 +693,90 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
       </chakra.button>
     </HStack>
   );
+});
+
+type PodiumRank = 1 | 2 | 3;
+
+interface PodiumConfig {
+  tag: string;
+  tagColor: string;
+  pointsColor: string;
+  bgImage: string;
+  badgeImage: string;
+  badgeGlow: string;
+  border: string;
+  borderHover: string;
+  boxShadow: string;
+  boxShadowHover: string;
+  avatarBoxBg: string;
+  avatarBoxBorder: string;
+  avatarBoxShadow: string;
+  cardWidth: any;
+  cardHeight: any;
 }
 
-
+const PODIUM_CONFIGS: Record<PodiumRank, PodiumConfig> = {
+  1: {
+    tag: '★ Champion · #1',
+    tagColor: '#F5C542',
+    pointsColor: '#F5C542',
+    bgImage: '/images/leaderboard/opencode-podium-1.png',
+    badgeImage: '/images/leaderboard/badge-1st.png',
+    badgeGlow: 'drop-shadow(0 0 16px rgba(245, 197, 66, 0.5))',
+    border: '1px solid rgba(245, 197, 66, 0.45)',
+    borderHover: 'rgba(245, 197, 66, 0.75)',
+    boxShadow:
+      '0 16px 36px -10px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(245, 197, 66, 0.25)',
+    boxShadowHover:
+      '0 20px 48px -8px rgba(0, 0, 0, 0.9), 0 0 36px -2px rgba(245, 197, 66, 0.4)',
+    avatarBoxBg: '#FFFFFF',
+    avatarBoxBorder: '3px solid #F5C542',
+    avatarBoxShadow:
+      '0 12px 28px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 197, 66, 0.45)',
+    cardWidth: '100%',
+    cardHeight: { base: 'auto', md: '180px' },
+  },
+  2: {
+    tag: 'Runner-Up · #2',
+    tagColor: '#BAE6FD',
+    pointsColor: '#E2E8F0',
+    bgImage: '/images/leaderboard/opencode-podium-2.png',
+    badgeImage: '/images/leaderboard/badge-2nd.png',
+    badgeGlow: 'drop-shadow(0 0 14px rgba(226, 232, 240, 0.4))',
+    border: '1px solid rgba(148, 163, 184, 0.35)',
+    borderHover: 'rgba(255, 255, 255, 0.65)',
+    boxShadow:
+      '0 14px 32px -10px rgba(0, 0, 0, 0.8), 0 0 24px -4px rgba(148, 163, 184, 0.2)',
+    boxShadowHover:
+      '0 18px 42px -8px rgba(0, 0, 0, 0.9), 0 0 32px -2px rgba(186, 230, 253, 0.35)',
+    avatarBoxBg: '#080A0C',
+    avatarBoxBorder: '2.5px solid #E2E8F0',
+    avatarBoxShadow:
+      '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(186, 230, 253, 0.35)',
+    cardWidth: { base: '100%', md: '94.5%' },
+    cardHeight: { base: 'auto', md: '175px' },
+  },
+  3: {
+    tag: 'Third Place · #3',
+    tagColor: '#FDBA74',
+    pointsColor: '#FDBA74',
+    bgImage: '/images/leaderboard/opencode-podium-3.png',
+    badgeImage: '/images/leaderboard/badge-3rd.png',
+    badgeGlow: 'drop-shadow(0 0 14px rgba(217, 119, 6, 0.4))',
+    border: '1px solid rgba(217, 119, 6, 0.35)',
+    borderHover: 'rgba(217, 119, 6, 0.7)',
+    boxShadow:
+      '0 12px 28px -10px rgba(0, 0, 0, 0.8), 0 0 20px -4px rgba(217, 119, 6, 0.2)',
+    boxShadowHover:
+      '0 16px 36px -8px rgba(0, 0, 0, 0.9), 0 0 28px -2px rgba(217, 119, 6, 0.35)',
+    avatarBoxBg: '#080A0C',
+    avatarBoxBorder: '2.5px solid #D97706',
+    avatarBoxShadow:
+      '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(217, 119, 6, 0.35)',
+    cardWidth: { base: '100%', md: '89%' },
+    cardHeight: { base: 'auto', md: '170px' },
+  },
+};
 
 /* ──────────────────────────────────────────────────────────────
    PSD REFERENCE TOP 3 PODIUM BANNER CARD
@@ -672,89 +786,20 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
    - Centered dynamic participant info (Name, Handle, College, Points, Merged PRs)
    - Square avatar box on the right edge
 ────────────────────────────────────────────────────────────── */
-function PodiumBannerCard({
-  row,
-  rank,
-  isOpencode,
-  hasPoints: hasPointsProp,
-}: {
-  row: RowObj;
-  rank: 1 | 2 | 3;
-  isOpencode: boolean;
-  hasPoints?: boolean;
-}) {
-  const isFirst = rank === 1;
-  const isSecond = rank === 2;
-  const isThird = rank === 3;
-  const college = String(row.college ?? '').trim();
-
-  // Distinct styling configurations derived directly from PSD layers
-  const config = useMemo(() => {
-    if (isFirst) {
-      return {
-        tag: '★ Champion · #1',
-        tagColor: '#F5C542',
-        pointsColor: '#F5C542',
-        bgImage: '/images/leaderboard/opencode-podium-1.png',
-        badgeImage: '/images/leaderboard/badge-1st.png',
-        badgeGlow: 'drop-shadow(0 0 16px rgba(245, 197, 66, 0.5))',
-        border: '1px solid rgba(245, 197, 66, 0.45)',
-        borderHover: 'rgba(245, 197, 66, 0.75)',
-        boxShadow:
-          '0 16px 36px -10px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(245, 197, 66, 0.25)',
-        boxShadowHover:
-          '0 20px 48px -8px rgba(0, 0, 0, 0.9), 0 0 36px -2px rgba(245, 197, 66, 0.4)',
-        avatarBoxBg: '#FFFFFF',
-        avatarBoxBorder: '3px solid #F5C542',
-        avatarBoxShadow:
-          '0 12px 28px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 197, 66, 0.45)',
-        cardWidth: '100%',
-        cardHeight: { base: 'auto', md: '180px' },
-      };
-    }
-    if (isSecond) {
-      return {
-        tag: 'Runner-Up · #2',
-        tagColor: '#BAE6FD',
-        pointsColor: '#E2E8F0',
-        bgImage: '/images/leaderboard/opencode-podium-2.png',
-        badgeImage: '/images/leaderboard/badge-2nd.png',
-        badgeGlow: 'drop-shadow(0 0 14px rgba(226, 232, 240, 0.4))',
-        border: '1px solid rgba(148, 163, 184, 0.35)',
-        borderHover: 'rgba(255, 255, 255, 0.65)',
-        boxShadow:
-          '0 14px 32px -10px rgba(0, 0, 0, 0.8), 0 0 24px -4px rgba(148, 163, 184, 0.2)',
-        boxShadowHover:
-          '0 18px 42px -8px rgba(0, 0, 0, 0.9), 0 0 32px -2px rgba(186, 230, 253, 0.35)',
-        avatarBoxBg: '#080A0C',
-        avatarBoxBorder: '2.5px solid #E2E8F0',
-        avatarBoxShadow:
-          '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(186, 230, 253, 0.35)',
-        cardWidth: { base: '100%', md: '94.5%' },
-        cardHeight: { base: 'auto', md: '175px' },
-      };
-    }
-    return {
-      tag: 'Third Place · #3',
-      tagColor: '#FDBA74',
-      pointsColor: '#FDBA74',
-      bgImage: '/images/leaderboard/opencode-podium-3.png',
-      badgeImage: '/images/leaderboard/badge-3rd.png',
-      badgeGlow: 'drop-shadow(0 0 14px rgba(217, 119, 6, 0.4))',
-      border: '1px solid rgba(217, 119, 6, 0.35)',
-      borderHover: 'rgba(217, 119, 6, 0.7)',
-      boxShadow:
-        '0 12px 28px -10px rgba(0, 0, 0, 0.8), 0 0 20px -4px rgba(217, 119, 6, 0.2)',
-      boxShadowHover:
-        '0 16px 36px -8px rgba(0, 0, 0, 0.9), 0 0 28px -2px rgba(217, 119, 6, 0.35)',
-      avatarBoxBg: '#080A0C',
-      avatarBoxBorder: '2.5px solid #D97706',
-      avatarBoxShadow:
-        '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(217, 119, 6, 0.35)',
-      cardWidth: { base: '100%', md: '89%' },
-      cardHeight: { base: 'auto', md: '170px' },
-    };
-  }, [isFirst, isSecond]);
+const PodiumBannerCard = React.memo(
+  function PodiumBannerCard({
+    row,
+    rank,
+    isOpencode,
+    hasPoints: hasPointsProp,
+  }: {
+    row: RowObj;
+    rank: 1 | 2 | 3;
+    isOpencode: boolean;
+    hasPoints?: boolean;
+  }) {
+    const college = String(row.college ?? '').trim();
+    const config = PODIUM_CONFIGS[rank] || PODIUM_CONFIGS[1];
 
   const cardContent = (
     <Box
@@ -979,4 +1024,18 @@ function PodiumBannerCard({
       {cardContent}
     </Box>
   );
-}
+},
+(prev, next) => {
+  return (
+    prev.rank === next.rank &&
+    prev.isOpencode === next.isOpencode &&
+    prev.hasPoints === next.hasPoints &&
+    prev.row.githubid === next.row.githubid &&
+    prev.row.points === next.row.points &&
+    prev.row.prmerged === next.row.prmerged &&
+    prev.row.name === next.row.name &&
+    prev.row.avatarUrl === next.row.avatarUrl &&
+    prev.row.college === next.row.college &&
+    prev.row.position === next.row.position
+  );
+});
