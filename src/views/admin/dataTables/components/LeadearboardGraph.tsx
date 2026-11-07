@@ -15,13 +15,21 @@ import {
 import RingLoader from 'react-spinners/RingLoader';
 import { FaCalendarAlt, FaClock, FaTrophy, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { isMaintainer } from 'constants/Maintainers';
+import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
 
 export type ParticipantSeries = {
   participantId: string;
   name: string;
+  college: string;
   avatarUrl?: string | null;
   officialPoints?: number;
   prmerged?: number;
+  latestPoints?: number;
+  data: { date: string; points: number }[];
+};
+
+export type CollegeSeries = {
+  college: string;
   data: { date: string; points: number }[];
 };
 
@@ -40,19 +48,58 @@ const PALETTE = [
   '#60A5FA', // Marine Blue
 ];
 
-async function fetchProgress(eventName: string, topN: number = 10): Promise<ParticipantSeries[]> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+async function fetchProgress(
+  eventName: string,
+  topN: number = 10
+): Promise<ParticipantSeries[]> {
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('token')
+      : null;
+
   const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}&topN=${topN}`;
+  
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const r = await fetch(url, { headers });
-  if (!r.ok) throw new Error('Failed to fetch leaderboard progress');
-  const json = await r.json();
+  // Fetch progress and rankings together
+  const [progressResponse, leaderboardRows] = await Promise.all([
+    fetch(url, { headers }),
+    FetchedLeaderboard(eventName),
+  ]);
 
-  if (json && Array.isArray(json.data)) return json.data as ParticipantSeries[];
-  if (Array.isArray(json)) return json as ParticipantSeries[];
-  return [];
+  if (!progressResponse.ok) {
+    throw new Error('Failed to fetch leaderboard progress');
+  }
+
+  const json = await progressResponse.json();
+
+  const progressRows: ParticipantSeries[] =
+    Array.isArray(json.data)
+      ? json.data
+      : Array.isArray(json)
+        ? json
+        : [];
+
+  // Create a map: GitHub ID -> College name
+  const collegeMap = new Map<string, string>();
+
+  leaderboardRows.forEach((participant) => {
+    if (participant.githubid && participant.collegeName) {
+      collegeMap.set(
+        participant.githubid.trim().toLowerCase(),
+        participant.collegeName
+      );
+    }
+  });
+
+  // Attach college names to progress data
+  return progressRows.map((participant) => ({
+    ...participant,
+    college:
+      collegeMap.get(participant.participantId.trim().toLowerCase()) ||
+      'Unknown College',
+  }));
 }
 
 const parseYMD = (s: string) => {
@@ -60,7 +107,14 @@ const parseYMD = (s: string) => {
   return new Date(y, m - 1, d);
 };
 
-const formatYMD = (d: Date) => d.toISOString().slice(0, 10);
+// const formatYMD = (d: Date) => d.toISOString().slice(0, 10);
+const formatYMD = (d: Date) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
 
 const addDays = (iso: string, days: number) => {
   const dt = parseYMD(iso);
@@ -235,10 +289,12 @@ export default function LeaderboardGraph({
 
   const defaultStartDate = process.env.NEXT_PUBLIC_EVENT_START_DATE || '2025-12-14';
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['leaderboardProgress', eventName, topN],
-    queryFn: () => fetchProgress(eventName, topN),
-  });
+
+ const { data, isLoading, isError, error } = useQuery({
+  queryKey: ['leaderboardProgress', eventName, topN],
+  queryFn: () => fetchProgress(eventName, topN),
+  // queryFn: () => Promise.resolve(mockData),
+});
 
   const { effectiveStartDate, effectiveEndDate } = useMemo(() => {
     let minD = startDate || defaultStartDate;
@@ -290,44 +346,120 @@ export default function LeaderboardGraph({
       .sort((a, b) => b.latestPoints - a.latestPoints);
   }, [data, isOpencode]);
 
-  // Display subset based on contributor limit filter (Top 5 / All)
-  const activeParticipants = useMemo(() => {
-    if (contributorLimit === 0) return sortedParticipants;
-    return sortedParticipants.slice(0, contributorLimit);
-  }, [sortedParticipants, contributorLimit]);
+  const collegeGroups = useMemo(() => {
+  const groups: Record<string, ParticipantSeries[]> = {};
+
+  sortedParticipants.forEach((participant) => {
+    const college = participant.college || "Unknown College";
+
+    if (!groups[college]) {
+      groups[college] = [];
+    }
+
+    groups[college].push(participant);
+  });
+
+  return groups;
+}, [sortedParticipants]);
+
+
+
+const activeColleges = useMemo(() => {
+  const colleges = Object.entries(collegeGroups).map(
+    ([college, participants]) => ({
+      college,
+      participants,
+    })
+  );
+
+  
+
+  const sortedColleges = colleges.sort((a, b) => {
+  const getCollegeTotal = (participants: ParticipantSeries[]) => {
+    
+    return participants.reduce((sum, p) => {
+      if (mode === 'daily') {
+        return sum + (p.latestPoints || 0);
+      }
+
+//     
+
+      const dayEntries = (p.data || []).filter((entry) => {
+        return new Date(entry.date).toISOString().slice(0, 10) === selectedDay;
+      });
+
+      const dayPoints = dayEntries.reduce(
+        (max, entry) => Math.max(max, entry.points || 0),
+        0
+      );
+
+      return sum + dayPoints;
+    }, 0);
+  };
+
+  const totalA = getCollegeTotal(a.participants);
+const totalB = getCollegeTotal(b.participants);
+
+
+
+return totalB - totalA;
+});
+
+  return contributorLimit === 0
+    ? sortedColleges
+    : sortedColleges.slice(0, contributorLimit);
+},  [collegeGroups, contributorLimit, mode, selectedDay]);
+
+
 
   // Assign distinct colors to participants
-  const participantColorMap = useMemo(() => {
-    const map = new Map<string, string>();
-    sortedParticipants.forEach((p, idx) => {
-      map.set(p.participantId, PALETTE[idx % PALETTE.length]);
-    });
-    return map;
-  }, [sortedParticipants]);
+  const collegeColorMap = useMemo(() => {
+  const map = new Map<string, string>();
+
+  activeColleges.forEach((college, index) => {
+    map.set(college.college, PALETTE[index % PALETTE.length]);
+  });
+
+  return map;
+}, [activeColleges]);
+
+
 
   // Process data for Recharts LineChart
   const { chartData, dates } = useMemo(() => {
-    if (!activeParticipants.length) return { chartData: [], dates: [] };
+    if (!sortedParticipants.length) return { chartData: [], dates: [] };
 
     if (mode === 'daily') {
       const allDates = genDates(effectiveStartDate, effectiveEndDate);
 
-      // Pre-process date maps for each participant
-      const pMaps = activeParticipants.map((p) => {
+      // Prepare date maps for every participant
+      const pMaps = sortedParticipants.map((p) => {
         const dmap = new Map<string, number>();
+
         for (const entry of p.data || []) {
           if (!entry || typeof entry.date !== 'string') continue;
+
           const ymd = new Date(entry.date).toISOString().slice(0, 10);
+
           if (entry.points > 0) {
             dmap.set(ymd, Math.max(dmap.get(ymd) || 0, entry.points));
           }
         }
-        return { participantId: p.participantId, dmap, officialPoints: p.officialPoints };
+
+        return {
+          participantId: p.participantId,
+          college: p.college || "Unknown College",
+          dmap,
+          officialPoints: p.officialPoints,
+        };
       });
 
-      // Construct chart rows with cumulative progression
+      // Track cumulative points for each participant
       const runningPoints = new Map<string, number | null>();
-      pMaps.forEach((p) => runningPoints.set(p.participantId, null));
+
+      pMaps.forEach((p) => {
+        runningPoints.set(p.participantId, null);
+      });
 
       const rows = allDates.map((dateStr, idx) => {
         const row: any = {
@@ -336,70 +468,110 @@ export default function LeaderboardGraph({
         };
 
         const isLastDay = idx === allDates.length - 1;
+        const collegeTotals: Record<string, number> = {};
+
         pMaps.forEach((p) => {
           if (p.dmap.has(dateStr)) {
             runningPoints.set(p.participantId, p.dmap.get(dateStr)!);
           }
-          if (isLastDay && (p as any).officialPoints !== undefined) {
-            runningPoints.set(p.participantId, (p as any).officialPoints);
+
+          if (isLastDay && p.officialPoints !== undefined) {
+              runningPoints.set(p.participantId, p.officialPoints);
           }
-          row[p.participantId] = runningPoints.get(p.participantId);
+
+          const points = runningPoints.get(p.participantId);
+
+          if (points != null) {
+            collegeTotals[p.college] =
+              (collegeTotals[p.college] || 0) + points;
+          }
+        });
+
+        Object.entries(collegeTotals).forEach(([college, total]) => {
+          row[college] = total;
         });
 
         return row;
       });
 
       return { chartData: rows, dates: allDates };
-    } else {
-      // Single Day 15-minute slot view
-      const slots = genTenMinSlots(selectedDay);
-      const slotTimes = slots.map((s) => new Date(s).getTime());
-      const dayStartMs = slotTimes[0];
-      const dayEndMs = dayStartMs + 24 * 60 * 60 * 1000;
+    }  else {
+  // Single Day 15-minute slot view
+  const slots = genTenMinSlots(selectedDay);
+  const slotTimes = slots.map((s) => new Date(s).getTime());
+  const dayStartMs = slotTimes[0];
+  const dayEndMs = dayStartMs + 24 * 60 * 60 * 1000;
 
-      const pMaps = activeParticipants.map((p) => {
-        const slotMap = new Map<number, number>();
-        for (const entry of p.data || []) {
-          if (!entry || entry.points <= 0) continue;
-          const ts = new Date(entry.date).getTime();
-          if (ts < dayStartMs || ts >= dayEndMs) continue;
-          const mins = Math.floor((ts - dayStartMs) / 60000);
-          const idx = Math.floor(mins / 15);
-          const clamped = Math.max(0, Math.min(idx, slotTimes.length - 1));
-          slotMap.set(clamped, Math.max(slotMap.get(clamped) || 0, entry.points));
-        }
-        return { participantId: p.participantId, slotMap };
-      });
+  const pMaps = sortedParticipants.map((p) => {
+    const slotMap = new Map<number, number>();
 
-      const runningPoints = new Map<string, number | null>();
-      pMaps.forEach((p) => runningPoints.set(p.participantId, null));
+    for (const entry of p.data || []) {
+      if (!entry || entry.points <= 0) continue;
 
-      const rows = slots.map((slotIso, idx) => {
-        let label = '';
-        try {
-          label = new Date(slotIso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } catch {
-          label = `T${idx}`;
-        }
+      const ts = new Date(entry.date).getTime();
+      if (ts < dayStartMs || ts >= dayEndMs) continue;
 
-        const row: any = {
-          day: label,
-          rawDate: slotIso,
-        };
+      const mins = Math.floor((ts - dayStartMs) / 60000);
+      const idx = Math.floor(mins / 15);
+      const clamped = Math.max(0, Math.min(idx, slotTimes.length - 1));
 
-        pMaps.forEach((p) => {
-          if (p.slotMap.has(idx)) {
-            runningPoints.set(p.participantId, p.slotMap.get(idx)!);
-          }
-          row[p.participantId] = runningPoints.get(p.participantId);
-        });
-
-        return row;
-      });
-
-      return { chartData: rows, dates: slots };
+      slotMap.set(
+        clamped,
+        Math.max(slotMap.get(clamped) || 0, entry.points)
+      );
     }
-  }, [activeParticipants, mode, effectiveStartDate, effectiveEndDate, selectedDay]);
+
+    return {
+      participantId: p.participantId,
+      college: p.college || "Unknown College",
+      slotMap,
+    };
+  });
+
+  const runningPoints = new Map<string, number | null>();
+  pMaps.forEach((p) => runningPoints.set(p.participantId, null));
+
+  const rows = slots.map((slotIso, idx) => {
+    let label = '';
+
+    try {
+      label = new Date(slotIso).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      label = `T${idx}`;
+    }
+
+    const row: any = {
+      day: label,
+      rawDate: slotIso,
+    };
+
+    const collegeTotals: Record<string, number> = {};
+
+    pMaps.forEach((p) => {
+      if (p.slotMap.has(idx)) {
+        runningPoints.set(p.participantId, p.slotMap.get(idx)!);
+      }
+
+      const points = runningPoints.get(p.participantId);
+
+      if (points != null) {
+        collegeTotals[p.college] =
+          (collegeTotals[p.college] || 0) + points;
+      }
+    });
+
+    Object.entries(collegeTotals).forEach(([college, total]) => {
+      row[college] = total;
+    });
+
+    return row;
+  });
+
+  return { chartData: rows, dates: slots };
+}},  [sortedParticipants, mode, effectiveStartDate, effectiveEndDate, selectedDay]);
 
   const toggleHideParticipant = (id: string) => {
     setHiddenIds((prev) => {
@@ -587,205 +759,280 @@ export default function LeaderboardGraph({
         )}
       </div>
 
-      {/* ─── INTERACTIVE LEGEND CHIPS ─── */}
+      {/* ─── INTERACTIVE COLLEGE LEGEND CHIPS ─── */}
+<div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '8px',
+    alignItems: 'center',
+    padding: '8px 4px',
+  }}
+>
+  {activeColleges.map((c) => {
+    const color = collegeColorMap.get(c.college) || '#58B99A';
+    const isHidden = hiddenIds.has(c.college);
+    const isHovered = hoveredParticipantId === c.college;
+
+    const totalPoints = c.participants.reduce(
+  (sum, p) =>
+    sum +
+    (p.officialPoints ??
+      p.data?.[p.data.length - 1]?.points ??
+      0),
+  0
+);
+
+    return (
       <div
+        key={c.college}
+        onMouseEnter={() => setHoveredParticipantId(c.college)}
+        onMouseLeave={() => setHoveredParticipantId(null)}
+        onClick={() => toggleHideParticipant(c.college)}
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
-          gap: '8px',
           alignItems: 'center',
-          padding: '8px 4px',
+          gap: '8px',
+          padding: '5px 12px',
+          borderRadius: '9999px',
+          background: isHovered
+            ? isLight
+              ? 'rgba(0, 0, 0, 0.07)'
+              : 'rgba(255, 255, 255, 0.08)'
+            : isHidden
+            ? isLight
+              ? 'rgba(0, 0, 0, 0.02)'
+              : 'rgba(255, 255, 255, 0.02)'
+            : isLight
+            ? 'rgba(0, 0, 0, 0.04)'
+            : 'rgba(255, 255, 255, 0.04)',
+          border: isHovered
+            ? `1.5px solid ${color}`
+            : `1px solid ${
+                isHidden
+                  ? isLight
+                    ? 'rgba(0, 0, 0, 0.06)'
+                    : 'rgba(255, 255, 255, 0.06)'
+                  : isLight
+                  ? 'rgba(0, 0, 0, 0.12)'
+                  : 'rgba(255, 255, 255, 0.12)'
+              }`,
+          cursor: 'pointer',
+          opacity: isHidden ? 0.45 : isHovered ? 1 : 0.95,
+          transform: isHovered ? 'translateY(-2px)' : 'none',
+          boxShadow: isHovered
+            ? isLight
+              ? `0 4px 12px ${color}25`
+              : `0 4px 14px ${color}33`
+            : 'none',
+          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
+        title={
+          isHidden
+            ? `Click to show ${c.college}`
+            : `Click to hide ${c.college}`
+        }
       >
-        {activeParticipants.map((p) => {
-          const color = participantColorMap.get(p.participantId) || '#58B99A';
-          const isHidden = hiddenIds.has(p.participantId);
-          const isHovered = hoveredParticipantId === p.participantId;
+        <span
+          style={{
+            width: '9px',
+            height: '9px',
+            borderRadius: '50%',
+            backgroundColor: color,
+            boxShadow: `0 0 8px ${color}`,
+            flexShrink: 0,
+          }}
+        />
+
+        <span
+          style={{
+            fontSize: '12px',
+            fontWeight: 600,
+            color: isHidden
+              ? isLight
+                ? '#94A3B8'
+                : '#718096'
+              : isLight
+              ? '#0F172A'
+              : '#F4F1E8',
+            maxWidth: '140px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {c.college}
+        </span>
+
+        <span
+          style={{
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            fontWeight: 700,
+            color: isLight && color === '#F5C542' ? '#B45309' : color,
+            background: isLight
+              ? 'rgba(0, 0, 0, 0.05)'
+              : 'rgba(0, 0, 0, 0.3)',
+            padding: '1px 6px',
+            borderRadius: '6px',
+          }}
+        >
+          {Number(totalPoints).toLocaleString()}
+        </span>
+
+        {isHidden ? (
+          <FaEyeSlash
+            size={10}
+            color={isLight ? '#94A3B8' : '#718096'}
+          />
+        ) : (
+          <FaEye
+            size={10}
+            color={isLight ? '#64748B' : '#A0AEC0'}
+            opacity={0.6}
+          />
+        )}
+      </div>
+    );
+  })}
+</div>
+
+{/* ─── RECHARTS COLLEGE LINE CHART ─── */}
+<div
+  style={{
+    width: '100%',
+    height: '460px',
+    background: isLight
+      ? 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.08) 0%, transparent 80%)'
+      : 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.05) 0%, transparent 80%)',
+    borderRadius: '16px',
+    padding: '12px 6px 0 0',
+  }}
+>
+  <ResponsiveContainer width="100%" height="100%">
+    <LineChart
+      data={chartData}
+      margin={{ top: 20, right: 30, left: 10, bottom: 25 }}
+    >
+      <defs>
+        {activeColleges.map((c) => {
+          const color = collegeColorMap.get(c.college) || '#58B99A';
 
           return (
-            <div
-              key={p.participantId}
-              onMouseEnter={() => setHoveredParticipantId(p.participantId)}
-              onMouseLeave={() => setHoveredParticipantId(null)}
-              onClick={() => toggleHideParticipant(p.participantId)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '5px 12px',
-                borderRadius: '9999px',
-                background: isHovered
-                  ? isLight
-                    ? 'rgba(0, 0, 0, 0.07)'
-                    : 'rgba(255, 255, 255, 0.08)'
-                  : isHidden
-                  ? isLight
-                    ? 'rgba(0, 0, 0, 0.02)'
-                    : 'rgba(255, 255, 255, 0.02)'
-                  : isLight
-                  ? 'rgba(0, 0, 0, 0.04)'
-                  : 'rgba(255, 255, 255, 0.04)',
-                border: isHovered
-                  ? `1.5px solid ${color}`
-                  : `1px solid ${
-                      isHidden
-                        ? isLight
-                          ? 'rgba(0, 0, 0, 0.06)'
-                          : 'rgba(255, 255, 255, 0.06)'
-                        : isLight
-                        ? 'rgba(0, 0, 0, 0.12)'
-                        : 'rgba(255, 255, 255, 0.12)'
-                    }`,
-                cursor: 'pointer',
-                opacity: isHidden ? 0.45 : isHovered ? 1 : 0.95,
-                transform: isHovered ? 'translateY(-2px)' : 'none',
-                boxShadow: isHovered
-                  ? isLight
-                    ? `0 4px 12px ${color}25`
-                    : `0 4px 14px ${color}33`
-                  : 'none',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
-              title={isHidden ? `Click to show ${p.name}` : `Click to hide ${p.name}`}
+            <linearGradient
+              key={`grad-${c.college}`}
+              id={`grad-${c.college}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
             >
-              <span
-                style={{
-                  width: '9px',
-                  height: '9px',
-                  borderRadius: '50%',
-                  backgroundColor: color,
-                  boxShadow: `0 0 8px ${color}`,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  color: isHidden ? (isLight ? '#94A3B8' : '#718096') : (isLight ? '#0F172A' : '#F4F1E8'),
-                  maxWidth: '140px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {p.name}
-              </span>
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontFamily: 'monospace',
-                  fontWeight: 700,
-                  color: isLight && color === '#F5C542' ? '#B45309' : color,
-                  background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.3)',
-                  padding: '1px 6px',
-                  borderRadius: '6px',
-                }}
-              >
-                {Number(p.latestPoints).toLocaleString()}
-              </span>
-              {isHidden ? (
-                <FaEyeSlash size={10} color={isLight ? '#94A3B8' : '#718096'} />
-              ) : (
-                <FaEye size={10} color={isLight ? '#64748B' : '#A0AEC0'} opacity={0.6} />
-              )}
-            </div>
+              <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+              <stop offset="100%" stopColor={color} stopOpacity={0.0} />
+            </linearGradient>
           );
         })}
-      </div>
+      </defs>
 
-      {/* ─── RECHARTS LINE CHART ─── */}
-      <div
-        style={{
-          width: '100%',
-          height: '460px',
-          background: isLight
-            ? 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.08) 0%, transparent 80%)'
-            : 'radial-gradient(ellipse at 50% 10%, rgba(88, 185, 154, 0.05) 0%, transparent 80%)',
-          borderRadius: '16px',
-          padding: '12px 6px 0 0',
+      <CartesianGrid
+        strokeDasharray="4 4"
+        stroke={
+          isLight
+            ? 'rgba(0, 0, 0, 0.06)'
+            : 'rgba(88, 185, 154, 0.09)'
+        }
+        vertical={false}
+      />
+
+      <XAxis
+        dataKey="day"
+        stroke={isLight ? '#94A3B8' : '#718096'}
+        tick={{
+          fill: isLight ? '#475569' : '#AEBCC7',
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: 600,
         }}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 25 }}>
-            <defs>
-              {activeParticipants.map((p) => {
-                const color = participantColorMap.get(p.participantId) || '#58B99A';
-                return (
-                  <linearGradient key={`grad-${p.participantId}`} id={`grad-${p.participantId}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={color} stopOpacity={0.25} />
-                    <stop offset="100%" stopColor={color} stopOpacity={0.0} />
-                  </linearGradient>
-                );
-              })}
-            </defs>
+        tickLine={false}
+        axisLine={{
+          stroke: isLight
+            ? 'rgba(0, 0, 0, 0.12)'
+            : 'rgba(255, 255, 255, 0.1)',
+        }}
+        interval={mode === 'daily' ? 1 : 3}
+        angle={-25}
+        textAnchor="end"
+        dy={6}
+      />
 
-            <CartesianGrid
-              strokeDasharray="4 4"
-              stroke={isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(88, 185, 154, 0.09)'}
-              vertical={false}
-            />
+      <YAxis
+        stroke={isLight ? '#94A3B8' : '#718096'}
+        tick={{
+          fill: isLight ? '#475569' : '#AEBCC7',
+          fontSize: 11,
+          fontFamily: 'monospace',
+          fontWeight: 600,
+        }}
+        tickLine={false}
+        axisLine={{
+          stroke: isLight
+            ? 'rgba(0, 0, 0, 0.12)'
+            : 'rgba(255, 255, 255, 0.1)',
+        }}
+        tickFormatter={(val) =>
+          val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
+        }
+        domain={['auto', 'auto']}
+      />
 
-            <XAxis
-              dataKey="day"
-              stroke={isLight ? '#94A3B8' : '#718096'}
-              tick={{ fill: isLight ? '#475569' : '#AEBCC7', fontSize: 11, fontFamily: 'monospace', fontWeight: 600 }}
-              tickLine={false}
-              axisLine={{ stroke: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.1)' }}
-              interval={mode === 'daily' ? 1 : 3}
-              angle={-25}
-              textAnchor="end"
-              dy={6}
-            />
+      <Tooltip content={<CustomTooltip />} />
 
-            <YAxis
-              stroke={isLight ? '#94A3B8' : '#718096'}
-              tick={{ fill: isLight ? '#475569' : '#AEBCC7', fontSize: 11, fontFamily: 'monospace', fontWeight: 600 }}
-              tickLine={false}
-              axisLine={{ stroke: isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.1)' }}
-              tickFormatter={(val) => (val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val)}
-              domain={['auto', 'auto']}
-            />
+      {activeColleges.map((c) => {
+        if (hiddenIds.has(c.college)) return null;
 
-            <Tooltip content={<CustomTooltip />} />
+        const color = collegeColorMap.get(c.college) || '#58B99A';
+        const isHovered = hoveredParticipantId === c.college;
+        const hasActiveHover = hoveredParticipantId !== null;
 
-            {activeParticipants.map((p) => {
-              if (hiddenIds.has(p.participantId)) return null;
+        const strokeWidth = isHovered
+          ? 3.5
+          : hasActiveHover
+          ? 1.5
+          : 2.4;
 
-              const color = participantColorMap.get(p.participantId) || '#58B99A';
-              const isHovered = hoveredParticipantId === p.participantId;
-              const hasActiveHover = hoveredParticipantId !== null;
+        const strokeOpacity = isHovered
+          ? 1
+          : hasActiveHover
+          ? 0.2
+          : 0.95;
 
-              const strokeWidth = isHovered ? 3.5 : hasActiveHover ? 1.5 : 2.4;
-              const strokeOpacity = isHovered ? 1 : hasActiveHover ? 0.2 : 0.95;
-
-              return (
-                <Line
-                  key={p.participantId}
-                  type="monotone"
-                  dataKey={p.participantId}
-                  name={p.name}
-                  stroke={color}
-                  strokeWidth={strokeWidth}
-                  strokeOpacity={strokeOpacity}
-                  dot={false}
-                  activeDot={{
-                    r: 6,
-                    stroke: '#FFFFFF',
-                    strokeWidth: 2,
-                    fill: color,
-                    filter: `drop-shadow(0 0 8px ${color})`,
-                  }}
-                  connectNulls
-                  isAnimationActive={true}
-                  animationDuration={900}
-                  animationEasing="ease-out"
-                />
-              );
-            })}
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+        return (
+          <Line
+            key={c.college}
+            type="monotone"
+            dataKey={c.college}
+            name={c.college}
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeOpacity={strokeOpacity}
+            dot={false}
+            activeDot={{
+              r: 6,
+              stroke: '#FFFFFF',
+              strokeWidth: 2,
+              fill: color,
+              filter: `drop-shadow(0 0 8px ${color})`,
+            }}
+            connectNulls
+            isAnimationActive={true}
+            animationDuration={900}
+            animationEasing="ease-out"
+          />
+        );
+      })}
+    </LineChart>
+  </ResponsiveContainer>
+</div>
 
       {/* ─── FOOTER TELEMETRY BADGE ─── */}
       <div
