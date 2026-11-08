@@ -922,7 +922,7 @@ return totalB - totalA;
   <ResponsiveContainer width="100%" height="100%">
     <LineChart
       data={chartData}
-      margin={{ top: 20, right: 30, left: 10, bottom: 25 }}
+      margin={{ top: 20, right: 30, left: 10, bottom: 15 }}
     >
       <defs>
         {activeColleges.map((c) => {
@@ -969,10 +969,12 @@ return totalB - totalA;
             ? 'rgba(0, 0, 0, 0.12)'
             : 'rgba(255, 255, 255, 0.1)',
         }}
-        interval={mode === 'daily' ? 1 : 3}
+        interval="preserveStartEnd"
+        minTickGap={25}
+        height={45}
         angle={-25}
         textAnchor="end"
-        dy={6}
+        dy={4}
       />
 
       <YAxis
