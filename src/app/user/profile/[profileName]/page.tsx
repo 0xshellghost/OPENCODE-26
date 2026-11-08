@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchLoggedInBasicDetails, getUserProfileByName, updateUserProfile } from 'api/profile/profile';
 import { Pencil } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { RingLoader } from 'react-spinners';
 import Banner from 'views/admin/profile/components/Banner';
 import CommunityMetrics from 'views/admin/profile/components/CommunityMetrics';
@@ -29,6 +29,7 @@ import PageHeading from 'components/japanese/PageHeading';
 import AnimatedContent from 'components/reactbits/AnimatedContent';
 import { getEligibleBadges, BadgeDefinition } from 'constants/badges';
 import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
+import { isMaintainer } from 'constants/Maintainers';
 
 export default function ProfileOverviewOther() {
   const { profileName } = useParams<{ profileName: string }>();
@@ -60,6 +61,9 @@ export default function ProfileOverviewOther() {
     loadLoggedInUser();
   }, []);
 
+  const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || 'Opencode';
+  const isOpencode = eventName.toLowerCase().includes('opencode');
+
   const { data, isLoading } = useQuery<{ data: ProfileData }>({
     queryKey: ['profileInfo', profileName],
     queryFn: () => getUserProfileByName(profileName),
@@ -67,17 +71,58 @@ export default function ProfileOverviewOther() {
   });
 
   const { data: leadData } = useQuery({
-    queryKey: ['LeadInfo'],
-    queryFn: () => FetchedLeaderboard(process.env.NEXT_PUBLIC_EVENT_NAME || "OPENCODE'25"),
+    queryKey: ['LeadInfo', eventName],
+    queryFn: () => FetchedLeaderboard(eventName),
   });
 
   const profile = data?.data;
 
-  const totalParticipants = leadData?.length || 50;
-  const leaderboardUser = leadData?.find(
-    (u) => u.githubid?.toLowerCase() === profileName?.toLowerCase()
-  );
-  const resolvedRank = profile?.rank || (leaderboardUser ? Number(leaderboardUser.position) : undefined);
+  // Determine if user is a maintainer or mentor (staff)
+  const isStaffOrMentor = useMemo(() => {
+    if (!profileName) return false;
+    return (
+      isMaintainer(profileName) ||
+      Boolean(profile?.isMentor || profile?.isAdmin)
+    );
+  }, [profileName, profile?.isMentor, profile?.isAdmin]);
+
+  // Derive rank & total eligible participants dynamically matching Leaderboard page
+  const { resolvedRank, totalParticipants } = useMemo(() => {
+    if (isStaffOrMentor) {
+      const eligibleList = leadData
+        ? isOpencode
+          ? leadData.filter((item) => !item.isMentor && (!item.githubid || !isMaintainer(item.githubid)))
+          : leadData
+        : [];
+      return { resolvedRank: null, totalParticipants: eligibleList.length };
+    }
+
+    if (!leadData || !Array.isArray(leadData) || leadData.length === 0) {
+      const backendRank = typeof profile?.rank === 'number' && profile.rank > 0 ? profile.rank : null;
+      return { resolvedRank: backendRank, totalParticipants: 0 };
+    }
+
+    const eligibleList = isOpencode
+      ? leadData.filter((item) => !item.isMentor && (!item.githubid || !isMaintainer(item.githubid)))
+      : leadData;
+
+    const total = eligibleList.length;
+
+    const userIndex = eligibleList.findIndex(
+      (u) => u.githubid?.toLowerCase() === profileName?.toLowerCase()
+    );
+
+    if (userIndex !== -1) {
+      return { resolvedRank: userIndex + 1, totalParticipants: total };
+    }
+
+    // If user has points > 0 and backend computed rank
+    if (typeof profile?.rank === 'number' && profile.rank > 0 && (profile.points || 0) > 0) {
+      return { resolvedRank: profile.rank, totalParticipants: total };
+    }
+
+    return { resolvedRank: null, totalParticipants: total };
+  }, [leadData, isOpencode, profileName, profile?.rank, profile?.points, isStaffOrMentor]);
 
   const isOwnProfile = loggedInGithubId != null && loggedInGithubId === profileName;
 
@@ -106,7 +151,11 @@ export default function ProfileOverviewOther() {
   };
 
   const roleTags = getRoleTags(profile, profileName);
-  const roleLabel = roleTags.map((t) => t.label).join(' • ');
+  const roleLabel = roleTags.map((t) => t.label).join(' • ') || 'Contributor';
+
+  const earnedBadges = useMemo(() => {
+    return getEligibleBadges(profile?.prMerged || 0, profile?.PR || []);
+  }, [profile?.prMerged, profile?.PR]);
 
   // Panel styling matching the Kyoto cherry blossom & dusk plum theme
   const glassPanel = {
@@ -144,18 +193,22 @@ export default function ProfileOverviewOther() {
       {/* Discord Banner */}
       <DiscordBanner />
 
-      {/* Row 1: 3-column responsive grid */}
+      {/* Main Profile Sections with Spacious, Balanced Layout */}
       <AnimatedContent distance={20} duration={0.5} delay={0.1}>
+        {/* Row 1: User Identity (Hero Left) + Community Metrics (Spacious Right) */}
         <Grid
-          templateColumns={{ base: '1fr', lg: '1fr 1.15fr 1.45fr' }}
-          gap="20px"
-          mb="20px"
+          templateColumns={{ base: '1fr', lg: '380px 1fr' }}
+          gap={{ base: '20px', md: '24px' }}
+          mb={{ base: '20px', md: '24px' }}
+          alignItems="stretch"
         >
           {/* User Identity */}
           <Box
             {...glassPanel}
-            borderRadius="22px"
-            p={{ base: '20px', md: '24px' }}
+            borderRadius="24px"
+            p={{ base: '22px', md: '28px 30px' }}
+            display="flex"
+            flexDirection="column"
           >
             <Banner
               avatar={profile?.avatarUrl || `https://github.com/${profile?.githubId || profileName}.png`}
@@ -170,52 +223,56 @@ export default function ProfileOverviewOther() {
           {/* Community Metrics */}
           <Box
             {...glassPanel}
-            borderRadius="22px"
-            p={{ base: '20px', md: '24px' }}
+            borderRadius="24px"
+            p={{ base: '22px', md: '28px 30px' }}
+            display="flex"
+            flexDirection="column"
           >
             <CommunityMetrics
-              prMerged={profile?.prMerged || 0}
-              pointsEarned={profile?.points || 0}
+              prMerged={profile?.prMerged ?? 0}
+              pointsEarned={profile?.points ?? 0}
               rank={resolvedRank}
               totalParticipants={totalParticipants}
-              totalPRsSubmitted={profile?.PR?.length || profile?.prMerged || 0}
-            />
-          </Box>
-
-          {/* General Information */}
-          <Box
-            {...glassPanel}
-            borderRadius="22px"
-            p={{ base: '20px', md: '24px' }}
-          >
-            <General
-              name={profile?.name || profileName}
-              githubId={profile?.githubId || profileName}
-              college={profile?.college}
-              discordId={profile?.discordId}
-              email={profile?.email}
-              gender={profile?.gender}
-              year={profile?.year}
-              role={roleLabel}
+              totalPRsSubmitted={profile?.totalPRs ?? profile?.PR?.length ?? profile?.prMerged ?? 0}
+              isStaffOrMentor={isStaffOrMentor}
             />
           </Box>
         </Grid>
+
+        {/* Row 2: General Information (Full Width, Spacious Multi-Column) */}
+        <Box
+          {...glassPanel}
+          borderRadius="24px"
+          p={{ base: '22px', md: '28px 32px' }}
+          mb={{ base: '20px', md: '24px' }}
+        >
+          <General
+            name={profile?.name || profileName}
+            githubId={profile?.githubId || profileName}
+            college={profile?.college}
+            discordId={profile?.discordId}
+            email={profile?.email}
+            gender={profile?.gender}
+            year={profile?.year}
+            role={roleLabel}
+          />
+        </Box>
       </AnimatedContent>
 
       {/* Badges Row (if any) */}
-      {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length > 0 && (
+      {earnedBadges.length > 0 && (
         <Box {...glassPanel} borderRadius="22px" p={{ base: '20px', md: '24px' }} mb="20px">
           <Flex justify="space-between" align="center" mb="16px">
             <Text fontSize="18px" fontWeight="800" color="var(--fg)">
               Unlocked Badges
             </Text>
             <Text fontSize="12px" color="var(--muted)" fontFamily="var(--f-mono)">
-              {getEligibleBadges(profile?.prMerged || 0, profile?.PR).length} Earned
+              {earnedBadges.length} Earned
             </Text>
           </Flex>
           <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap="16px">
-            {getEligibleBadges(profile?.prMerged || 0, profile?.PR).map((badge, idx) => (
-              <BadgeCard key={idx} badge={badge} />
+            {earnedBadges.map((badge, idx) => (
+              <BadgeCard key={badge.id || idx} badge={badge} />
             ))}
           </Grid>
         </Box>

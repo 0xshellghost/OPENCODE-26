@@ -18,17 +18,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-14 border-b border-[#AEBCC7]/10">
           {/* Col 1: About OpenCode & GeekHaven */}
           <div className="space-y-5">
-            <Link href="/" className="flex items-center space-x-2.5 group">
-              <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-[#58B99A] via-[#B8E5D5] to-[#102535] p-[2px]">
-                <div className="bg-[#07131F] rounded-full flex items-center justify-center w-full h-full">
-                  <Image
-                    src="/logo_rb-min.png"
-                    width={28}
-                    height={28}
-                    alt="OpenCode Logo"
-                    className="w-6 h-6 object-contain"
-                  />
-                </div>
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className="relative w-9 h-9 shrink-0 flex items-center justify-center">
+                <Image
+                  src="/Logo/opencode-logo.png"
+                  width={36}
+                  height={36}
+                  alt="OpenCode '26 Logo"
+                  className="w-full h-full object-contain transition-transform group-hover:scale-105"
+                />
               </div>
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#F4F1E8] via-[#D9E2E8] to-[#B8E5D5] tracking-tight">
                 OpenCode 2026

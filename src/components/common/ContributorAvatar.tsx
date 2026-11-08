@@ -35,8 +35,8 @@ export interface ContributorAvatarProps extends Omit<BoxProps, 'fontSize'> {
   name?: string;
   githubid?: string;
   avatarUrl?: string;
-  size?: string | number;
-  fontSize?: string | number;
+  size?: BoxProps['w'];
+  fontSize?: BoxProps['fontSize'];
   bg?: string;
   boxShadow?: string;
 }

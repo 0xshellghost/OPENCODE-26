@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useMemo, useState, useCallback, useEffect } from 'react';
+import React, { useDeferredValue, useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Avatar,
   Box,
@@ -73,6 +73,13 @@ const controlStyle = {
   _focusVisible: { outline: '2px solid var(--accent)', outlineOffset: '2px' },
 } as const;
 
+// Pure helper to determine whether an entry belongs to the first year (hoisted to avoid churn)
+function isFirstYear(item: { graduationYear?: string | number; year?: string }): boolean {
+  const grad = String(item.graduationYear ?? '').trim();
+  const yr = String(item.year ?? '').trim().toLowerCase();
+  return grad === '2029' || yr.includes('1st') || yr === '1';
+}
+
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const router = useRouter();
@@ -81,6 +88,10 @@ export default function EventName() {
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
   const [isEventHovered, setIsEventHovered] = useState(false);
+
+  // React concurrent deferred search value for immediate keystroke responsiveness
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const isStale = searchQuery !== deferredSearchQuery;
 
   const eventLabel = safeDecode(eventName);
   const isOpencode = eventLabel.toLowerCase().includes('opencode');
@@ -139,76 +150,108 @@ export default function EventName() {
     enabled: !!eventName,
   });
 
-  const tableDataColumns: RowObj[] = useMemo(() => {
+  // Base list of participants eligible for ranking (excluding mentors & maintainers for Opencode)
+  const eligibleList = useMemo(() => {
     const rawList = LeadData || [];
-    const eligibleList = isOpencode
+    return isOpencode
       ? rawList.filter((item) => !item.isMentor && (!item.githubid || !isMaintainer(item.githubid)))
       : rawList;
-
-    return eligibleList.map((item, index) => ({
-      position: isOpencode ? String(index + 1) : String(item.position ?? index + 1),
-      name: item.name,
-      prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
-      githubid: item.githubid ?? undefined,
-      points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
-      avatarUrl: item.githubid ? `https://github.com/${item.githubid}.png` : item.avatarUrl,
-      prDetailsURL: item.prDetailsURL,
-      college: item.collegeName ?? '',
-      graduationYear: item.graduationYear ?? '',
-    }));
   }, [LeadData, isOpencode]);
 
-  const hasPoints = useMemo(() => {
-    if (isOpencode) return true;
-    return tableDataColumns.some(
-      (r) => r.points !== undefined && r.points !== null && !isNaN(Number(r.points))
-    );
-  }, [isOpencode, tableDataColumns]);
-
   const collegeOptions = useMemo(() => {
-    const colleges = tableDataColumns
-      .map((r) => (r.college as string)?.trim())
+    const colleges = eligibleList
+      .map((r) => (r.collegeName as string)?.trim())
       .filter(Boolean);
     return [...new Set(colleges)].sort();
-  }, [tableDataColumns]);
+  }, [eligibleList]);
 
-  const hasActiveFilters =
-    selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
-
-  const filteredTableData = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+  // Filter cohort based on active cohort filters (College and/or 1st Years)
+  const activeCohort = useMemo(() => {
     const collegeLower = selectedCollege !== 'All' ? selectedCollege.toLowerCase() : null;
 
-    return tableDataColumns.filter((row) => {
-      if (collegeLower && (row.college as string)?.trim().toLowerCase() !== collegeLower) {
+    return eligibleList.filter((item) => {
+      if (collegeLower && (item.collegeName as string)?.trim().toLowerCase() !== collegeLower) {
         return false;
       }
-      if (firstYearOnly && String(row.graduationYear ?? '').trim() !== '2029') {
+      if (firstYearOnly && !isFirstYear(item)) {
         return false;
-      }
-      if (q) {
-        const matchesUser =
-          (isOpencode && row.githubid?.toLowerCase().includes(q)) ||
-          row.name?.toLowerCase().includes(q);
-        if (!matchesUser) return false;
       }
       return true;
     });
-  }, [searchQuery, selectedCollege, firstYearOnly, tableDataColumns, isOpencode]);
+  }, [eligibleList, selectedCollege, firstYearOnly]);
 
-  const deferredTableData = useDeferredValue(filteredTableData);
-  const isStale = deferredTableData !== filteredTableData;
-  const participantCount = filteredTableData.length;
-  const totalCount = tableDataColumns.length;
+  // Recalculate ranks within the active filtered cohort starting at 1 (1 to N)
+  // Preserves existing sorting order (points desc, createdAt asc) and tie-breaking policies
+  const rankedCohortData: RowObj[] = useMemo(() => {
+    let currentRank = 1;
 
-  // Top 3 overall (not affected by filters) for the spotlight cards
-  const topThree = useMemo(
-    () =>
-      [...tableDataColumns]
-        .sort((a, b) => Number(a.position) - Number(b.position))
-        .slice(0, 3),
-    [tableDataColumns],
-  );
+    return activeCohort.map((item, index) => {
+      let posStr = String(index + 1);
+
+      if (index > 0) {
+        const prev = activeCohort[index - 1];
+        // Preserve tied position if backend assigned identical position to both
+        if (item.position !== undefined && prev.position !== undefined && item.position === prev.position) {
+          posStr = String(currentRank);
+        } else {
+          currentRank = index + 1;
+          posStr = String(currentRank);
+        }
+      } else {
+        currentRank = 1;
+        posStr = "1";
+      }
+
+      return {
+        position: posStr,
+        name: item.name,
+        prmerged: item.prmerged !== undefined && item.prmerged !== null ? Number(item.prmerged) : undefined,
+        githubid: item.githubid ?? undefined,
+        points: item.points !== undefined && item.points !== null ? Number(item.points) : undefined,
+        avatarUrl: item.githubid ? `https://github.com/${item.githubid}.png` : item.avatarUrl,
+        prDetailsURL: item.prDetailsURL,
+        college: item.collegeName ?? '',
+        graduationYear: item.graduationYear ?? '',
+        year: item.year ?? '',
+      };
+    });
+  }, [activeCohort]);
+
+  const hasPoints = useMemo(() => {
+    if (isOpencode) return true;
+    return rankedCohortData.some(
+      (r) => r.points !== undefined && r.points !== null && !isNaN(Number(r.points))
+    );
+  }, [isOpencode, rankedCohortData]);
+
+  // Top 3 of the active cohort for spotlight podium cards (respects firstYearOnly & college filters)
+  const topThree = useMemo(() => {
+    return rankedCohortData.slice(0, 3);
+  }, [rankedCohortData]);
+
+  // Memoized set of spotlight IDs for O(1) table row deduplication
+  const topThreeIdSet = useMemo(() => {
+    return new Set(
+      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    );
+  }, [topThree]);
+
+  // Apply search query filter using DEFERRED search value on top of the ranked cohort
+  // Preserves each user's cohort rank and allows uninterrupted UI typing
+  const searchFilteredData = useMemo(() => {
+    const q = deferredSearchQuery.trim().toLowerCase();
+    if (!q) return rankedCohortData;
+
+    return rankedCohortData.filter((row) => {
+      const matchesUser =
+        (isOpencode && row.githubid?.toLowerCase().includes(q)) ||
+        row.name?.toLowerCase().includes(q);
+      return Boolean(matchesUser);
+    });
+  }, [deferredSearchQuery, rankedCohortData, isOpencode]);
+
+  const participantCount = searchFilteredData.length;
+  const totalCount = eligibleList.length;
 
   const clearAllFilters = useCallback(() => {
     setSelectedCollege('All');
@@ -216,25 +259,46 @@ export default function EventName() {
     setSearchQuery('');
   }, []);
 
-  const showSpotlight = !hasActiveFilters && topThree.length === 3;
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+  }, []);
 
-  // When the spotlight cards are visible, don't repeat those three people in the table below.
-  // With any filter active the spotlight is hidden, so the table shows everyone who matches.
+  const handleClearCollege = useCallback(() => {
+    setSelectedCollege('All');
+  }, []);
+
+  const handleClearFirstYear = useCallback(() => {
+    setFirstYearOnly(false);
+  }, []);
+
+  const handleToggleFirstYear = useCallback(() => {
+    setFirstYearOnly((prev) => !prev);
+  }, []);
+
+  const handleSelectCollege = useCallback((college: string) => {
+    setSelectedCollege(college);
+  }, []);
+
+  // Display spotlight podium whenever top 3 are available and not actively searching
+  const showSpotlight = !deferredSearchQuery.trim() && topThree.length === 3;
+
+  // When spotlight cards are visible, don't repeat those three people in the table below.
+  // When spotlight is hidden (e.g. during a search), show everyone who matches.
   const tableRows = useMemo(() => {
-    if (!showSpotlight) return deferredTableData;
-    const spotlightIds = new Set(
-      topThree.map((r) => r.githubid || `${r.name}-${r.position}`)
+    if (!showSpotlight) return searchFilteredData;
+    return searchFilteredData.filter(
+      (r) => !topThreeIdSet.has(r.githubid || `${r.name}-${r.position}`)
     );
-    return deferredTableData.filter(
-      (r) => !spotlightIds.has(r.githubid || `${r.name}-${r.position}`)
-    );
-  }, [showSpotlight, deferredTableData, topThree]);
+  }, [showSpotlight, searchFilteredData, topThreeIdSet]);
+
+  const hasActiveFilters =
+    selectedCollege !== 'All' || firstYearOnly || !!searchQuery.trim();
 
   if (isLoading) {
     return <LeaderboardLoader />;
   }
 
-  const showEmpty = hasActiveFilters && filteredTableData.length === 0;
+  const showEmpty = searchFilteredData.length === 0;
 
   return (
     <Flex direction="column" gap="24px" w="100%" maxW="1400px" mx="auto">
@@ -399,7 +463,7 @@ export default function EventName() {
                   return (
                     <MenuItem
                       key={college}
-                      onClick={() => setSelectedCollege(college)}
+                      onClick={() => handleSelectCollege(college)}
                       bg="transparent"
                       _hover={{ bg: 'var(--accent-soft)' }}
                       _focus={{ bg: 'var(--accent-soft)' }}
@@ -430,7 +494,7 @@ export default function EventName() {
           role="switch"
           aria-checked={firstYearOnly}
           aria-label="Show first years only"
-          onClick={() => setFirstYearOnly((prev) => !prev)}
+          onClick={handleToggleFirstYear}
           display="flex"
           alignItems="center"
           gap="10px"
@@ -497,42 +561,44 @@ export default function EventName() {
             Showing {participantCount.toLocaleString()} of {totalCount.toLocaleString()}
           </Text>
           {searchQuery.trim() && (
-            <FilterChip label={`Search: ${searchQuery.trim()}`} onRemove={() => setSearchQuery('')} />
+            <FilterChip label={`Search: ${searchQuery.trim()}`} onRemove={handleClearSearch} />
           )}
           {selectedCollege !== 'All' && (
-            <FilterChip label={selectedCollege} onRemove={() => setSelectedCollege('All')} />
+            <FilterChip label={selectedCollege} onRemove={handleClearCollege} />
           )}
           {firstYearOnly && (
-            <FilterChip label="1st years only" onRemove={() => setFirstYearOnly(false)} />
+            <FilterChip label="1st years only" onRemove={handleClearFirstYear} />
           )}
         </Flex>
       )}
 
-      {/* ─── 3. TOP 3 SPOTLIGHT ─── */}
+      {/* ─── 3. TOP 3 SPOTLIGHT (PSD Reference Reproduction) ─── */}
       {showSpotlight && (
-        <Box>
-          <Text
-            fontSize="11px"
-            fontWeight="700"
-            letterSpacing="0.16em"
-            textTransform="uppercase"
-            color="var(--muted)"
-            fontFamily="var(--f-mono)"
-            mb="16px"
-            px="4px"
-          >
-            TOP STANDINGS
-          </Text>
+        <Box w="100%" pr={{ base: '0px', md: '28px' }}>
+          <Flex align="center" gap="10px" mb="18px" px="4px">
+            <Text
+              fontSize="11px"
+              fontWeight="700"
+              letterSpacing="0.16em"
+              textTransform="uppercase"
+              color="var(--muted)"
+              fontFamily="var(--f-mono)"
+            >
+              {firstYearOnly ? 'TOP FRESHERS · PODIUM' : 'TOP STANDINGS · PODIUM'}
+            </Text>
+            <Box flex="1" h="1px" bg="var(--border)" opacity={0.6} />
+          </Flex>
 
-          <SimpleGrid
-            columns={{ base: 1, md: 3 }}
-            spacing={{ base: '16px', md: '20px' }}
-            alignItems={{ base: 'stretch', md: 'flex-end' }}
+          <Flex
+            direction="column"
+            gap={{ base: '16px', md: '22px' }}
+            w="100%"
+            align="center"
           >
-            <SpotlightCard row={topThree[1]} rank={2} isOpencode={isOpencode} hasPoints={hasPoints} />
-            <SpotlightCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
-            <SpotlightCard row={topThree[2]} rank={3} isOpencode={isOpencode} hasPoints={hasPoints} />
-          </SimpleGrid>
+            <PodiumBannerCard row={topThree[0]} rank={1} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <PodiumBannerCard row={topThree[1]} rank={2} isOpencode={isOpencode} hasPoints={hasPoints} />
+            <PodiumBannerCard row={topThree[2]} rank={3} isOpencode={isOpencode} hasPoints={hasPoints} />
+          </Flex>
         </Box>
       )}
 
@@ -588,7 +654,13 @@ export default function EventName() {
 
 /* ------------------ Helpers ------------------ */
 
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+const FilterChip = React.memo(function FilterChip({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
   return (
     <HStack
       spacing="4px"
@@ -621,254 +693,313 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
       </chakra.button>
     </HStack>
   );
+});
+
+type PodiumRank = 1 | 2 | 3;
+
+interface PodiumConfig {
+  tag: string;
+  tagColor: string;
+  pointsColor: string;
+  bgImage: string;
+  badgeImage: string;
+  badgeGlow: string;
+  border: string;
+  borderHover: string;
+  boxShadow: string;
+  boxShadowHover: string;
+  avatarBoxBg: string;
+  avatarBoxBorder: string;
+  avatarBoxShadow: string;
+  cardWidth: any;
+  cardHeight: any;
 }
 
+const PODIUM_CONFIGS: Record<PodiumRank, PodiumConfig> = {
+  1: {
+    tag: '★ Champion · #1',
+    tagColor: '#F5C542',
+    pointsColor: '#F5C542',
+    bgImage: '/images/leaderboard/opencode-podium-1.png',
+    badgeImage: '/images/leaderboard/badge-1st.png',
+    badgeGlow: 'drop-shadow(0 0 16px rgba(245, 197, 66, 0.5))',
+    border: '1px solid rgba(245, 197, 66, 0.45)',
+    borderHover: 'rgba(245, 197, 66, 0.75)',
+    boxShadow:
+      '0 16px 36px -10px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(245, 197, 66, 0.25)',
+    boxShadowHover:
+      '0 20px 48px -8px rgba(0, 0, 0, 0.9), 0 0 36px -2px rgba(245, 197, 66, 0.4)',
+    avatarBoxBg: '#FFFFFF',
+    avatarBoxBorder: '3px solid #F5C542',
+    avatarBoxShadow:
+      '0 12px 28px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 197, 66, 0.45)',
+    cardWidth: '100%',
+    cardHeight: { base: 'auto', md: '180px' },
+  },
+  2: {
+    tag: 'Runner-Up · #2',
+    tagColor: '#BAE6FD',
+    pointsColor: '#E2E8F0',
+    bgImage: '/images/leaderboard/opencode-podium-2.png',
+    badgeImage: '/images/leaderboard/badge-2nd.png',
+    badgeGlow: 'drop-shadow(0 0 14px rgba(226, 232, 240, 0.4))',
+    border: '1px solid rgba(148, 163, 184, 0.35)',
+    borderHover: 'rgba(255, 255, 255, 0.65)',
+    boxShadow:
+      '0 14px 32px -10px rgba(0, 0, 0, 0.8), 0 0 24px -4px rgba(148, 163, 184, 0.2)',
+    boxShadowHover:
+      '0 18px 42px -8px rgba(0, 0, 0, 0.9), 0 0 32px -2px rgba(186, 230, 253, 0.35)',
+    avatarBoxBg: '#080A0C',
+    avatarBoxBorder: '2.5px solid #E2E8F0',
+    avatarBoxShadow:
+      '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(186, 230, 253, 0.35)',
+    cardWidth: { base: '100%', md: '94.5%' },
+    cardHeight: { base: 'auto', md: '175px' },
+  },
+  3: {
+    tag: 'Third Place · #3',
+    tagColor: '#FDBA74',
+    pointsColor: '#FDBA74',
+    bgImage: '/images/leaderboard/opencode-podium-3.png',
+    badgeImage: '/images/leaderboard/badge-3rd.png',
+    badgeGlow: 'drop-shadow(0 0 14px rgba(217, 119, 6, 0.4))',
+    border: '1px solid rgba(217, 119, 6, 0.35)',
+    borderHover: 'rgba(217, 119, 6, 0.7)',
+    boxShadow:
+      '0 12px 28px -10px rgba(0, 0, 0, 0.8), 0 0 20px -4px rgba(217, 119, 6, 0.2)',
+    boxShadowHover:
+      '0 16px 36px -8px rgba(0, 0, 0, 0.9), 0 0 28px -2px rgba(217, 119, 6, 0.35)',
+    avatarBoxBg: '#080A0C',
+    avatarBoxBorder: '2.5px solid #D97706',
+    avatarBoxShadow:
+      '0 10px 24px rgba(0, 0, 0, 0.7), 0 0 20px rgba(217, 119, 6, 0.35)',
+    cardWidth: { base: '100%', md: '89%' },
+    cardHeight: { base: 'auto', md: '170px' },
+  },
+};
 
-
-function SpotlightCard({
-  row,
-  rank,
-  isOpencode,
-  hasPoints: hasPointsProp,
-}: {
-  row: RowObj;
-  rank: 1 | 2 | 3;
-  isOpencode: boolean;
-  hasPoints?: boolean;
-}) {
-  const isFirst = rank === 1;
-  const isSecond = rank === 2;
-  const isThird = rank === 3;
-  const college = String(row.college ?? '').trim();
-  const { colorMode } = useColorMode();
-  const isLight = colorMode === 'light';
-
-  // Distinct circle backgrounds matching the design:
-  // Champion #1: Maroon / Deep Coral circle (#853D3D)
-  // Runner-up #2: Teal / Slate circle (#2A5A68)
-  // Third place #3: Terracotta / Orange circle (#BD5319)
-  const avatarBg = isFirst ? '#853D3D' : isSecond ? '#2A5A68' : '#BD5319';
-
-  // Stepped heights: 1st (430px) > 2nd (380px) > 3rd (340px)
-  const cardHeight = isFirst
-    ? { base: 'auto', md: '430px' }
-    : isSecond
-    ? { base: 'auto', md: '380px' }
-    : { base: 'auto', md: '340px' };
-
-  const cardMinHeight = isFirst
-    ? { base: '320px', md: '430px' }
-    : isSecond
-    ? { base: '290px', md: '380px' }
-    : { base: '270px', md: '340px' };
-
-  // Substantially larger avatar sizes to fill empty space heroically
-  const avatarSize = isFirst ? '96px' : isSecond ? '82px' : '72px';
-  const avatarFontSize = isFirst ? '26px' : isSecond ? '22px' : '19px';
+/* ──────────────────────────────────────────────────────────────
+   PSD REFERENCE TOP 3 PODIUM BANNER CARD
+   Faithfully reproduces daily_ui_019_-_leaderboard.psd:
+   - 3D metallic rank badge on black corner with ink-splatter grunge
+   - Atmospheric background artwork (God of War, Fallout 3, The Last of Us)
+   - Centered dynamic participant info (Name, Handle, College, Points, Merged PRs)
+   - Square avatar box on the right edge
+────────────────────────────────────────────────────────────── */
+const PodiumBannerCard = React.memo(
+  function PodiumBannerCard({
+    row,
+    rank,
+    isOpencode,
+    hasPoints: hasPointsProp,
+  }: {
+    row: RowObj;
+    rank: 1 | 2 | 3;
+    isOpencode: boolean;
+    hasPoints?: boolean;
+  }) {
+    const college = String(row.college ?? '').trim();
+    const config = PODIUM_CONFIGS[rank] || PODIUM_CONFIGS[1];
 
   const cardContent = (
     <Box
       position="relative"
-      textAlign="center"
-      borderRadius="24px"
-      bg="var(--surface)"
-      backdropFilter="blur(20px)"
-      border={isFirst ? '1.5px solid var(--secondary)' : '1px solid var(--border)'}
-      boxShadow={
-        isFirst
-          ? '0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 28px -4px rgba(245, 197, 66, 0.3)'
-          : 'var(--shadow)'
-      }
-      pt={{ base: '26px', md: isFirst ? '34px' : isSecond ? '28px' : '24px' }}
-      pb={{ base: '24px', md: isFirst ? '32px' : isSecond ? '26px' : '22px' }}
-      px={{ base: '18px', md: '24px' }}
+      w="100%"
+      maxW={config.cardWidth}
+      mx="auto"
+      minH={{ base: '120px', md: '160px' }}
+      h={config.cardHeight}
+      borderRadius="14px"
+      bgImage={`url(${config.bgImage})`}
+      bgSize="cover"
+      bgPosition="left center"
+      bgRepeat="no-repeat"
+      border={config.border}
+      boxShadow={config.boxShadow}
       display="flex"
-      flexDirection="column"
       alignItems="center"
       justifyContent="space-between"
-      h={cardHeight}
-      minH={cardMinHeight}
-      w="100%"
-      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+      px={{ base: '12px', sm: '16px', md: '20px' }}
+      py={{ base: '12px', md: '0px' }}
+      transition="transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease"
       _hover={{
         transform: 'translateY(-4px)',
-        borderColor: isFirst ? 'var(--secondary)' : 'var(--accent)',
-        boxShadow: isFirst
-          ? '0 20px 48px -8px rgba(245, 197, 66, 0.4)'
-          : 'var(--shadow), 0 0 20px var(--accent-soft)',
+        borderColor: config.borderHover,
+        boxShadow: config.boxShadowHover,
       }}
+      role="group"
       cursor={row.githubid ? 'pointer' : 'default'}
     >
-      {/* Top section: Rank Badge, Large Avatar, Name, Handle, College */}
-      <Flex direction="column" align="center" w="100%">
-        {/* Rank Header Badge */}
-        {isFirst ? (
-          <Box
-            px="12px"
-            py="3px"
-            borderRadius="full"
-            bg="var(--secondary-soft)"
-            border="1px solid var(--secondary-border)"
-            mb="16px"
-          >
-            <Text
-              fontSize="12.5px"
-              fontWeight="700"
-              fontFamily="var(--f-mono)"
-              color="var(--secondary)"
-              letterSpacing="0.06em"
-            >
-              Champion · #1
-            </Text>
-          </Box>
-        ) : isSecond ? (
-          <Box
-            px="11px"
-            py="2.5px"
-            borderRadius="full"
-            bg={isLight ? 'rgba(3, 105, 161, 0.1)' : 'rgba(148, 163, 184, 0.1)'}
-            border={isLight ? '1px solid rgba(3, 105, 161, 0.3)' : '1px solid rgba(148, 163, 184, 0.25)'}
-            mb="14px"
-          >
-            <Text
-              fontSize="12px"
-              fontWeight="600"
-              fontFamily="var(--f-mono)"
-              color={isLight ? '#0369A1' : '#BAE6FD'}
-              letterSpacing="0.05em"
-            >
-              Runner-up · #2
-            </Text>
-          </Box>
-        ) : (
-          <Box
-            px="11px"
-            py="2.5px"
-            borderRadius="full"
-            bg={isLight ? 'rgba(194, 65, 12, 0.1)' : 'rgba(217, 119, 6, 0.1)'}
-            border={isLight ? '1px solid rgba(194, 65, 12, 0.3)' : '1px solid rgba(217, 119, 6, 0.25)'}
-            mb="12px"
-          >
-            <Text
-              fontSize="12px"
-              fontWeight="600"
-              fontFamily="var(--f-mono)"
-              color={isLight ? '#C2410C' : '#FDBA74'}
-              letterSpacing="0.05em"
-            >
-              Third place · #3
-            </Text>
-          </Box>
-        )}
-
-        {/* Heroic Avatar Circle with GitHub profile image & clean initials fallback */}
-        <ContributorAvatar
-          name={row.name}
-          githubid={row.githubid}
-          avatarUrl={row.avatarUrl}
-          size={avatarSize}
-          fontSize={avatarFontSize}
-          bg={avatarBg}
-          boxShadow={
-            isFirst
-              ? '0 8px 24px rgba(245, 197, 66, 0.25), 0 4px 12px rgba(0,0,0,0.4)'
-              : '0 6px 18px rgba(0,0,0,0.3)'
-          }
-          border={
-            isFirst
-              ? '2px solid var(--secondary)'
-              : isSecond
-              ? isLight
-                ? '1.5px solid rgba(3, 105, 161, 0.4)'
-                : '1.5px solid rgba(186, 230, 253, 0.35)'
-              : isLight
-              ? '1.5px solid rgba(194, 65, 12, 0.4)'
-              : '1.5px solid rgba(253, 186, 116, 0.35)'
-          }
-          mb={isFirst ? '16px' : isSecond ? '14px' : '12px'}
+      {/* 1. Left Zone: 3D Metallic Rank Badge */}
+      <Flex
+        w={{ base: '56px', sm: '76px', md: '110px' }}
+        pl={{ base: '2px', md: '14px' }}
+        align="center"
+        justify={{ base: 'center', md: 'flex-start' }}
+        shrink={0}
+        zIndex={2}
+      >
+        <img
+          src={config.badgeImage}
+          alt={`Rank ${rank}`}
+          style={{
+            height: 'clamp(46px, 7vw, 76px)',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: config.badgeGlow,
+          }}
         />
+      </Flex>
 
-        {/* Contributor Name - scaled up to command presence */}
+      {/* 2. Center Zone: Dynamic Participant Info */}
+      <Flex
+        direction="column"
+        align={{ base: 'flex-start', sm: 'center' }}
+        justify="center"
+        textAlign={{ base: 'left', sm: 'center' }}
+        flex="1"
+        minW="0"
+        px={{ base: '8px', sm: '16px', md: '20px' }}
+        zIndex={2}
+      >
+        {/* Tier Tag */}
+        <Text
+          fontSize={{ base: '10px', sm: '11px' }}
+          fontFamily="var(--f-mono)"
+          fontWeight="700"
+          letterSpacing="0.13em"
+          textTransform="uppercase"
+          color={config.tagColor}
+          mb="2px"
+        >
+          {config.tag}
+        </Text>
+
+        {/* Name */}
         <Text
           fontFamily="var(--f-display)"
-          fontSize={{
-            base: '22px',
-            md: isFirst ? '28px' : isSecond ? '24px' : '22px',
-            lg: isFirst ? '30px' : isSecond ? '26px' : '24px',
-          }}
-          fontWeight={isFirst ? '700' : '600'}
-          color="var(--fg)"
-          lineHeight="1.2"
+          fontSize={{ base: '18px', sm: '24px', md: '28px', lg: '32px' }}
+          fontWeight="700"
+          color="#F4F1E8"
+          lineHeight="1.15"
           noOfLines={1}
-          mb="4px"
+          maxW="100%"
+          textShadow="0 2px 14px rgba(0, 0, 0, 0.95), 0 0 28px rgba(0, 0, 0, 0.85)"
+          _groupHover={{ color: 'var(--accent)' }}
+          transition="color 0.2s ease"
         >
           {row.name}
         </Text>
 
-        {/* Github Handle */}
-        {row.githubid && (
-          <Text
-            fontSize={isFirst ? '14px' : '13px'}
-            color="var(--accent)"
-            fontWeight={isFirst ? '600' : '500'}
-            noOfLines={1}
-            mb="4px"
-          >
-            @{row.githubid}
-          </Text>
-        )}
-
-        {/* College Name */}
-        {college && (
-          <Text
-            fontSize={isFirst ? '13px' : isSecond ? '12.5px' : '12px'}
-            color="var(--muted)"
-            noOfLines={2}
-            maxW="260px"
-            lineHeight="1.35"
-          >
-            {college}
-          </Text>
-        )}
-      </Flex>
-
-      {/* Bottom section: Bold Points and Merged PRs */}
-      <Box w="100%" mt={isThird ? '10px' : '14px'}>
-        <Flex align="baseline" justify="center" gap="6px">
-          <Text
-            fontFamily="var(--f-display)"
-            fontSize={{
-              base: '38px',
-              md: isFirst ? '52px' : isSecond ? '44px' : '38px',
-              lg: isFirst ? '58px' : isSecond ? '48px' : '42px',
-            }}
-            fontWeight="700"
-            color={isFirst ? 'var(--secondary)' : 'var(--fg)'}
-            lineHeight="1"
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {Number(row.points || 0).toLocaleString()}
-          </Text>
-          <Text
-            fontSize={isFirst ? '14px' : '13px'}
-            color={isFirst ? 'var(--secondary)' : 'var(--muted)'}
-            fontFamily="var(--f-body)"
-            fontWeight="600"
-          >
-            pts
-          </Text>
+        {/* GitHub Handle + College */}
+        <Flex
+          align="center"
+          gap={{ base: '5px', sm: '8px' }}
+          mt="2px"
+          flexWrap="wrap"
+          justify={{ base: 'flex-start', sm: 'center' }}
+        >
+          {row.githubid && (
+            <Text
+              fontSize={{ base: '11px', sm: '12.5px', md: '13px' }}
+              fontFamily="var(--f-mono)"
+              fontWeight="600"
+              color="var(--accent)"
+              noOfLines={1}
+            >
+              @{row.githubid}
+            </Text>
+          )}
+          {college && (
+            <>
+              <Text fontSize="11px" color="rgba(244, 241, 232, 0.4)">
+                •
+              </Text>
+              <Text
+                fontSize={{ base: '11px', sm: '12px', md: '12.5px' }}
+                color="rgba(244, 241, 232, 0.72)"
+                noOfLines={1}
+                maxW={{ base: '130px', sm: '200px', md: '280px' }}
+              >
+                {college}
+              </Text>
+            </>
+          )}
         </Flex>
 
-        <Text
-          fontSize={isFirst ? '14px' : isSecond ? '13px' : '12.5px'}
-          color={isFirst ? 'var(--fg)' : 'var(--muted)'}
-          mt="6px"
-          fontFamily="var(--f-body)"
-          fontWeight={isFirst ? '600' : '500'}
+        {/* Points & PRs */}
+        <Flex align="baseline" gap={{ base: '8px', sm: '12px' }} mt={{ base: '3px', md: '6px' }}>
+          <Flex align="baseline" gap="3px">
+            <Text
+              fontFamily="var(--f-display)"
+              fontSize={{ base: '22px', sm: '28px', md: '36px' }}
+              fontWeight="800"
+              color={config.pointsColor}
+              lineHeight="1"
+              style={{ fontVariantNumeric: 'tabular-nums' }}
+              textShadow="0 2px 12px rgba(0, 0, 0, 0.9)"
+            >
+              {Number(row.points || 0).toLocaleString()}
+            </Text>
+            <Text
+              fontFamily="var(--f-mono)"
+              fontSize={{ base: '10.5px', sm: '12px' }}
+              fontWeight="700"
+              color={config.pointsColor}
+              textTransform="uppercase"
+              opacity={0.9}
+            >
+              pts
+            </Text>
+          </Flex>
+
+          <Text fontSize="11px" color="rgba(244, 241, 232, 0.35)">
+            |
+          </Text>
+
+          <Text
+            fontSize={{ base: '11px', sm: '12px', md: '13px' }}
+            color="#D9E2E8"
+            fontWeight="500"
+            opacity={0.85}
+            noOfLines={1}
+          >
+            {Number(row.prmerged || 0).toLocaleString()} PRs merged
+          </Text>
+        </Flex>
+      </Flex>
+
+      {/* 3. Right Zone: Square Avatar Container */}
+      <Flex
+        align="center"
+        justify={{ base: 'center', md: 'flex-end' }}
+        shrink={0}
+        zIndex={3}
+        transform={{ base: 'none', md: 'translateX(26px)' }}
+        pr={{ base: '2px', md: '8px' }}
+      >
+        <Box
+          w={{ base: '56px', sm: '72px', md: '96px', lg: '104px' }}
+          h={{ base: '56px', sm: '72px', md: '96px', lg: '104px' }}
+          bg={config.avatarBoxBg}
+          border={config.avatarBoxBorder}
+          boxShadow={config.avatarBoxShadow}
+          borderRadius="6px"
+          overflow="hidden"
+          p={{ base: '2px', md: '3px' }}
+          transition="transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+          _groupHover={{ transform: 'scale(1.06)' }}
         >
-          {Number(row.prmerged || 0).toLocaleString()} PRs merged
-        </Text>
-      </Box>
+          <ContributorAvatar
+            name={row.name}
+            githubid={row.githubid}
+            avatarUrl={row.avatarUrl}
+            size="100%"
+            fontSize={{ base: '18px', sm: '24px', md: '32px' }}
+            borderRadius="3px"
+          />
+        </Box>
+      </Flex>
     </Box>
   );
 
@@ -880,7 +1011,7 @@ function SpotlightCard({
           textDecoration: 'none',
           display: 'flex',
           width: '100%',
-          alignSelf: 'flex-end',
+          justifyContent: 'center',
         }}
       >
         {cardContent}
@@ -889,8 +1020,22 @@ function SpotlightCard({
   }
 
   return (
-    <Box w="100%" alignSelf="flex-end">
+    <Box w="100%" display="flex" justifyContent="center">
       {cardContent}
     </Box>
   );
-}
+},
+(prev, next) => {
+  return (
+    prev.rank === next.rank &&
+    prev.isOpencode === next.isOpencode &&
+    prev.hasPoints === next.hasPoints &&
+    prev.row.githubid === next.row.githubid &&
+    prev.row.points === next.row.points &&
+    prev.row.prmerged === next.row.prmerged &&
+    prev.row.name === next.row.name &&
+    prev.row.avatarUrl === next.row.avatarUrl &&
+    prev.row.college === next.row.college &&
+    prev.row.position === next.row.position
+  );
+});

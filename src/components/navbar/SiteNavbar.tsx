@@ -196,7 +196,7 @@ export default function SiteNavbar() {
               setIsMenuOpen(false);
             }}
           >
-            <OpenCodeLogo width={24} height={24} className="oc-brand-mark transition-transform group-hover:scale-105 shrink-0" />
+            <OpenCodeLogo width={28} height={28} className="oc-brand-mark transition-transform group-hover:scale-105 shrink-0" />
             <span className="text-base sm:text-lg font-bold tracking-tight text-[var(--fg)] group-hover:opacity-90 transition-opacity whitespace-nowrap">
               OpenCode<span className="text-[var(--accent)]">&apos;26</span>
             </span>

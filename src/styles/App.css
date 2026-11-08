@@ -363,7 +363,6 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 }
 .oc-brand { display: flex; align-items: center; gap: 10px; color: var(--fg); flex-shrink: 0; font-family: var(--f-display); font-size: 19px; font-weight: 300; letter-spacing: .25em; text-transform: uppercase; }
 .oc-brand-mark { object-fit: contain; }
-.chakra-ui-light .oc-brand-mark { filter: brightness(.23); }
 .oc-brand small { font-size: 11px; font-weight: 400; color: var(--muted); font-family: var(--f-body); letter-spacing: 0; margin-left: 3px; }
 .oc-desktop-nav { display: flex; align-items: center; gap: 24px; height: 100%; }
 .oc-desktop-nav a { position: relative; display: flex; align-items: center; height: 100%; font-size: 13.5px; font-family: var(--f-body); font-weight: 500; color: var(--muted); transition: color .2s; white-space: nowrap; }

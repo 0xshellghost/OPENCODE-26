@@ -19,14 +19,18 @@ export function getRoleTags(
     githubId?: string;
     college?: string;
     role?: string;
+    isMentor?: boolean;
+    isAdmin?: boolean;
   },
   fallbackGithubId?: string,
 ): RoleTag[] {
   const tags: RoleTag[] = [];
   const effectiveGithubId = profile?.githubId || fallbackGithubId;
 
-  // 1. Check Mentor status
+  // 1. Check Mentor / Staff status
   const isMentor =
+    Boolean(profile?.isMentor) ||
+    Boolean(profile?.isAdmin) ||
     Boolean(effectiveGithubId && isMaintainer(effectiveGithubId)) ||
     profile?.role?.toLowerCase() === 'mentor' ||
     profile?.role?.toLowerCase() === 'maintainer';

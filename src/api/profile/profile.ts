@@ -9,8 +9,9 @@ export async function fetchLoggedInBasicDetails() {
     console.warn('No token found, redirecting to login.');
     return null;
   } else {
+    const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || 'Opencode';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/?eventName=${encodeURIComponent(eventName)}`,
       {
         method: 'GET',
         headers: {
@@ -59,16 +60,16 @@ export async function sendRegData(formData: any) {
 }
 
 export async function getUserProfileByName(profileName: string) {
-
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || 'Opencode';
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${profileName}/${process.env.NEXT_PUBLIC_EVENT_NAME}`,
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${encodeURIComponent(profileName)}/${encodeURIComponent(eventName)}`,
     {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     },
   );

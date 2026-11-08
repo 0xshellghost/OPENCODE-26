@@ -45,15 +45,23 @@ export default function Banner(props: {
       {...rest}
     >
       {/* Title */}
-      <Flex justify="space-between" align="center" w="100%" mb="16px">
+      <Flex
+        justify="space-between"
+        align="center"
+        w="100%"
+        mb="20px"
+        pb="12px"
+        borderBottom="1px solid rgba(174, 188, 199, 0.12)"
+      >
         <Text
-          fontSize="15px"
+          fontSize="16px"
           fontWeight="700"
           color={textPrimary}
+          letterSpacing="0.02em"
         >
           User Identity
         </Text>
-        <Text fontSize="12px" color={textSecondary} fontFamily="var(--f-mono)">
+        <Text fontSize="12px" color={textSecondary} fontFamily="var(--f-mono)" letterSpacing="0.08em" textTransform="uppercase">
           Contributor
         </Text>
       </Flex>
@@ -64,71 +72,91 @@ export default function Banner(props: {
         align="center"
         justify="center"
         flex="1"
-        py="8px"
+        py={{ base: '12px', md: '20px' }}
       >
-        {/* Avatar */}
-        <Flex justify="center" mb="16px">
+        {/* Avatar with Ambient Luminous Ring */}
+        <Box
+          position="relative"
+          p="4px"
+          borderRadius="full"
+          bg="linear-gradient(135deg, var(--border-accent) 0%, rgba(174, 188, 199, 0.25) 50%, var(--border-accent) 100%)"
+          boxShadow="0 12px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(88, 185, 154, 0.22)"
+          transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+          mb="20px"
+          _hover={{
+            transform: 'scale(1.03)',
+            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.7), 0 0 32px rgba(88, 185, 154, 0.35)',
+          }}
+        >
           <NextAvatar
             src={avatar}
             name={name}
-            h="128px"
-            w="128px"
-            border="3.5px solid"
-            borderColor={avatarBorder}
-            boxShadow={avatarShadow}
+            h={{ base: '124px', md: '144px' }}
+            w={{ base: '124px', md: '144px' }}
+            border="3px solid var(--navy-500)"
           />
-        </Flex>
+        </Box>
 
         {/* Name */}
         <Text
           color={textPrimary}
           fontWeight="800"
-          fontSize="22px"
+          fontSize={{ base: '24px', md: '28px' }}
           lineHeight="1.2"
           textAlign="center"
+          letterSpacing="-0.01em"
         >
           {name}
         </Text>
 
         {/* GitHub handle */}
         <Text
-          color={textSecondary}
+          as="a"
+          href={githubUrl ? `https://github.com/${githubUrl}` : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          color="var(--accent)"
           fontSize="14px"
-          mt="4px"
-          mb={tags && tags.length > 0 ? '10px' : '16px'}
+          fontWeight="600"
+          mt="6px"
+          mb={tags && tags.length > 0 ? '14px' : '22px'}
           textAlign="center"
+          transition="color 0.2s ease"
+          _hover={{ color: 'var(--accent-hover)', textDecoration: 'underline' }}
         >
           @{githubUrl}
         </Text>
 
         {/* Role Tags */}
         {tags && tags.length > 0 && (
-          <RoleBadgesGroup tags={tags} mb="16px" />
+          <RoleBadgesGroup tags={tags} mb="20px" />
         )}
       </Flex>
 
       {/* Edit Profile Button */}
       {showEdit && (
         <Button
-          leftIcon={<Pencil size={14} />}
-          size="sm"
+          leftIcon={<Pencil size={15} />}
           w="100%"
-          maxW="260px"
+          maxW="280px"
+          h="44px"
           mx="auto"
+          mt="auto"
           bg="var(--accent-soft)"
           color="var(--fg)"
-          border="1px solid var(--border)"
+          border="1px solid var(--border-accent)"
           borderRadius="full"
           fontWeight="700"
-          fontSize="13px"
-          py="18px"
+          fontSize="14px"
+          letterSpacing="0.02em"
           _hover={{
-            bg: 'var(--accent-soft)',
+            bg: 'var(--accent)',
+            color: 'var(--accent-ink)',
             borderColor: 'var(--accent)',
-            transform: 'translateY(-1px)',
-            boxShadow: 'var(--shadow)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 24px rgba(88, 185, 154, 0.35)',
           }}
-          transition="all 0.3s ease"
+          transition="all 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
           onClick={onEdit}
         >
           Edit Profile
