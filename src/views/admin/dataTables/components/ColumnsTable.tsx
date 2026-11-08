@@ -1002,7 +1002,7 @@ function ColumnTable({
         <Box p={{ base: "12px", md: "20px" }}>
           <LeaderboardGraph
             eventName={cleanEventName}
-            topN={10}
+            topN={5}
             startDate={process.env.NEXT_PUBLIC_EVENT_START_DATE || "2025-12-14"}
           />
         </Box>

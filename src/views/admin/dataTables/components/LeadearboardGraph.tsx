@@ -50,7 +50,7 @@ const PALETTE = [
 
 async function fetchProgress(
   eventName: string,
-  topN: number = 10
+  topN: number | string = 5
 ): Promise<ParticipantSeries[]> {
   const token =
     typeof window !== 'undefined'
@@ -98,6 +98,7 @@ async function fetchProgress(
     ...participant,
     college:
       collegeMap.get(participant.participantId.trim().toLowerCase()) ||
+      participant.college ||
       'Unknown College',
   }));
 }
@@ -274,7 +275,7 @@ function CustomTooltip({ active, payload, label }: any) {
  * ------------------------------------------------------------- */
 export default function LeaderboardGraph({
   eventName,
-  topN = 10,
+  topN = 5,
   startDate,
   endDate,
 }: {
@@ -289,12 +290,20 @@ export default function LeaderboardGraph({
 
   const defaultStartDate = process.env.NEXT_PUBLIC_EVENT_START_DATE || '2025-12-14';
 
+  const [mode, setMode] = useState<'daily' | 'tenMin'>('daily');
+  const [selectedDay, setSelectedDay] = useState(() => new Date().toISOString().slice(0, 10));
+  const [hoveredParticipantId, setHoveredParticipantId] = useState<string | null>(null);
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [contributorLimit, setContributorLimit] = useState<number>(5);
+  const [hasRequestedAll, setHasRequestedAll] = useState<boolean>(false);
 
- const { data, isLoading, isError, error } = useQuery({
-  queryKey: ['leaderboardProgress', eventName, topN],
-  queryFn: () => fetchProgress(eventName, topN),
-  // queryFn: () => Promise.resolve(mockData),
-});
+  const queryLimit = hasRequestedAll ? 'all' : (contributorLimit === 0 ? 'all' : (topN || 5));
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['leaderboardProgress', eventName, queryLimit],
+    queryFn: () => fetchProgress(eventName, queryLimit),
+    placeholderData: (prev) => prev,
+  });
 
   const { effectiveStartDate, effectiveEndDate } = useMemo(() => {
     let minD = startDate || defaultStartDate;
@@ -317,12 +326,6 @@ export default function LeaderboardGraph({
 
     return { effectiveStartDate: minD, effectiveEndDate: maxD };
   }, [startDate, endDate, data, defaultStartDate]);
-
-  const [mode, setMode] = useState<'daily' | 'tenMin'>('daily');
-  const [selectedDay, setSelectedDay] = useState(() => new Date().toISOString().slice(0, 10));
-  const [hoveredParticipantId, setHoveredParticipantId] = useState<string | null>(null);
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
-  const [contributorLimit, setContributorLimit] = useState<number>(5);
 
   // Sort participants by official total points from database (excluding mentors if OpenCode)
   const sortedParticipants = useMemo(() => {
@@ -361,6 +364,10 @@ export default function LeaderboardGraph({
 
   return groups;
 }, [sortedParticipants]);
+
+  const totalCollegesCount = useMemo(() => {
+    return Object.keys(collegeGroups).length;
+  }, [collegeGroups]);
 
 
 
@@ -718,7 +725,10 @@ return totalB - totalA;
             </button>
             <button
               type="button"
-              onClick={() => setContributorLimit(0)}
+              onClick={() => {
+                setContributorLimit(0);
+                setHasRequestedAll(true);
+              }}
               style={{
                 padding: '5px 12px',
                 background: contributorLimit === 0 ? (isLight ? 'rgba(88, 185, 154, 0.2)' : 'rgba(88, 185, 154, 0.15)') : 'transparent',
@@ -731,7 +741,7 @@ return totalB - totalA;
                 transition: 'all 0.2s ease',
               }}
             >
-              All ({sortedParticipants.length})
+              All {totalCollegesCount > 0 && (hasRequestedAll || totalCollegesCount > 5) ? `(${totalCollegesCount})` : ''}
             </button>
           </div>
         </div>
