@@ -105,6 +105,8 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
   userTierRef.current = userTier;
 
   const toast = useToast();
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
 
   // Board state
   const [selectedColorId, setSelectedColorId] = useState<number>(2); // Default to Red
@@ -274,15 +276,18 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       reconnectTimerRef.current = null;
     }
 
-    const wsUrl =
+    const configuredWsUrl =
       process.env.NEXT_PUBLIC_RPLACE_WS_URL ||
       process.env.NEXT_PUBLIC_WS_URL ||
-      'ws://localhost:3001/ws';
+      process.env.NEXT_PUBLIC_RPLACE_API_URL;
+    const wsUrl = configuredWsUrl
+      ? configuredWsUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:')
+      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
 
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const fullUrl = token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl;
-      const ws = new WebSocket(fullUrl);
+      const fullWsUrl = token ? `${wsUrl}?token=${encodeURIComponent(token)}` : wsUrl;
+      const ws = new WebSocket(fullWsUrl);
       ws.binaryType = 'arraybuffer';
       wsRef.current = ws;
 
@@ -295,7 +300,12 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         console.warn('Canvas WebSocket error:', e);
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
+        console.warn('Canvas WebSocket closed:', {
+          code: event.code,
+          reason: event.reason || 'no reason',
+          url: wsUrl,
+        });
         if (wsRef.current === ws) {
           setConnected(false);
           wsRef.current = null;
@@ -342,7 +352,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
                   setCooldown(Math.max(0, data.ttl));
                 }
               } else {
-                toast({
+                toastRef.current({
                   title: 'Placement Error',
                   description: data.error || 'Unable to place pixel',
                   status: 'error',
@@ -381,7 +391,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       console.error('Could not create WebSocket:', err);
       setConnected(false);
     }
-  }, [processBinaryUpdate, toast]);
+  }, [processBinaryUpdate]);
 
   // Initial load
   useEffect(() => {
