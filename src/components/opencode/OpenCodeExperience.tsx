@@ -236,7 +236,7 @@ export default function OpenCodeExperience({
             aria-label="GeekHaven, back to the beginning"
             onClick={(e) => { e.preventDefault(); scrollToChapter(0, true) }}
           >
-            <OpenCodeLogo width={28} height={28} color="var(--accent)" />
+            <OpenCodeLogo width={36} height={36} color="var(--accent)" />
             <span className={styles.brandTitle}>
               GEEKHAVEN <small className={styles.brandYear}>2026</small>
             </span>
