@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Truck,
   Trash2,
+  Package,
 } from 'lucide-react';
 import { CatalogItem } from 'types/geekstore';
 
@@ -36,8 +37,10 @@ export default function ProductDetailModal({
 }: ProductDetailModalProps) {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
+    setImgError(false);
     if (item) {
       if (initialSize) {
         setSelectedSize(initialSize);
@@ -80,37 +83,48 @@ export default function ProductDetailModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-[var(--r)] border border-[var(--border-strong)] bg-[var(--surface-raised)] shadow-[var(--shadow)] backdrop-blur-2xl z-10 my-auto animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-3xl overflow-hidden rounded-[24px] border border-[var(--border-strong)] bg-[var(--surface-raised)] shadow-[0_24px_64px_rgba(0,0,0,0.8)] backdrop-blur-2xl z-10 my-auto animate-in zoom-in-95 duration-200">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-2)]/80 text-[var(--fg)] border border-[var(--border)] transition-transform hover:scale-110 hover:text-[var(--accent)]"
+          className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-2)]/90 text-[var(--fg)] border border-[var(--border)] transition-transform hover:scale-110 hover:text-[var(--accent)]"
         >
           <X size={18} />
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image Showcase */}
-          <div className="relative aspect-square md:aspect-auto md:h-full min-h-[320px] bg-[var(--card-soft)] overflow-hidden">
-            <Image
-              src={item.imageUrl}
-              alt={item.name}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-raised)]/80 via-transparent to-transparent md:hidden" />
+          <div className="relative aspect-square md:aspect-auto md:h-full min-h-[340px] bg-[var(--card-soft)] overflow-hidden border-b md:border-b-0 md:border-r border-[var(--border)]">
+            {!imgError && item.imageUrl ? (
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+                onError={() => setImgError(true)}
+                unoptimized
+                priority
+              />
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center bg-[var(--surface-2)] text-[var(--muted)] p-8">
+                <Package size={48} className="opacity-30 mb-2" />
+                <span className="text-xs font-mono uppercase tracking-wider text-[var(--subtle)]">
+                  {item.category || 'Merch'}
+                </span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-raised)]/90 via-transparent to-transparent md:hidden" />
             <div className="absolute bottom-4 left-4">
-              <span className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[var(--card-bg)]/90 text-[var(--accent)] border border-[var(--border)] backdrop-blur-md">
-                {item.category}
+              <span className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-[var(--card-bg)]/90 text-[var(--accent)] border border-[var(--border-accent)] backdrop-blur-md">
+                {item.category || 'Official Swag'}
               </span>
             </div>
           </div>
@@ -123,17 +137,17 @@ export default function ProductDetailModal({
                   ITEM ID: {item.id}
                 </span>
                 {isOutOfStock ? (
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-red-400">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
                     Out of Stock
                   </span>
                 ) : item.stock <= 5 ? (
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-amber-400">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
                     Only {item.stock} left
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--status-live-text)]">
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-[var(--status-live-text)] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                     <span className="h-1.5 w-1.5 rounded-full bg-[var(--status-live-text)]" />
                     In Stock ({item.stock} units)
                   </span>
@@ -166,7 +180,7 @@ export default function ProductDetailModal({
                       Select Size
                     </label>
                     <span className="text-xs text-[var(--muted)]">
-                      Regular Fit
+                      Standard Fit
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2">

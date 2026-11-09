@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Search,
   Package,
@@ -13,6 +14,12 @@ import {
   ExternalLink,
   ShoppingBag,
   ArrowRight,
+  Sparkles,
+  Truck,
+  ShieldCheck,
+  Flame,
+  ArrowUpDown,
+  Trash2,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@chakra-ui/react';
@@ -23,9 +30,18 @@ import ProductCard from 'components/geekstore/ProductCard';
 import ProductDetailModal from 'components/geekstore/ProductDetailModal';
 
 // Link to the external order form (e.g. Google Form, Typeform, etc.)
-// Replace with your actual form URL or set NEXT_PUBLIC_GEEKSTORE_FORM_URL in .env
 export const ORDER_FORM_URL =
   process.env.NEXT_PUBLIC_GEEKSTORE_FORM_URL || 'https://forms.google.com';
+
+const CATEGORIES = [
+  'All',
+  'Hoodies',
+  'T-Shirts',
+  'Accessories',
+  'Stickers',
+  'Drinkware',
+  'Merchandise',
+];
 
 interface SelectedProductState {
   item: CatalogItem;
@@ -35,7 +51,9 @@ interface SelectedProductState {
 
 export default function GeekstorePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured');
   const [page, setPage] = useState(1);
   const limit = 8;
 
@@ -55,6 +73,11 @@ export default function GeekstorePage() {
     setPage(1);
   };
 
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    setPage(1);
+  };
+
   const handleStockToggle = () => {
     setInStockOnly((prev) => !prev);
     setPage(1);
@@ -62,19 +85,28 @@ export default function GeekstorePage() {
 
   // Fetch items with React Query
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['geekstore-items', page, limit, searchQuery, inStockOnly],
+    queryKey: ['geekstore-items', page, limit, searchQuery, inStockOnly, selectedCategory],
     queryFn: () =>
       GeekstoreService.listItems({
         page,
         limit,
+        category: selectedCategory !== 'All' ? selectedCategory : undefined,
         search: searchQuery,
         inStockOnly,
       }),
   });
 
-  const items = data?.items || [];
+  const rawItems = data?.items || [];
   const totalPages = data?.totalPages || 1;
   const totalItems = data?.total || 0;
+
+  // Client-side sorting for selected page
+  const items = [...rawItems].sort((a, b) => {
+    if (sortBy === 'price-asc') return a.price - b.price;
+    if (sortBy === 'price-desc') return b.price - a.price;
+    if (sortBy === 'name') return a.name.localeCompare(b.name);
+    return 0; // featured default
+  });
 
   // Calculate selected total quantity and amount
   const selectedEntries = Array.from(selectedMap.values());
@@ -166,6 +198,16 @@ export default function GeekstorePage() {
     });
   };
 
+  const handleClearSelection = () => {
+    setSelectedMap(new Map());
+    toast({
+      title: 'Selection cleared',
+      status: 'info',
+      duration: 2000,
+      isClosable: true,
+    });
+  };
+
   const handleProceedToForm = () => {
     if (totalSelectedCount === 0) {
       toast({
@@ -178,24 +220,23 @@ export default function GeekstorePage() {
       return;
     }
 
-    // Open form link in a new tab
     if (typeof window !== 'undefined') {
       window.open(ORDER_FORM_URL, '_blank', 'noopener,noreferrer');
     }
   };
 
   return (
-    <div className="w-full max-w-[1344px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-28">
+    <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
       {/* Page Header */}
       <PageHeading
         eyebrow="GEEKSTORE / MERCHANDISE & GEAR"
         title="Official Geekstore"
-        description="Exclusive OpenCode and GeekHaven apparel, hacker accessories, dev stickers, and limited-edition swag. Select your items and proceed to the order form."
+        description="Exclusive OpenCode '26 and GeekHaven apparel, developer hoodies, stickers, and limited-edition swag. Select your favorites and proceed to the order form."
         rightContent={
           <div className="flex items-center gap-3">
             <Link
               href="/user/geekstore/orders"
-              className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-xs font-semibold text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all"
+              className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-xs font-semibold text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all shadow-sm"
             >
               <Package size={14} />
               <span>My Orders</span>
@@ -222,8 +263,94 @@ export default function GeekstorePage() {
         }
       />
 
-      {/* Filter and Search Bar (Category filter removed) */}
-      <div className="mt-8 mb-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 rounded-[var(--r)] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5 backdrop-blur-xl shadow-[var(--shadow)]">
+      {/* Hero Showcase Banner */}
+      <div className="relative mt-8 overflow-hidden rounded-[24px] border border-[var(--border)] bg-gradient-to-br from-[var(--surface-2)] via-[var(--surface)] to-[var(--surface-2)] p-6 sm:p-8 backdrop-blur-xl shadow-[var(--shadow)]">
+        {/* Decorative backdrop elements */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[var(--accent)]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-purple-500/10 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] px-3 py-1 border border-[var(--border-accent)] mb-3">
+              <Sparkles size={13} className="text-[var(--accent)] animate-pulse" />
+              <span className="text-[11px] font-bold tracking-wider uppercase text-[var(--accent)]">
+                Limited OpenCode &apos;26 Drop
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--fg)] tracking-tight">
+              Wear the Code. Fuel the Community.
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+              Premium heavyweight fleece hoodies, breathable ring-spun tees, and holographic sticker packs crafted for IIIT Allahabad developers and open-source contributors.
+            </p>
+
+            {/* Perks Badges */}
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-[var(--muted)]">
+              <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
+                <Truck size={13} className="text-[var(--accent)]" /> Campus Hand-Delivery
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
+                <ShieldCheck size={13} className="text-emerald-400" /> 100% Verified Quality
+              </span>
+              <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
+                <Flame size={13} className="text-amber-400" /> Limited Batch
+              </span>
+            </div>
+          </div>
+
+          {/* Quick stats mini card */}
+          <div className="flex md:flex-col items-center gap-4 bg-[var(--surface-2)]/80 border border-[var(--border)] p-4 sm:p-5 rounded-2xl backdrop-blur-md">
+            <div className="text-center">
+              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--accent)]">
+                {totalItems}
+              </div>
+              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider">
+                Merch Styles
+              </div>
+            </div>
+            <div className="h-8 w-[1px] md:h-[1px] md:w-full bg-[var(--border)]" />
+            <div className="text-center">
+              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--fg)]">
+                {totalSelectedCount}
+              </div>
+              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider">
+                In Your Order
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Pills Navigation */}
+      <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        {CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => handleCategorySelect(cat)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 border ${
+                isSelected
+                  ? 'bg-[var(--accent)] text-[var(--accent-ink)] border-[var(--accent)] shadow-[0_0_16px_rgba(88,185,154,0.35)] scale-102'
+                  : 'bg-[var(--surface)] text-[var(--muted)] border-[var(--border)] hover:text-[var(--fg)] hover:border-[var(--border-accent)] hover:bg-[var(--surface-2)]'
+              }`}
+            >
+              <span>{cat}</span>
+              {cat === 'All' && totalItems > 0 && (
+                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                  isSelected ? 'bg-[var(--accent-ink)]/20 text-[var(--accent-ink)]' : 'bg-[var(--surface-2)] text-[var(--subtle)]'
+                }`}>
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Filter, Search & Sort Control Bar */}
+      <div className="mt-4 mb-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-3 sm:p-4 backdrop-blur-xl shadow-[var(--shadow)]">
         {/* Search Box */}
         <div className="relative flex-1">
           <Search
@@ -234,7 +361,7 @@ export default function GeekstorePage() {
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Search hoodies, tees, stickers, deskmats..."
+            placeholder="Search hoodies, tees, deskmats, stickers by keyword..."
             className="w-full rounded-full border border-[var(--border)] bg-[var(--surface-2)] pl-10 pr-10 py-2.5 text-xs text-[var(--fg)] placeholder-[var(--subtle)] outline-none focus:border-[var(--accent)] transition-all"
           />
           {searchQuery && (
@@ -248,25 +375,41 @@ export default function GeekstorePage() {
           )}
         </div>
 
-        {/* In-Stock Toggle */}
-        <div className="flex items-center gap-3">
+        {/* Sort & In-Stock Controls */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Sort By Dropdown */}
+          <div className="flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-3 py-1.5">
+            <ArrowUpDown size={13} className="text-[var(--subtle)]" />
+            <select
+              value={sortBy}
+              onChange={(e: any) => setSortBy(e.target.value)}
+              className="bg-transparent text-xs text-[var(--fg)] outline-none cursor-pointer pr-1"
+            >
+              <option value="featured" style={{ background: '#0B1C2A' }}>Featured</option>
+              <option value="price-asc" style={{ background: '#0B1C2A' }}>Price: Low to High</option>
+              <option value="price-desc" style={{ background: '#0B1C2A' }}>Price: High to Low</option>
+              <option value="name" style={{ background: '#0B1C2A' }}>Name: A to Z</option>
+            </select>
+          </div>
+
+          {/* In-Stock Toggle */}
           <button
             type="button"
             onClick={handleStockToggle}
-            className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-medium transition-all ${
+            className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-medium transition-all ${
               inStockOnly
                 ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)] shadow-[0_0_10px_rgba(88,185,154,0.2)]'
                 : 'border-[var(--border)] bg-[var(--surface-2)] text-[var(--muted)] hover:text-[var(--fg)]'
             }`}
           >
             <div
-              className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] ${
+              className={`flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] ${
                 inStockOnly
                   ? 'bg-[var(--accent)] text-[var(--accent-ink)]'
                   : 'border border-[var(--subtle)]'
               }`}
             >
-              {inStockOnly && <Check size={10} />}
+              {inStockOnly && <Check size={9} />}
             </div>
             <span>In Stock Only</span>
           </button>
@@ -279,7 +422,7 @@ export default function GeekstorePage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="h-80 rounded-[var(--r)] border border-[var(--border)] bg-[var(--surface)] p-4 animate-pulse flex flex-col justify-between"
+              className="h-88 rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-4 animate-pulse flex flex-col justify-between"
             >
               <div className="aspect-[16/10] w-full rounded-[14px] bg-[var(--surface-2)]" />
               <div className="space-y-2 mt-4">
@@ -294,9 +437,9 @@ export default function GeekstorePage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="flex flex-col items-center justify-center rounded-[var(--r)] border border-red-500/30 bg-red-500/5 py-16 px-4 text-center">
+        <div className="flex flex-col items-center justify-center rounded-[24px] border border-red-500/30 bg-red-500/5 py-16 px-4 text-center">
           <p className="text-sm text-red-400 mb-4">
-            Could not load merchandise catalog from the backend.
+            Could not load merchandise catalog from the database.
           </p>
           <button
             type="button"
@@ -308,26 +451,33 @@ export default function GeekstorePage() {
           </button>
         </div>
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-[var(--r)] border border-[var(--border)] bg-[var(--surface)] py-20 px-4 text-center backdrop-blur-xl">
+        <div className="flex flex-col items-center justify-center rounded-[24px] border border-[var(--border)] bg-[var(--surface)] py-20 px-4 text-center backdrop-blur-xl">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--subtle)] mb-4">
             <ShoppingBag size={28} />
           </div>
           <h3 className="font-['DM_Sans',sans-serif] text-lg font-bold text-[var(--fg)]">
-            No products found
+            {searchQuery || selectedCategory !== 'All' || inStockOnly
+              ? 'No matching products'
+              : 'Geekstore is being stocked'}
           </h3>
           <p className="mt-1 max-w-sm text-xs text-[var(--muted)]">
-            Try adjusting your search criteria or uncheck the "In Stock Only" toggle.
+            {searchQuery || selectedCategory !== 'All' || inStockOnly
+              ? 'Try adjusting your search criteria, category selection, or uncheck "In Stock Only".'
+              : 'Official OpenCode merchandise and gear will appear here once added by administrators.'}
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchQuery('');
-              setInStockOnly(false);
-            }}
-            className="mt-6 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-xs font-semibold text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all"
-          >
-            Reset Filters
-          </button>
+          {(searchQuery || selectedCategory !== 'All' || inStockOnly) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('All');
+                setInStockOnly(false);
+              }}
+              className="mt-6 rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-xs font-semibold text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all"
+            >
+              Reset Filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -415,35 +565,65 @@ export default function GeekstorePage() {
         onRemoveSelection={handleRemoveModalSelection}
       />
 
-      {/* Floating Bottom Bar: Action to proceed to external order form */}
+      {/* Floating Bottom Bar: Order Selection Dock */}
       {totalSelectedCount > 0 && (
         <aside
           aria-label="Proceed to Order Form"
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-lg animate-in slide-in-from-bottom duration-300"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-xl animate-in slide-in-from-bottom duration-300"
         >
-          <div className="flex items-center justify-between gap-3 rounded-full border border-[var(--border-accent)] bg-[var(--surface-raised)]/95 px-5 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
-            <div className="flex items-center gap-3">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] font-mono text-xs font-bold">
+          <div className="flex items-center justify-between gap-3 rounded-full border border-[var(--border-accent)] bg-[var(--surface-raised)]/95 px-4 sm:px-5 py-3 shadow-[0_16px_40px_rgba(0,0,0,0.7)] backdrop-blur-2xl ring-1 ring-[var(--accent)]/20">
+            <div className="flex items-center gap-3 min-w-0">
+              {/* Stacked Thumbnails */}
+              <div className="hidden sm:flex -space-x-2 overflow-hidden py-1">
+                {selectedEntries.slice(0, 3).map((entry) => (
+                  <div
+                    key={entry.item.id}
+                    className="inline-block h-8 w-8 rounded-full ring-2 ring-[var(--surface)] overflow-hidden bg-[var(--card-soft)] relative flex-shrink-0"
+                  >
+                    <Image
+                      src={entry.item.imageUrl || '/images/kyoto-garden.png'}
+                      alt={entry.item.name}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] font-mono text-xs font-bold flex-shrink-0">
                 {totalSelectedCount}
               </span>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-[var(--fg)]">
+
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-bold text-[var(--fg)] truncate">
                   {totalSelectedCount} item{totalSelectedCount === 1 ? '' : 's'} selected
                 </span>
-                <span className="font-mono text-[11px] text-[var(--accent)]">
+                <span className="font-mono text-[11px] text-[var(--accent)] font-semibold">
                   Estimated Total: ₹{totalSelectedAmount.toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleProceedToForm}
-              className="flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-xs font-bold text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-[0_2px_12px_rgba(88,185,154,0.35)]"
-            >
-              <span>Fill Order Form</span>
-              <ArrowRight size={14} />
-            </button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                type="button"
+                onClick={handleClearSelection}
+                className="hidden sm:flex items-center justify-center p-2 rounded-full text-[var(--muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                title="Clear selection"
+              >
+                <Trash2 size={14} />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleProceedToForm}
+                className="flex items-center gap-2 rounded-full bg-[var(--accent)] px-4 py-2 text-xs font-bold text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] transition-all shadow-[0_2px_14px_rgba(88,185,154,0.35)]"
+              >
+                <span>Fill Order Form</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
           </div>
         </aside>
       )}

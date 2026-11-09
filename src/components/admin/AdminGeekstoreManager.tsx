@@ -25,6 +25,13 @@ import {
   Avatar,
   Switch,
   Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import {
   Plus,
@@ -46,6 +53,9 @@ import {
   CreditCard,
   User,
   XCircle,
+  Archive,
+  RefreshCw,
+  AlertTriangle,
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import GeekstoreService from 'services/geekstore.service';
@@ -96,12 +106,12 @@ export default function AdminGeekstoreManager() {
   const [itemSearch, setItemSearch] = useState('');
   const [itemCategory, setItemCategory] = useState('ALL');
   const [includeInactive, setIncludeInactive] = useState(true);
-  const [includeDeleted, setIncludeDeleted] = useState(true);
+  const [includeDeleted, setIncludeDeleted] = useState(false);
 
   // Item Modals
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<CatalogItem | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deleteModalItem, setDeleteModalItem] = useState<CatalogItem | null>(null);
 
   // Fetch Items Query
   const {
@@ -128,18 +138,26 @@ export default function AdminGeekstoreManager() {
 
   const catalogItems: CatalogItem[] = itemsData?.items || [];
 
-  // Soft Delete Mutation
+  // Metrics counts
+  const activeItemsCount = catalogItems.filter((i) => !i.deletedAt && i.isActive).length;
+  const lowStockItemsCount = catalogItems.filter((i) => !i.deletedAt && i.stock <= 5).length;
+  const deletedItemsCount = catalogItems.filter((i) => Boolean(i.deletedAt)).length;
+
+  // Delete Mutation (Soft Delete or Permanent Purge)
   const deleteMutation = useMutation({
-    mutationFn: (itemId: string) => GeekstoreService.adminDeleteItem(itemId),
-    onSuccess: () => {
+    mutationFn: ({ itemId, permanent }: { itemId: string; permanent?: boolean }) =>
+      GeekstoreService.adminDeleteItem(itemId, permanent),
+    onSuccess: (_, vars) => {
       toast({
-        title: 'Product Soft-Deleted',
-        description: 'Item marked as deleted and deactivated from user view.',
+        title: vars.permanent ? 'Product Permanently Deleted 🗑️' : 'Product Moved to Trash 📦',
+        description: vars.permanent
+          ? 'Item was purged from database and storefront.'
+          : 'Item marked as deleted and deactivated from user view.',
         status: 'info',
         duration: 3500,
         isClosable: true,
       });
-      setConfirmDeleteId(null);
+      setDeleteModalItem(null);
       queryClient.invalidateQueries({ queryKey: ['admin-geekstore-items'] });
       queryClient.invalidateQueries({ queryKey: ['geekstore-items'] });
     },
@@ -147,6 +165,31 @@ export default function AdminGeekstoreManager() {
       toast({
         title: 'Failed to delete product',
         description: err?.message || 'Could not delete item.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
+    },
+  });
+
+  // Restore Mutation
+  const restoreMutation = useMutation({
+    mutationFn: (itemId: string) => GeekstoreService.adminRestoreItem(itemId),
+    onSuccess: (data) => {
+      toast({
+        title: 'Product Restored! ♻️',
+        description: `"${data.item?.name || 'Product'}" has been restored to active inventory.`,
+        status: 'success',
+        duration: 3500,
+        isClosable: true,
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-geekstore-items'] });
+      queryClient.invalidateQueries({ queryKey: ['geekstore-items'] });
+    },
+    onError: (err: any) => {
+      toast({
+        title: 'Failed to restore product',
+        description: err?.message || 'Could not restore item.',
         status: 'error',
         duration: 4000,
         isClosable: true,
@@ -350,6 +393,54 @@ export default function AdminGeekstoreManager() {
       {/* ============================================================= */}
       {subTab === 'items' && (
         <Box>
+          {/* Quick Metrics Strip */}
+          <SimpleGrid columns={{ base: 2, sm: 2, md: 4 }} spacing={4} mb="20px">
+            <Box bg="var(--surface)" border="1px solid var(--border)" borderRadius="16px" p={4} boxShadow="var(--shadow)">
+              <Flex align="center" gap={3}>
+                <Flex h="40px" w="40px" borderRadius="12px" bg="var(--accent-soft)" color="var(--accent)" align="center" justify="center" flexShrink={0}>
+                  <Icon as={Package} size={20} />
+                </Flex>
+                <Box minW="0">
+                  <Text fontSize="xs" color="var(--fg-muted)" fontWeight="500">Total Products</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="var(--fg)">{catalogItems.length}</Text>
+                </Box>
+              </Flex>
+            </Box>
+            <Box bg="var(--surface)" border="1px solid var(--border)" borderRadius="16px" p={4} boxShadow="var(--shadow)">
+              <Flex align="center" gap={3}>
+                <Flex h="40px" w="40px" borderRadius="12px" bg="teal.500.15" color="teal.300" align="center" justify="center" flexShrink={0}>
+                  <Icon as={CheckCircle} size={20} />
+                </Flex>
+                <Box minW="0">
+                  <Text fontSize="xs" color="var(--fg-muted)" fontWeight="500">Active in Store</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="teal.300">{activeItemsCount}</Text>
+                </Box>
+              </Flex>
+            </Box>
+            <Box bg="var(--surface)" border="1px solid var(--border)" borderRadius="16px" p={4} boxShadow="var(--shadow)">
+              <Flex align="center" gap={3}>
+                <Flex h="40px" w="40px" borderRadius="12px" bg="orange.500.15" color="orange.300" align="center" justify="center" flexShrink={0}>
+                  <Icon as={AlertCircle} size={20} />
+                </Flex>
+                <Box minW="0">
+                  <Text fontSize="xs" color="var(--fg-muted)" fontWeight="500">Low / Out of Stock</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="orange.300">{lowStockItemsCount}</Text>
+                </Box>
+              </Flex>
+            </Box>
+            <Box bg="var(--surface)" border="1px solid var(--border)" borderRadius="16px" p={4} boxShadow="var(--shadow)">
+              <Flex align="center" gap={3}>
+                <Flex h="40px" w="40px" borderRadius="12px" bg="purple.500.15" color="purple.300" align="center" justify="center" flexShrink={0}>
+                  <Icon as={ShoppingBag} size={20} />
+                </Flex>
+                <Box minW="0">
+                  <Text fontSize="xs" color="var(--fg-muted)" fontWeight="500">Orders Placed</Text>
+                  <Text fontSize="xl" fontWeight="bold" color="purple.300">{orders.length}</Text>
+                </Box>
+              </Flex>
+            </Box>
+          </SimpleGrid>
+
           {/* Header & Controls Card */}
           <Box
             bg="var(--surface)"
@@ -376,7 +467,7 @@ export default function AdminGeekstoreManager() {
                   </Badge>
                 </Flex>
                 <Text fontSize="sm" color="var(--fg-muted)" mt={1}>
-                  Create, restock, edit pricing, or soft-delete products. Filter active and archived inventory.
+                  Create, restock, edit pricing, or delete products with cloud image uploads.
                 </Text>
               </Box>
 
@@ -442,7 +533,7 @@ export default function AdminGeekstoreManager() {
               <Flex
                 align="center"
                 justify="space-between"
-                p={2}
+                p={2.5}
                 bg="var(--surface-2)"
                 borderRadius="12px"
                 border="1px solid var(--border)"
@@ -463,21 +554,30 @@ export default function AdminGeekstoreManager() {
                 />
               </Flex>
 
-              {/* Include Deleted Switch */}
+              {/* Show Trash / Deleted Switch */}
               <Flex
                 align="center"
                 justify="space-between"
-                p={2}
-                bg="var(--surface-2)"
+                p={2.5}
+                bg={includeDeleted ? 'rgba(239, 68, 68, 0.12)' : 'var(--surface-2)'}
                 borderRadius="12px"
-                border="1px solid var(--border)"
+                border="1px solid"
+                borderColor={includeDeleted ? 'rgba(239, 68, 68, 0.35)' : 'var(--border)'}
+                transition="all 0.2s"
               >
                 <Box>
-                  <Text fontSize="xs" fontWeight="600" color="var(--fg)">
-                    Include Deleted
-                  </Text>
+                  <Flex align="center" gap={1.5}>
+                    <Text fontSize="xs" fontWeight="600" color={includeDeleted ? 'red.300' : 'var(--fg)'}>
+                      Show Trash & Deleted
+                    </Text>
+                    {deletedItemsCount > 0 && (
+                      <Badge colorScheme="red" fontSize="9px" borderRadius="full">
+                        {deletedItemsCount}
+                      </Badge>
+                    )}
+                  </Flex>
                   <Text fontSize="10px" color="var(--fg-muted)">
-                    Show soft-deleted items
+                    {includeDeleted ? 'Viewing archived items' : 'Hidden by default'}
                   </Text>
                 </Box>
                 <Switch
@@ -665,61 +765,59 @@ export default function AdminGeekstoreManager() {
                           )}
                         </Td>
 
-                        {/* Actions (Edit / Delete) */}
+                        {/* Actions (Edit / Delete / Restore / Purge) */}
                         <Td borderColor="var(--border)" textAlign="right">
                           <Flex justify="flex-end" align="center" gap="6px">
-                            {/* Edit Button */}
-                            <Button
-                              size="xs"
-                              variant="outline"
-                              borderColor="var(--border)"
-                              color="var(--fg)"
-                              _hover={{ bg: 'var(--surface)' }}
-                              borderRadius="full"
-                              onClick={() => handleOpenEditModal(prod)}
-                              leftIcon={<Icon as={Edit} size={12} />}
-                            >
-                              Edit
-                            </Button>
-
-                            {/* Soft Delete Action */}
                             {prod.deletedAt ? (
-                              <Text fontSize="10px" color="red.300" fontFamily="mono">
-                                Deleted
-                              </Text>
-                            ) : confirmDeleteId === prod.id ? (
-                              <Flex align="center" gap="4px">
+                              <>
+                                <Button
+                                  size="xs"
+                                  colorScheme="teal"
+                                  variant="outline"
+                                  borderRadius="full"
+                                  isLoading={restoreMutation.isPending}
+                                  onClick={() => restoreMutation.mutate(prod.id)}
+                                  leftIcon={<Icon as={RotateCcw} size={12} />}
+                                >
+                                  Restore
+                                </Button>
                                 <Button
                                   size="xs"
                                   colorScheme="red"
-                                  isLoading={deleteMutation.isPending}
-                                  onClick={() => deleteMutation.mutate(prod.id)}
+                                  variant="ghost"
                                   borderRadius="full"
+                                  onClick={() => setDeleteModalItem(prod)}
+                                  leftIcon={<Icon as={Trash2} size={12} />}
                                 >
-                                  Confirm
+                                  Purge
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="xs"
+                                  variant="outline"
+                                  borderColor="var(--border)"
+                                  color="var(--fg)"
+                                  _hover={{ bg: 'var(--surface-2)' }}
+                                  borderRadius="full"
+                                  onClick={() => handleOpenEditModal(prod)}
+                                  leftIcon={<Icon as={Edit} size={12} />}
+                                >
+                                  Edit
                                 </Button>
                                 <Button
                                   size="xs"
                                   variant="ghost"
-                                  color="var(--fg-muted)"
-                                  onClick={() => setConfirmDeleteId(null)}
+                                  color="red.400"
+                                  _hover={{ bg: 'rgba(239, 68, 68, 0.1)', color: 'red.300' }}
                                   borderRadius="full"
+                                  onClick={() => setDeleteModalItem(prod)}
+                                  leftIcon={<Icon as={Trash2} size={12} />}
                                 >
-                                  Cancel
+                                  Delete
                                 </Button>
-                              </Flex>
-                            ) : (
-                              <Button
-                                size="xs"
-                                variant="ghost"
-                                color="red.400"
-                                _hover={{ bg: 'red.500.10', color: 'red.300' }}
-                                borderRadius="full"
-                                onClick={() => setConfirmDeleteId(prod.id)}
-                                leftIcon={<Icon as={Trash2} size={12} />}
-                              >
-                                Delete
-                              </Button>
+                              </>
                             )}
                           </Flex>
                         </Td>
@@ -1159,6 +1257,96 @@ export default function AdminGeekstoreManager() {
         onOpenStatusModal={handleOpenStatusModal}
         onOpenPaymentModal={handleOpenPaymentModal}
       />
+
+      {/* 4. Delete Confirmation Modal */}
+      {deleteModalItem && (
+        <Modal
+          isOpen={Boolean(deleteModalItem)}
+          onClose={() => setDeleteModalItem(null)}
+          isCentered
+          size="md"
+        >
+          <ModalOverlay bg="blackAlpha.800" backdropFilter="blur(6px)" />
+          <ModalContent
+            bg="var(--surface)"
+            border="1px solid var(--border-strong)"
+            borderRadius="20px"
+            color="var(--fg)"
+            boxShadow="0 18px 48px rgba(0, 0, 0, 0.75)"
+          >
+            <ModalHeader borderBottom="1px solid var(--border)" pb={3}>
+              <Flex align="center" gap={2}>
+                <Icon as={Trash2} color="red.400" size={18} />
+                <Text fontSize="md" fontWeight="bold">
+                  {deleteModalItem.deletedAt
+                    ? 'Permanently Purge Product?'
+                    : 'Delete Product from Store?'}
+                </Text>
+              </Flex>
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody py={4}>
+              <Text fontSize="sm" color="var(--fg)" mb={2}>
+                Are you sure you want to delete{' '}
+                <Text as="span" fontWeight="bold" color="var(--accent)">
+                  &quot;{deleteModalItem.name}&quot;
+                </Text>
+                ?
+              </Text>
+              {deleteModalItem.deletedAt ? (
+                <Text fontSize="xs" color="red.300">
+                  ⚠️ This product is already in the trash. Purging will permanently remove it from the database and cannot be recovered.
+                </Text>
+              ) : (
+                <Text fontSize="xs" color="var(--fg-muted)">
+                  You can move this item to the Trash (Soft Delete) to remove it from the user store while keeping records, or purge it permanently.
+                </Text>
+              )}
+            </ModalBody>
+            <ModalFooter borderTop="1px solid var(--border)" gap={2}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setDeleteModalItem(null)}
+                borderRadius="full"
+              >
+                Cancel
+              </Button>
+              {!deleteModalItem.deletedAt && (
+                <Button
+                  size="sm"
+                  colorScheme="orange"
+                  variant="outline"
+                  borderRadius="full"
+                  isLoading={deleteMutation.isPending}
+                  onClick={() =>
+                    deleteMutation.mutate({
+                      itemId: deleteModalItem.id,
+                      permanent: false,
+                    })
+                  }
+                >
+                  Move to Trash
+                </Button>
+              )}
+              <Button
+                size="sm"
+                colorScheme="red"
+                borderRadius="full"
+                isLoading={deleteMutation.isPending}
+                onClick={() =>
+                  deleteMutation.mutate({
+                    itemId: deleteModalItem.id,
+                    permanent: true,
+                  })
+                }
+              >
+                {deleteModalItem.deletedAt ? 'Purge Permanently' : 'Delete Permanently'}
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
     </Box>
   );
 }
