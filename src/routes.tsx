@@ -11,6 +11,7 @@ import {
   Sliders,
   Trophy,
   User,
+  ShoppingBag,
 } from 'lucide-react';
 
 import { IRoute } from 'types/navigation';
@@ -52,6 +53,12 @@ const routes: IRoute[] = [
     layout: '/user',
     icon: <Icon as={BarChart2} width="20px" height="20px" color="inherit" />,
     path: '/leaderboard/Opencode',
+  },
+  {
+    name: 'Geekstore',
+    layout: '/user',
+    icon: <Icon as={ShoppingBag} width="20px" height="20px" color="inherit" />,
+    path: '/geekstore',
   },
   {
     name: 'Repositories',

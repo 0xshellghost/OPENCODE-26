@@ -39,6 +39,21 @@ const nextConfig = {
         destination: '/user/leaderboard/Opencode',
         permanent: false,
       },
+      {
+        source: '/geekstore',
+        destination: '/user/geekstore',
+        permanent: false,
+      },
+      {
+        source: '/orders',
+        destination: '/user/geekstore/orders',
+        permanent: false,
+      },
+      {
+        source: '/geekstore/orders',
+        destination: '/user/geekstore/orders',
+        permanent: false,
+      },
     ];
   },
   images: {

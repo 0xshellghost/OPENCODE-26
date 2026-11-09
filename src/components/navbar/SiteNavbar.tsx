@@ -26,6 +26,7 @@ const navigation = [
   { label: 'Home', href: '/' },
   { label: 'Events', href: '/user/events' },
   { label: 'Leaderboard', href: '/user/leaderboard/Opencode' },
+  { label: 'Geekstore', href: '/user/geekstore' },
   { label: 'RPlace Canvas', href: '/user/rplace' },
   { label: 'Winners', href: '/user/winners' },
   { label: 'Milestones', href: '/user/milestones' },
