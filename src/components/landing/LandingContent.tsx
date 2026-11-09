@@ -122,7 +122,7 @@ export default function LandingContent() {
         <div className={`${styles.timeline} ${styles.fadeInUp}`}>
           <div className={styles.timelineItem} data-active="true">
             <div className={styles.timelineDot} />
-            <div className={styles.timelineDate}>Phase 1 — Registration</div>
+            <div className={styles.timelineDate}>Phase 1 - Registration</div>
             <h3 className={styles.timelineTitle}>The Awakening</h3>
             <p className={styles.timelineDescription}>
               Sign up, set up your GitHub profile, and get ready. Maintainers prepare their repositories with starter issues for beginners.
@@ -130,7 +130,7 @@ export default function LandingContent() {
           </div>
           <div className={styles.timelineItem}>
             <div className={styles.timelineDot} />
-            <div className={styles.timelineDate}>Phase 2 — Week 1 & 2</div>
+            <div className={styles.timelineDate}>Phase 2 - Week 1 & 2</div>
             <h3 className={styles.timelineTitle}>First Blood</h3>
             <p className={styles.timelineDescription}>
               The coding begins! Start with &quot;good first issues&quot;, learn the contribution workflow, and get your first PR merged.
@@ -138,7 +138,7 @@ export default function LandingContent() {
           </div>
           <div className={styles.timelineItem}>
             <div className={styles.timelineDot} />
-            <div className={styles.timelineDate}>Phase 3 — Week 3 & 4</div>
+            <div className={styles.timelineDate}>Phase 3 - Week 3 & 4</div>
             <h3 className={styles.timelineTitle}>Deep Dive</h3>
             <p className={styles.timelineDescription}>
               Tackle complex features, optimize performance, and collaborate on architecture. The leaderboard heats up.
@@ -146,7 +146,7 @@ export default function LandingContent() {
           </div>
           <div className={`${styles.timelineItem} ${styles.timelineItemGold}`}>
             <div className={styles.timelineDot} />
-            <div className={styles.timelineDate}>Phase 4 — Closing</div>
+            <div className={styles.timelineDate}>Phase 4 - Closing</div>
             <h3 className={styles.timelineTitle}>The Sakura Festival</h3>
             <p className={styles.timelineDescription}>
               Closing ceremony, final leaderboard reveal, project showcases, and prize distribution.

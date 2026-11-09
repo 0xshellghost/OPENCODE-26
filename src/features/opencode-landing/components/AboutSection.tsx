@@ -63,14 +63,14 @@ export default function AboutSection() {
           Visible moonlit mountains, pagodas, village lanterns, mist, and sakura petals.
           ========================================================================= */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        {/* Japanese Hero Landscape Image — seamless continuation from StatsRibbon */}
+        {/* Japanese Hero Landscape Image - seamless continuation from StatsRibbon */}
         <img
           src="/images/hero-japanese-bg.jpg"
           alt="Japanese Night Landscape"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-50 sm:opacity-60 scale-105 pointer-events-none transition-opacity"
         />
 
-        {/* Deep Dark Indigo/Navy gradient tint — keeps text ultra-readable while landscape shines through */}
+        {/* Deep Dark Indigo/Navy gradient tint - keeps text ultra-readable while landscape shines through */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#07131F]/90 via-[#07131F]/60 to-[#07131F]/90 pointer-events-none" />
         <div className="absolute inset-0 bg-[#07131F]/30 pointer-events-none" />
 

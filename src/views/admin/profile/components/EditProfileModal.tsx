@@ -437,7 +437,7 @@ export default function EditProfileModal({
                   </Badge>
                 </Flex>
                 <Input
-                  value={profile?.githubId ? `@${profile.githubId}` : '—'}
+                  value={profile?.githubId ? `@${profile.githubId}` : '-'}
                   isReadOnly
                   isDisabled
                   bg={lockedBg}
@@ -477,7 +477,7 @@ export default function EditProfileModal({
                   </Badge>
                 </Flex>
                 <Input
-                  value={profile?.email || '—'}
+                  value={profile?.email || '-'}
                   isReadOnly
                   isDisabled
                   bg={lockedBg}

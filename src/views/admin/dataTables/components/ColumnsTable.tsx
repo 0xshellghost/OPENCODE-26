@@ -650,7 +650,7 @@ function ColumnTable({
               ),
               cell: (info) => {
                 const row = info.row.original;
-                if (!row.githubid) return <Text color="var(--muted)">—</Text>;
+                if (!row.githubid) return <Text color="var(--muted)">-</Text>;
                 const isYou = Boolean(currentGithubId && row.githubid === currentGithubId);
                 const maintainer = Boolean(isMaintainer(row.githubid) || row.isMentor);
 

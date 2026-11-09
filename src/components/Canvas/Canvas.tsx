@@ -918,7 +918,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
           </Flex>
         )}
 
-        {/* The Canvas Element — fills 100% of the frame at zoom = 1.0 */}
+        {/* The Canvas Element - fills 100% of the frame at zoom = 1.0 */}
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}

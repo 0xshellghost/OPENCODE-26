@@ -210,7 +210,7 @@ export default function SakuraCanvas({
       ctx.clearRect(0, 0, width, height);
       tick++;
 
-      if (active) {
+      if (isEffectiveActive) {
         // Decay mouse wind velocity gradually
         mouseRef.current.vx *= 0.92;
         mouseRef.current.vy *= 0.92;

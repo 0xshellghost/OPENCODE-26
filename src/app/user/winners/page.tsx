@@ -197,22 +197,22 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
   );
 }
 
-function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrations: number } }) {
+const StatCircle = ({
+  icon: Icon,
+  title,
+  statsList,
+  side,
+}: {
+  icon: any;
+  title: string;
+  statsList: { value: number; label: string }[];
+  side: 'left' | 'right';
+}) => {
   const glass = 'var(--surface)';
   const text = opencodeTokens.colors.text.primary;
   const muted = opencodeTokens.colors.text.secondary;
 
-  const Circle = ({
-    icon: Icon,
-    title,
-    statsList,
-    side,
-  }: {
-    icon: any;
-    title: string;
-    statsList: { value: number; label: string }[];
-    side: 'left' | 'right';
-  }) => (
+  return (
     <Box
       position="absolute"
       top="50%"
@@ -269,10 +269,12 @@ function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrat
       ))}
     </Box>
   );
+};
 
+function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrations: number } }) {
   return (
     <>
-      <Circle
+      <StatCircle
         icon={FaCodeBranch}
         title="Contributions"
         side="left"
@@ -281,7 +283,7 @@ function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrat
         ]}
       />
 
-      <Circle
+      <StatCircle
         icon={FaUsers}
         title="Community"
         side="right"

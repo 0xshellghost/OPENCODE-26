@@ -95,7 +95,7 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
     throw new Error('No authentication token found. Please sign in again.');
   }
 
-  // Never send GitHub ID or email — those fields are immutable.
+  // Never send GitHub ID or email - those fields are immutable.
   const payload: ProfileUpdatePayload = {
     name: updatedData.name,
     college: updatedData.college,

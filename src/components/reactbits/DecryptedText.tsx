@@ -17,7 +17,7 @@ export default function DecryptedText({
   text,
   speed = 40,
   maxIterations = 8,
-  characters = '0123456789ABCDEFGHJKMNPQRSTVWXYZ·/—',
+  characters = '0123456789ABCDEFGHJKMNPQRSTVWXYZ·/-',
   className = '',
   parentClassName = '',
   encryptedClassName = '',

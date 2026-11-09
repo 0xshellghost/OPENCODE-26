@@ -193,7 +193,7 @@ export default function ReposPage() {
       <PageHeading
         eyebrow="THE PROJECTS WE BUILD TOGETHER"
         title="Open Source Repositories"
-        description="Explore our community projects — browse code, find issues, and start contributing."
+        description="Explore our community projects - browse code, find issues, and start contributing."
       />
 
       {/* Search Toolbar & Domain Filter Bar */}

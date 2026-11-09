@@ -13,7 +13,7 @@ export default function LandingPage() {
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: 'GeekHaven 2026',
-    description: 'A season of ideas, collaboration, and open-source possibilities — guided by Yuzuki.',
+    description: 'A season of ideas, collaboration, and open-source possibilities - guided by Yuzuki.',
     organizer: { '@type': 'Organization', name: 'GeekHaven, IIIT Allahabad' },
     character: {
       '@type': 'Thing',

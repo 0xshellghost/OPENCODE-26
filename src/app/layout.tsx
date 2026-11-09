@@ -6,7 +6,7 @@ import AppWrappers from './AppWrappers';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://opencode.iiita.ac.in'),
-  title: { default: 'OpenCode 2026 — Learn. Contribute. Belong.', template: '%s | OpenCode 2026' },
+  title: { default: 'OpenCode 2026 - Learn. Contribute. Belong.', template: '%s | OpenCode 2026' },
   description: 'Discover OpenCode 2026 by GeekHaven. Explore open-source events, meet fellow contributors, follow the leaderboards, and build something that matters.',
   manifest: '/manifest.json',
   icons: {
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     shortcut: ['/favicon.ico'],
   },
   openGraph: {
-    title: 'OpenCode 2026 — Guided by Yuzuki',
+    title: 'OpenCode 2026 - Guided by Yuzuki',
     description: 'A month-long open-source celebration where students collaborate with maintainers to build, fix, and improve real-world projects.',
     url: 'https://opencode.iiita.ac.in',
     siteName: 'OpenCode 2026',
