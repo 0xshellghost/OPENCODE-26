@@ -179,6 +179,46 @@ export default function ManagementPage() {
     }
   };
 
+  const [togglingFeature, setTogglingFeature] = useState<string | null>(null);
+
+  const handleToggleFeature = async (
+    key: 'showWinners' | 'showMilestones' | 'showRPlace' | 'showRepositories' | 'showLeaderboard',
+    val: boolean,
+    label: string
+  ) => {
+    setTogglingFeature(key);
+    try {
+      const success = await toggleFeature(key, val);
+      if (success) {
+        toast({
+          title: `${label} tab ${val ? 'enabled' : 'hidden'}`,
+          description: 'Updated in database and synced across deployment.',
+          status: 'success',
+          duration: 2500,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: `Failed to update ${label} tab`,
+          description: 'Could not persist change to database. Please check your admin permissions.',
+          status: 'error',
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: `Failed to update ${label} tab`,
+        description: err?.message || 'Database update failed.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setTogglingFeature(null);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -845,16 +885,8 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showWinners}
-              onChange={async (e) => {
-                const val = e.target.checked;
-                await toggleFeature('showWinners', val);
-                toast({
-                  title: `Winners tab ${val ? 'enabled' : 'hidden'}`,
-                  status: 'info',
-                  duration: 2000,
-                  isClosable: true,
-                });
-              }}
+              isDisabled={togglingFeature === 'showWinners'}
+              onChange={(e) => handleToggleFeature('showWinners', e.target.checked, 'Winners')}
             />
           </Flex>
 
@@ -880,16 +912,8 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showMilestones}
-              onChange={async (e) => {
-                const val = e.target.checked;
-                await toggleFeature('showMilestones', val);
-                toast({
-                  title: `Milestones tab ${val ? 'enabled' : 'hidden'}`,
-                  status: 'info',
-                  duration: 2000,
-                  isClosable: true,
-                });
-              }}
+              isDisabled={togglingFeature === 'showMilestones'}
+              onChange={(e) => handleToggleFeature('showMilestones', e.target.checked, 'Milestones')}
             />
           </Flex>
           <Flex
@@ -914,16 +938,8 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showRPlace}
-              onChange={async (e) => {
-                const val = e.target.checked;
-                await toggleFeature('showRPlace', val);
-                toast({
-                  title: `RPlace tab ${val ? 'enabled' : 'hidden'}`,
-                  status: 'info',
-                  duration: 2000,
-                  isClosable: true,
-                });
-              }}
+              isDisabled={togglingFeature === 'showRPlace'}
+              onChange={(e) => handleToggleFeature('showRPlace', e.target.checked, 'RPlace')}
             />
           </Flex>
           <Flex
@@ -948,16 +964,8 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showRepositories}
-              onChange={async (e) => {
-                const val = e.target.checked;
-                await toggleFeature('showRepositories', val);
-                toast({
-                  title: `Repositories tab ${val ? 'enabled' : 'hidden'}`,
-                  status: 'info',
-                  duration: 2000,
-                  isClosable: true,
-                });
-              }}
+              isDisabled={togglingFeature === 'showRepositories'}
+              onChange={(e) => handleToggleFeature('showRepositories', e.target.checked, 'Repositories')}
             />
           </Flex>
           <Flex
@@ -982,16 +990,8 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showLeaderboard}
-              onChange={async (e) => {
-                const val = e.target.checked;
-                await toggleFeature('showLeaderboard', val);
-                toast({
-                  title: `Leaderboard tab ${val ? 'enabled' : 'hidden'}`,
-                  status: 'info',
-                  duration: 2000,
-                  isClosable: true,
-                });
-              }}
+              isDisabled={togglingFeature === 'showLeaderboard'}
+              onChange={(e) => handleToggleFeature('showLeaderboard', e.target.checked, 'Leaderboard')}
             />
           </Flex>
         </Grid>

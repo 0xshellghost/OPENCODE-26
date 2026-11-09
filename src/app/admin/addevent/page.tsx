@@ -140,7 +140,7 @@ export default function Addevent() {
     }
 
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
+      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
       await axios.post(
         `${baseUrl}/api/v1/admin/create`,
         formData,

@@ -74,7 +74,7 @@ export default function Viewevents() {
     // Fetch Data
     const fetchData = async () => {
       try {
-        const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
+        const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
         const response = await axios.get(
           `${baseUrl}/api/v1/events/`
         );
@@ -96,7 +96,7 @@ export default function Viewevents() {
     const token = localStorage.getItem('token');
 
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com').replace(/\/+$/, '');
+      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
       await axios.delete(
         `${baseUrl}/api/v1/admin/delete/${encodeURIComponent(eventName)}`,
         {

@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { fetchPlatformFeatures, updatePlatformFeaturesInDb } from 'api/admin/admin';
 
 export interface FeaturesConfig {
   showWinners: boolean;
@@ -15,6 +16,7 @@ interface FeaturesContextType {
   features: FeaturesConfig;
   toggleFeature: (key: keyof FeaturesConfig, value: boolean) => Promise<boolean>;
   setFlagshipEvent: (eventName: string | null) => Promise<boolean>;
+  refreshFeatures: () => Promise<void>;
 }
 
 const STORAGE_KEY = 'oc-feature-flags';
@@ -32,10 +34,61 @@ const FeaturesContext = createContext<FeaturesContextType>({
   features: DEFAULT_FEATURES,
   toggleFeature: async () => false,
   setFlagshipEvent: async () => false,
+  refreshFeatures: async () => {},
 });
 
 export function FeaturesProvider({ children }: { children: ReactNode }) {
   const [features, setFeatures] = useState<FeaturesConfig>(DEFAULT_FEATURES);
+
+  const refreshFeatures = useCallback(async () => {
+    try {
+      // 1. Try to fetch directly from backend database API
+      const backendData = await fetchPlatformFeatures();
+      if (backendData) {
+        setFeatures((prev) => {
+          const next = {
+            ...prev,
+            showWinners: typeof backendData.showWinners === 'boolean' ? backendData.showWinners : prev.showWinners,
+            showMilestones: typeof backendData.showMilestones === 'boolean' ? backendData.showMilestones : prev.showMilestones,
+            showRPlace: typeof backendData.showRPlace === 'boolean' ? backendData.showRPlace : prev.showRPlace,
+            showRepositories: typeof backendData.showRepositories === 'boolean' ? backendData.showRepositories : prev.showRepositories,
+            showLeaderboard: typeof backendData.showLeaderboard === 'boolean' ? backendData.showLeaderboard : prev.showLeaderboard,
+          };
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          } catch {}
+          return next;
+        });
+        return;
+      }
+    } catch (e) {
+      console.warn('[FeaturesContext] Backend direct fetch failed, trying proxy:', e);
+    }
+
+    // 2. Fallback to Next.js API proxy
+    try {
+      const res = await fetch('/api/features');
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setFeatures((prev) => {
+            const next = {
+              showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : prev.showWinners,
+              showMilestones: typeof data.showMilestones === 'boolean' ? data.showMilestones : prev.showMilestones,
+              showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
+              showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
+              showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
+              flagshipEvent: data.flagshipEvent !== undefined ? data.flagshipEvent : prev.flagshipEvent,
+            };
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+            } catch {}
+            return next;
+          });
+        }
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     try {
@@ -46,30 +99,13 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
     } catch {
       // localStorage unavailable
     }
-    fetch('/api/features')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!data) return;
-        setFeatures((prev) => {
-          const next = {
-            showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : prev.showWinners,
-            showMilestones: typeof data.showMilestones === 'boolean' ? data.showMilestones : prev.showMilestones,
-            showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
-            showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
-            showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
-            flagshipEvent: data.flagshipEvent !== undefined ? data.flagshipEvent : prev.flagshipEvent,
-          };
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          } catch {}
-          return next;
-        });
-      })
-      .catch(() => {});
-  }, []);
+    refreshFeatures();
+  }, [refreshFeatures]);
 
   const toggleFeature = useCallback(async (key: keyof FeaturesConfig, value: boolean) => {
+    let previousState: FeaturesConfig = DEFAULT_FEATURES;
     setFeatures((prev) => {
+      previousState = prev;
       const next = { ...prev, [key]: value };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -77,8 +113,18 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
       return next;
     });
 
+    let backendSuccess = false;
     try {
-      const token = localStorage.getItem('token');
+      // Update in database via backend API
+      await updatePlatformFeaturesInDb({ [key]: value });
+      backendSuccess = true;
+    } catch (dbErr) {
+      console.warn('[FeaturesContext] updatePlatformFeaturesInDb warning:', dbErr);
+    }
+
+    // Also sync with Next.js local route for proxy cache consistency
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const res = await fetch('/api/features', {
         method: 'POST',
         headers: {
@@ -87,10 +133,23 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
         },
         body: JSON.stringify({ [key]: value }),
       });
-      return res.ok;
-    } catch {
+      if (res.ok) {
+        backendSuccess = true;
+      }
+    } catch (proxyErr) {
+      console.warn('[FeaturesContext] Next.js features proxy update warning:', proxyErr);
+    }
+
+    if (!backendSuccess) {
+      // Rollback to previous state on total failure
+      setFeatures(previousState);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(previousState));
+      } catch {}
       return false;
     }
+
+    return true;
   }, []);
 
   const setFlagshipEvent = useCallback(async (eventName: string | null) => {
@@ -103,7 +162,7 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
     });
 
     try {
-      const token = localStorage.getItem('token');
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const res = await fetch('/api/features', {
         method: 'POST',
         headers: {
@@ -119,7 +178,7 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <FeaturesContext.Provider value={{ features, toggleFeature, setFlagshipEvent }}>
+    <FeaturesContext.Provider value={{ features, toggleFeature, setFlagshipEvent, refreshFeatures }}>
       {children}
     </FeaturesContext.Provider>
   );

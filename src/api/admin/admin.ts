@@ -226,7 +226,7 @@ export async function updateFlagshipEvent(eventName: string, isFlagship = true) 
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found. Please sign in as admin.');
 
-  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://opencode-26-backend.onrender.com';
+  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
   const baseUrl = rawBase.replace(/\/+$/, '');
   const url = `${baseUrl}/api/v1/admin/events/${encodeURIComponent(eventName)}/flagship`;
 
@@ -276,4 +276,74 @@ export async function uploadRPlaceBoardSnapshot(buffer: ArrayBuffer) {
   }
 
   return await response.json();
+}
+
+export interface BackendPlatformFeatures {
+  showWinners: boolean;
+  showMilestones: boolean;
+  showLeaderboard: boolean;
+  showRepositories: boolean;
+  showRPlace: boolean;
+}
+
+export async function fetchPlatformFeatures(): Promise<BackendPlatformFeatures | null> {
+  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+  const baseUrl = rawBase.replace(/\/+$/, '');
+  const url = `${baseUrl}/api/v1/features`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return (data?.data || data) as BackendPlatformFeatures;
+    }
+  } catch (err) {
+    console.warn('[fetchPlatformFeatures] Could not fetch from backend:', err);
+  }
+
+  return null;
+}
+
+export async function updatePlatformFeaturesInDb(
+  featuresPayload: Partial<BackendPlatformFeatures>
+): Promise<BackendPlatformFeatures> {
+  if (typeof window === 'undefined') {
+    throw new Error('Window is undefined');
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('No authentication token found. Please sign in as admin.');
+  }
+
+  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+  const baseUrl = rawBase.replace(/\/+$/, '');
+  const url = `${baseUrl}/api/v1/admin/features`;
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(featuresPayload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message ||
+        errorData?.error ||
+        `Failed to update features in database (HTTP ${response.status}: ${response.statusText})`
+    );
+  }
+
+  const result = await response.json();
+  return (result?.data || result) as BackendPlatformFeatures;
 }
