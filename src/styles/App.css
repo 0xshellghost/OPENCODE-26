@@ -156,10 +156,10 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .global-sakura-host {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 10;
   pointer-events: none;
   background: transparent;
-  opacity: 0.85;
+  opacity: 0.70;
   transform: translateZ(0);
   will-change: transform;
   contain: strict;
@@ -167,7 +167,7 @@ h1, h2, h3 { font-family: var(--f-display); font-weight: 300; text-wrap: balance
 .chakra-ui-light .global-sakura-host,
 [data-theme="light"] .global-sakura-host,
 .light .global-sakura-host {
-  opacity: 0.35;
+  opacity: 0.40;
 }
 
 .glass, .glass-panel, .glass-panel-dark, .glass-panel-light {

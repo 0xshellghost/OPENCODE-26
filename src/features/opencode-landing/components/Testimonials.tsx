@@ -263,15 +263,15 @@ export function Testimonials() {
         <div className="absolute inset-x-0 top-0 h-56 sm:h-72 bg-gradient-to-b from-[#07131F] via-[#07131F]/95 to-transparent pointer-events-none z-10" />
         <div className="absolute inset-x-0 top-0 h-44 bg-[radial-gradient(ellipse_80%_100%_at_50%_0%,rgba(88,185,154,0.06),transparent_75%)] pointer-events-none z-10" />
         <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#07131F] via-[#07131F]/80 to-transparent pointer-events-none z-10" />
-
-        {/* Drifting Cherry Blossom Petals */}
-        <SakuraCanvas
-          active={true}
-          position="absolute"
-          petalCount={24}
-          className="opacity-45 pointer-events-none z-1"
-        />
       </div>
+
+      {/* Drifting Cherry Blossom Petals floating gracefully in background */}
+      <SakuraCanvas
+        active={true}
+        position="absolute"
+        petalCount={12}
+        className="pointer-events-none z-10 opacity-70"
+      />
 
       {/* ─────────────────────────────────────────────────────────────
           2. Section Header & Japanese Memoir Framing

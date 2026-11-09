@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { useSakura } from "contexts/SakuraContext";
 
 interface SakuraCanvasProps {
   active?: boolean;
@@ -29,22 +30,24 @@ interface Petal {
 }
 
 const PETAL_COLORS = [
-  "rgba(184, 229, 213, 0.85)", // Crisp Mint (#B8E5D5)
-  "rgba(88, 185, 154, 0.80)",  // Glowing Emerald (#58B99A)
-  "rgba(212, 241, 231, 0.80)", // Soft Mint Frost (#D4F1E7)
-  "rgba(62, 168, 137, 0.75)",  // Deep Luminous Emerald (#3EA889)
-  "rgba(244, 241, 232, 0.85)", // Soft Moonlit White (#F4F1E8)
-  "rgba(217, 226, 232, 0.80)", // Cool Misty Blue-White (#D9E2E8)
-  "rgba(143, 175, 196, 0.75)", // Soft Desaturated Moon-Blue (#8FAFC4)
+  "rgba(184, 229, 213, 0.70)", // Crisp Mint (#B8E5D5)
+  "rgba(88, 185, 154, 0.65)",  // Glowing Emerald (#58B99A)
+  "rgba(212, 241, 231, 0.65)", // Soft Mint Frost (#D4F1E7)
+  "rgba(62, 168, 137, 0.60)",  // Deep Luminous Emerald (#3EA889)
+  "rgba(244, 241, 232, 0.70)", // Soft Moonlit White (#F4F1E8)
+  "rgba(217, 226, 232, 0.65)", // Cool Misty Blue-White (#D9E2E8)
+  "rgba(143, 175, 196, 0.60)", // Soft Desaturated Moon-Blue (#8FAFC4)
 ];
 
 export default function SakuraCanvas({
   active = true,
   className = "",
-  petalCount = 55,
+  petalCount = 14,
   position = "fixed",
   colors,
 }: SakuraCanvasProps) {
+  const { enabled } = useSakura();
+  const isEffectiveActive = active && enabled;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mouseRef = useRef<{ x: number; y: number; vx: number; vy: number }>({
     x: -9999,
@@ -54,6 +57,7 @@ export default function SakuraCanvas({
   });
 
   useEffect(() => {
+    if (!isEffectiveActive) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -110,17 +114,17 @@ export default function SakuraCanvas({
       x: Math.random() * (width + 200) - 100,
       y: randomY ? Math.random() * height : -30,
       z: Math.random() * 0.8 + 0.4, // Depth factor
-      size: Math.random() * 10 + 10,
-      speedX: Math.random() * 1.5 + 0.8, // Breeze from left to right
-      speedY: Math.random() * 1.8 + 1.0, // Gentle downward drift
+      size: Math.random() * 10 + 10, // Restored to original delicate size (10px - 20px)
+      speedX: Math.random() * 1.3 + 0.6, // Graceful, slow breeze
+      speedY: Math.random() * 1.4 + 0.8, // Gentle downward drift
       speedZ: Math.random() * 0.02 - 0.01,
       rotationX: Math.random() * Math.PI * 2,
       rotationY: Math.random() * Math.PI * 2,
       rotationZ: Math.random() * Math.PI * 2,
-      rotationSpeedX: (Math.random() - 0.5) * 0.04,
-      rotationSpeedY: (Math.random() - 0.5) * 0.05,
-      rotationSpeedZ: (Math.random() - 0.5) * 0.03,
-      opacity: Math.random() * 0.4 + 0.5,
+      rotationSpeedX: (Math.random() - 0.5) * 0.03,
+      rotationSpeedY: (Math.random() - 0.5) * 0.035,
+      rotationSpeedZ: (Math.random() - 0.5) * 0.02,
+      opacity: Math.random() * 0.25 + 0.35, // Soft, non-blocking translucent alpha (0.35 - 0.60)
       color: activeColors[Math.floor(Math.random() * activeColors.length)],
     });
 
@@ -128,7 +132,7 @@ export default function SakuraCanvas({
       petals.push(createPetal(true));
     }
 
-    // Draw realistic notched cherry blossom petal shape
+    // Draw realistic notched cherry blossom petal shape with soft gradient
     const drawPetal = (
       p: Petal,
       context: CanvasRenderingContext2D,
@@ -143,7 +147,12 @@ export default function SakuraCanvas({
       context.rotate(p.rotationZ);
       context.scale(scaleX, scaleY);
 
-      context.fillStyle = p.color;
+      // Gradient from base (deeper tone) to notched tip (translucent mist)
+      const grad = context.createLinearGradient(0, p.size, 0, -p.size);
+      grad.addColorStop(0, p.color);
+      grad.addColorStop(1, "rgba(244, 241, 232, 0.45)");
+
+      context.fillStyle = grad;
       context.globalAlpha = p.opacity;
 
       // Authentic Sakura petal geometry with notched tip
@@ -171,7 +180,7 @@ export default function SakuraCanvas({
       context.fill();
 
       // Subtle translucent vein down the center
-      context.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      context.strokeStyle = "rgba(255, 255, 255, 0.25)";
       context.lineWidth = 0.7;
       context.beginPath();
       context.moveTo(0, -p.size * 0.7);
@@ -258,14 +267,18 @@ export default function SakuraCanvas({
       window.removeEventListener("mouseleave", handleMouseLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [active, petalCount, position, colors]);
+  }, [isEffectiveActive, petalCount, position, colors]);
+
+  if (!isEffectiveActive) return null;
+
+  const hasZIndex = /\bz(-\w+|-\[\d+\])/.test(className);
 
   return (
     <canvas
       ref={canvasRef}
       className={`pointer-events-none ${
         position === "absolute" ? "absolute inset-0" : "fixed inset-0"
-      } z-20 ${className}`}
+      } ${hasZIndex ? "" : "z-20"} ${className}`}
     />
   );
 }

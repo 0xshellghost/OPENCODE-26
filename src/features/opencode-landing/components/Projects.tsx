@@ -283,14 +283,14 @@ export default function Projects() {
       <SakuraCanvas
         active={true}
         position="absolute"
-        petalCount={30}
+        petalCount={12}
         className="pointer-events-none z-10 opacity-70"
         colors={[
-          "rgba(184, 229, 213, 0.85)", // Glowing Mint
-          "rgba(88, 185, 154, 0.80)",  // Emerald
-          "rgba(255, 183, 197, 0.75)", // Sakura Pink
-          "rgba(56, 189, 248, 0.70)",  // Cyan
-          "rgba(244, 241, 232, 0.80)", // Soft Moonlit Ivory
+          "rgba(184, 229, 213, 0.70)", // Glowing Mint
+          "rgba(88, 185, 154, 0.65)",  // Emerald
+          "rgba(255, 183, 197, 0.65)", // Sakura Pink
+          "rgba(56, 189, 248, 0.60)",  // Cyan
+          "rgba(244, 241, 232, 0.70)", // Soft Moonlit Ivory
         ]}
       />
 

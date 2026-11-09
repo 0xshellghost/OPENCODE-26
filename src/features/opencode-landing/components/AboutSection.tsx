@@ -97,15 +97,15 @@ export default function AboutSection() {
             background: "linear-gradient(to bottom, transparent 0%, rgba(7, 19, 31, 0.35) 25%, rgba(11, 28, 42, 0.85) 70%, #0B1C2A 100%)"
           }}
         />
-
-        {/* Drifting Cherry Blossom Petals */}
-        <SakuraCanvas
-          active={true}
-          position="absolute"
-          petalCount={28}
-          className="opacity-55 pointer-events-none z-1"
-        />
       </div>
+
+      {/* Drifting Cherry Blossom Petals floating gracefully in background */}
+      <SakuraCanvas
+        active={true}
+        position="absolute"
+        petalCount={12}
+        className="pointer-events-none z-[5] opacity-70"
+      />
 
       {/* =========================================================================
           CONTENT CONTAINER
