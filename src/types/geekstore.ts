@@ -35,30 +35,6 @@ export interface ListItemsResponse {
   totalPages: number;
 }
 
-export interface CartItem {
-  id: string;
-  itemId: string;
-  name?: string;
-  price?: number;
-  imageUrl?: string;
-  category?: string;
-  item?: CatalogItem;
-  quantity: number;
-  size?: string;
-  isAvailable?: boolean;
-  lineTotal?: number;
-}
-
-export interface Cart {
-  id?: string;
-  userId?: string;
-  items: CartItem[];
-  subtotal: number;
-  totalItems: number;
-  canCheckout: boolean;
-  warnings?: string[];
-}
-
 export interface CheckoutPayload {
   shippingAddress: string;
   contactNumber: string;
