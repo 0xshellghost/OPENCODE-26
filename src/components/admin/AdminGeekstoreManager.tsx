@@ -770,6 +770,15 @@ export default function AdminGeekstoreManager() {
                           <Flex justify="flex-end" align="center" gap="6px">
                             {prod.deletedAt ? (
                               <>
+                                <Text
+                                  fontSize="10px"
+                                  color="red.300"
+                                  fontFamily="var(--f-mono)"
+                                  fontWeight="600"
+                                  mr={1}
+                                >
+                                  Deleted
+                                </Text>
                                 <Button
                                   size="xs"
                                   colorScheme="teal"
