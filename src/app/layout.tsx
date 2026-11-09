@@ -64,9 +64,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <link
           rel="preload"
-          href="/videos/beginning.mp4"
+          href="/videos/beginning.webm"
           as="video"
-          type="video/mp4"
+          type="video/webm"
         />
       </head>
       <body id="root"><AppWrappers>{children}</AppWrappers></body>

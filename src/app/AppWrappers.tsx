@@ -69,7 +69,15 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasLoaded || !minTimeReached || !animationDone) return;
     setIsExiting(true);
-    const timer = setTimeout(() => setIsLoading(false), 700);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('initial-loader-exiting'));
+    }
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('initial-loader-finished'));
+      }
+    }, 700);
     return () => clearTimeout(timer);
   }, [hasLoaded, minTimeReached, animationDone]);
 

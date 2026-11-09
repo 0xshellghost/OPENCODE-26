@@ -34,25 +34,99 @@ export default function CinematicIntro() {
   }, []);
 
   useEffect(() => {
-    // Trigger smooth entrance of controls after mount
-    const timer = setTimeout(() => setControlsVisible(true), 150);
-    return () => clearTimeout(timer);
+    const isLoaderActive = () => {
+      if (typeof document === "undefined") return false;
+      return (
+        document.documentElement.classList.contains("oc-initial-loading") ||
+        document.body.classList.contains("oc-initial-loading")
+      );
+    };
+
+    if (isLoaderActive()) {
+      const handleLoaderDone = () => setControlsVisible(true);
+      window.addEventListener("initial-loader-finished", handleLoaderDone, { once: true });
+      return () => window.removeEventListener("initial-loader-finished", handleLoaderDone);
+    } else {
+      const timer = setTimeout(() => setControlsVisible(true), 150);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
-  // Play with sound by default, with seamless gesture fallback for browser autoplay policy
+  // Play with sound by default once the initial loader finishes, with seamless gesture fallback for browser autoplay policy
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isOpen) return;
 
-    video.muted = false;
-    video.play().then(() => {
-      setIsMuted(false);
-    }).catch(() => {
-      // If browser blocks unmuted autoplay without prior gesture, start muted
-      video.muted = true;
-      setIsMuted(true);
-      video.play().catch(() => {});
-    });
+    let isCancelled = false;
+
+    const startPlayback = () => {
+      if (isCancelled) return;
+      const vid = videoRef.current;
+      if (!vid || !isOpen) return;
+
+      const triggerPlay = () => {
+        if (isCancelled || !videoRef.current) return;
+        vid.currentTime = 0;
+        vid.muted = false;
+        vid.play().then(() => {
+          if (!isCancelled) {
+            setIsMuted(false);
+            setIsPlaying(true);
+          }
+        }).catch(() => {
+          // If browser blocks unmuted autoplay without prior gesture, start muted
+          if (!isCancelled) {
+            vid.muted = true;
+            setIsMuted(true);
+            vid.play().then(() => {
+              if (!isCancelled) setIsPlaying(true);
+            }).catch(() => {});
+          }
+        });
+      };
+
+      if (vid.readyState >= 2) {
+        triggerPlay();
+      } else {
+        vid.addEventListener("canplay", triggerPlay, { once: true });
+        vid.load();
+      }
+    };
+
+    const isLoaderActive = () => {
+      if (typeof document === "undefined") return false;
+      return (
+        document.documentElement.classList.contains("oc-initial-loading") ||
+        document.body.classList.contains("oc-initial-loading")
+      );
+    };
+
+    if (isLoaderActive()) {
+      // Keep paused at frame 0 while initial loader is on screen
+      video.pause();
+      video.currentTime = 0;
+
+      const handleLoaderFinished = () => {
+        startPlayback();
+      };
+
+      window.addEventListener("initial-loader-finished", handleLoaderFinished, { once: true });
+
+      // Fallback timer: ensure playback begins if loader takes longer than expected
+      const fallbackTimer = setTimeout(() => {
+        if (!isLoaderActive()) {
+          startPlayback();
+        }
+      }, 4200);
+
+      return () => {
+        isCancelled = true;
+        window.removeEventListener("initial-loader-finished", handleLoaderFinished);
+        clearTimeout(fallbackTimer);
+      };
+    } else {
+      startPlayback();
+    }
 
     const handleFirstGesture = () => {
       if (video && video.muted) {
@@ -66,6 +140,7 @@ export default function CinematicIntro() {
     window.addEventListener("touchstart", handleFirstGesture, { once: true });
 
     return () => {
+      isCancelled = true;
       window.removeEventListener("click", handleFirstGesture);
       window.removeEventListener("keydown", handleFirstGesture);
       window.removeEventListener("touchstart", handleFirstGesture);
@@ -247,7 +322,6 @@ export default function CinematicIntro() {
             <video
               ref={videoRef}
               poster="/images/intro-poster.webp"
-              autoPlay
               playsInline
               preload="auto"
               muted={isMuted}
