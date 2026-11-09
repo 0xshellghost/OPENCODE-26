@@ -251,7 +251,7 @@ export default function CommunityMetrics({
               fontWeight="900"
               lineHeight="1"
               color={currentTier.color}
-              fontFamily="var(--f-sans)"
+              fontFamily="var(--f-body)"
               noOfLines={1}
             >
               {currentTier.name}
@@ -305,7 +305,7 @@ export default function CommunityMetrics({
                 fontWeight="900"
                 lineHeight="1"
                 color="#FBBF24"
-                fontFamily="var(--f-sans)"
+                fontFamily="var(--f-body)"
               >
                 Staff
               </Text>
@@ -325,7 +325,7 @@ export default function CommunityMetrics({
                 fontWeight="900"
                 lineHeight="1"
                 color="var(--muted)"
-                fontFamily="var(--f-sans)"
+                fontFamily="var(--f-body)"
               >
                 Unranked
               </Text>

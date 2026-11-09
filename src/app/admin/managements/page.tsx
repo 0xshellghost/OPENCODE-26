@@ -852,7 +852,14 @@ ON DUPLICATE KEY UPDATE
 
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }} px="20px">
-      <Text color={textColor} fontSize="2xl" mb="24px" fontWeight="700">
+      <Text
+        color={textColor}
+        fontFamily="var(--f-display)"
+        fontSize={{ base: '26px', md: '32px' }}
+        fontWeight="400"
+        letterSpacing="0.02em"
+        mb="24px"
+      >
         Management Tools
       </Text>
 

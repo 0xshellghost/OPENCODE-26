@@ -244,7 +244,14 @@ export default function Dashboard() {
           boxShadow="var(--shadow)"
           mb="24px"
         >
-          <Text color="var(--fg)" fontSize="2xl" fontWeight="700" mb="6px">
+          <Text
+            color="var(--fg)"
+            fontFamily="var(--f-display)"
+            fontSize={{ base: '26px', md: '30px' }}
+            fontWeight="400"
+            letterSpacing="0.02em"
+            mb="6px"
+          >
             Change Points
           </Text>
           <Text fontSize="sm" color="var(--fg-muted)" mb="20px">
