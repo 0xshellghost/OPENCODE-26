@@ -11,6 +11,7 @@ import {
   Sliders,
   Trophy,
   User,
+  ShoppingBag,
 } from 'lucide-react';
 
 import { IRoute } from 'types/navigation';
@@ -35,7 +36,7 @@ const routes: IRoute[] = [
     icon: <Icon as={CalendarDays} width="20px" height="20px" color="inherit" />,
   },
   {
-    name: 'Change Points',
+    name: 'Store & Points',
     layout: '/admin',
     path: '/home',
     icon: <Icon as={Sliders} width="20px" height="20px" color="inherit" />,
@@ -52,6 +53,12 @@ const routes: IRoute[] = [
     layout: '/user',
     icon: <Icon as={BarChart2} width="20px" height="20px" color="inherit" />,
     path: '/leaderboard/Opencode',
+  },
+  {
+    name: 'Geekstore',
+    layout: '/user',
+    icon: <Icon as={ShoppingBag} width="20px" height="20px" color="inherit" />,
+    path: '/geekstore',
   },
   {
     name: 'Repositories',

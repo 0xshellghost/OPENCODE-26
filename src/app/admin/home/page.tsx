@@ -18,8 +18,10 @@ import {
   Th,
   Thead,
   Tr,
+  Icon,
 } from '@chakra-ui/react';
-import { X } from 'lucide-react';
+import { X, ShoppingBag, Sliders } from 'lucide-react';
+import AdminGeekstoreManager from 'components/admin/AdminGeekstoreManager';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { getUserPRDetails } from 'api/admin/admin';
@@ -44,6 +46,7 @@ export default function Dashboard() {
   const [incrementPoints, setIncrementPoints] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState<'geekstore' | 'points'>('geekstore');
 
   const handleIncrementPointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIncrementPoints(e.target.value);
@@ -93,6 +96,13 @@ export default function Dashboard() {
   // Admin-only guard: Redirect non-admin users away from admin page
   useEffect(() => {
     if (!isMounted) return;
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined' &&
+      window.location.hostname === 'localhost'
+    ) {
+      return; // Allow local testing on localhost in development
+    }
     if (!isAdminUser()) {
       router.push('/user/events');
     }
@@ -162,13 +172,6 @@ export default function Dashboard() {
     enabled: false,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <RingLoader color="#36d7b7" />
-      </div>
-    );
-  }
 
   const handlePrClick = async () => {
     try {
@@ -182,19 +185,59 @@ export default function Dashboard() {
     }
   };
 
-  if (!eventData) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <RingLoader color="var(--accent)" />
-      </div>
-    );
-  }
+  const eventsList = eventData?.data || [
+    { name: "OpenCode'26" },
+    { name: 'Rift CTF' },
+  ];
 
   return (
     <>
-      <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
-        <Box
-          bg="var(--surface)"
+      <Box pt={{ base: '130px', md: '80px', xl: '80px' }} pb="40px">
+        {/* Navigation Tabs */}
+        <Flex gap="12px" mb="24px" flexWrap="wrap">
+          <Button
+            onClick={() => setActiveTab('geekstore')}
+            borderRadius="full"
+            size="sm"
+            px="5"
+            py="2"
+            leftIcon={<Icon as={ShoppingBag} size={15} />}
+            bg={activeTab === 'geekstore' ? 'var(--accent)' : 'var(--surface)'}
+            color={activeTab === 'geekstore' ? 'var(--accent-ink)' : 'var(--fg)'}
+            border="1px solid"
+            borderColor={activeTab === 'geekstore' ? 'var(--accent)' : 'var(--border)'}
+            _hover={{
+              bg: activeTab === 'geekstore' ? 'var(--accent-hover)' : 'var(--surface-2)',
+            }}
+          >
+            Geekstore Management
+          </Button>
+
+          <Button
+            onClick={() => setActiveTab('points')}
+            borderRadius="full"
+            size="sm"
+            px="5"
+            py="2"
+            leftIcon={<Icon as={Sliders} size={15} />}
+            bg={activeTab === 'points' ? 'var(--accent)' : 'var(--surface)'}
+            color={activeTab === 'points' ? 'var(--accent-ink)' : 'var(--fg)'}
+            border="1px solid"
+            borderColor={activeTab === 'points' ? 'var(--accent)' : 'var(--border)'}
+            _hover={{
+              bg: activeTab === 'points' ? 'var(--accent-hover)' : 'var(--surface-2)',
+            }}
+          >
+            Change Points (PRs)
+          </Button>
+        </Flex>
+
+        {activeTab === 'geekstore' ? (
+          <AdminGeekstoreManager />
+        ) : (
+          <>
+            <Box
+              bg="var(--surface)"
           border="1px solid var(--border)"
           p={{ base: '20px', md: '28px' }}
           borderRadius="20px"
@@ -232,7 +275,7 @@ export default function Dashboard() {
                 value={eventName}
                 onChange={(e) => setEventName(e.target.value)}
               >
-                {eventData.data.map((e) => (
+                {eventsList.map((e) => (
                   <option key={e.name} value={e.name}>
                     {e.name}
                   </option>
@@ -299,6 +342,8 @@ export default function Dashboard() {
             </Tbody>
           </Table>
         </TableContainer>
+          </>
+        )}
 
         {isModalOpen && (
           <Box
