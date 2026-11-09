@@ -186,7 +186,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
         >
           <Icon as={MdEmojiEvents} boxSize="28px" />
         </Box>
-        <Text fontFamily="Georgia, serif" fontSize="22px" color="var(--text)" mb="6px">
+        <Text fontFamily="var(--f-display)" fontSize="22px" color="var(--text)" mb="6px">
           No Event Winners Yet
         </Text>
         <Text fontSize="14px" color="var(--muted)">
@@ -339,7 +339,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                     >
                       <Box overflow="hidden" mr="12px">
                         <Text
-                          fontSize="10.5px"
+                          fontSize="11px"
                           letterSpacing="0.16em"
                           color="var(--accent)"
                           fontWeight="700"
@@ -351,8 +351,8 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                         <Text
                           as="h3"
                           aria-live="polite"
-                          fontFamily="Georgia, serif"
-                          fontSize="21px"
+                          fontFamily="var(--f-display)"
+                          fontSize="22px"
                           fontWeight="400"
                           color="var(--text)"
                           lineHeight="1.2"
@@ -402,7 +402,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                         >
                           <Icon as={MdEmojiEvents} boxSize="24px" />
                         </Box>
-                        <Text fontFamily="Georgia, serif" fontSize="20px" color="var(--text)" mb="6px">
+                        <Text fontFamily="var(--f-display)" fontSize="20px" color="var(--text)" mb="6px">
                           Winners In Progress
                         </Text>
                         <Text fontSize="13px" color="var(--muted)" maxW="240px" lineHeight="1.6">
@@ -459,7 +459,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                                 >
                                   <Icon as={MdStar} color={rStyle.text} boxSize="13px" />
                                   <Text
-                                    fontSize="11.5px"
+                                    fontSize="12px"
                                     fontWeight="700"
                                     color={rStyle.text}
                                     letterSpacing="0.04em"
@@ -512,7 +512,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                                           <Box flex="1" minW="0" mr="8px">
                                             <Flex align="center">
                                               <Text
-                                                fontSize="13.5px"
+                                                fontSize="14px"
                                                 fontWeight="600"
                                                 color="var(--text)"
                                                 noOfLines={1}
@@ -535,7 +535,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                                               )}
                                             </Flex>
                                             <Text
-                                              fontSize="11.5px"
+                                              fontSize="12px"
                                               color="var(--muted)"
                                               noOfLines={1}
                                               mt="1px"
@@ -640,7 +640,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
                 borderRadius="999px"
                 px={{ base: '12px', sm: '16px' }}
                 py="6px"
-                fontSize="12.5px"
+                fontSize="12px"
                 fontWeight={isPillActive ? 700 : 500}
                 bg={isPillActive ? 'var(--accent)' : 'var(--card-soft)'}
                 color={isPillActive ? 'var(--accent-ink)' : 'var(--muted)'}
@@ -684,7 +684,7 @@ export function EventWinnersCard({ events }: { events: Event[] }) {
           borderRadius="999px"
           px="10px"
           py="6px"
-          fontSize="11.5px"
+          fontSize="12px"
           variant="ghost"
           color="var(--subtle)"
           _hover={{ color: 'var(--fg)', bg: 'var(--card-soft)' }}

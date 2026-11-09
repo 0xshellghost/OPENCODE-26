@@ -952,7 +952,7 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
             zIndex={10}
           >
             <Crosshair size={12} color="var(--accent)" />
-            <Text fontSize="12px" fontWeight="600" fontFamily="mono" color="#FFFFFF">
+            <Text fontSize="12px" fontWeight="600" fontFamily="var(--f-mono)" color="#FFFFFF">
               {hoverCoords !== null ? `X: ${hoverCoords.x} · Y: ${hoverCoords.y}` : 'Hover canvas'}
             </Text>
             {hoverCoords !== null && (

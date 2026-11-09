@@ -93,13 +93,13 @@ export default function ProductCard({
           {/* Sizes Tag (Placed cleanly away from price) */}
           {item.sizes && item.sizes.length > 0 && (
             <div className="mt-1 flex flex-wrap items-center gap-1">
-              <span className="text-[10.5px] font-mono text-[var(--subtle)] mr-0.5">
+              <span className="text-[11px] font-mono text-[var(--subtle)] mr-0.5">
                 Sizes:
               </span>
               {item.sizes.map((s) => (
                 <span
                   key={s}
-                  className="rounded px-1.5 py-0.5 text-[9.5px] font-mono font-medium bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]"
+                  className="rounded px-1.5 py-0.5 text-[10px] font-mono font-medium bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]"
                 >
                   {s}
                 </span>

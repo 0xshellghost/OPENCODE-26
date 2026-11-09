@@ -136,7 +136,7 @@ export default function AdminOrderDetailsModal({
               </Text>
               <Badge
                 fontSize="xs"
-                fontFamily="mono"
+                fontFamily="var(--f-mono)"
                 borderRadius="md"
                 px={2}
                 py={0.5}
@@ -251,7 +251,7 @@ export default function AdminOrderDetailsModal({
                 <Text fontWeight="600" color="var(--fg)">
                   Contact Phone:
                 </Text>
-                <Text color="var(--fg-muted)" fontFamily="mono">
+                <Text color="var(--fg-muted)" fontFamily="var(--f-mono)">
                   {order.contactNumber || 'Not specified'}
                 </Text>
               </Flex>
@@ -351,16 +351,16 @@ export default function AdminOrderDetailsModal({
                             </Text>
                           </Flex>
                         </Td>
-                        <Td borderColor="var(--border)" fontFamily="mono" fontSize="xs">
+                        <Td borderColor="var(--border)" fontFamily="var(--f-mono)" fontSize="xs">
                           {it.size || '—'}
                         </Td>
-                        <Td borderColor="var(--border)" fontFamily="mono" fontSize="xs">
+                        <Td borderColor="var(--border)" fontFamily="var(--f-mono)" fontSize="xs">
                           {it.quantity}
                         </Td>
-                        <Td borderColor="var(--border)" fontFamily="mono" fontSize="xs">
+                        <Td borderColor="var(--border)" fontFamily="var(--f-mono)" fontSize="xs">
                           ₹{unitP.toLocaleString('en-IN')}
                         </Td>
-                        <Td borderColor="var(--border)" fontFamily="mono" fontSize="xs" textAlign="right" fontWeight="700">
+                        <Td borderColor="var(--border)" fontFamily="var(--f-mono)" fontSize="xs" textAlign="right" fontWeight="700">
                           ₹{totP.toLocaleString('en-IN')}
                         </Td>
                       </Tr>
@@ -374,7 +374,7 @@ export default function AdminOrderDetailsModal({
               <Text fontSize="sm" color="var(--fg-muted)">
                 Grand Total:
               </Text>
-              <Text fontSize="xl" fontWeight="800" color="var(--fg)" fontFamily="mono">
+              <Text fontSize="xl" fontWeight="800" color="var(--fg)" fontFamily="var(--f-mono)">
                 ₹{order.totalAmount.toLocaleString('en-IN')}
               </Text>
             </Flex>

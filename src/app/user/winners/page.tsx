@@ -449,7 +449,22 @@ function WinnersHeader() {
           <ShinyText text="HALL OF FAME" speed={5} />
           <span />
         </p>
-        <h1 style={{ textAlign: 'center', margin: '0 0 10px', color: 'var(--fg)', textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)', maxWidth: '100%', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+        <h1
+          style={{
+            fontFamily: 'var(--f-display)',
+            fontWeight: 300,
+            fontSize: 'var(--fs-page-title, clamp(32px, 5.5vw, 54px))',
+            lineHeight: 1.15,
+            letterSpacing: '0.02em',
+            textAlign: 'center',
+            margin: '0 0 10px',
+            color: 'var(--fg)',
+            textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)',
+            maxWidth: '100%',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+          }}
+        >
           <BlurText text="Legacy of Legends" delay={50} animateBy="words" direction="top" />
         </h1>
         <p className="oc-description" style={{ textAlign: 'center', maxWidth: '540px', margin: 0 }}>

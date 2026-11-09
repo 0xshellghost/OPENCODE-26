@@ -87,9 +87,10 @@ export default function Milestones() {
 
   return (
     <Box w="full" pt="0" pb="24px">
-      {/* 1. Header: use oc-page-heading markup with visible eyebrow and Georgia stat tiles on the right */}
+      {/* 1. Header: use oc-page-heading markup with visible eyebrow and display stat tiles on the right */}
       <Box
         as="header"
+        className="oc-page-header"
         display="flex"
         flexDirection={{ base: 'column', lg: 'row' }}
         alignItems={{ base: 'flex-start', lg: 'center' }}
@@ -104,7 +105,17 @@ export default function Milestones() {
             <span />
             <ShinyText text="Highlights · OpenCode 2026" speed={5} />
           </p>
-          <h1 style={{ marginBottom: '12px' }}>
+          <h1
+            style={{
+              fontFamily: 'var(--f-display)',
+              fontWeight: 300,
+              fontSize: 'clamp(32px, 5.5vw, 54px)',
+              lineHeight: 1.15,
+              letterSpacing: '0.02em',
+              color: 'var(--fg)',
+              margin: '0 0 12px',
+            }}
+          >
             <BlurText text="Moments that matter." delay={45} animateBy="words" direction="top" />
           </h1>
           <p className="oc-description">
@@ -112,7 +123,7 @@ export default function Milestones() {
           </p>
         </Box>
 
-        {/* Compact stat tiles with Georgia numerals; stacks below description on mobile */}
+        {/* Compact stat tiles with display numerals; stacks below description on mobile */}
         <Flex
           direction="row"
           gap={{ base: '8px', sm: '12px', md: '14px' }}
@@ -285,7 +296,7 @@ function StatTile({ label, value }: { label: string; value: string }) {
       flex={{ base: '1', sm: 'initial' }}
     >
       <Text
-        fontFamily="Georgia, serif"
+        fontFamily="var(--f-display)"
         fontSize={{ base: '18px', sm: '22px', md: '28px' }}
         fontWeight="400"
         color="var(--text)"

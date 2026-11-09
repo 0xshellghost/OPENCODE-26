@@ -193,7 +193,7 @@ function CustomTooltip({ active, payload, label }: any) {
           borderBottom: isLight ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        <span style={{ fontSize: '12px', fontWeight: 800, color: isLight ? '#0D9488' : '#58B99A', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '12px', fontWeight: 800, color: isLight ? '#0D9488' : '#58B99A', fontFamily: 'var(--f-mono)' }}>
           {label}
         </span>
         {formattedDate && (
@@ -238,7 +238,7 @@ function CustomTooltip({ active, payload, label }: any) {
                   )}
                   <span
                     style={{
-                      fontSize: '12.5px',
+                      fontSize: '12px',
                       fontWeight: isLeader ? 700 : 500,
                       color: isLeader ? (isLight ? '#B45309' : '#F5C542') : (isLight ? '#1E293B' : '#E2E8F0'),
                       whiteSpace: 'nowrap',
@@ -252,8 +252,8 @@ function CustomTooltip({ active, payload, label }: any) {
 
                 <span
                   style={{
-                    fontFamily: 'monospace',
-                    fontSize: '12.5px',
+                    fontFamily: 'var(--f-mono)',
+                    fontSize: '12px',
                     fontWeight: 800,
                     color: isLight && (entry.stroke === '#F5C542' || entry.color === '#F5C542') ? '#B45309' : (entry.stroke || entry.color),
                     flexShrink: 0,
@@ -594,7 +594,7 @@ return totalB - totalA;
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '380px', gap: '16px' }}>
         <RingLoader color="#58B99A" size={48} />
-        <span style={{ fontSize: '13px', color: isLight ? '#475569' : '#AEBCC7', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '13px', color: isLight ? '#475569' : '#AEBCC7', fontFamily: 'var(--f-body)' }}>
           Loading Points Telemetry...
         </span>
       </div>
@@ -663,7 +663,7 @@ return totalB - totalA;
                 border: 'none',
                 borderRadius: '9999px',
                 fontWeight: mode === 'daily' ? 700 : 600,
-                fontSize: '12.5px',
+                fontSize: '12px',
                 cursor: 'pointer',
                 boxShadow: mode === 'daily' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
@@ -686,7 +686,7 @@ return totalB - totalA;
                 border: 'none',
                 borderRadius: '9999px',
                 fontWeight: mode === 'tenMin' ? 700 : 600,
-                fontSize: '12.5px',
+                fontSize: '12px',
                 cursor: 'pointer',
                 boxShadow: mode === 'tenMin' ? '0 2px 10px rgba(88, 185, 154, 0.35)' : 'none',
                 transition: 'all 0.2s ease',
@@ -737,7 +737,7 @@ return totalB - totalA;
                   borderRadius: '9999px',
                   fontWeight:
                     contributorLimit === limit && !isCustomSelected ? 700 : 600,
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   cursor: 'pointer',
                 }}
               >
@@ -764,7 +764,7 @@ return totalB - totalA;
                 border: '1px solid transparent',
                 borderRadius: '9999px',
                 fontWeight: isCustomSelected ? 700 : 600,
-                fontSize: '11.5px',
+                fontSize: '12px',
                 cursor: 'pointer',
               }}
             >
@@ -814,7 +814,7 @@ return totalB - totalA;
                 border: isLight ? '1px solid rgba(0, 0, 0, 0.15)' : '1px solid rgba(88, 185, 154, 0.35)',
                 borderRadius: '10px',
                 padding: '6px 12px',
-                fontSize: '12.5px',
+                fontSize: '12px',
                 outline: 'none',
                 colorScheme: isLight ? 'light' : 'dark',
               }}
@@ -931,7 +931,7 @@ return totalB - totalA;
         <span
           style={{
             fontSize: '11px',
-            fontFamily: 'monospace',
+            fontFamily: 'var(--f-mono)',
             fontWeight: 700,
             color: isLight && color === '#F5C542' ? '#B45309' : color,
             background: isLight
@@ -1014,7 +1014,7 @@ return totalB - totalA;
         tick={{
           fill: isLight ? '#475569' : '#AEBCC7',
           fontSize: 11,
-          fontFamily: 'monospace',
+          fontFamily: 'var(--f-mono)',
           fontWeight: 600,
         }}
         tickLine={false}
@@ -1036,7 +1036,7 @@ return totalB - totalA;
         tick={{
           fill: isLight ? '#475569' : '#AEBCC7',
           fontSize: 11,
-          fontFamily: 'monospace',
+          fontFamily: 'var(--f-mono)',
           fontWeight: 600,
         }}
         tickLine={false}

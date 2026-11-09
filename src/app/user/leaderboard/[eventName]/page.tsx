@@ -901,7 +901,7 @@ const PodiumBannerCard = React.memo(
         >
           {row.githubid && (
             <Text
-              fontSize={{ base: '11px', sm: '12.5px', md: '13px' }}
+              fontSize={{ base: '11px', sm: '12px', md: '13px' }}
               fontFamily="var(--f-mono)"
               fontWeight="600"
               color="var(--accent)"
@@ -916,7 +916,7 @@ const PodiumBannerCard = React.memo(
                 •
               </Text>
               <Text
-                fontSize={{ base: '11px', sm: '12px', md: '12.5px' }}
+                fontSize={{ base: '11px', sm: '12px', md: '13px' }}
                 color="rgba(244, 241, 232, 0.72)"
                 noOfLines={1}
                 maxW={{ base: '130px', sm: '200px', md: '280px' }}
@@ -943,7 +943,7 @@ const PodiumBannerCard = React.memo(
             </Text>
             <Text
               fontFamily="var(--f-mono)"
-              fontSize={{ base: '10.5px', sm: '12px' }}
+              fontSize={{ base: '11px', sm: '12px' }}
               fontWeight="700"
               color={config.pointsColor}
               textTransform="uppercase"

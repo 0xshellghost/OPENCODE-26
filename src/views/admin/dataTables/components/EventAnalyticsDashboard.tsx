@@ -360,7 +360,7 @@ export default function EventAnalyticsDashboard({
             </Flex>
           </Flex>
           <Text
-            fontFamily="var(--f-sans), sans-serif"
+            fontFamily="var(--f-body), sans-serif"
             fontSize="18px"
             fontWeight="800"
             color="#F4F1E8"
