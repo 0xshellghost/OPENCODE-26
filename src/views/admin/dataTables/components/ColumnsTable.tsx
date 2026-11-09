@@ -110,7 +110,7 @@ function RankBadge({ position }: { position: string | number }) {
         <Text
           fontFamily="var(--f-mono), monospace"
           fontWeight="800"
-          fontSize="12.5px"
+          fontSize="12px"
           color={trophyColor}
         >
           #{pos}
@@ -225,7 +225,7 @@ function ContributorHoverCard({
                   </Box>
                 )}
               </Flex>
-              <Text fontSize="12.5px" color="var(--accent)" fontWeight="600" mt="2px">
+              <Text fontSize="12px" color="var(--accent)" fontWeight="600" mt="2px">
                 @{row.githubid}
               </Text>
             </Box>
@@ -235,7 +235,7 @@ function ContributorHoverCard({
           {row.college && (
             <Flex align="center" gap="6px" mb="12px" px="10px" py="6px" borderRadius="10px" bg="var(--surface-2)">
               <Building2 size={13} color="var(--muted)" />
-              <Text fontSize="11.5px" color="var(--muted)" noOfLines={1}>
+              <Text fontSize="12px" color="var(--muted)" noOfLines={1}>
                 {row.college}
               </Text>
             </Flex>
@@ -335,7 +335,7 @@ function TablePagination({
       mt="10px"
     >
       <Text
-        fontSize="12.5px"
+        fontSize="12px"
         color="var(--muted)"
         fontFamily="var(--f-mono), monospace"
       >
@@ -428,19 +428,19 @@ function MobileLeaderboard({
               githubid={user.githubid}
               avatarUrl={user.avatarUrl}
               size="36px"
-              fontSize="12.5px"
+              fontSize="12px"
             />
 
             <Box minW={0}>
-              <Text fontWeight="600" fontSize="13.5px" color="var(--fg)" noOfLines={1}>
+              <Text fontWeight="600" fontSize="14px" color="var(--fg)" noOfLines={1}>
                 {user.name}
               </Text>
               {isOpencode && user.githubid ? (
-                <Text fontSize="11.5px" color="var(--muted)">
+                <Text fontSize="12px" color="var(--muted)">
                   @{user.githubid}
                 </Text>
               ) : user.college ? (
-                <Text fontSize="11.5px" color="var(--muted)" noOfLines={1} maxW="150px">
+                <Text fontSize="12px" color="var(--muted)" noOfLines={1} maxW="150px">
                   {user.college}
                 </Text>
               ) : null}
@@ -599,7 +599,7 @@ function ColumnTable({
               <Box minW={0}>
                 <Text
                   fontWeight="600"
-                  fontSize="14.5px"
+                  fontSize="14px"
                   color="var(--fg)"
                   noOfLines={1}
                 >
@@ -663,7 +663,7 @@ function ColumnTable({
                     <Flex align="center" gap="8px">
                       <Link
                         href={`/user/profile/${row.githubid}`}
-                        fontSize="13.5px"
+                        fontSize="14px"
                         fontWeight="500"
                         color="var(--muted)"
                         _hover={{ color: "var(--accent)", textDecoration: "none" }}
@@ -689,7 +689,7 @@ function ColumnTable({
                         <Box
                           bg="var(--accent)"
                           color="var(--accent-ink)"
-                          fontSize="9.5px"
+                          fontSize="10px"
                           fontWeight="900"
                           px="6px"
                           py="1px"
@@ -716,7 +716,7 @@ function ColumnTable({
                   <Text
                     fontFamily="var(--f-mono), monospace"
                     fontWeight="600"
-                    fontSize="13.5px"
+                    fontSize="14px"
                     color="var(--fg)"
                   >
                     {info.getValue() ?? 0}
@@ -749,7 +749,7 @@ function ColumnTable({
                       {val.toLocaleString()}
                     </Text>
                     <Text
-                      fontSize="11.5px"
+                      fontSize="12px"
                       color="var(--muted)"
                       fontFamily="var(--f-body)"
                     >
@@ -936,7 +936,7 @@ function ColumnTable({
                         py="12px"
                         px="16px"
                         fontFamily="var(--f-mono), monospace"
-                        fontSize="11.5px"
+                        fontSize="11px"
                         letterSpacing="0.14em"
                         fontWeight="600"
                         color="var(--muted)"

@@ -689,7 +689,7 @@ export default function AdminGeekstoreManager() {
                               <Text
                                 color="var(--fg-muted)"
                                 fontSize="10px"
-                                fontFamily="mono"
+                                fontFamily="var(--f-mono)"
                               >
                                 {prod.id}
                               </Text>
@@ -715,7 +715,7 @@ export default function AdminGeekstoreManager() {
                           <Text
                             color="var(--fg)"
                             fontWeight="700"
-                            fontFamily="mono"
+                            fontFamily="var(--f-mono)"
                             fontSize="xs"
                           >
                             ₹{prod.price.toLocaleString('en-IN')}
@@ -741,7 +741,7 @@ export default function AdminGeekstoreManager() {
 
                         {/* Sizes */}
                         <Td borderColor="var(--border)">
-                          <Text fontSize="11px" color="var(--fg-muted)" fontFamily="mono">
+                          <Text fontSize="11px" color="var(--fg-muted)" fontFamily="var(--f-mono)">
                             {prod.sizes && prod.sizes.length > 0
                               ? prod.sizes.join(', ')
                               : '—'}
@@ -1055,14 +1055,14 @@ export default function AdminGeekstoreManager() {
                               color="var(--fg)"
                               fontWeight="700"
                               fontSize="xs"
-                              fontFamily="mono"
+                              fontFamily="var(--f-mono)"
                             >
                               #{ord.id}
                             </Text>
                             <Text
                               color="var(--fg-muted)"
                               fontSize="10px"
-                              fontFamily="mono"
+                              fontFamily="var(--f-mono)"
                               mt={0.5}
                             >
                               {ord.createdAt
@@ -1095,7 +1095,7 @@ export default function AdminGeekstoreManager() {
                                 <Text
                                   color="purple.300"
                                   fontSize="10px"
-                                  fontFamily="mono"
+                                  fontFamily="var(--f-mono)"
                                   isTruncated
                                 >
                                   @{ord.user?.githubId || ord.githubId || 'contributor'}
@@ -1140,7 +1140,7 @@ export default function AdminGeekstoreManager() {
                             <Text
                               color="var(--fg)"
                               fontWeight="700"
-                              fontFamily="mono"
+                              fontFamily="var(--f-mono)"
                               fontSize="xs"
                             >
                               ₹{ord.totalAmount.toLocaleString('en-IN')}

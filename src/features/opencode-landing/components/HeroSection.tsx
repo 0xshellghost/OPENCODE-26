@@ -122,7 +122,7 @@ export default function HeroSection() {
       <div className="relative z-30 mx-auto flex max-w-5xl flex-col items-center px-4 sm:px-6 text-center">
         {/* Registration & Event Status Ribbon */}
         <div className="flex flex-col items-center gap-3">
-          <div className="flex items-center gap-2 sm:gap-2.5 rounded-full border border-[#58B99A]/30 bg-[#102535]/55 px-3 sm:px-4 py-1.5 sm:py-2 text-[10.5px] sm:text-xs font-semibold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-[#D9E2E8] backdrop-blur-md shadow-lg shadow-[#07131F]/70 whitespace-nowrap max-w-full">
+          <div className="flex items-center gap-2 sm:gap-2.5 rounded-full border border-[#58B99A]/30 bg-[#102535]/55 px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-[#D9E2E8] backdrop-blur-md shadow-lg shadow-[#07131F]/70 whitespace-nowrap max-w-full">
             <Sparkles className="h-3.5 w-3.5 text-[#58B99A] animate-pulse shrink-0" />
             <span className="truncate">OpenCode 2026 • GeekHaven IIITA</span>
             <span className="hidden sm:inline text-[#718394]">•</span>

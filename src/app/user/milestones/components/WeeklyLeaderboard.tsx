@@ -221,7 +221,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
         >
           <Icon as={MdLeaderboard} boxSize="28px" />
         </Box>
-        <Text fontFamily="Georgia, serif" fontSize="22px" color="var(--text)" mb="6px">
+        <Text fontFamily="var(--f-display)" fontSize="22px" color="var(--text)" mb="6px">
           No Weekly Champions Yet
         </Text>
         <Text fontSize="14px" color="var(--muted)">
@@ -407,7 +407,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                     >
                       <Box>
                         <Text
-                          fontSize="10.5px"
+                          fontSize="11px"
                           letterSpacing="0.16em"
                           color="var(--accent)"
                           fontWeight="700"
@@ -419,8 +419,8 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                         <Text
                           as="h3"
                           aria-live="polite"
-                          fontFamily="Georgia, serif"
-                          fontSize="21px"
+                          fontFamily="var(--f-display)"
+                          fontSize="22px"
                           fontWeight="400"
                           color="var(--text)"
                           lineHeight="1.2"
@@ -469,7 +469,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                         >
                           <Icon as={MdLeaderboard} boxSize="24px" />
                         </Box>
-                        <Text fontFamily="Georgia, serif" fontSize="20px" color="var(--text)" mb="6px">
+                        <Text fontFamily="var(--f-display)" fontSize="20px" color="var(--text)" mb="6px">
                           No Standings Yet
                         </Text>
                         <Text fontSize="13px" color="var(--muted)" maxW="240px" lineHeight="1.6">
@@ -648,7 +648,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     left="50%"
                                     transform="translateX(-50%)"
                                     borderRadius="full"
-                                    fontSize="10.5px"
+                                    fontSize="11px"
                                     fontWeight="800"
                                     bg="#f7e7b4"
                                     color="#0C1C2C"
@@ -848,7 +848,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                                     />
                                     <Flex align="center" flex="1" minW="0" mr="8px">
                                       <Text
-                                        fontSize="13.5px"
+                                        fontSize="14px"
                                         fontWeight="600"
                                         color="var(--text)"
                                         noOfLines={1}
@@ -961,7 +961,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
                 borderRadius="999px"
                 px={{ base: '12px', sm: '16px' }}
                 py="6px"
-                fontSize="12.5px"
+                fontSize="12px"
                 fontWeight={isPillActive ? 700 : 500}
                 bg={isPillActive ? 'var(--accent)' : 'var(--card-soft)'}
                 color={isPillActive ? 'var(--accent-ink)' : 'var(--muted)'}
@@ -1005,7 +1005,7 @@ export function WeeklyLeaderboardCard({ weeks }: WeeklyLeaderboardCardProps) {
           borderRadius="999px"
           px="10px"
           py="6px"
-          fontSize="11.5px"
+          fontSize="12px"
           variant="ghost"
           color="var(--subtle)"
           _hover={{ color: 'var(--fg)', bg: 'var(--card-soft)' }}

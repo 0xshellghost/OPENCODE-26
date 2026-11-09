@@ -172,7 +172,7 @@ export default function AdminOrderStatusModal({
                 {mode === 'status' ? 'Update Order Status' : 'Update Payment Status'}
               </Text>
               <Flex align="center" gap={2} mt={1}>
-                <Text fontSize="xs" color="var(--fg-muted)" fontFamily="mono">
+                <Text fontSize="xs" color="var(--fg-muted)" fontFamily="var(--f-mono)">
                   Order ID: {order.id}
                 </Text>
                 <Badge colorScheme="purple" fontSize="10px" borderRadius="md">
