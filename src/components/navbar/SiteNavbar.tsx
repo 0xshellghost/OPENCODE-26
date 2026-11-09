@@ -182,8 +182,8 @@ export default function SiteNavbar() {
           className={cn(
             "pointer-events-auto flex items-center justify-between transition-all duration-300 oc-capsule-navbar min-w-0",
             scrolled
-              ? "flex-1 max-w-5xl rounded-full px-3.5 sm:px-5 py-2 shadow-2xl"
-              : "flex-1 max-w-6xl rounded-[2.75rem] px-4 sm:px-6 py-2.5 sm:py-3 shadow-xl"
+              ? "flex-1 max-w-6xl 2xl:max-w-7xl rounded-full px-3.5 sm:px-5 py-2 shadow-2xl"
+              : "flex-1 max-w-6xl 2xl:max-w-7xl rounded-full px-3.5 sm:px-5 py-2.5 sm:py-3 shadow-xl"
           )}
         >
           {/* Left: Brand Title with Logo */}
@@ -204,7 +204,7 @@ export default function SiteNavbar() {
           </Link>
 
           {/* Center: Desktop Navigation Links Pill */}
-          <div className="hidden xl:flex items-center gap-0.5 xl:gap-1 backdrop-blur-xl px-2 py-1 xl:px-2.5 xl:py-1 rounded-full oc-capsule-pill shadow-inner shrink min-w-0 mx-1 sm:mx-2">
+          <div className="hidden xl:flex items-center gap-0 xl:gap-0.5 backdrop-blur-xl px-1.5 py-1 xl:px-2 xl:py-1 rounded-full oc-capsule-pill shadow-inner shrink min-w-0 mx-1 sm:mx-2">
             {activeNavigation.map((item) => {
               const isActive = isLinkActive(item.href);
               return (
@@ -239,7 +239,7 @@ export default function SiteNavbar() {
 
           {/* Right: Actions (Sakura, Theme, Auth, Mobile Toggle) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+            <div className="hidden sm:flex items-center gap-1 shrink-0">
               <SakuraToggle />
               <ThemeToggle />
             </div>
@@ -292,21 +292,19 @@ export default function SiteNavbar() {
 
         {/* Standalone Control Capsules: Play Trailer & Sound (shown on landing page) */}
         {pathname === "/" && (
-          <div className="pointer-events-auto shrink-0 hidden md:flex items-center gap-1.5 sm:gap-2">
+          <div className="pointer-events-auto shrink hidden md:flex items-center gap-1.5 sm:gap-2">
             {/* Play Trailer Button */}
             <button
               type="button"
               onClick={openTrailer}
               className={cn(
                 "group flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-xs sm:text-sm font-semibold text-[var(--fg)] backdrop-blur-md shadow-lg hover:border-[var(--border-accent)] transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0",
-                scrolled
-                  ? "px-2.5 sm:px-3 py-2"
-                  : "px-3 sm:px-3.5 py-2.5"
+                "px-2.5 sm:px-3 py-2"
               )}
               title="Play cinematic trailer"
             >
               <Film className="w-4 h-4 text-[var(--accent-bold)] transition-transform duration-300 group-hover:scale-110 shrink-0" />
-              <span className="hidden xl:inline text-[var(--fg)] whitespace-nowrap">Play Trailer</span>
+             <span className="hidden text-[var(--fg)] whitespace-nowrap">Play Trailer</span>
             </button>
 
             {/* Sound Switch Button */}
@@ -315,24 +313,22 @@ export default function SiteNavbar() {
               onClick={toggleHeroSound}
               className={cn(
                 "group flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-2)] text-xs sm:text-sm font-semibold text-[var(--fg)] backdrop-blur-md shadow-lg hover:border-[var(--border-accent)] transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0",
-                scrolled
-                  ? "px-2.5 sm:px-3 py-2"
-                  : "px-3 sm:px-3.5 py-2.5"
+                "px-2.5 sm:px-3 py-2"
               )}
               title={heroMuted ? "Turn background audio on" : "Turn background audio off"}
             >
               {heroMuted ? (
                 <>
                   <VolumeX className="w-4 h-4 text-[var(--subtle)] transition-colors group-hover:text-[var(--accent)] shrink-0" />
-                  <span className="hidden xl:inline text-[var(--muted)] group-hover:text-[var(--fg)] transition-colors whitespace-nowrap">
+                  <span className="hidden text-[var(--muted)] group-hover:text-[var(--fg)] transition-colors whitespace-nowrap">
                     Sound Off
                   </span>
                 </>
               ) : (
                 <>
                   <Volume2 className="w-4 h-4 text-[var(--accent-bold)] animate-pulse shrink-0" />
-                  <span className="hidden xl:inline text-[var(--fg)] whitespace-nowrap">Sound On</span>
-                  <span className="hidden xl:flex items-end gap-0.5 h-3 ml-0.5">
+                  <span className="hidden text-[var(--fg)] whitespace-nowrap">Sound On</span>
+                  <span className="hidden items-end gap-0.5 h-3 ml-0.5">
                     <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-2.5" />
                     <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-1.5" />
                     <span className="w-0.5 bg-[var(--accent-bold)] animate-pulse h-3" />
