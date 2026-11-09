@@ -295,9 +295,10 @@ export default function LeaderboardGraph({
   const [hoveredParticipantId, setHoveredParticipantId] = useState<string | null>(null);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [contributorLimit, setContributorLimit] = useState<number>(5);
-  const [hasRequestedAll, setHasRequestedAll] = useState<boolean>(false);
+  const [customLimit, setCustomLimit] = useState<number>(25);
+  const [isCustomSelected, setIsCustomSelected] = useState(false);
 
-  const queryLimit = hasRequestedAll ? 'all' : (contributorLimit === 0 ? 'all' : (topN || 5));
+  const queryLimit = 'all';
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['leaderboardProgress', eventName, queryLimit],
@@ -696,56 +697,109 @@ return totalB - totalA;
             </button>
           </div>
 
-          {/* Top 5 vs All Filter */}
+                    {/* College Limit Filters */}
           <div
             style={{
               display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
               padding: '3px',
-              background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+              background: isLight
+                ? 'rgba(0, 0, 0, 0.04)'
+                : 'rgba(255, 255, 255, 0.04)',
               borderRadius: '9999px',
-              border: isLight ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid var(--border)',
+              border: isLight
+                ? '1px solid rgba(0, 0, 0, 0.1)'
+                : '1px solid var(--border)',
             }}
           >
-            <button
-              type="button"
-              onClick={() => setContributorLimit(5)}
-              style={{
-                padding: '5px 12px',
-                background: contributorLimit === 5 ? (isLight ? 'rgba(88, 185, 154, 0.2)' : 'rgba(88, 185, 154, 0.15)') : 'transparent',
-                color: contributorLimit === 5 ? (isLight ? '#0D9488' : '#58B99A') : (isLight ? '#475569' : '#AEBCC7'),
-                border: contributorLimit === 5 ? (isLight ? '1px solid rgba(88, 185, 154, 0.5)' : '1px solid rgba(88, 185, 154, 0.4)') : '1px solid transparent',
-                borderRadius: '9999px',
-                fontWeight: contributorLimit === 5 ? 700 : 600,
-                fontSize: '11.5px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Top 5
-            </button>
+            {[5, 10, 20].map((limit) => (
+              <button
+                key={limit}
+                type="button"
+                onClick={() => {
+                  setContributorLimit(limit);
+                  setIsCustomSelected(false);
+                }}
+                style={{
+                  padding: '5px 12px',
+                  background:
+                    contributorLimit === limit && !isCustomSelected
+                      ? isLight
+                        ? 'rgba(88, 185, 154, 0.2)'
+                        : 'rgba(88, 185, 154, 0.15)'
+                      : 'transparent',
+                  color:
+                    contributorLimit === limit && !isCustomSelected
+                      ? isLight ? '#0D9488' : '#58B99A'
+                      : isLight ? '#475569' : '#AEBCC7',
+                  border: '1px solid transparent',
+                  borderRadius: '9999px',
+                  fontWeight:
+                    contributorLimit === limit && !isCustomSelected ? 700 : 600,
+                  fontSize: '11.5px',
+                  cursor: 'pointer',
+                }}
+              >
+                Top {limit}
+              </button>
+            ))}
+
             <button
               type="button"
               onClick={() => {
-                setContributorLimit(0);
-                setHasRequestedAll(true);
+                setIsCustomSelected(true);
+                setContributorLimit(customLimit);
               }}
               style={{
                 padding: '5px 12px',
-                background: contributorLimit === 0 ? (isLight ? 'rgba(88, 185, 154, 0.2)' : 'rgba(88, 185, 154, 0.15)') : 'transparent',
-                color: contributorLimit === 0 ? (isLight ? '#0D9488' : '#58B99A') : (isLight ? '#475569' : '#AEBCC7'),
-                border: contributorLimit === 0 ? (isLight ? '1px solid rgba(88, 185, 154, 0.5)' : '1px solid rgba(88, 185, 154, 0.4)') : '1px solid transparent',
+                background: isCustomSelected
+                  ? isLight
+                    ? 'rgba(88, 185, 154, 0.2)'
+                    : 'rgba(88, 185, 154, 0.15)'
+                  : 'transparent',
+                color: isCustomSelected
+                  ? isLight ? '#0D9488' : '#58B99A'
+                  : isLight ? '#475569' : '#AEBCC7',
+                border: '1px solid transparent',
                 borderRadius: '9999px',
-                fontWeight: contributorLimit === 0 ? 700 : 600,
+                fontWeight: isCustomSelected ? 700 : 600,
                 fontSize: '11.5px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
               }}
             >
-              All {totalCollegesCount > 0 && (hasRequestedAll || totalCollegesCount > 5) ? `(${totalCollegesCount})` : ''}
+              Custom
             </button>
           </div>
-        </div>
 
+          {isCustomSelected && (
+            <input
+              type="number"
+              min="1"
+              value={customLimit}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+
+                if (Number.isInteger(value) && value >= 1) {
+                  setCustomLimit(value);
+                  setContributorLimit(value);
+                }
+              }}
+              style={{
+                width: '65px',
+                padding: '6px 8px',
+                borderRadius: '8px',
+                border: isLight
+                  ? '1px solid rgba(0, 0, 0, 0.15)'
+                  : '1px solid rgba(88, 185, 154, 0.35)',
+                background: isLight ? '#FFFFFF' : 'rgba(10, 24, 38, 0.8)',
+                color: isLight ? '#0F172A' : '#F4F1E8',
+                fontSize: '12px',
+              }}
+              aria-label="Number of colleges to display"
+            />
+          )}
+        </div>
         {/* Right: Date Picker when in Single Day mode */}
         {mode === 'tenMin' && (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
