@@ -81,14 +81,14 @@ export default function HeroSection() {
           poster="/images/hero-japanese-bg.jpg"
           playsInline
           muted
-          autoPlay
-          preload="auto"
+          preload="none"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleVideoEnded}
           className={`w-full h-full object-cover object-center pointer-events-none transition-opacity duration-500 ${
             isFrozen ? "opacity-0" : "opacity-100"
           }`}
         >
+          <source src="/videos/ending.webm" type="video/webm" />
           <source src="/videos/ending.mp4" type="video/mp4" />
         </video>
         {/* Subtle dark tint to ensure headline text readability */}

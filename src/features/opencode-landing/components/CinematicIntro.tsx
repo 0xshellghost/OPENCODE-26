@@ -246,10 +246,10 @@ export default function CinematicIntro() {
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               ref={videoRef}
-              src="/videos/beginning.mp4"
-              poster="/images/hero-japanese-bg.jpg"
+              poster="/images/intro-poster.webp"
               autoPlay
               playsInline
+              preload="auto"
               muted={isMuted}
               onEnded={handleEnter}
               onTimeUpdate={handleTimeUpdate}
@@ -257,7 +257,10 @@ export default function CinematicIntro() {
               style={{
                 filter: "contrast(1.04) saturate(1.04)",
               }}
-            />
+            >
+              <source src="/videos/beginning.webm" type="video/webm" />
+              <source src="/videos/beginning.mp4" type="video/mp4" />
+            </video>
             {/* Soft, Transparent Ambient Vignette */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#07131F]/30 via-transparent to-[#07131F]/50 pointer-events-none" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_65%,rgba(7,19,31,0.3)_100%)] pointer-events-none" />
