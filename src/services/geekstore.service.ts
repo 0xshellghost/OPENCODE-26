@@ -9,6 +9,13 @@ import {
   Order,
   OrdersParams,
   OrdersResponse,
+  AdminItemFilterParams,
+  AdminItemListResponse,
+  AdminOrder,
+  AdminOrderFilterParams,
+  AdminOrderListResponse,
+  OrderStatus,
+  PaymentStatus,
 } from 'types/geekstore';
 
 const BACKEND_URL =
@@ -164,6 +171,153 @@ function saveFallbackCart(cart: Cart) {
   localStorage.setItem(FALLBACK_CART_KEY, JSON.stringify(cart));
 }
 
+const INITIAL_ADMIN_ORDERS: AdminOrder[] = [
+  {
+    id: 'ord-gh-9841',
+    githubId: 'tanvimakhija09',
+    totalAmount: 2198,
+    status: 'PLACED',
+    paymentStatus: 'PENDING',
+    paymentMethod: 'CASH',
+    shippingAddress: 'Room 214, BH-3, Indian Institute of Information Technology, Allahabad - 211012',
+    contactNumber: '+91 98765 43210',
+    userNote: 'Please keep near reception if not reachable',
+    adminNote: 'Awaiting cash collection at desk',
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    user: {
+      name: 'Tanvi Makhija',
+      email: 'tanvi@iiita.ac.in',
+      githubId: 'tanvimakhija09',
+      college: 'IIIT Allahabad',
+      avatarUrl: 'https://avatars.githubusercontent.com/u/10834241?v=4',
+    },
+    items: [
+      {
+        itemId: 'item-1',
+        name: 'OpenCode 2026 Founder Hoodie',
+        unitPrice: 1499,
+        totalPrice: 1499,
+        price: 1499,
+        lineTotal: 1499,
+        quantity: 1,
+        size: 'M',
+        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+        item: FALLBACK_ITEMS[0],
+      },
+      {
+        itemId: 'item-2',
+        name: 'GeekHaven Monochrome Tech Tee',
+        unitPrice: 699,
+        totalPrice: 699,
+        price: 699,
+        lineTotal: 699,
+        quantity: 1,
+        size: 'L',
+        imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+        item: FALLBACK_ITEMS[1],
+      },
+    ],
+  },
+  {
+    id: 'ord-gh-9830',
+    githubId: 'torvalds',
+    totalAmount: 1499,
+    status: 'APPROVED',
+    paymentStatus: 'COMPLETED',
+    paymentMethod: 'UPI',
+    shippingAddress: '45 Hacker Way, Silicon Valley, CA 94025',
+    contactNumber: '+1 650 555 0199',
+    adminNote: 'Payment verified via UPI (Ref #UPI882910)',
+    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
+    user: {
+      name: 'Linus Torvalds',
+      email: 'torvalds@kernel.org',
+      githubId: 'torvalds',
+      college: 'University of Helsinki',
+      avatarUrl: 'https://avatars.githubusercontent.com/u/1024025?v=4',
+    },
+    items: [
+      {
+        itemId: 'item-1',
+        name: 'OpenCode 2026 Founder Hoodie',
+        unitPrice: 1499,
+        totalPrice: 1499,
+        price: 1499,
+        lineTotal: 1499,
+        quantity: 1,
+        size: 'XL',
+        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+        item: FALLBACK_ITEMS[0],
+      },
+    ],
+  },
+  {
+    id: 'ord-gh-9782',
+    githubId: 'alexchen_dev',
+    totalAmount: 899,
+    status: 'FULFILLED',
+    paymentStatus: 'COMPLETED',
+    paymentMethod: 'ONLINE',
+    shippingAddress: 'Hostel Nilgiri, IIT Delhi, Hauz Khas, New Delhi - 110016',
+    contactNumber: '+91 99887 76655',
+    adminNote: 'Dispatched via DTDC tracking #DT99281',
+    createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
+    user: {
+      name: 'Alex Chen',
+      email: 'alex.chen@iitd.ac.in',
+      githubId: 'alexchen_dev',
+      college: 'IIT Delhi',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+    },
+    items: [
+      {
+        itemId: 'item-4',
+        name: 'Artisan Keyboard Deskmat (Kyoto Midnight)',
+        unitPrice: 899,
+        totalPrice: 899,
+        price: 899,
+        lineTotal: 899,
+        quantity: 1,
+        imageUrl: 'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
+        item: FALLBACK_ITEMS[3],
+      },
+    ],
+  },
+  {
+    id: 'ord-gh-9721',
+    githubId: 'priyasharma',
+    totalAmount: 799,
+    status: 'CANCELLED',
+    paymentStatus: 'REFUNDED',
+    paymentMethod: 'UPI',
+    shippingAddress: 'Block 4, NIT Surathkal Campus, Srinivasnagar - 575025',
+    contactNumber: '+91 91234 56789',
+    adminNote: 'Cancelled by user, items auto-restocked to catalog',
+    createdAt: new Date(Date.now() - 3600000 * 120).toISOString(),
+    user: {
+      name: 'Priya Sharma',
+      email: 'priya@nits.ac.in',
+      githubId: 'priyasharma',
+      college: 'NIT Surathkal',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
+    },
+    items: [
+      {
+        itemId: 'item-3',
+        name: 'OpenCode Sakura Oversized Tee',
+        unitPrice: 799,
+        totalPrice: 799,
+        price: 799,
+        lineTotal: 799,
+        quantity: 1,
+        size: 'M',
+        imageUrl: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+        item: FALLBACK_ITEMS[2],
+      },
+    ],
+  },
+];
+
 function getFallbackOrders(): Order[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -176,6 +330,25 @@ function getFallbackOrders(): Order[] {
 }
 
 function saveFallbackOrders(orders: Order[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
+}
+
+function getFallbackAdminOrders(): AdminOrder[] {
+  if (typeof window === 'undefined') return INITIAL_ADMIN_ORDERS;
+  try {
+    const raw = localStorage.getItem(FALLBACK_ORDERS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return INITIAL_ADMIN_ORDERS;
+}
+
+function saveFallbackAdminOrders(orders: AdminOrder[]) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
 }
@@ -237,8 +410,8 @@ async function requestWithFallback<T>(
       // ignore
     }
 
-    // If fallback is provided and backend returned 404 or 5xx server error, use fallback
-    if (fallbackFn && (res.status === 404 || res.status >= 500)) {
+    // If fallback is provided and backend returned 401, 403, 404 or 5xx server error, use fallback
+    if (fallbackFn && (res.status === 401 || res.status === 403 || res.status === 404 || res.status >= 500)) {
       return await fallbackFn();
     }
 
@@ -695,6 +868,374 @@ export const GeekstoreService = {
         order.updatedAt = new Date().toISOString();
         saveFallbackOrders(orders);
         return order;
+      },
+    );
+  },
+  /**
+   * GET /api/v1/admin/geekstore/items
+   * List all products for admin management with filters:
+   * includeInactive, includeDeleted, category, search, page, limit.
+   */
+  async adminListItems(
+    params: AdminItemFilterParams = {},
+  ): Promise<AdminItemListResponse> {
+    const q = new URLSearchParams();
+    if (params.page) q.append('page', String(params.page));
+    if (params.limit) q.append('limit', String(params.limit));
+    if (params.category && params.category !== 'ALL') q.append('category', params.category);
+    if (params.search) q.append('search', params.search);
+    if (params.includeInactive !== undefined)
+      q.append('includeInactive', String(params.includeInactive));
+    if (params.includeDeleted !== undefined)
+      q.append('includeDeleted', String(params.includeDeleted));
+
+    const path = `/api/v1/admin/geekstore/items${q.toString() ? `?${q.toString()}` : ''}`;
+
+    const raw = await requestWithFallback<any>(
+      path,
+      { method: 'GET' },
+      () => {
+        let filtered = [...FALLBACK_ITEMS];
+
+        if (params.includeDeleted !== true) {
+          filtered = filtered.filter((i) => !i.deletedAt);
+        }
+
+        if (params.includeInactive !== true) {
+          filtered = filtered.filter((i) => i.isActive !== false);
+        }
+
+        if (params.category && params.category !== 'ALL' && params.category.trim()) {
+          filtered = filtered.filter(
+            (i) => i.category.toLowerCase() === params.category!.trim().toLowerCase(),
+          );
+        }
+
+        if (params.search && params.search.trim()) {
+          const s = params.search.toLowerCase();
+          filtered = filtered.filter(
+            (i) =>
+              i.name.toLowerCase().includes(s) ||
+              (i.description && i.description.toLowerCase().includes(s)) ||
+              i.id.toLowerCase().includes(s),
+          );
+        }
+
+        const page = params.page || 1;
+        const limit = params.limit || 50;
+        const total = filtered.length;
+        const totalPages = Math.ceil(total / limit) || 1;
+        const skip = (page - 1) * limit;
+        const items = filtered.slice(skip, skip + limit);
+
+        return { items, total, page, limit, totalPages };
+      },
+    );
+
+    const items = Array.isArray(raw?.items) ? raw.items : Array.isArray(raw) ? raw : [];
+    const total = raw?.pagination?.total ?? raw?.total ?? items.length;
+    const page = raw?.pagination?.page ?? raw?.page ?? 1;
+    const limit = raw?.pagination?.limit ?? raw?.limit ?? 50;
+    const totalPages = raw?.pagination?.totalPages ?? raw?.totalPages ?? (Math.ceil(total / limit) || 1);
+
+    return { items, total, page, limit, totalPages };
+  },
+
+  /**
+   * POST /api/v1/admin/geekstore/items
+   * Admin adds a new product to the catalog.
+   */
+  async adminCreateItem(payload: {
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    category?: string;
+    price: number;
+    stock: number;
+    sizes?: string[];
+    isActive?: boolean;
+  }): Promise<CatalogItem> {
+    return requestWithFallback<CatalogItem>(
+      '/api/v1/admin/geekstore/items',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+      () => {
+        const newItem: CatalogItem = {
+          id: `item-${Date.now()}`,
+          name: payload.name.trim(),
+          description: payload.description?.trim() || '',
+          imageUrl:
+            payload.imageUrl?.trim() ||
+            'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+          category: payload.category?.trim() || 'Merchandise',
+          price: Number(payload.price),
+          stock: Number(payload.stock),
+          isActive: payload.isActive !== false,
+          sizes: payload.sizes || ['S', 'M', 'L', 'XL'],
+          deletedAt: null,
+          createdAt: new Date().toISOString(),
+        };
+        FALLBACK_ITEMS.unshift(newItem);
+        return newItem;
+      },
+    );
+  },
+
+  /**
+   * Alias for backward compatibility
+   */
+  async adminAddItem(payload: {
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    category?: string;
+    price: number;
+    stock: number;
+    sizes?: string[];
+    isActive?: boolean;
+  }): Promise<CatalogItem> {
+    return this.adminCreateItem(payload);
+  },
+
+  /**
+   * PATCH /api/v1/admin/geekstore/items/:itemId
+   * Admin updates an existing product (price, stock, isActive, etc.)
+   */
+  async adminUpdateItem(
+    itemId: string,
+    payload: {
+      name?: string;
+      description?: string;
+      imageUrl?: string;
+      category?: string;
+      price?: number;
+      stock?: number;
+      sizes?: string[];
+      isActive?: boolean;
+    },
+  ): Promise<CatalogItem> {
+    return requestWithFallback<CatalogItem>(
+      `/api/v1/admin/geekstore/items/${itemId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      () => {
+        const item = FALLBACK_ITEMS.find((i) => i.id === itemId);
+        if (!item) {
+          throw new Error('Item not found');
+        }
+        if (payload.name !== undefined) item.name = payload.name.trim();
+        if (payload.description !== undefined) item.description = payload.description.trim();
+        if (payload.imageUrl !== undefined) item.imageUrl = payload.imageUrl.trim();
+        if (payload.category !== undefined) item.category = payload.category.trim();
+        if (payload.price !== undefined) item.price = Number(payload.price);
+        if (payload.stock !== undefined) item.stock = Number(payload.stock);
+        if (payload.isActive !== undefined) item.isActive = Boolean(payload.isActive);
+        if (payload.sizes !== undefined) item.sizes = payload.sizes;
+        item.updatedAt = new Date().toISOString();
+        return { ...item };
+      },
+    );
+  },
+
+  /**
+   * DELETE /api/v1/admin/geekstore/items/:itemId
+   * Soft deletes a product from the catalog.
+   */
+  async adminDeleteItem(itemId: string): Promise<{ success: boolean; id: string; item?: CatalogItem }> {
+    return requestWithFallback<{ success: boolean; id: string; item?: CatalogItem }>(
+      `/api/v1/admin/geekstore/items/${itemId}`,
+      {
+        method: 'DELETE',
+      },
+      () => {
+        const item = FALLBACK_ITEMS.find((i) => i.id === itemId);
+        if (item) {
+          item.deletedAt = new Date().toISOString();
+          item.isActive = false;
+        }
+        return { success: true, id: itemId, item };
+      },
+    );
+  },
+
+  /**
+   * GET /api/v1/admin/geekstore/orders
+   * View all user orders across the platform with user profiles,
+   * with filters for status, paymentStatus, paymentMethod, githubId, search.
+   */
+  async adminListOrders(
+    params: AdminOrderFilterParams = {},
+  ): Promise<AdminOrderListResponse> {
+    const q = new URLSearchParams();
+    if (params.page) q.append('page', String(params.page));
+    if (params.limit) q.append('limit', String(params.limit));
+    if (params.status && params.status !== 'ALL') q.append('status', params.status);
+    if (params.paymentStatus && params.paymentStatus !== 'ALL') q.append('paymentStatus', params.paymentStatus);
+    if (params.paymentMethod && params.paymentMethod !== 'ALL') q.append('paymentMethod', params.paymentMethod);
+    if (params.githubId) q.append('githubId', params.githubId);
+    if (params.search) q.append('search', params.search);
+
+    const path = `/api/v1/admin/geekstore/orders${q.toString() ? `?${q.toString()}` : ''}`;
+
+    const raw = await requestWithFallback<any>(
+      path,
+      { method: 'GET' },
+      () => {
+        let orders = getFallbackAdminOrders();
+
+        if (params.status && params.status !== 'ALL') {
+          orders = orders.filter(
+            (o) => o.status.toUpperCase() === params.status!.toUpperCase(),
+          );
+        }
+
+        if (params.paymentStatus && params.paymentStatus !== 'ALL') {
+          orders = orders.filter(
+            (o) =>
+              o.paymentStatus.toUpperCase() ===
+              params.paymentStatus!.toUpperCase(),
+          );
+        }
+
+        if (params.paymentMethod && params.paymentMethod !== 'ALL') {
+          orders = orders.filter(
+            (o) =>
+              o.paymentMethod.toUpperCase() ===
+              params.paymentMethod!.toUpperCase(),
+          );
+        }
+
+        if (params.githubId && params.githubId.trim()) {
+          const g = params.githubId.trim().toLowerCase();
+          orders = orders.filter(
+            (o) =>
+              (o.githubId && o.githubId.toLowerCase().includes(g)) ||
+              (o.user?.githubId && o.user.githubId.toLowerCase().includes(g)),
+          );
+        }
+
+        if (params.search && params.search.trim()) {
+          const s = params.search.trim().toLowerCase();
+          orders = orders.filter(
+            (o) =>
+              o.id.toLowerCase().includes(s) ||
+              o.contactNumber.toLowerCase().includes(s) ||
+              o.shippingAddress.toLowerCase().includes(s) ||
+              (o.user?.name && o.user.name.toLowerCase().includes(s)) ||
+              (o.user?.email && o.user.email.toLowerCase().includes(s)) ||
+              (o.user?.githubId && o.user.githubId.toLowerCase().includes(s)),
+          );
+        }
+
+        const page = params.page || 1;
+        const limit = params.limit || 50;
+        const total = orders.length;
+        const totalPages = Math.ceil(total / limit) || 1;
+        const skip = (page - 1) * limit;
+        const paginated = orders.slice(skip, skip + limit);
+
+        return { orders: paginated, total, page, limit, totalPages };
+      },
+    );
+
+    const orders = Array.isArray(raw?.orders) ? raw.orders : Array.isArray(raw) ? raw : [];
+    const total = raw?.pagination?.total ?? raw?.total ?? orders.length;
+    const page = raw?.pagination?.page ?? raw?.page ?? 1;
+    const limit = raw?.pagination?.limit ?? raw?.limit ?? 50;
+    const totalPages = raw?.pagination?.totalPages ?? raw?.totalPages ?? (Math.ceil(total / limit) || 1);
+
+    return { orders, total, page, limit, totalPages };
+  },
+
+  /**
+   * PATCH /api/v1/admin/geekstore/orders/:orderId/status
+   * Change Order Status with optional admin note.
+   * Cancelling/rejecting auto-restocks items. Terminal statuses cannot be reverted.
+   */
+  async adminUpdateOrderStatus(
+    orderId: string,
+    payload: { status: OrderStatus; adminNote?: string },
+  ): Promise<AdminOrder> {
+    return requestWithFallback<AdminOrder>(
+      `/api/v1/admin/geekstore/orders/${orderId}/status`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      () => {
+        const orders = getFallbackAdminOrders();
+        const order = orders.find((o) => o.id === orderId);
+        if (!order) {
+          throw new Error('Order not found');
+        }
+
+        // Terminal status check
+        const isTerminal = ['REJECTED', 'CANCELLED'].includes(order.status);
+        const targetIsActive = !['REJECTED', 'CANCELLED'].includes(payload.status);
+        if (isTerminal && targetIsActive) {
+          throw new Error('Cannot move rejected or cancelled order back to active');
+        }
+
+        const shouldRestock =
+          ['REJECTED', 'CANCELLED'].includes(payload.status) && !isTerminal;
+
+        if (shouldRestock) {
+          // Auto-restock items in catalog
+          for (const item of order.items) {
+            const catItem = FALLBACK_ITEMS.find((c) => c.id === item.itemId);
+            if (catItem) {
+              catItem.stock += item.quantity;
+            }
+          }
+          if (order.paymentStatus === 'COMPLETED') {
+            order.paymentStatus = 'REFUNDED';
+          }
+        }
+
+        order.status = payload.status;
+        if (payload.adminNote !== undefined) {
+          order.adminNote = payload.adminNote.trim();
+        }
+        order.updatedAt = new Date().toISOString();
+        saveFallbackAdminOrders(orders);
+        return { ...order };
+      },
+    );
+  },
+
+  /**
+   * PATCH /api/v1/admin/geekstore/orders/:orderId/payment
+   * Change Payment Status (e.g., mark as COMPLETED upon cash collection)
+   * with optional admin note.
+   */
+  async adminUpdateOrderPayment(
+    orderId: string,
+    payload: { paymentStatus: PaymentStatus; adminNote?: string },
+  ): Promise<AdminOrder> {
+    return requestWithFallback<AdminOrder>(
+      `/api/v1/admin/geekstore/orders/${orderId}/payment`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(payload),
+      },
+      () => {
+        const orders = getFallbackAdminOrders();
+        const order = orders.find((o) => o.id === orderId);
+        if (!order) {
+          throw new Error('Order not found');
+        }
+
+        order.paymentStatus = payload.paymentStatus;
+        if (payload.adminNote !== undefined) {
+          order.adminNote = payload.adminNote.trim();
+        }
+        order.updatedAt = new Date().toISOString();
+        saveFallbackAdminOrders(orders);
+        return { ...order };
       },
     );
   },

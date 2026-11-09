@@ -36,7 +36,7 @@ const routes: IRoute[] = [
     icon: <Icon as={CalendarDays} width="20px" height="20px" color="inherit" />,
   },
   {
-    name: 'Change Points',
+    name: 'Store & Points',
     layout: '/admin',
     path: '/home',
     icon: <Icon as={Sliders} width="20px" height="20px" color="inherit" />,

@@ -14,6 +14,7 @@ export interface CatalogItem {
   stock: number;
   isActive: boolean;
   sizes?: string[];
+  deletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -84,6 +85,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   userId?: string;
+  githubId?: string;
   items: OrderItem[];
   totalAmount: number;
   status: OrderStatus;
@@ -110,4 +112,68 @@ export interface OrdersResponse {
   limit: number;
   totalPages: number;
 }
+
+export interface AdminUserProfile {
+  name: string;
+  email: string;
+  githubId: string;
+  college: string;
+  avatarUrl?: string;
+}
+
+export interface AdminOrderItem {
+  id?: string;
+  itemId: string;
+  quantity: number;
+  unitPrice?: number;
+  totalPrice?: number;
+  price?: number;
+  lineTotal?: number;
+  size?: string;
+  name?: string;
+  imageUrl?: string;
+  item?: CatalogItem;
+}
+
+export interface AdminOrder extends Omit<Order, 'items'> {
+  items: AdminOrderItem[];
+  user?: AdminUserProfile;
+  adminNote?: string;
+}
+
+export interface AdminItemFilterParams {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  includeInactive?: boolean;
+  includeDeleted?: boolean;
+}
+
+export interface AdminOrderFilterParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  githubId?: string;
+  search?: string;
+}
+
+export interface AdminItemListResponse {
+  items: CatalogItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface AdminOrderListResponse {
+  orders: AdminOrder[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 

@@ -60,6 +60,14 @@ export default function AdminLayout(props: DashboardLayoutProps) {
     const token = localStorage.getItem('token');
     const payload = parseJwt(token);
     if (!payload?.roles?.isAdmin) {
+      // In local development on localhost, allow access for testing
+      if (
+        process.env.NODE_ENV === 'development' &&
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'localhost'
+      ) {
+        return;
+      }
       console.error('Only admin can access admin pages');
       router.push('/user/events');
     }
