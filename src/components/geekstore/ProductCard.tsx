@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, Eye, Package } from 'lucide-react';
 import { CatalogItem } from 'types/geekstore';
 import SpotlightCard from 'components/reactbits/SpotlightCard';
 
@@ -23,15 +23,16 @@ export default function ProductCard({
   onSelect,
   onToggleSelect,
 }: ProductCardProps) {
+  const [imgError, setImgError] = useState(false);
   const isOutOfStock = item.stock <= 0;
   const isLowStock = item.stock > 0 && item.stock <= 5;
 
   return (
     <SpotlightCard
-      spotlightColor="rgba(88, 185, 154, 0.12)"
-      className={`group relative flex flex-col justify-between rounded-[var(--r)] border bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer ${
+      spotlightColor="rgba(88, 185, 154, 0.14)"
+      className={`group relative flex flex-col justify-between rounded-[var(--r)] border bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 cursor-pointer ${
         isSelected
-          ? 'border-[var(--accent)] shadow-[0_0_24px_rgba(88,185,154,0.22)] ring-1 ring-[var(--accent)]'
+          ? 'border-[var(--accent)] shadow-[0_0_24px_rgba(88,185,154,0.25)] ring-1 ring-[var(--accent)]'
           : 'border-[var(--border)] hover:border-[var(--border-accent)] hover:shadow-[var(--shadow)]'
       }`}
       onClick={() => onSelect(item)}
@@ -39,22 +40,22 @@ export default function ProductCard({
       <div>
         {/* Header Category & Stock Status Row */}
         <div className="flex items-center justify-between gap-2 mb-2.5 min-w-0">
-          <span className="text-[11px] font-mono font-medium uppercase tracking-wider text-[var(--accent)] truncate max-w-[120px]">
-            {item.category}
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--border-accent)] truncate max-w-[130px]">
+            {item.category || 'Merch'}
           </span>
 
           {isOutOfStock ? (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium text-red-400 whitespace-nowrap flex-shrink-0">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20 whitespace-nowrap flex-shrink-0">
               <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
               Out of Stock
             </span>
           ) : isLowStock ? (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium text-amber-300 whitespace-nowrap flex-shrink-0">
+            <span className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 whitespace-nowrap flex-shrink-0">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
               Only {item.stock} left
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--status-live-text)] whitespace-nowrap flex-shrink-0">
+            <span className="flex items-center gap-1.5 text-[11px] font-medium text-[var(--status-live-text)] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 whitespace-nowrap flex-shrink-0">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--status-live-text)]" />
               In Stock
             </span>
@@ -62,15 +63,34 @@ export default function ProductCard({
         </div>
 
         {/* Product Image Container */}
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[14px] bg-[var(--card-soft)]">
-          <Image
-            src={item.imageUrl}
-            alt={item.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            priority={false}
-          />
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[14px] bg-[var(--card-soft)] border border-[var(--border)]">
+          {!imgError && item.imageUrl ? (
+            <Image
+              src={item.imageUrl}
+              alt={item.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-108"
+              onError={() => setImgError(true)}
+              unoptimized
+              priority={false}
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center bg-[var(--surface-2)] text-[var(--muted)]">
+              <Package size={32} className="opacity-40 mb-1" />
+              <span className="text-[10px] font-mono text-[var(--subtle)] uppercase">
+                {item.category || 'Merch'}
+              </span>
+            </div>
+          )}
+
+          {/* Hover "Quick View" Overlay Pill */}
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+            <span className="flex items-center gap-1.5 rounded-full bg-black/75 backdrop-blur-md px-3 py-1.5 text-xs font-semibold text-white border border-white/20 shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+              <Eye size={13} />
+              <span>Quick View</span>
+            </span>
+          </div>
 
           {/* Selected Badge Overlay */}
           {isSelected && (
@@ -86,11 +106,11 @@ export default function ProductCard({
           <h3 className="font-['DM_Sans',sans-serif] text-base font-semibold text-[var(--fg)] group-hover:text-[var(--accent)] transition-colors line-clamp-1">
             {item.name}
           </h3>
-          <p className="text-xs text-[var(--muted)] line-clamp-2 leading-relaxed">
+          <p className="text-xs text-[var(--muted)] line-clamp-2 leading-relaxed min-h-[32px]">
             {item.description}
           </p>
 
-          {/* Sizes Tag (Placed cleanly away from price) */}
+          {/* Sizes Tag */}
           {item.sizes && item.sizes.length > 0 && (
             <div className="mt-1 flex flex-wrap items-center gap-1">
               <span className="text-[11px] font-mono text-[var(--subtle)] mr-0.5">
@@ -111,13 +131,16 @@ export default function ProductCard({
 
       {/* Pricing & Selection Action */}
       <div className="mt-4 pt-3.5 border-t border-[var(--line)]">
-        <div className="mb-3">
+        <div className="mb-3 flex items-baseline justify-between">
           <div className="flex items-baseline gap-1">
             <span className="text-xs font-mono text-[var(--muted)]">₹</span>
-            <span className="font-['DM_Mono',monospace] text-xl font-bold tracking-tight text-[var(--fg)]">
+            <span className="font-['DM_Mono',monospace] text-2xl font-bold tracking-tight text-[var(--fg)]">
               {item.price.toLocaleString('en-IN')}
             </span>
           </div>
+          <span className="text-[10px] text-[var(--subtle)] font-mono">
+            Campus Drop
+          </span>
         </div>
 
         <div>
@@ -127,7 +150,7 @@ export default function ProductCard({
             onClick={(e) => onToggleSelect(item, e)}
             className={`w-full flex items-center justify-center gap-2 rounded-full py-2.5 px-4 text-xs font-semibold transition-all duration-200 ${
               isSelected
-                ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_2px_12px_rgba(88,185,154,0.35)] hover:bg-[var(--accent-hover)]'
+                ? 'bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_2px_14px_rgba(88,185,154,0.4)] hover:bg-[var(--accent-hover)]'
                 : 'border border-[var(--border)] bg-[var(--surface-2)] text-[var(--fg)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)]'
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >

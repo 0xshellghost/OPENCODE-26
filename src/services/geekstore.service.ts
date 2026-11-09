@@ -36,258 +36,42 @@ function getAuthHeader(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// Initial mock fallback dataset for seamless local development
-const FALLBACK_ITEMS: CatalogItem[] = [
-  {
-    id: 'item-1',
-    name: 'OpenCode 2026 Founder Hoodie',
-    description:
-      'Heavyweight 380 GSM fleece hoodie in Obsidian Black with subtle embroidered Kyoto cherry blossom motif and OpenCode terminal branding on sleeve.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-    category: 'Hoodies',
-    price: 1499,
-    stock: 24,
-    isActive: true,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-  },
-  {
-    id: 'item-2',
-    name: 'GeekHaven Monochrome Tech Tee',
-    description:
-      '100% combed ring-spun cotton tee with high-density minimalist GeekHaven chest print and woven hem tag. Ultra-breathable for late-night coding sessions.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
-    category: 'T-Shirts',
-    price: 699,
-    stock: 45,
-    isActive: true,
-    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-  },
-  {
-    id: 'item-3',
-    name: 'OpenCode Sakura Oversized Tee',
-    description:
-      'Drop-shoulder 240 GSM oversized streetwear t-shirt featuring Kanji typography and Japanese watercolor cherry blossom illustration on the back.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
-    category: 'T-Shirts',
-    price: 799,
-    stock: 4,
-    isActive: true,
-    sizes: ['S', 'M', 'L', 'XL'],
-  },
-  {
-    id: 'item-4',
-    name: 'Artisan Keyboard Deskmat (Kyoto Midnight)',
-    description:
-      '900x400mm waterproof micro-weave cloth gaming deskmat with stitched anti-fray edges and non-slip rubber base. Features the official OpenCode Kyoto scenery artwork.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
-    category: 'Accessories',
-    price: 899,
-    stock: 12,
-    isActive: true,
-  },
-  {
-    id: 'item-5',
-    name: 'Developer Holographic Sticker Pack (15 pcs)',
-    description:
-      'Waterproof, scratch-resistant vinyl and holographic stickers: Git, Linux, Vim, Rust, TypeScript, GeekHaven, and OpenCode edition badges.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1589384267710-7a170981ca78?auto=format&fit=crop&w=800&q=80',
-    category: 'Stickers',
-    price: 199,
-    stock: 150,
-    isActive: true,
-  },
-  {
-    id: 'item-6',
-    name: 'Stainless Steel Insulated Tumbler 750ml',
-    description:
-      'Double-walled vacuum insulated bottle in matte stealth black. Keeps cold drinks chilly for 24h and coffee hot for 12h. Laser-engraved with binary coordinate.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
-    category: 'Drinkware',
-    price: 599,
-    stock: 0,
-    isActive: true,
-  },
-  {
-    id: 'item-7',
-    name: 'Canvas Commuter Tote Bag',
-    description:
-      'Heavy-duty 14oz canvas tote with reinforced handles, padded interior sleeve for 15" laptops, and internal zipper pouch for dongles and keys.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
-    category: 'Accessories',
-    price: 499,
-    stock: 18,
-    isActive: true,
-  },
-  {
-    id: 'item-8',
-    name: 'OpenCode Enamel Lapel Pin Set (3 pcs)',
-    description:
-      'Hard enamel pins with gold plating and butterfly clutch backing. Includes GeekHaven shield, Sakura blossom, and OpenCode terminal logo.',
-    imageUrl:
-      'https://images.unsplash.com/photo-1617050318658-a9a3175e34cb?auto=format&fit=crop&w=800&q=80',
-    category: 'Accessories',
-    price: 299,
-    stock: 35,
-    isActive: true,
-  },
-];
+// Fallback storage (empty by default; populated only when real products or orders exist)
+const FALLBACK_ITEMS: CatalogItem[] = [];
+const INITIAL_ADMIN_ORDERS: AdminOrder[] = [];
 
-// Local storage key for fallback simulation
+// Local storage key for catalog & fallback simulation
+const FALLBACK_ITEMS_KEY = 'oc_geekstore_items_v2';
 const FALLBACK_ORDERS_KEY = 'oc_geekstore_orders_v1';
 
-const INITIAL_ADMIN_ORDERS: AdminOrder[] = [
-  {
-    id: 'ord-gh-9841',
-    githubId: 'tanvimakhija09',
-    totalAmount: 2198,
-    status: 'PLACED',
-    paymentStatus: 'PENDING',
-    paymentMethod: 'CASH',
-    shippingAddress: 'Room 214, BH-3, Indian Institute of Information Technology, Allahabad - 211012',
-    contactNumber: '+91 98765 43210',
-    userNote: 'Please keep near reception if not reachable',
-    adminNote: 'Awaiting cash collection at desk',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-    user: {
-      name: 'Tanvi Makhija',
-      email: 'tanvi@iiita.ac.in',
-      githubId: 'tanvimakhija09',
-      college: 'IIIT Allahabad',
-      avatarUrl: 'https://avatars.githubusercontent.com/u/10834241?v=4',
-    },
-    items: [
-      {
-        itemId: 'item-1',
-        name: 'OpenCode 2026 Founder Hoodie',
-        unitPrice: 1499,
-        totalPrice: 1499,
-        price: 1499,
-        lineTotal: 1499,
-        quantity: 1,
-        size: 'M',
-        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-        item: FALLBACK_ITEMS[0],
-      },
-      {
-        itemId: 'item-2',
-        name: 'GeekHaven Monochrome Tech Tee',
-        unitPrice: 699,
-        totalPrice: 699,
-        price: 699,
-        lineTotal: 699,
-        quantity: 1,
-        size: 'L',
-        imageUrl: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
-        item: FALLBACK_ITEMS[1],
-      },
-    ],
-  },
-  {
-    id: 'ord-gh-9830',
-    githubId: 'torvalds',
-    totalAmount: 1499,
-    status: 'APPROVED',
-    paymentStatus: 'COMPLETED',
-    paymentMethod: 'UPI',
-    shippingAddress: '45 Hacker Way, Silicon Valley, CA 94025',
-    contactNumber: '+1 650 555 0199',
-    adminNote: 'Payment verified via UPI (Ref #UPI882910)',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
-    user: {
-      name: 'Linus Torvalds',
-      email: 'torvalds@kernel.org',
-      githubId: 'torvalds',
-      college: 'University of Helsinki',
-      avatarUrl: 'https://avatars.githubusercontent.com/u/1024025?v=4',
-    },
-    items: [
-      {
-        itemId: 'item-1',
-        name: 'OpenCode 2026 Founder Hoodie',
-        unitPrice: 1499,
-        totalPrice: 1499,
-        price: 1499,
-        lineTotal: 1499,
-        quantity: 1,
-        size: 'XL',
-        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-        item: FALLBACK_ITEMS[0],
-      },
-    ],
-  },
-  {
-    id: 'ord-gh-9782',
-    githubId: 'alexchen_dev',
-    totalAmount: 899,
-    status: 'FULFILLED',
-    paymentStatus: 'COMPLETED',
-    paymentMethod: 'ONLINE',
-    shippingAddress: 'Hostel Nilgiri, IIT Delhi, Hauz Khas, New Delhi - 110016',
-    contactNumber: '+91 99887 76655',
-    adminNote: 'Dispatched via DTDC tracking #DT99281',
-    createdAt: new Date(Date.now() - 3600000 * 72).toISOString(),
-    user: {
-      name: 'Alex Chen',
-      email: 'alex.chen@iitd.ac.in',
-      githubId: 'alexchen_dev',
-      college: 'IIT Delhi',
-      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-    },
-    items: [
-      {
-        itemId: 'item-4',
-        name: 'Artisan Keyboard Deskmat (Kyoto Midnight)',
-        unitPrice: 899,
-        totalPrice: 899,
-        price: 899,
-        lineTotal: 899,
-        quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?auto=format&fit=crop&w=800&q=80',
-        item: FALLBACK_ITEMS[3],
-      },
-    ],
-  },
-  {
-    id: 'ord-gh-9721',
-    githubId: 'priyasharma',
-    totalAmount: 799,
-    status: 'CANCELLED',
-    paymentStatus: 'REFUNDED',
-    paymentMethod: 'UPI',
-    shippingAddress: 'Block 4, NIT Surathkal Campus, Srinivasnagar - 575025',
-    contactNumber: '+91 91234 56789',
-    adminNote: 'Cancelled by user, items auto-restocked to catalog',
-    createdAt: new Date(Date.now() - 3600000 * 120).toISOString(),
-    user: {
-      name: 'Priya Sharma',
-      email: 'priya@nits.ac.in',
-      githubId: 'priyasharma',
-      college: 'NIT Surathkal',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-    },
-    items: [
-      {
-        itemId: 'item-3',
-        name: 'OpenCode Sakura Oversized Tee',
-        unitPrice: 799,
-        totalPrice: 799,
-        price: 799,
-        lineTotal: 799,
-        quantity: 1,
-        size: 'M',
-        imageUrl: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
-        item: FALLBACK_ITEMS[2],
-      },
-    ],
-  },
-];
+export function getFallbackItems(): CatalogItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(FALLBACK_ITEMS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        // Filter out any legacy dummy/mock items if previously stored in localStorage
+        const clean = parsed.filter(
+          (item) => item && !String(item.id).startsWith('item-'),
+        );
+        return clean;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  return [];
+}
+
+export function saveFallbackItems(items: CatalogItem[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(FALLBACK_ITEMS_KEY, JSON.stringify(items));
+  } catch (e) {
+    // ignore
+  }
+}
 
 function getFallbackOrders(): Order[] {
   if (typeof window === 'undefined') return [];
@@ -302,26 +86,39 @@ function getFallbackOrders(): Order[] {
 
 function saveFallbackOrders(orders: Order[]) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
+  try {
+    localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
+  } catch (e) {
+    // ignore
+  }
 }
 
 function getFallbackAdminOrders(): AdminOrder[] {
-  if (typeof window === 'undefined') return INITIAL_ADMIN_ORDERS;
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(FALLBACK_ORDERS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) {
+        // Filter out legacy dummy orders
+        return parsed.filter(
+          (ord) => ord && !String(ord.id).startsWith('ord-gh-'),
+        );
+      }
     }
   } catch (e) {
     // ignore
   }
-  return INITIAL_ADMIN_ORDERS;
+  return [];
 }
 
 function saveFallbackAdminOrders(orders: AdminOrder[]) {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
+  try {
+    localStorage.setItem(FALLBACK_ORDERS_KEY, JSON.stringify(orders));
+  } catch (e) {
+    // ignore
+  }
 }
 
 /**
@@ -347,7 +144,13 @@ async function requestWithFallback<T>(
     });
 
     if (res.ok) {
-      const data = await res.json();
+      let data: any = null;
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : { success: true };
+      } catch {
+        data = { success: true };
+      }
       return (data?.data !== undefined ? data.data : data) as T;
     }
 
@@ -363,7 +166,13 @@ async function requestWithFallback<T>(
           },
         });
         if (altRes.ok) {
-          const altData = await altRes.json();
+          let altData: any = null;
+          try {
+            const text = await altRes.text();
+            altData = text ? JSON.parse(text) : { success: true };
+          } catch {
+            altData = { success: true };
+          }
           return (altData?.data !== undefined ? altData.data : altData) as T;
         }
       } catch {
@@ -374,21 +183,28 @@ async function requestWithFallback<T>(
     // Try to parse error message from server
     let errorMessage = `Request failed with status ${res.status}`;
     try {
-      const errorJson = await res.json();
-      errorMessage =
-        errorJson.message || errorJson.error || JSON.stringify(errorJson);
+      const text = await res.text();
+      if (text) {
+        try {
+          const errorJson = JSON.parse(text);
+          errorMessage =
+            errorJson.message || errorJson.error || JSON.stringify(errorJson);
+        } catch {
+          errorMessage = text;
+        }
+      }
     } catch {
       // ignore
     }
 
-    // If fallback is provided and backend returned 401, 403, 404 or 5xx server error, use fallback
-    if (fallbackFn && (res.status === 401 || res.status === 403 || res.status === 404 || res.status >= 500)) {
+    // If fallback is provided and backend returned an error, use fallback
+    if (fallbackFn) {
       return await fallbackFn();
     }
 
     throw new Error(errorMessage);
   } catch (error: any) {
-    // If backend is unreachable or throws any error (Safari "Load failed", Chrome "Failed to fetch", etc.), use fallback
+    // If backend is unreachable or throws any error, use fallback
     if (fallbackFn) {
       return await fallbackFn();
     }
@@ -416,7 +232,8 @@ export const GeekstoreService = {
       path,
       { method: 'GET' },
       () => {
-        let filtered = [...FALLBACK_ITEMS].filter((i) => i.isActive);
+        const storedItems = getFallbackItems();
+        let filtered = [...storedItems].filter((i) => i.isActive && !i.deletedAt);
 
         if (params.category && params.category !== 'All') {
           filtered = filtered.filter(
@@ -465,7 +282,8 @@ export const GeekstoreService = {
       `/geekstore/items/${itemId}`,
       { method: 'GET' },
       () => {
-        const found = FALLBACK_ITEMS.find((i) => i.id === itemId);
+        const storedItems = getFallbackItems();
+        const found = storedItems.find((i) => i.id === itemId && !i.deletedAt);
         if (!found) throw new Error('Product not found');
         return found;
       },
@@ -495,11 +313,16 @@ export const GeekstoreService = {
         body: JSON.stringify(buyData),
       },
       () => {
-        const item = FALLBACK_ITEMS.find((i) => i.id === itemId);
+        const storedItems = getFallbackItems();
+        const item = storedItems.find((i) => i.id === itemId);
         if (!item) throw new Error('Product not found');
         if (item.stock < buyData.quantity) {
           throw new Error('Insufficient stock available');
         }
+
+        // Deduct stock in persistent store
+        item.stock -= buyData.quantity;
+        saveFallbackItems(storedItems);
 
         const newOrder: Order = {
           id: `ORD-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -641,7 +464,8 @@ export const GeekstoreService = {
       path,
       { method: 'GET' },
       () => {
-        let filtered = [...FALLBACK_ITEMS];
+        const storedItems = getFallbackItems();
+        let filtered = [...storedItems];
 
         if (params.includeDeleted !== true) {
           filtered = filtered.filter((i) => !i.deletedAt);
@@ -708,6 +532,7 @@ export const GeekstoreService = {
         body: JSON.stringify(payload),
       },
       () => {
+        const storedItems = getFallbackItems();
         const newItem: CatalogItem = {
           id: `item-${Date.now()}`,
           name: payload.name.trim(),
@@ -723,7 +548,8 @@ export const GeekstoreService = {
           deletedAt: null,
           createdAt: new Date().toISOString(),
         };
-        FALLBACK_ITEMS.unshift(newItem);
+        storedItems.unshift(newItem);
+        saveFallbackItems(storedItems);
         return newItem;
       },
     );
@@ -769,10 +595,12 @@ export const GeekstoreService = {
         body: JSON.stringify(payload),
       },
       () => {
-        const item = FALLBACK_ITEMS.find((i) => i.id === itemId);
-        if (!item) {
+        const storedItems = getFallbackItems();
+        const itemIndex = storedItems.findIndex((i) => i.id === itemId);
+        if (itemIndex === -1) {
           throw new Error('Item not found');
         }
+        const item = storedItems[itemIndex];
         if (payload.name !== undefined) item.name = payload.name.trim();
         if (payload.description !== undefined) item.description = payload.description.trim();
         if (payload.imageUrl !== undefined) item.imageUrl = payload.imageUrl.trim();
@@ -782,6 +610,8 @@ export const GeekstoreService = {
         if (payload.isActive !== undefined) item.isActive = Boolean(payload.isActive);
         if (payload.sizes !== undefined) item.sizes = payload.sizes;
         item.updatedAt = new Date().toISOString();
+        storedItems[itemIndex] = { ...item };
+        saveFallbackItems(storedItems);
         return { ...item };
       },
     );
@@ -789,23 +619,113 @@ export const GeekstoreService = {
 
   /**
    * DELETE /api/v1/admin/geekstore/items/:itemId
-   * Soft deletes a product from the catalog.
+   * Soft deletes or permanently purges a product from the catalog.
    */
-  async adminDeleteItem(itemId: string): Promise<{ success: boolean; id: string; item?: CatalogItem }> {
+  async adminDeleteItem(
+    itemId: string,
+    permanent: boolean = false,
+  ): Promise<{ success: boolean; id: string; item?: CatalogItem }> {
+    const query = permanent ? '?permanent=true' : '';
     return requestWithFallback<{ success: boolean; id: string; item?: CatalogItem }>(
-      `/api/v1/admin/geekstore/items/${itemId}`,
+      `/api/v1/admin/geekstore/items/${itemId}${query}`,
       {
         method: 'DELETE',
       },
       () => {
-        const item = FALLBACK_ITEMS.find((i) => i.id === itemId);
-        if (item) {
-          item.deletedAt = new Date().toISOString();
-          item.isActive = false;
+        const storedItems = getFallbackItems();
+        if (permanent) {
+          const remaining = storedItems.filter((i) => i.id !== itemId);
+          saveFallbackItems(remaining);
+          return { success: true, id: itemId };
         }
-        return { success: true, id: itemId, item };
+
+        const itemIndex = storedItems.findIndex((i) => i.id === itemId);
+        if (itemIndex !== -1) {
+          storedItems[itemIndex].deletedAt = new Date().toISOString();
+          storedItems[itemIndex].isActive = false;
+          saveFallbackItems(storedItems);
+          return { success: true, id: itemId, item: storedItems[itemIndex] };
+        }
+        return { success: true, id: itemId };
       },
     );
+  },
+
+  /**
+   * POST /api/v1/admin/geekstore/items/:itemId/restore
+   * Restores a soft-deleted product to active catalog.
+   */
+  async adminRestoreItem(
+    itemId: string,
+  ): Promise<{ success: boolean; id: string; item?: CatalogItem }> {
+    return requestWithFallback<{ success: boolean; id: string; item?: CatalogItem }>(
+      `/api/v1/admin/geekstore/items/${itemId}/restore`,
+      {
+        method: 'POST',
+      },
+      () => {
+        const storedItems = getFallbackItems();
+        const itemIndex = storedItems.findIndex((i) => i.id === itemId);
+        if (itemIndex !== -1) {
+          storedItems[itemIndex].deletedAt = null;
+          storedItems[itemIndex].isActive = true;
+          storedItems[itemIndex].updatedAt = new Date().toISOString();
+          saveFallbackItems(storedItems);
+          return { success: true, id: itemId, item: storedItems[itemIndex] };
+        }
+        throw new Error('Item not found');
+      },
+    );
+  },
+
+  /**
+   * Upload an image to the cloud storage provider via backend Cloudinary
+   * (POST /api/v1/admin/geekstore/upload) with local fallback.
+   */
+  async uploadImage(
+    file: File,
+  ): Promise<{ success: boolean; url: string; provider?: string; publicId?: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('image', file);
+    formData.append('folder', 'geekstore');
+
+    // 1. Upload directly to backend Cloudinary endpoint
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const res = await fetch(`${BACKEND_URL}/api/v1/admin/geekstore/upload`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        const payload = json.data || json;
+        return {
+          success: true,
+          url: payload.url || payload.secure_url,
+          provider: 'backend-cloudinary',
+          publicId: payload.publicId || payload.public_id,
+        };
+      }
+    } catch (e) {
+      console.warn('Backend Cloudinary upload error, falling back to local route:', e);
+    }
+
+    // 2. Fallback to local Next.js proxy/handler if backend is offline
+    const res = await fetch('/api/geekstore/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errorJson = await res.json().catch(() => null);
+      throw new Error(errorJson?.error || `Upload failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
   },
 
   /**
@@ -931,12 +851,14 @@ export const GeekstoreService = {
 
         if (shouldRestock) {
           // Auto-restock items in catalog
+          const catalog = getFallbackItems();
           for (const item of order.items) {
-            const catItem = FALLBACK_ITEMS.find((c) => c.id === item.itemId);
+            const catItem = catalog.find((c) => c.id === item.itemId);
             if (catItem) {
               catItem.stock += item.quantity;
             }
           }
+          saveFallbackItems(catalog);
           if (order.paymentStatus === 'COMPLETED') {
             order.paymentStatus = 'REFUNDED';
           }
