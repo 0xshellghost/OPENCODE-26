@@ -7,12 +7,12 @@ interface SakuraContextType {
   toggle: () => void;
 }
 
-const SakuraContext = createContext<SakuraContextType>({ enabled: false, toggle: () => {} });
+const SakuraContext = createContext<SakuraContextType>({ enabled: true, toggle: () => {} });
 
 const STORAGE_KEY = 'oc-sakura-petals';
 
 export function SakuraProvider({ children }: { children: ReactNode }) {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
 
   // Hydrate from localStorage
   useEffect(() => {
