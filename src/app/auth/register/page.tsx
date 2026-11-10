@@ -16,6 +16,7 @@ export default function Register() {
   const [formData, setFormData] = useState({ name: '', email: '', gender: '', degree: '', branch: '', college: 'IIIT Allahabad', discordId: '', githubId: '', graduationYear: '', avatarUrl: '', year: '' });
   const [collegeType, setCollegeType] = useState('IIIT Allahabad');
   const [otherCollege, setOtherCollege] = useState('');
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const toast = useToast();
   const router = useRouter();
 
@@ -48,6 +49,7 @@ export default function Register() {
   const registerMutation = useMutation({
     mutationFn: sendRegData,
     onSuccess: () => {
+      setIsRedirecting(true);
       toast({
         title: 'Registration Successful!',
         description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
@@ -64,6 +66,7 @@ export default function Register() {
       }, 1000);
     },
     onError: (error: any) => {
+      setIsRedirecting(false);
       toast({
         title: 'Registration could not be completed',
         description: error?.message || 'Please check your details and try again.',
@@ -73,6 +76,8 @@ export default function Register() {
       });
     },
   });
+
+  const isSubmitting = registerMutation.isPending || isRedirecting;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -143,7 +148,7 @@ export default function Register() {
           <RegistrationField name="year" label="Current year" value={formData.year} onChange={handleChange} options={['School', '1st Year', '2nd Year', '3rd Year', '4th Year', 'Passout']} />
           <RegistrationField name="graduationYear" label="Graduation year" value={formData.graduationYear} onChange={handleChange} placeholder="Graduation year" type="number" />
         </div></section>
-        <Button type="submit" width="100%" height="48px" bg="var(--accent)" color="var(--accent-ink)" borderRadius="10px" fontSize="13px" _hover={{ bg: 'var(--accent-hover)' }} isLoading={registerMutation.isPending} loadingText="Creating your profile" rightIcon={<ArrowRight size={16} />}>Begin your journey</Button>
+        <Button type="submit" width="100%" height="48px" bg="var(--accent)" color="var(--accent-ink)" borderRadius="10px" fontSize="13px" _hover={{ bg: 'var(--accent-hover)' }} isLoading={isSubmitting} loadingText="Preparing your journey..." rightIcon={<ArrowRight size={16} />}>Begin your journey</Button>
         <p className="oc-auth-fineprint">All fields are required. Let&apos;s make your profile feel like you.</p>
         <div className="oc-auth-links">Already part of the community? <Link href="/auth/sign-in">Sign in</Link></div>
       </form>
