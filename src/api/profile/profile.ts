@@ -32,32 +32,28 @@ export async function fetchLoggedInBasicDetails() {
 }
 
 export async function sendRegData(formData: any) {
-  try {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(
-      `${getApiBase()}/api/v1/register`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const response = await fetch(
+    `${getApiBase()}/api/v1/register`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-    );
+      body: JSON.stringify(formData),
+    },
+  );
 
-    if (response.status === 200) {
-      // console.log('Success!');
-    } else {
-      console.error('Registration failed:', response.statusText);
-    }
+  const data = await response.json().catch(() => null);
 
-    const data = await response.json();
-    // console.log(data);
-    return data;
-  } catch (error: any) {
-    console.error('Error sending registration data:', error.message);
+  if (!response.ok) {
+    const errorMsg = data?.error || data?.message || `Registration failed (${response.status}: ${response.statusText})`;
+    console.error('Registration failed:', errorMsg);
+    throw new Error(errorMsg);
   }
+
+  return data;
 }
 
 export async function getUserProfileByName(profileName: string) {

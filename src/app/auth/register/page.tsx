@@ -47,12 +47,64 @@ export default function Register() {
   };
   const registerMutation = useMutation({
     mutationFn: sendRegData,
-    onSuccess: () => router.push(`/user/events?token=${localStorage.getItem('token')}&avatar_url=${formData.avatarUrl}`),
-    onError: () => toast({ title: 'Registration could not be completed', description: 'Please check your details and try again.', status: 'error', isClosable: true }),
+    onSuccess: () => {
+      toast({
+        title: 'Registration Successful!',
+        description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
+        status: 'success',
+        duration: 3500,
+        isClosable: true,
+      });
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
+      const avatarUrl = formData.avatarUrl || '';
+      setTimeout(() => {
+        window.location.assign(
+          `/user/events?token=${encodeURIComponent(token)}&avatar_url=${encodeURIComponent(avatarUrl)}`
+        );
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Registration could not be completed',
+        description: error?.message || 'Please check your details and try again.',
+        status: 'error',
+        duration: 6000,
+        isClosable: true,
+      });
+    },
   });
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    registerMutation.mutate({ ...formData, gender: formData.gender.trim().toLowerCase() });
+
+    const missing: string[] = [];
+    if (!formData.name?.trim()) missing.push('Full name');
+    if (!formData.email?.trim()) missing.push('Email address');
+    if (!formData.githubId?.trim()) missing.push('GitHub username');
+    if (!formData.discordId?.trim()) missing.push('Discord username');
+    if (!formData.gender?.trim()) missing.push('Gender');
+    if (!formData.degree?.trim()) missing.push('Degree');
+    if (!formData.branch?.trim()) missing.push('Branch');
+    if (!formData.year?.trim()) missing.push('Current year');
+    if (!formData.graduationYear) missing.push('Graduation year');
+    if (collegeType === 'Other' && !otherCollege?.trim()) missing.push('College name');
+
+    if (missing.length > 0) {
+      toast({
+        title: 'Please fill in all required fields',
+        description: `Missing: ${missing.join(', ')}`,
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    registerMutation.mutate({
+      ...formData,
+      gender: formData.gender.trim().toLowerCase(),
+      graduationYear: Number(formData.graduationYear),
+    });
   };
 
   return <JapaneseBackground variant="auth">
@@ -64,7 +116,7 @@ export default function Register() {
         <p className="oc-description">Complete your profile and become part of OpenCode 2026. Your first contribution is just the beginning.</p>
         <ul className="oc-register-benefits"><li><Code2 size={18} />Build something that matters</li><li><Users size={18} />Find people who share your curiosity</li><li><Sprout size={18} />Grow, one contribution at a time</li></ul>
       </header>
-      <form className="glass-panel oc-register-card" onSubmit={handleSubmit}>
+      <form className="glass-panel oc-register-card" onSubmit={handleSubmit} noValidate>
         <section className="oc-form-section"><h2><span>01</span>A little about you</h2><div className="oc-form-grid">
           <RegistrationField name="name" label="Full name" value={formData.name} onChange={handleChange} placeholder="Your full name" autoComplete="name" />
           <RegistrationField name="email" label="Email address" value={formData.email} onChange={handleChange} placeholder="you@example.com" type="email" autoComplete="email" />
