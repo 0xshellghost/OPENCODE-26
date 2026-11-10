@@ -17,6 +17,7 @@ export default function Register() {
   const [collegeType, setCollegeType] = useState('IIIT Allahabad');
   const [otherCollege, setOtherCollege] = useState('');
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [formStatus, setFormStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const toast = useToast();
   const router = useRouter();
 
@@ -33,23 +34,31 @@ export default function Register() {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(previous => ({ ...previous, [event.target.name]: event.target.value }));
+    if (formStatus) setFormStatus(null);
   };
   const handleCollegeChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setCollegeType(event.target.value);
     setFormData(previous => ({ ...previous, college: event.target.value === 'Other' ? otherCollege : 'IIIT Allahabad' }));
+    if (formStatus) setFormStatus(null);
   };
   const handleOtherCollegeChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setOtherCollege(event.target.value);
     setFormData(previous => ({ ...previous, college: event.target.value }));
+    if (formStatus) setFormStatus(null);
   };
   const handleSelectCollege = (college: string) => {
     setOtherCollege(college);
     setFormData(previous => ({ ...previous, college }));
+    if (formStatus) setFormStatus(null);
   };
   const registerMutation = useMutation({
     mutationFn: sendRegData,
     onSuccess: () => {
       setIsRedirecting(true);
+      setFormStatus({
+        type: 'success',
+        message: 'Registration successful! Welcome to OpenCode 2026. Redirecting...',
+      });
       toast({
         title: 'Registration Successful!',
         description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
@@ -67,9 +76,14 @@ export default function Register() {
     },
     onError: (error: any) => {
       setIsRedirecting(false);
+      const errorMsg = error?.message || 'Please check your details and try again.';
+      setFormStatus({
+        type: 'error',
+        message: errorMsg,
+      });
       toast({
         title: 'Registration could not be completed',
-        description: error?.message || 'Please check your details and try again.',
+        description: errorMsg,
         status: 'error',
         duration: 6000,
         isClosable: true,
@@ -79,22 +93,47 @@ export default function Register() {
 
   const isSubmitting = registerMutation.isPending || isRedirecting;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = (event?: FormEvent<HTMLFormElement> | React.MouseEvent) => {
+    if (event?.preventDefault) {
+      event.preventDefault();
+    }
+
+    // Resolve current values with DOM fallback in case browser autofill didn't trigger React onChange
+    const resolved = { ...formData };
+    if (typeof document !== 'undefined') {
+      const getVal = (name: string) => {
+        const el = document.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`);
+        return el?.value?.trim() || '';
+      };
+      if (!resolved.name?.trim()) resolved.name = getVal('name');
+      if (!resolved.email?.trim()) resolved.email = getVal('email');
+      if (!resolved.githubId?.trim()) resolved.githubId = getVal('githubId');
+      if (!resolved.discordId?.trim()) resolved.discordId = getVal('discordId');
+      if (!resolved.gender?.trim()) resolved.gender = getVal('gender');
+      if (!resolved.degree?.trim()) resolved.degree = getVal('degree');
+      if (!resolved.branch?.trim()) resolved.branch = getVal('branch');
+      if (!resolved.year?.trim()) resolved.year = getVal('year');
+      if (!resolved.graduationYear) resolved.graduationYear = getVal('graduationYear');
+    }
 
     const missing: string[] = [];
-    if (!formData.name?.trim()) missing.push('Full name');
-    if (!formData.email?.trim()) missing.push('Email address');
-    if (!formData.githubId?.trim()) missing.push('GitHub username');
-    if (!formData.discordId?.trim()) missing.push('Discord username');
-    if (!formData.gender?.trim()) missing.push('Gender');
-    if (!formData.degree?.trim()) missing.push('Degree');
-    if (!formData.branch?.trim()) missing.push('Branch');
-    if (!formData.year?.trim()) missing.push('Current year');
-    if (!formData.graduationYear) missing.push('Graduation year');
+    if (!resolved.name?.trim()) missing.push('Full name');
+    if (!resolved.email?.trim()) missing.push('Email address');
+    if (!resolved.githubId?.trim()) missing.push('GitHub username');
+    if (!resolved.discordId?.trim()) missing.push('Discord username');
+    if (!resolved.gender?.trim()) missing.push('Gender');
+    if (!resolved.degree?.trim()) missing.push('Degree');
+    if (!resolved.branch?.trim()) missing.push('Branch');
+    if (!resolved.year?.trim()) missing.push('Current year');
+    if (!resolved.graduationYear) missing.push('Graduation year');
     if (collegeType === 'Other' && !otherCollege?.trim()) missing.push('College name');
 
     if (missing.length > 0) {
+      const errorMsg = `Please fill in all required fields: ${missing.join(', ')}`;
+      setFormStatus({
+        type: 'error',
+        message: errorMsg,
+      });
       toast({
         title: 'Please fill in all required fields',
         description: `Missing: ${missing.join(', ')}`,
@@ -105,10 +144,12 @@ export default function Register() {
       return;
     }
 
+    setFormStatus(null);
     registerMutation.mutate({
-      ...formData,
-      gender: formData.gender.trim().toLowerCase(),
-      graduationYear: Number(formData.graduationYear),
+      ...resolved,
+      college: collegeType === 'Other' ? otherCollege : 'IIIT Allahabad',
+      gender: resolved.gender.trim().toLowerCase(),
+      graduationYear: Number(resolved.graduationYear),
     });
   };
 
@@ -148,7 +189,45 @@ export default function Register() {
           <RegistrationField name="year" label="Current year" value={formData.year} onChange={handleChange} options={['School', '1st Year', '2nd Year', '3rd Year', '4th Year', 'Passout']} />
           <RegistrationField name="graduationYear" label="Graduation year" value={formData.graduationYear} onChange={handleChange} placeholder="Graduation year" type="number" />
         </div></section>
-        <Button type="submit" width="100%" height="48px" bg="var(--accent)" color="var(--accent-ink)" borderRadius="10px" fontSize="13px" _hover={{ bg: 'var(--accent-hover)' }} isLoading={isSubmitting} loadingText="Preparing your journey..." rightIcon={<ArrowRight size={16} />}>Begin your journey</Button>
+        {formStatus && (
+          <div
+            style={{
+              padding: '12px 16px',
+              borderRadius: '10px',
+              marginBottom: '16px',
+              fontSize: '13px',
+              lineHeight: '1.5',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              background: formStatus.type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.12)',
+              border: `1px solid ${formStatus.type === 'error' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(34, 197, 94, 0.35)'}`,
+              color: formStatus.type === 'error' ? '#fca5a5' : '#86efac',
+            }}
+          >
+            <span>{formStatus.type === 'error' ? '⚠️' : '✓'}</span>
+            <span>{formStatus.message}</span>
+          </div>
+        )}
+        <Button
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit(e);
+          }}
+          width="100%"
+          height="48px"
+          bg="var(--accent)"
+          color="var(--accent-ink)"
+          borderRadius="10px"
+          fontSize="13px"
+          _hover={{ bg: 'var(--accent-hover)' }}
+          isLoading={isSubmitting}
+          loadingText="Preparing your journey..."
+          rightIcon={<ArrowRight size={16} />}
+        >
+          Begin your journey
+        </Button>
         <p className="oc-auth-fineprint">All fields are required. Let&apos;s make your profile feel like you.</p>
         <div className="oc-auth-links">Already part of the community? <Link href="/auth/sign-in">Sign in</Link></div>
       </form>
