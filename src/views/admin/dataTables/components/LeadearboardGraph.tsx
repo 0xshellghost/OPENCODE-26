@@ -16,6 +16,7 @@ import RingLoader from 'react-spinners/RingLoader';
 import { FaCalendarAlt, FaClock, FaTrophy, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { isMaintainer } from 'constants/Maintainers';
 import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
+import { getApiBase } from 'utils/apiBase';
 
 export type ParticipantSeries = {
   participantId: string;
@@ -57,7 +58,7 @@ async function fetchProgress(
       ? localStorage.getItem('token')
       : null;
 
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}&topN=${topN}`;
+  const url = `${getApiBase()}/api/v1/leaderboard/progress?eventName=${encodeURIComponent(eventName)}&topN=${topN}`;
   
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;

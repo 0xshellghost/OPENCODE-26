@@ -1,8 +1,9 @@
 // src/api/admin/admin.ts
+import { getApiBase } from 'utils/apiBase';
 
 export async function getUserPRDetails(githubId: string, eventName: string) {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${githubId}/${eventName}/pr`,
+    `${getApiBase()}/api/v1/participant/${githubId}/${eventName}/pr`,
     {
       method: 'GET',
       headers: {
@@ -33,7 +34,7 @@ export async function EditPRPoints(prUpdateData: any) {
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/modify`,
+      `${getApiBase()}/api/v1/admin/modify`,
       {
         method: 'PATCH',
         headers: {
@@ -65,7 +66,7 @@ export async function addRepo(
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/add`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/add`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({
@@ -95,7 +96,7 @@ export async function updateRepoTags(
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/${repoName}/update`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/${repoName}/update`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(data),
@@ -108,7 +109,7 @@ export async function deleteRepo(eventName: string, repoName: string) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/${repoName}/delete`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/${repoName}/delete`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
@@ -120,7 +121,7 @@ export async function renameRepo(eventName: string, repoName: string, newRepoNam
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${eventName}/repos/${repoName}/rename`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/${repoName}/rename`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ newRepoName }),
@@ -144,8 +145,8 @@ export async function fetchMentors(): Promise<MentorUser[]> {
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const url = token
-    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/mentors`
-    : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/mentors`;
+    ? `${getApiBase()}/api/v1/admin/mentors`
+    : `${getApiBase()}/api/v1/events/mentors`;
 
   try {
     const response = await fetch(url, { headers });
@@ -155,7 +156,7 @@ export async function fetchMentors(): Promise<MentorUser[]> {
     }
   } catch {}
 
-  const fallbackRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/events/mentors`);
+  const fallbackRes = await fetch(`${getApiBase()}/api/v1/events/mentors`);
   if (!fallbackRes.ok) throw new Error('Failed to fetch mentors');
   const fallbackData = await fallbackRes.json();
   return fallbackData.data || [];
@@ -166,7 +167,7 @@ export async function addMentor(userId: string) {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
   const cleanId = userId.trim().replace(/^@/, '');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/${encodeURIComponent(cleanId)}/addMentor`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/${encodeURIComponent(cleanId)}/addMentor`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
@@ -182,7 +183,7 @@ export async function removeMentor(userId: string) {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
   const cleanId = userId.trim().replace(/^@/, '');
-  const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/${encodeURIComponent(cleanId)}/removeMentor`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/${encodeURIComponent(cleanId)}/removeMentor`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
@@ -203,7 +204,7 @@ export async function uploadEventLeaderboard(eventName: string, file: File) {
   formData.append('eventName', eventName);
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/event/${encodeURIComponent(eventName)}/leaderboard/upload`,
+    `${getApiBase()}/api/v1/admin/event/${encodeURIComponent(eventName)}/leaderboard/upload`,
     {
       method: 'POST',
       headers: {
@@ -226,8 +227,7 @@ export async function updateFlagshipEvent(eventName: string, isFlagship = true) 
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found. Please sign in as admin.');
 
-  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
-  const baseUrl = rawBase.replace(/\/+$/, '');
+  const baseUrl = getApiBase();
   const url = `${baseUrl}/api/v1/admin/events/${encodeURIComponent(eventName)}/flagship`;
 
   console.log('[updateFlagshipEvent] Sending PUT request to:', url, { isFlagship });
@@ -287,8 +287,7 @@ export interface BackendPlatformFeatures {
 }
 
 export async function fetchPlatformFeatures(): Promise<BackendPlatformFeatures | null> {
-  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
-  const baseUrl = rawBase.replace(/\/+$/, '');
+  const baseUrl = getApiBase();
   const url = `${baseUrl}/api/v1/features`;
 
   try {
@@ -322,8 +321,7 @@ export async function updatePlatformFeaturesInDb(
     throw new Error('No authentication token found. Please sign in as admin.');
   }
 
-  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
-  const baseUrl = rawBase.replace(/\/+$/, '');
+  const baseUrl = getApiBase();
   const url = `${baseUrl}/api/v1/admin/features`;
 
   const response = await fetch(url, {

@@ -10,6 +10,7 @@ import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 import { updateFlagshipEvent } from 'api/admin/admin';
+import { getApiBase } from 'utils/apiBase';
 
 // 1. Define Types
 interface EventItem {
@@ -74,7 +75,7 @@ export default function Viewevents() {
     // Fetch Data
     const fetchData = async () => {
       try {
-        const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
+        const baseUrl = getApiBase();
         const response = await axios.get(
           `${baseUrl}/api/v1/events/`
         );
@@ -96,7 +97,7 @@ export default function Viewevents() {
     const token = localStorage.getItem('token');
 
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
+      const baseUrl = getApiBase();
       await axios.delete(
         `${baseUrl}/api/v1/admin/delete/${encodeURIComponent(eventName)}`,
         {

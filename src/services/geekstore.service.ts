@@ -15,9 +15,11 @@ import {
   OrderStatus,
   PaymentStatus,
 } from 'types/geekstore';
+import { getApiBase } from 'utils/apiBase';
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+function getBackendUrl() {
+  return getApiBase();
+}
 
 export function generateIdempotencyKey(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -131,7 +133,7 @@ async function requestWithFallback<T>(
   options: RequestInit = {},
   fallbackFn?: () => Promise<T> | T,
 ): Promise<T> {
-  const url = `${BACKEND_URL}${path}`;
+  const url = `${getBackendUrl()}${path}`;
 
   try {
     const res = await fetch(url, {
@@ -157,7 +159,7 @@ async function requestWithFallback<T>(
     // If 404, maybe it's under /api/v1 prefix?
     if (res.status === 404 && !path.startsWith('/api/v1')) {
       try {
-        const altRes = await fetch(`${BACKEND_URL}/api/v1${path}`, {
+        const altRes = await fetch(`${getBackendUrl()}/api/v1${path}`, {
           ...options,
           headers: {
             'Content-Type': 'application/json',
@@ -693,7 +695,7 @@ export const GeekstoreService = {
     // 1. Upload directly to backend Cloudinary endpoint
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch(`${BACKEND_URL}/api/v1/admin/geekstore/upload`, {
+      const res = await fetch(`${getBackendUrl()}/api/v1/admin/geekstore/upload`, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,

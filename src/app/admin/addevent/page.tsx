@@ -17,6 +17,7 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { getApiBase } from 'utils/apiBase';
 
 // Define the shape of the JWT payload
 interface JWTPayload {
@@ -140,7 +141,7 @@ export default function Addevent() {
     }
 
     try {
-      const baseUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000').replace(/\/+$/, '');
+      const baseUrl = getApiBase();
       await axios.post(
         `${baseUrl}/api/v1/admin/create`,
         formData,

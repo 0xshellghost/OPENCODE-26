@@ -1,4 +1,5 @@
 import { FetchedLeaderboard } from 'api/leaderboard/leaderboard';
+import { getApiBase } from 'utils/apiBase';
 
 export async function fetchLoggedInBasicDetails() {
   if (typeof window === 'undefined') return null;
@@ -11,7 +12,7 @@ export async function fetchLoggedInBasicDetails() {
   } else {
     const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || 'Opencode';
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/?eventName=${encodeURIComponent(eventName)}`,
+      `${getApiBase()}/api/v1/participant/?eventName=${encodeURIComponent(eventName)}`,
       {
         method: 'GET',
         headers: {
@@ -34,7 +35,7 @@ export async function sendRegData(formData: any) {
   try {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/register`,
+      `${getApiBase()}/api/v1/register`,
       {
         method: 'POST',
         headers: {
@@ -64,7 +65,7 @@ export async function getUserProfileByName(profileName: string) {
   const eventName = process.env.NEXT_PUBLIC_EVENT_NAME || 'Opencode';
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/${encodeURIComponent(profileName)}/${encodeURIComponent(eventName)}`,
+    `${getApiBase()}/api/v1/participant/${encodeURIComponent(profileName)}/${encodeURIComponent(eventName)}`,
     {
       method: 'GET',
       headers: {
@@ -105,7 +106,7 @@ export async function updateUserProfile(updatedData: ProfileUpdatePayload) {
   };
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/participant/update`,
+    `${getApiBase()}/api/v1/participant/update`,
     {
       method: 'PUT',
       headers: {
@@ -176,7 +177,7 @@ export async function fetchColleges(param?: string | { queryKey?: unknown }): Pr
 
   // 2. Fallback to /api/v1/colleges if available
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/colleges`);
+    const response = await fetch(`${getApiBase()}/api/v1/colleges`);
     if (response.ok) {
       const data = await response.json();
       if (Array.isArray(data.data) && data.data.length > 0) {

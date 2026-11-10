@@ -20,11 +20,11 @@ import Link from 'next/link';
 import Canvas from '../../../components/Canvas/Canvas';
 import BlurText from 'components/reactbits/BlurText';
 import PageHeading from 'components/japanese/PageHeading';
+import { getApiBase } from 'utils/apiBase';
 
-const BACKEND_API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  'http://localhost:4000';
+function getBackendApiUrl() {
+  return getApiBase();
+}
 
 // ─── Theme constants ───
 const SERIF = 'var(--f-display)';
@@ -90,7 +90,7 @@ export default function RPlaceCanvasPage() {
     const username = decoded.id;
     setUserHandle(username);
 
-    fetch(`${BACKEND_API_URL}/api/v1/participant/${encodeURIComponent(username)}/pr-points`)
+    fetch(`${getBackendApiUrl()}/api/v1/participant/${encodeURIComponent(username)}/pr-points`)
       .then((res) => (res.ok ? res.json() : null))
       .then((body) => {
         if (body && body.data !== undefined) {
