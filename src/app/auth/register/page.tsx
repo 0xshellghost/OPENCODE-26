@@ -1,4 +1,5 @@
 'use client';
+
 import { useToast } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -149,12 +150,6 @@ export default function Register() {
     if (event?.preventDefault) {
       event.preventDefault();
     }
-    console.log("3. Handle submit entered");
-
-    const token = localStorage.getItem("token");
-
-    console.log("4. Token exists: ", !!token);
-    console.log("5. Form data:", formData);
 
     // Resolve current values with DOM fallback in case browser autofill didn't trigger React onChange
     const resolved = { ...formData };
@@ -266,12 +261,7 @@ export default function Register() {
           </ul>
         </header>
 
-        <form className="glass-panel oc-register-card" 
-        onSubmit={(e) => {
-            e.preventDefault()
-            console.log('2. Form submitted');
-            handleSubmit(e);
-        }} noValidate>
+        <form className="glass-panel oc-register-card" onSubmit={handleSubmit} noValidate>
           <section className="oc-form-section">
             <h2><span>01</span>A little about you</h2>
             <div className="oc-form-grid">
@@ -406,7 +396,6 @@ export default function Register() {
           <button
             type="submit"
             disabled={isSubmitting}
-            onClick={() => console.log("1. Register button clicked")}
             className="oc-button"
             style={{
               width: '100%',
