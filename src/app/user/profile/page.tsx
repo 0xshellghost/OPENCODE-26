@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Flex } from '@chakra-ui/react';
 import { RingLoader } from 'react-spinners';
+import { parseJwt } from 'utils/jwt';
 
 export interface PullRequest {
   prNumber: number;
@@ -41,9 +42,20 @@ export default function ProfileSelf() {
   useEffect(() => {
     try {
       const cached = JSON.parse(localStorage.getItem('user') ?? '{}');
-      const githubID = cached?.githubId;
+      let githubID = cached?.githubId;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+      if (!githubID && token) {
+        const payload = parseJwt(token);
+        if (payload?.githubId) {
+          githubID = payload.githubId;
+        }
+      }
+
       if (githubID) {
         router.replace(`/user/profile/${encodeURIComponent(githubID)}`);
+      } else if (token) {
+        router.replace('/auth/register');
       } else {
         router.replace('/auth/sign-in');
       }

@@ -11,6 +11,7 @@ import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
 import RegistrationField from 'components/japanese/RegistrationField';
 import CollegeAutocompleteField from 'components/japanese/CollegeAutocompleteField';
+import { parseJwt } from 'utils/jwt';
 
 export default function Register() {
   const [formData, setFormData] = useState({ name: '', email: '', gender: '', degree: '', branch: '', college: 'IIIT Allahabad', discordId: '', githubId: '', graduationYear: '', avatarUrl: '', year: '' });
@@ -28,8 +29,28 @@ export default function Register() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setFormData(previous => ({ ...previous, avatarUrl: params.get('avatar_url') || '' }));
-    if (params.get('token')) localStorage.setItem('token', params.get('token')!);
+    const tokenParam = params.get('token');
+    const avatarParam = params.get('avatar_url');
+
+    if (tokenParam) {
+      localStorage.setItem('token', tokenParam);
+    }
+    const token = tokenParam || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
+
+    setFormData(previous => {
+      const updated = { ...previous };
+      if (avatarParam) updated.avatarUrl = avatarParam;
+      if (token) {
+        const payload = parseJwt(token);
+        if (payload?.githubId && !updated.githubId) {
+          updated.githubId = payload.githubId;
+        }
+        if (payload?.avatarUrl && !updated.avatarUrl) {
+          updated.avatarUrl = payload.avatarUrl;
+        }
+      }
+      return updated;
+    });
   }, []);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
