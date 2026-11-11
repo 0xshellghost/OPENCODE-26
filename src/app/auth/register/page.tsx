@@ -1,5 +1,4 @@
 'use client';
-
 import { useToast } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
