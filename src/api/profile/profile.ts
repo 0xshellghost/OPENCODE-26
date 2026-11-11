@@ -176,20 +176,7 @@ export async function fetchColleges(param?: string | { queryKey?: unknown }): Pr
     console.error('Error fetching colleges from event leaderboard:', error);
   }
 
-  // 2. Fallback to /api/v1/colleges if available
-  try {
-    const response = await fetch(`${getApiBase()}/api/v1/colleges`);
-    if (response.ok) {
-      const data = await response.json();
-      if (Array.isArray(data.data) && data.data.length > 0) {
-        return [...new Set((data.data as string[]).map((c) => c?.trim()).filter((c) => Boolean(c) && !isIIITAllahabad(c)))].sort();
-      }
-    }
-  } catch {
-    // ignore backend colleges endpoint error
-  }
-
-  // 3. Fallback list of known colleges when offline or event is newly initialized
+  // 2. Fallback list of known colleges when offline or event is newly initialized
   return [
     'Birla Institute of Technology and Science, Pilani',
     'Delhi Technological University',
