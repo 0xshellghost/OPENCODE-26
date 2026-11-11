@@ -155,13 +155,18 @@ export async function fetchColleges(param?: string | { queryKey?: unknown }): Pr
       ? param
       : process.env.NEXT_PUBLIC_EVENT_NAME || "OPENCODE'26";
 
+  const isIIITAllahabad = (col: string) => {
+    const s = col.toLowerCase().replace(/[^a-z]/g, '');
+    return s.includes('allahabad') && (s.includes('iiit') || s.includes('informationtechnology'));
+  };
+
   // 1. Fetch registered colleges from the active event leaderboard
   try {
     const leadData = await FetchedLeaderboard(targetEvent);
     if (leadData && Array.isArray(leadData)) {
       const colleges = leadData
         .map((item) => (item.collegeName ?? '')?.trim())
-        .filter(Boolean);
+        .filter((c) => Boolean(c) && !isIIITAllahabad(c));
       const uniqueColleges = [...new Set(colleges)].sort();
       if (uniqueColleges.length > 0) {
         return uniqueColleges;
@@ -177,7 +182,7 @@ export async function fetchColleges(param?: string | { queryKey?: unknown }): Pr
     if (response.ok) {
       const data = await response.json();
       if (Array.isArray(data.data) && data.data.length > 0) {
-        return [...new Set((data.data as string[]).map((c) => c?.trim()).filter(Boolean))].sort();
+        return [...new Set((data.data as string[]).map((c) => c?.trim()).filter((c) => Boolean(c) && !isIIITAllahabad(c)))].sort();
       }
     }
   } catch {
@@ -188,7 +193,6 @@ export async function fetchColleges(param?: string | { queryKey?: unknown }): Pr
   return [
     'Birla Institute of Technology and Science, Pilani',
     'Delhi Technological University',
-    'Indian Institute of Information Technology, Allahabad',
     'Indian Institute of Information Technology, Hyderabad',
     'Indian Institute of Information Technology, Lucknow',
     'Indian Institute of Technology BHU',
