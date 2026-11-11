@@ -261,7 +261,11 @@ export default function Register() {
           </ul>
         </header>
 
-        <form className="glass-panel oc-register-card" onSubmit={handleSubmit} noValidate>
+        <form className="glass-panel oc-register-card" 
+        onSubmit={(e) => {
+            console.log('Form submitted');
+            handleSubmit(e);
+        }} noValidate>
           <section className="oc-form-section">
             <h2><span>01</span>A little about you</h2>
             <div className="oc-form-grid">
