@@ -31,6 +31,7 @@ import {
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
+  EXPECTED_SNAPSHOT_BYTES,
   renderSnapshotToCanvas,
   drawPixel,
 } from '../../utils/rplaceProtocol';
@@ -228,7 +229,8 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         // 2. Fall back to direct backend URL if proxy failed
         const backendBase = process.env.NEXT_PUBLIC_RPLACE_API_URL;
         if (backendBase) {
-          result = await fetchBufferWithTimeout(`${backendBase}/api/board`, 10000);
+          const cleanBase = backendBase.replace(/\/api\/?$/, '').replace(/\/+$/, '');
+          result = await fetchBufferWithTimeout(`${cleanBase}/api/board`, 10000);
         } else {
           throw proxyErr;
         }
@@ -262,8 +264,14 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
         }
       }
     } catch (err) {
-      console.error('Failed to load board snapshot:', err);
-      setIsError(true);
+      console.warn('Failed to load remote board snapshot, rendering fallback buffer:', err);
+      // Fallback: initialize a blank 300,000-byte board so user can still see the canvas grid
+      if (canvasRef.current) {
+        const fallbackBuffer = new ArrayBuffer(EXPECTED_SNAPSHOT_BYTES);
+        renderSnapshotToCanvas(canvasRef.current, fallbackBuffer);
+        isLoadedRef.current = true;
+      }
+      setIsError(false);
     } finally {
       setIsLoading(false);
     }
@@ -280,9 +288,21 @@ export default function Canvas({ userTier, userHandle }: CanvasProps) {
       process.env.NEXT_PUBLIC_RPLACE_WS_URL ||
       process.env.NEXT_PUBLIC_WS_URL ||
       process.env.NEXT_PUBLIC_RPLACE_API_URL;
-    const wsUrl = configuredWsUrl
-      ? configuredWsUrl.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:')
-      : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+
+    let wsUrl: string;
+    if (configuredWsUrl) {
+      let cleaned = configuredWsUrl
+        .replace(/^http:/, 'ws:')
+        .replace(/^https:/, 'wss:')
+        .replace(/\/+$/, '');
+      if (!cleaned.endsWith('/ws')) {
+        cleaned = cleaned.replace(/\/api$/, '');
+        cleaned = `${cleaned}/ws`;
+      }
+      wsUrl = cleaned;
+    } else {
+      wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+    }
 
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
