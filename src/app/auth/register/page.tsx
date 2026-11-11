@@ -263,6 +263,7 @@ export default function Register() {
 
         <form className="glass-panel oc-register-card" 
         onSubmit={(e) => {
+            e.preventDefault()
             console.log('Form submitted');
             handleSubmit(e);
         }} noValidate>
@@ -400,6 +401,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={isSubmitting}
+            onClick={() => console.log("Register button clicked")}
             className="oc-button"
             style={{
               width: '100%',
