@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Menu,
   X,
@@ -11,6 +11,7 @@ import {
   Film,
   UserRound,
   ArrowUpRight,
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from 'contexts/AuthContext';
 import { useFeatures } from 'contexts/FeaturesContext';
@@ -36,16 +37,25 @@ const navigation = [
 
 export default function SiteNavbar() {
   const pathname = usePathname();
-  const { isLoggedIn } = useAuth();
+  const router = useRouter();
+  const { isLoggedIn,logout } = useAuth();
   const { features } = useFeatures();
 
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [heroMuted, setHeroMuted] = useState(false);
 
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileMenuOpen(false);
+    setIsMenuOpen(false);
+    router.push('/');
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -257,33 +267,51 @@ export default function SiteNavbar() {
             <div className="hidden sm:block w-[1px] h-4 bg-[var(--border)] mx-0.5 shrink-0" />
 
             {/* Dynamic Sign In / Profile action pill */}
-            <Link
-              href={mounted && isLoggedIn ? '/user/profile' : '/auth/sign-in'}
-              aria-current={
-                pathname?.startsWith('/user/profile') ||
-                pathname?.startsWith('/auth')
-                  ? 'page'
-                  : undefined
-              }
-              className={cn(
-                'relative z-10 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0 whitespace-nowrap',
-                mounted && isLoggedIn
-                  ? 'bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border-accent)] hover:bg-[var(--accent-soft)]/80'
-                  : 'bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] shadow-md shadow-[var(--accent-soft)]',
-              )}
-            >
-              {mounted && isLoggedIn ? (
-                <>
-                  <UserRound className="w-3.5 h-3.5 text-[var(--accent)]" />
-                  <span>Profile</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </Link>
+            {mounted && isLoggedIn ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  aria-expanded={isProfileMenuOpen}
+                  aria-haspopup="true"
+                  className="relative z-10 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0 whitespace-nowrap bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border-accent)] hover:bg-[var(--accent-soft)]/80"
+                >
+                <UserRound className="w-3.5 h-3.5" />
+                <span>Profile</span>
+                </button>
+
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1.5 shadow-xl z-50">
+                  <Link
+                    href="/user/profile"
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-[var(--fg)] hover:bg-[var(--accent-soft)] transition-colors"
+                  >
+                  <UserRound className="w-4 h-4" />
+                    My Profile
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-colors"
+                  >
+                  <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+               )}
+              </div>
+            ) : (
+              <Link
+                href="/auth/sign-in"
+                aria-current={pathname?.startsWith('/auth') ? 'page' : undefined}
+                className="relative z-10 flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 text-xs xl:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 shrink-0 whitespace-nowrap bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--accent-hover)] shadow-md shadow-[var(--accent-soft)]"
+              >
+                <span>Sign In</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
 
             {/* Mobile Hamburger Toggle Button */}
             <div className="xl:hidden flex items-center shrink-0">
@@ -464,10 +492,21 @@ export default function SiteNavbar() {
                 {mounted && isLoggedIn ? 'My Profile' : 'Sign In to OpenCode'}
               </span>
             </div>
-            <ArrowUpRight className="w-4 h-4" />
+                <ArrowUpRight className="w-4 h-4" />
           </Link>
+
+          {mounted && isLoggedIn && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full text-left rounded-xl px-4 py-2.5 text-sm sm:text-base font-semibold transition-all flex items-center gap-2.5 text-red-500 hover:bg-red-500/10"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          )}
+          </div>
         </div>
-      </div>
     </header>
   );
 }
