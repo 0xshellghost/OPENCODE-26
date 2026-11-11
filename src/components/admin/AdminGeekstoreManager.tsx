@@ -149,7 +149,7 @@ export default function AdminGeekstoreManager() {
       GeekstoreService.adminDeleteItem(itemId, permanent),
     onSuccess: (_, vars) => {
       toast({
-        title: vars.permanent ? 'Product Permanently Deleted 🗑️' : 'Product Moved to Trash 📦',
+        title: vars.permanent ? 'Product Permanently Deleted' : 'Product Moved to Trash',
         description: vars.permanent
           ? 'Item was purged from database and storefront.'
           : 'Item marked as deleted and deactivated from user view.',
@@ -177,7 +177,7 @@ export default function AdminGeekstoreManager() {
     mutationFn: (itemId: string) => GeekstoreService.adminRestoreItem(itemId),
     onSuccess: (data) => {
       toast({
-        title: 'Product Restored! ♻️',
+        title: 'Product Restored',
         description: `"${data.item?.name || 'Product'}" has been restored to active inventory.`,
         status: 'success',
         duration: 3500,
@@ -1172,7 +1172,7 @@ export default function AdminGeekstoreManager() {
                                 maxW="120px"
                                 mt={0.5}
                               >
-                                📝 {ord.adminNote}
+                                Note: {ord.adminNote}
                               </Text>
                             )}
                           </Td>
@@ -1304,7 +1304,7 @@ export default function AdminGeekstoreManager() {
               </Text>
               {deleteModalItem.deletedAt ? (
                 <Text fontSize="xs" color="red.300">
-                  ⚠️ This product is already in the trash. Purging will permanently remove it from the database and cannot be recovered.
+                  This product is already in the trash. Purging will permanently remove it from the database and cannot be recovered.
                 </Text>
               ) : (
                 <Text fontSize="xs" color="var(--fg-muted)">

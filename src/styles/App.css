@@ -984,3 +984,12 @@ body.oc-initial-loading {
   animation: haloRotate 20s linear infinite;
   pointer-events: none;
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

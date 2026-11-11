@@ -32,7 +32,26 @@ export async function fetchLoggedInBasicDetails() {
 }
 
 export async function sendRegData(formData: any) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  let token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (!token && typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+    }
+  }
+
+  // Ensure avatarUrl is never missing (Prisma User model requires avatarUrl: String)
+  const avatarUrl =
+    formData.avatarUrl?.trim() ||
+    (formData.githubId ? `https://github.com/${formData.githubId}.png` : 'https://github.com/identicons/user.png');
+
+  const payload = {
+    ...formData,
+    avatarUrl,
+    graduationYear: Number(formData.graduationYear),
+  };
+
   const response = await fetch(
     `${getApiBase()}/api/v1/register`,
     {
@@ -41,7 +60,7 @@ export async function sendRegData(formData: any) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify(payload),
     },
   );
 

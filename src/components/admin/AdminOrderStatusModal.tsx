@@ -94,7 +94,7 @@ export default function AdminOrderStatusModal({
         });
 
         toast({
-          title: 'Order Status Updated! 📦',
+          title: 'Order Status Updated',
           description: `Order #${order.id} status changed to ${selectedStatus}.`,
           status: 'success',
           duration: 4000,
@@ -109,7 +109,7 @@ export default function AdminOrderStatusModal({
         });
 
         toast({
-          title: 'Payment Status Updated! 💳',
+          title: 'Payment Status Updated',
           description: `Order #${order.id} payment status changed to ${selectedPaymentStatus}.`,
           status: 'success',
           duration: 4000,

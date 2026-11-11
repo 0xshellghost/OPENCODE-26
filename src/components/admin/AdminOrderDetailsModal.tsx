@@ -29,6 +29,7 @@ import {
   CreditCard,
   ShoppingBag,
   FileText,
+  GraduationCap,
 } from 'lucide-react';
 import { AdminOrder } from 'types/geekstore';
 
@@ -209,9 +210,10 @@ export default function AdminOrderDetailsModal({
 
                 <Flex gap={4} mt={1} flexWrap="wrap" fontSize="xs" color="var(--fg-muted)">
                   {order.user?.college && (
-                    <Text>
-                      🏫 {order.user.college}
-                    </Text>
+                    <Flex align="center" gap={1}>
+                      <Icon as={GraduationCap} size={12} />
+                      <Text>{order.user.college}</Text>
+                    </Flex>
                   )}
                   {order.user?.email && (
                     <Flex align="center" gap={1}>

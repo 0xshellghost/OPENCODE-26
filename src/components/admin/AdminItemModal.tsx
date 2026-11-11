@@ -159,7 +159,7 @@ export default function AdminItemModal({
         });
 
         toast({
-          title: 'Image Uploaded to Cloud! ☁️',
+          title: 'Image Uploaded Successfully',
           description: `Uploaded successfully (${res.provider === 'cloudinary' ? 'Cloudinary Cloud' : 'Storage'}). Ready to publish.`,
           status: 'success',
           duration: 3500,
@@ -258,7 +258,7 @@ export default function AdminItemModal({
           isActive,
         });
         toast({
-          title: 'Product Updated Successfully! ✏️',
+          title: 'Product Updated Successfully',
           description: `"${updated.name}" has been updated.`,
           status: 'success',
           duration: 4000,
@@ -278,7 +278,7 @@ export default function AdminItemModal({
           isActive,
         });
         toast({
-          title: 'Product Added Successfully! 🎉',
+          title: 'Product Added Successfully',
           description: `"${created.name}" is now live in the Geekstore catalog.`,
           status: 'success',
           duration: 4000,
@@ -636,7 +636,7 @@ export default function AdminItemModal({
                           </Text>
                           {uploadInfo?.fileSize && (
                             <Text fontSize="10px" color="var(--accent)" mt={0.5}>
-                              ✓ File size: {uploadInfo.fileSize}
+                              File size: {uploadInfo.fileSize}
                             </Text>
                           )}
                         </Box>
