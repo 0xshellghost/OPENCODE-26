@@ -169,17 +169,6 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
     }
   }, [isLoading, pathname]);
 
-  if (!mounted) {
-    if (pathname === '/') {
-      return (
-        <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
-          <InitialLoader isExiting={false} variant={initialVariant} />
-        </ChakraProvider>
-      );
-    }
-    return null;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <FeaturesProvider>

@@ -9,14 +9,6 @@
 }
 
 @font-face {
-  font-family: 'HarryP';
-  src: url('/fonts/HarryP.ttf') format('truetype');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Henshin';
   src: url('/fonts/Henshin.ttf') format('truetype');
   font-weight: 100 900;
@@ -46,10 +38,6 @@
 
 .font-zen {
   font-family: 'Zen Kaku Gothic New', sans-serif;
-}
-
-.font-harry {
-  font-family: 'HarryP', fantasy, serif;
 }
 
 .font-henshin {
