@@ -10,6 +10,7 @@ export default function SakuraToggle() {
   return (
     <button
       type="button"
+      suppressHydrationWarning
       className={`${styles.toggle} ${enabled ? styles.active : ''}`}
       onClick={toggle}
       aria-label={enabled ? 'Disable sakura petals' : 'Enable sakura petals'}

@@ -137,6 +137,23 @@ export default function Register() {
       if (!resolved.graduationYear) resolved.graduationYear = getVal('graduationYear');
     }
 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      const authError = 'No GitHub sign-in detected. Please sign in with GitHub first so your account can be linked.';
+      setFormStatus({
+        type: 'error',
+        message: authError,
+      });
+      toast({
+        title: 'Sign in required',
+        description: 'Please sign in with GitHub first so we can link your profile.',
+        status: 'error',
+        duration: 6000,
+        isClosable: true,
+      });
+      return;
+    }
+
     const missing: string[] = [];
     if (!resolved.name?.trim()) missing.push('Full name');
     if (!resolved.email?.trim()) missing.push('Email address');
