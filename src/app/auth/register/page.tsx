@@ -3,7 +3,6 @@
 import { useToast } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { ArrowRight, Code2, Users, Sprout, Loader2 } from 'lucide-react';
 import { sendRegData, fetchColleges } from 'api/profile/profile';
@@ -12,9 +11,14 @@ import SiteNavbar from 'components/navbar/SiteNavbar';
 import RegistrationField from 'components/japanese/RegistrationField';
 import CollegeAutocompleteField from 'components/japanese/CollegeAutocompleteField';
 import { parseJwt } from 'utils/jwt';
+import {
+  RegistrationFieldErrors,
+  RegistrationFormData,
+  validateRegistration,
+} from 'utils/registrationValidation';
 
 export default function Register() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegistrationFormData>({
     name: '',
     email: '',
     gender: 'male',
@@ -28,12 +32,12 @@ export default function Register() {
     year: '2nd Year',
   });
   const [missingFields, setMissingFields] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<RegistrationFieldErrors>({});
   const [collegeType, setCollegeType] = useState('IIIT Allahabad');
   const [otherCollege, setOtherCollege] = useState('');
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [formStatus, setFormStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const toast = useToast();
-  const router = useRouter();
 
   const { data: colleges = [] } = useQuery({
     queryKey: ['colleges'],
@@ -55,8 +59,9 @@ export default function Register() {
       if (avatarParam) updated.avatarUrl = avatarParam;
       if (token) {
         const payload = parseJwt(token);
-        if (payload?.githubId && !updated.githubId) {
-          updated.githubId = payload.githubId;
+        const githubId = payload?.githubId || payload?.id;
+        if (githubId && !updated.githubId) {
+          updated.githubId = githubId;
         }
         if ((payload?.avatarUrl || payload?.avatar_url) && !updated.avatarUrl) {
           updated.avatarUrl = payload.avatarUrl || payload.avatar_url;
@@ -64,6 +69,10 @@ export default function Register() {
       }
       return updated;
     });
+
+    if (tokenParam) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
   }, []);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -72,6 +81,9 @@ export default function Register() {
     if (formStatus) setFormStatus(null);
     if (missingFields.includes(name)) {
       setMissingFields(prev => prev.filter(f => f !== name));
+    }
+    if (fieldErrors[name as keyof RegistrationFieldErrors]) {
+      setFieldErrors(previous => ({ ...previous, [name]: undefined }));
     }
   };
 
@@ -83,6 +95,7 @@ export default function Register() {
     if (missingFields.includes('college')) {
       setMissingFields(prev => prev.filter(f => f !== 'college'));
     }
+    setFieldErrors(previous => ({ ...previous, college: undefined }));
   };
 
   const handleOtherCollegeChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -93,6 +106,7 @@ export default function Register() {
     if (missingFields.includes('college')) {
       setMissingFields(prev => prev.filter(f => f !== 'college'));
     }
+    setFieldErrors(previous => ({ ...previous, college: undefined }));
   };
 
   const handleSelectCollege = (college: string) => {
@@ -102,6 +116,7 @@ export default function Register() {
     if (missingFields.includes('college')) {
       setMissingFields(prev => prev.filter(f => f !== 'college'));
     }
+    setFieldErrors(previous => ({ ...previous, college: undefined }));
   };
 
   const registerMutation = useMutation({
@@ -127,9 +142,17 @@ export default function Register() {
         );
       }, 1000);
     },
-    onError: (error: any) => {
+    onError: (error: Error & { fields?: RegistrationFieldErrors; status?: number }) => {
       setIsRedirecting(false);
       const errorMsg = error?.message || 'Please check your details and try again.';
+      if (error.fields) {
+        setFieldErrors(error.fields);
+        const firstField = Object.keys(error.fields)[0];
+        document.getElementById(`register-${firstField}`)?.focus();
+      }
+      if (error.status === 401) {
+        localStorage.removeItem('token');
+      }
       setFormStatus({
         type: 'error',
         message: errorMsg,
@@ -186,29 +209,22 @@ export default function Register() {
       return;
     }
 
-    const missing: { key: string; label: string }[] = [];
-    if (!resolved.name?.trim()) missing.push({ key: 'name', label: 'Full name' });
-    if (!resolved.email?.trim()) missing.push({ key: 'email', label: 'Email address' });
-    if (!resolved.githubId?.trim()) missing.push({ key: 'githubId', label: 'GitHub username' });
-    if (!resolved.discordId?.trim()) missing.push({ key: 'discordId', label: 'Discord username' });
-    if (!resolved.gender?.trim()) missing.push({ key: 'gender', label: 'Gender' });
-    if (!resolved.degree?.trim()) missing.push({ key: 'degree', label: 'Degree' });
-    if (!resolved.branch?.trim()) missing.push({ key: 'branch', label: 'Branch' });
-    if (!resolved.year?.trim()) missing.push({ key: 'year', label: 'Current year' });
-    if (!resolved.graduationYear) missing.push({ key: 'graduationYear', label: 'Graduation year' });
-    if (collegeType === 'Other' && !otherCollege?.trim()) missing.push({ key: 'college', label: 'College name' });
+    resolved.college = collegeType === 'Other' ? otherCollege.trim() : 'IIIT Allahabad';
+    const errors = validateRegistration(resolved);
+    const invalidKeys = Object.keys(errors);
 
-    if (missing.length > 0) {
-      const missingKeys = missing.map(m => m.key);
+    if (invalidKeys.length > 0) {
+      const missingKeys = invalidKeys;
       setMissingFields(missingKeys);
-      const errorMsg = `Please fill in all required fields: ${missing.map(m => m.label).join(', ')}`;
+      setFieldErrors(errors);
+      const errorMsg = 'Please correct the highlighted fields before continuing.';
       setFormStatus({
         type: 'error',
         message: errorMsg,
       });
       toast({
         title: 'Please fill in all required fields',
-        description: `Missing: ${missing.map(m => m.label).join(', ')}`,
+        description: errorMsg,
         status: 'warning',
         duration: 5000,
         isClosable: true,
@@ -225,6 +241,7 @@ export default function Register() {
     }
 
     setMissingFields([]);
+    setFieldErrors({});
     setFormStatus(null);
 
     const resolvedAvatarUrl =
@@ -239,7 +256,7 @@ export default function Register() {
       degree: resolved.degree.trim(),
       branch: resolved.branch.trim(),
       year: resolved.year.trim(),
-      college: collegeType === 'Other' ? otherCollege.trim() : 'IIIT Allahabad',
+      college: resolved.college,
       gender: resolved.gender.trim().toLowerCase(),
       graduationYear: Number(resolved.graduationYear),
       avatarUrl: resolvedAvatarUrl,
@@ -273,6 +290,7 @@ export default function Register() {
                 placeholder="Your full name"
                 autoComplete="name"
                 hasError={missingFields.includes('name')}
+                error={fieldErrors.name}
               />
               <RegistrationField
                 name="email"
@@ -283,6 +301,7 @@ export default function Register() {
                 type="email"
                 autoComplete="email"
                 hasError={missingFields.includes('email')}
+                error={fieldErrors.email}
               />
               <RegistrationField
                 name="githubId"
@@ -291,6 +310,8 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Your GitHub handle"
                 hasError={missingFields.includes('githubId')}
+                error={fieldErrors.githubId}
+                readOnly
               />
               <RegistrationField
                 name="discordId"
@@ -299,6 +320,7 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Your Discord handle"
                 hasError={missingFields.includes('discordId')}
+                error={fieldErrors.discordId}
               />
               <RegistrationField
                 name="gender"
@@ -308,6 +330,7 @@ export default function Register() {
                 options={['male', 'female', 'other']}
                 full
                 hasError={missingFields.includes('gender')}
+                error={fieldErrors.gender}
               />
             </div>
           </section>
@@ -334,6 +357,7 @@ export default function Register() {
                   placeholder="Your institution"
                   full
                   hasError={missingFields.includes('college')}
+                  error={fieldErrors.college}
                 />
               )}
               <RegistrationField
@@ -343,6 +367,7 @@ export default function Register() {
                 onChange={handleChange}
                 options={['BTECH', 'MTECH', 'PHD', 'Other']}
                 hasError={missingFields.includes('degree')}
+                error={fieldErrors.degree}
               />
               <RegistrationField
                 name="branch"
@@ -351,6 +376,7 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="Your field of study"
                 hasError={missingFields.includes('branch')}
+                error={fieldErrors.branch}
               />
               <RegistrationField
                 name="year"
@@ -359,6 +385,7 @@ export default function Register() {
                 onChange={handleChange}
                 options={['School', '1st Year', '2nd Year', '3rd Year', '4th Year', 'Passout']}
                 hasError={missingFields.includes('year')}
+                error={fieldErrors.year}
               />
               <RegistrationField
                 name="graduationYear"
@@ -368,6 +395,9 @@ export default function Register() {
                 placeholder="Graduation year"
                 type="number"
                 hasError={missingFields.includes('graduationYear')}
+                error={fieldErrors.graduationYear}
+                min={2000}
+                max={2100}
               />
             </div>
           </section>

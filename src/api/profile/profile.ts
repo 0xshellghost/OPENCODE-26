@@ -69,7 +69,10 @@ export async function sendRegData(formData: any) {
   if (!response.ok) {
     const errorMsg = data?.error || data?.message || `Registration failed (${response.status}: ${response.statusText})`;
     console.error('Registration failed:', errorMsg);
-    throw new Error(errorMsg);
+    const error = new Error(errorMsg) as Error & { fields?: Record<string, string>; status?: number };
+    error.fields = data?.fields;
+    error.status = response.status;
+    throw error;
   }
 
   return data;

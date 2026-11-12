@@ -6,7 +6,15 @@ export interface JWTPayload {
   };
   id?: string;
   githubId?: string;
+  exp?: number;
   [key: string]: any;
+}
+
+export function isTokenActive(token: string | null | undefined): boolean {
+  const payload = parseJwt(token);
+  if (!payload) return false;
+  if (typeof payload.exp !== 'number') return false;
+  return payload.exp * 1000 > Date.now();
 }
 
 /**

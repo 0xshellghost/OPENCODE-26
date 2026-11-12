@@ -12,6 +12,10 @@ export default function RegistrationField({
   full = false,
   list,
   hasError = false,
+  error,
+  readOnly = false,
+  min,
+  max,
 }: {
   name: string;
   label: string;
@@ -24,8 +28,13 @@ export default function RegistrationField({
   full?: boolean;
   list?: string;
   hasError?: boolean;
+  error?: string;
+  readOnly?: boolean;
+  min?: number;
+  max?: number;
 }) {
-  const errorStyle = hasError
+  const invalid = hasError || Boolean(error);
+  const errorStyle = invalid
     ? {
         borderColor: '#ef4444',
         boxShadow: '0 0 0 1px #ef4444',
@@ -34,8 +43,8 @@ export default function RegistrationField({
 
   return (
     <label className={`oc-field${full ? ' oc-field-full' : ''}`} htmlFor={`register-${name}`}>
-      <span style={{ color: hasError ? '#f87171' : undefined }}>
-        {label} <span aria-hidden="true" style={{ color: hasError ? '#ef4444' : 'var(--accent)' }}>*</span>
+      <span style={{ color: invalid ? '#f87171' : undefined }}>
+        {label} <span aria-hidden="true" style={{ color: invalid ? '#ef4444' : 'var(--accent)' }}>*</span>
       </span>
       {options ? (
         <select
@@ -44,6 +53,8 @@ export default function RegistrationField({
           value={value}
           onChange={onChange}
           style={errorStyle}
+          aria-invalid={invalid}
+          aria-describedby={error ? `register-${name}-error` : undefined}
         >
           <option value="">Choose an option</option>
           {options.map((option) => (
@@ -63,7 +74,17 @@ export default function RegistrationField({
           autoComplete={autoComplete}
           list={list}
           style={errorStyle}
+          readOnly={readOnly}
+          min={min}
+          max={max}
+          aria-invalid={invalid}
+          aria-describedby={error ? `register-${name}-error` : undefined}
         />
+      )}
+      {error && (
+        <small id={`register-${name}-error`} role="alert" style={{ color: '#fca5a5', lineHeight: 1.4 }}>
+          {error}
+        </small>
       )}
     </label>
   );
