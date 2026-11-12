@@ -65,6 +65,7 @@ export async function sendRegData(formData: any) {
   );
 
   const data = await response.json().catch(() => null);
+  console.log(data);
 
   if (!response.ok) {
     const errorMsg = data?.error || data?.message || `Registration failed (${response.status}: ${response.statusText})`;
