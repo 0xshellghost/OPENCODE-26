@@ -176,6 +176,8 @@ export default function Register() {
       event.preventDefault();
     }
 
+    console.log('[Register] Submit initiated');
+
     // Resolve current values with DOM fallback in case browser autofill didn't trigger React onChange
     const resolved = { ...formData };
     if (typeof document !== 'undefined') {
@@ -194,7 +196,26 @@ export default function Register() {
       if (!resolved.graduationYear) resolved.graduationYear = getVal('graduationYear');
     }
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    let token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      token = params.get('token');
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+    }
+
+    // Auto-recover githubId from token if still missing
+    if (!resolved.githubId?.trim() && token) {
+      const payload = parseJwt(token);
+      resolved.githubId = payload?.githubId || payload?.id || '';
+      if (resolved.githubId) {
+        setFormData(prev => ({ ...prev, githubId: resolved.githubId }));
+      }
+    }
+
+    console.log('[Register] Form state resolved:', { resolved, hasToken: Boolean(token) });
+
     if (!token) {
       const authError = 'No GitHub sign-in detected. Please sign in with GitHub first so your account can be linked.';
       setFormStatus({
@@ -219,7 +240,24 @@ export default function Register() {
       const missingKeys = invalidKeys;
       setMissingFields(missingKeys);
       setFieldErrors(errors);
-      const errorMsg = 'Please correct the highlighted fields before continuing.';
+
+      const fieldLabels: Record<string, string> = {
+        name: 'Full Name',
+        email: 'Email address',
+        githubId: 'GitHub username',
+        discordId: 'Discord username',
+        gender: 'Gender',
+        college: 'College name',
+        degree: 'Degree',
+        branch: 'Branch',
+        year: 'Current year',
+        graduationYear: 'Graduation year',
+      };
+      const missingList = missingKeys.map(k => fieldLabels[k] || k).join(', ');
+      const errorMsg = `Please fix or fill in the required fields: ${missingList}`;
+      
+      console.warn('[Register] Validation failed for fields:', missingKeys, errors);
+
       setFormStatus({
         type: 'error',
         message: errorMsg,
@@ -228,11 +266,11 @@ export default function Register() {
         title: 'Please fill in all required fields',
         description: errorMsg,
         status: 'warning',
-        duration: 5000,
+        duration: 6000,
         isClosable: true,
       });
 
-      // Focus first missing input field
+      // Focus first missing input field and scroll into view
       const firstMissingKey = missingKeys[0];
       const el = document.getElementById(`register-${firstMissingKey}`);
       if (el) {
@@ -249,6 +287,16 @@ export default function Register() {
     const resolvedAvatarUrl =
       resolved.avatarUrl?.trim() ||
       (resolved.githubId?.trim() ? `https://github.com/${resolved.githubId.trim()}.png` : '');
+
+    console.log('[Register] Calling registerMutation.mutate with:', {
+      name: resolved.name.trim(),
+      email: resolved.email.trim(),
+      githubId: resolved.githubId.trim(),
+      discordId: resolved.discordId.trim(),
+      college: resolved.college,
+      gender: resolved.gender.trim().toLowerCase(),
+      graduationYear: Number(resolved.graduationYear),
+    });
 
     registerMutation.mutate({
       name: resolved.name.trim(),
@@ -331,7 +379,7 @@ export default function Register() {
                 placeholder="Your GitHub handle"
                 hasError={missingFields.includes('githubId')}
                 error={fieldErrors.githubId}
-                readOnly
+                readOnly={Boolean(formData.githubId)}
               />
               <RegistrationField
                 name="discordId"
@@ -447,6 +495,7 @@ export default function Register() {
             type="submit"
             disabled={isSubmitting}
             onClick={(e) => {
+              console.log('[Register] Button clicked directly, isSubmitting:', isSubmitting);
               if (!isSubmitting) {
                 handleSubmit(e as any);
               }

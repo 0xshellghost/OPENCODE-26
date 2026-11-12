@@ -23,7 +23,7 @@ export type RowObj = LeaderboardEntry;
 export const FetchedLeaderboard = async (eventName: string): Promise<LeaderboardEntry[]> => {
 
   try {
-    const response = await fetch(`${getLeaderboardApiUrl()}${eventName}/leaderboard`);
+    const response = await fetch(`${getLeaderboardApiUrl()}${encodeURIComponent(eventName)}/leaderboard`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch leaderboard data: ${response.statusText}`);
