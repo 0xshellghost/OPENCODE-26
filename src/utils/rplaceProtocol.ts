@@ -7,10 +7,19 @@
  * - Alpha-less canvas rendering for zero blending overhead
  */
 
-export const CANVAS_WIDTH = 1000;
-export const CANVAS_HEIGHT = 600;
-export const TOTAL_PIXELS = CANVAS_WIDTH * CANVAS_HEIGHT; // 600,000
-export const EXPECTED_SNAPSHOT_BYTES = TOTAL_PIXELS / 2; // 300,000
+import {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  TOTAL_PIXELS,
+  EXPECTED_SNAPSHOT_BYTES,
+} from '../config/canvas.config';
+
+export {
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  TOTAL_PIXELS,
+  EXPECTED_SNAPSHOT_BYTES,
+};
 
 /** Existing backend 16-color palette: index -> [r, g, b]. */
 export const BACKEND_PALETTE: readonly [number, number, number][] = [

@@ -17,7 +17,6 @@ export default function SignIn() {
       <main className="oc-auth-layout">
         <section className="glass-panel oc-auth-card" aria-labelledby="sign-in-title">
           <div className="oc-auth-symbol"><ShieldCheck size={25} strokeWidth={1.4} /></div>
-          <p className="oc-eyebrow"><span />YOUR NEXT CHAPTER</p>
           <h1 className="oc-auth-heading" id="sign-in-title">Welcome back.</h1>
           <p className="oc-description">Good to see you again. Sign in to follow your progress, celebrate your contributions, and keep creating.</p>
           <button type="button" className="oc-button" onClick={handleLoginWithGitHub}><Github size={19} />Continue with GitHub<ArrowUpRight size={17} /></button>

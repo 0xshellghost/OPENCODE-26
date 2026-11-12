@@ -22,6 +22,13 @@ export default function BlurText({
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
+    // If reduced motion is preferred, render visible immediately
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setInView(true);
+      if (onAnimationComplete) onAnimationComplete();
+      return;
+    }
+
     const timer = setTimeout(() => {
       setInView(true);
       if (onAnimationComplete) {
@@ -42,12 +49,12 @@ export default function BlurText({
         <span
           key={index}
           style={{
-            transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${index * delay}ms`,
+            transition: `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * delay}ms, filter 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * delay}ms, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${index * delay}ms`,
             opacity: inView ? 1 : 0,
-            filter: inView ? 'blur(0px)' : 'blur(8px)',
+            filter: inView ? 'blur(0px)' : 'blur(6px)',
             transform: inView
               ? 'translate3d(0, 0, 0)'
-              : `translate3d(0, ${direction === 'top' ? '-12px' : '12px'}, 0)`,
+              : `translate3d(0, ${direction === 'top' ? '-8px' : '8px'}, 0)`,
           }}
           className="inline-block"
         >

@@ -18,6 +18,9 @@ import { useFeatures } from 'contexts/FeaturesContext';
 import ThemeToggle from 'components/japanese/ThemeToggle';
 import SakuraToggle from 'components/common/SakuraToggle';
 import OpenCodeLogo from 'components/common/OpenCodeLogo';
+import { getNavSizing, type NavDensityConfig } from 'utils/navSizing';
+
+export { getNavSizing, type NavDensityConfig };
 
 function cn(...inputs: (string | boolean | undefined | null)[]): string {
   return inputs.filter(Boolean).join(' ');
@@ -69,8 +72,12 @@ export default function SiteNavbar() {
       return false;
     if (item.href === '/user/repos' && !features.showRepositories) return false;
     if (item.href === '/user/rplace' && !features.showRPlace) return false;
+    if (item.href === '/user/geekstore' && !features.showGeekstore) return false;
     return true;
   });
+
+  const activeCount = activeNavigation.length;
+  const navSizing = getNavSizing(activeCount);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -224,7 +231,14 @@ export default function SiteNavbar() {
           </Link>
 
           {/* Center: Desktop Navigation Links Pill */}
-          <div className="hidden xl:flex items-center gap-0 xl:gap-0.5 backdrop-blur-xl px-1.5 py-1 xl:px-2 xl:py-1 rounded-full oc-capsule-pill shadow-inner shrink min-w-0 mx-1 sm:mx-2">
+          <div
+            className={cn(
+              'hidden xl:flex items-center backdrop-blur-xl rounded-full oc-capsule-pill shadow-inner shrink min-w-0 mx-1 sm:mx-2 transition-all duration-300 ease-in-out',
+              navSizing.pillClasses,
+            )}
+            data-nav-count={activeCount}
+            data-nav-tier={navSizing.tier}
+          >
             {activeNavigation.map((item) => {
               const isActive = isLinkActive(item.href);
               return (
@@ -232,23 +246,33 @@ export default function SiteNavbar() {
                   key={item.href}
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
+                  data-nav-item={item.label.toLowerCase()}
                   className={cn(
-                    'relative z-10 px-2 xl:px-2.5 2xl:px-3 py-1 text-xs xl:text-[13px] font-medium rounded-full transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 oc-capsule-link whitespace-nowrap shrink-0',
+                    'relative z-10 rounded-full transition-all duration-300 ease-in-out cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/50 oc-capsule-link whitespace-nowrap shrink-0 flex items-center justify-center text-center',
+                    navSizing.buttonClasses,
                     isActive
                       ? 'text-[var(--fg)] bg-[var(--surface-2)] border border-[var(--border-accent)] shadow-sm shadow-[var(--accent-soft)] font-semibold'
                       : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--surface)] border border-transparent',
                   )}
                 >
                   {item.label === 'RPlace Canvas' ? (
-                    <>
-                      <span className="hidden 2xl:inline">RPlace Canvas</span>
-                      <span className="2xl:hidden">RPlace</span>
-                    </>
+                    activeCount <= 6 ? (
+                      <span>RPlace Canvas</span>
+                    ) : (
+                      <>
+                        <span className="hidden 2xl:inline">RPlace Canvas</span>
+                        <span className="2xl:hidden">RPlace</span>
+                      </>
+                    )
                   ) : item.label === 'Repositories' ? (
-                    <>
-                      <span className="hidden 2xl:inline">Repositories</span>
-                      <span className="2xl:hidden">Repos</span>
-                    </>
+                    activeCount <= 6 ? (
+                      <span>Repositories</span>
+                    ) : (
+                      <>
+                        <span className="hidden 2xl:inline">Repositories</span>
+                        <span className="2xl:hidden">Repos</span>
+                      </>
+                    )
                   ) : (
                     <span>{item.label}</span>
                   )}

@@ -55,6 +55,19 @@ GET `/api/v1/leaderboard/progress?eventName=...` : Fetch per-user points over ti
 `NEXT_PUBLIC_BACKEND_URL` : Backend base URL.<br>
 `NEXT_PUBLIC_EVENT_NAME` : Current event name used for registration and profile fetches.
 
+## R/Place Canvas Configuration
+The collaborative canvas configuration is managed via `.env` using eight canonical environment variables:
+- `NEXT_PUBLIC_CANVAS_WIDTH`: Canvas width in pixels (default: `1000`)
+- `NEXT_PUBLIC_CANVAS_HEIGHT`: Canvas height in pixels (default: `600`)
+- `NEXT_PUBLIC_CANVAS_DEFAULT_ZOOM`: Initial zoom level (default: `1.0`)
+- `NEXT_PUBLIC_CANVAS_MIN_ZOOM`: Minimum zoom boundary (default: `1.0`)
+- `NEXT_PUBLIC_CANVAS_MAX_ZOOM`: Maximum zoom boundary (default: `40.0`)
+- `NEXT_PUBLIC_CANVAS_ZOOM_STEP`: Zoom increment per action (default: `0.25`)
+- `NEXT_PUBLIC_CANVAS_INITIAL_PAN_X`: Initial horizontal pan (default: `0`)
+- `NEXT_PUBLIC_CANVAS_INITIAL_PAN_Y`: Initial vertical pan (default: `0`)
+
+For a comprehensive guide, see [docs/canvas-configuration.md](docs/canvas-configuration.md).
+
 
 
 # Advice (From terror_quota)

@@ -44,20 +44,13 @@ export default function PageHeading({
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          {eyebrow && (
-            <p className="oc-eyebrow" style={{ marginBottom: '14px' }}>
-              <span />
-              <ShinyText text={eyebrow} speed={5} />
-            </p>
-          )}
-
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '16px',
               flexWrap: 'wrap',
-              marginBottom: '14px',
+              marginBottom: '12px',
             }}
           >
             <h1
@@ -66,17 +59,18 @@ export default function PageHeading({
                 fontWeight: 300,
                 fontSize: 'clamp(32px, 5.5vw, 54px)',
                 lineHeight: 1.15,
-                letterSpacing: '0.02em',
+                letterSpacing: '0.01em',
                 color: 'var(--fg)',
                 margin: 0,
+                textWrap: 'balance',
               }}
             >
-              <BlurText text={title} delay={45} animateBy="words" direction="top" />
+              <BlurText text={title} delay={40} animateBy="words" direction="top" />
             </h1>
             {badge}
           </div>
 
-          <p className="oc-description" style={{ maxWidth: '720px' }}>
+          <p className="oc-description" style={{ maxWidth: '720px', margin: 0 }}>
             {description}
           </p>
         </div>

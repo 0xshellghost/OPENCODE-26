@@ -30,13 +30,12 @@ export default function OpenCodeFAQ() {
     <SiteNavbar />
     <main className="oc-faq-layout">
       <header className="oc-faq-intro">
-        <p className="oc-eyebrow"><span />A LITTLE GUIDANCE</p>
         <h1 className="oc-faq-heading">Good questions.<br />Clear beginnings.</h1>
         <p className="oc-description">Everything you need to know about OpenCode. Your next chapter starts with a little curiosity.</p>
         <div className="oc-note"><MessageCircle size={21} strokeWidth={1.5} /><div><a href="https://discord.com/channels/885149696249708635/885151791329722448" target="_blank" rel="noopener noreferrer">Let&apos;s talk on Discord <ArrowUpRight size={13} style={{ display: 'inline' }} /></a><p>Good people. Always happy to help.</p></div></div>
       </header>
       <FAQAccordion items={faqs} />
     </main>
-    <footer className="oc-footer"><span>OPENCODE 2026 <span className="oc-footer-dot">/</span> Learn. Contribute. Belong.</span><Link href="/user/events">Explore events <ArrowUpRight size={14} /></Link></footer>
+    <footer className="oc-footer"><span>OPENCODE 2026 &mdash; Learn. Contribute. Belong.</span><Link href="/user/events">Explore events <ArrowUpRight size={14} /></Link></footer>
   </JapaneseBackground>;
 }

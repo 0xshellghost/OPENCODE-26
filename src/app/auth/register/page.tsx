@@ -4,7 +4,7 @@ import { useToast } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { ArrowRight, Code2, Users, Sprout, Loader2 } from 'lucide-react';
+import { ArrowRight, Code2, Users, Sprout, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { sendRegData, fetchColleges } from 'api/profile/profile';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
@@ -482,7 +482,9 @@ export default function Register() {
                 color: formStatus.type === 'error' ? '#fca5a5' : '#86efac',
               }}
             >
-              <span>{formStatus.type === 'error' ? '⚠️' : '✓'}</span>
+              <span className="shrink-0">
+                {formStatus.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+              </span>
               <span>{formStatus.message}</span>
             </div>
           )}

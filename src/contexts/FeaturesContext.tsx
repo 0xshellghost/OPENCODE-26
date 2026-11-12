@@ -9,6 +9,7 @@ export interface FeaturesConfig {
   showRPlace: boolean;
   showRepositories: boolean;
   showLeaderboard: boolean;
+  showGeekstore: boolean;
   flagshipEvent?: string | null;
 }
 
@@ -27,6 +28,7 @@ const DEFAULT_FEATURES: FeaturesConfig = {
   showRepositories: true,
   showRPlace: true,
   showLeaderboard: true,
+  showGeekstore: true,
   flagshipEvent: 'Rift CTF',
 };
 
@@ -46,6 +48,11 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
       const backendData = await fetchPlatformFeatures();
       if (backendData) {
         setFeatures((prev) => {
+          const backendGeekstore =
+            typeof backendData.showGeekstore === 'boolean'
+              ? backendData.showGeekstore
+              : (prev.showGeekstore !== undefined ? prev.showGeekstore : DEFAULT_FEATURES.showGeekstore);
+
           const next = {
             ...prev,
             showWinners: typeof backendData.showWinners === 'boolean' ? backendData.showWinners : prev.showWinners,
@@ -53,6 +60,7 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
             showRPlace: typeof backendData.showRPlace === 'boolean' ? backendData.showRPlace : prev.showRPlace,
             showRepositories: typeof backendData.showRepositories === 'boolean' ? backendData.showRepositories : prev.showRepositories,
             showLeaderboard: typeof backendData.showLeaderboard === 'boolean' ? backendData.showLeaderboard : prev.showLeaderboard,
+            showGeekstore: backendGeekstore,
           };
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -72,12 +80,18 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
         const data = await res.json();
         if (data) {
           setFeatures((prev) => {
+            const proxyGeekstore =
+              typeof data.showGeekstore === 'boolean'
+                ? data.showGeekstore
+                : (prev.showGeekstore !== undefined ? prev.showGeekstore : DEFAULT_FEATURES.showGeekstore);
+
             const next = {
               showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : prev.showWinners,
               showMilestones: typeof data.showMilestones === 'boolean' ? data.showMilestones : prev.showMilestones,
               showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
               showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
               showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
+              showGeekstore: proxyGeekstore,
               flagshipEvent: data.flagshipEvent !== undefined ? data.flagshipEvent : prev.flagshipEvent,
             };
             try {
@@ -114,15 +128,33 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
     });
 
     let backendSuccess = false;
+    let backendAttempted = false;
+
+    // 1. Update in database via backend API
     try {
-      // Update in database via backend API
-      await updatePlatformFeaturesInDb({ [key]: value });
-      backendSuccess = true;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (token) {
+        backendAttempted = true;
+        const res = await updatePlatformFeaturesInDb({ [key]: value });
+        if (res) {
+          backendSuccess = true;
+        }
+      }
     } catch (dbErr) {
       console.warn('[FeaturesContext] updatePlatformFeaturesInDb warning:', dbErr);
+      backendSuccess = false;
     }
 
-    // Also sync with Next.js local route for proxy cache consistency
+    // If backend persistence was attempted and failed, rollback immediately
+    if (backendAttempted && !backendSuccess) {
+      setFeatures(previousState);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(previousState));
+      } catch {}
+      return false;
+    }
+
+    // 2. Also sync with Next.js local route for proxy cache consistency
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       const res = await fetch('/api/features', {
@@ -134,7 +166,9 @@ export function FeaturesProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ [key]: value }),
       });
       if (res.ok) {
-        backendSuccess = true;
+        if (!backendAttempted) {
+          backendSuccess = true;
+        }
       }
     } catch (proxyErr) {
       console.warn('[FeaturesContext] Next.js features proxy update warning:', proxyErr);

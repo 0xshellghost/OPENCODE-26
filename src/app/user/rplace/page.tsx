@@ -146,16 +146,12 @@ export default function RPlaceCanvasPage() {
 
       {/* ─── 3. LEADERBOARD ADVANTAGE & TIERS ─── */}
       <Box className="glass-panel" p={{ base: '20px', sm: '24px', md: '32px' }}>
-        <p className="oc-eyebrow">
-          <span />
-          Leaderboard Advantage
-        </p>
         <h2
           style={{
             fontFamily: SERIF,
             fontWeight: 400,
             fontSize: 'clamp(26px, 3vw, 34px)',
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.02em',
             lineHeight: 1.2,
             marginBottom: 10,
             color: 'var(--text)',

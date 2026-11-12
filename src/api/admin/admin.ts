@@ -1,5 +1,6 @@
 // src/api/admin/admin.ts
 import { getApiBase } from 'utils/apiBase';
+import { EXPECTED_SNAPSHOT_BYTES } from 'config/canvas.config';
 
 export async function getUserPRDetails(githubId: string, eventName: string) {
   const response = await fetch(
@@ -250,15 +251,15 @@ export async function updateFlagshipEvent(eventName: string, isFlagship = true) 
 }
 
 /**
- * Uploads a 300,000-byte board snapshot to R/Place backend via /api/rplace/board proxy
+ * Uploads a board snapshot to R/Place backend via /api/rplace/board proxy
  */
 export async function uploadRPlaceBoardSnapshot(buffer: ArrayBuffer) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found. Please sign in as admin.');
 
-  if (buffer.byteLength !== 300000) {
-    throw new Error(`Snapshot buffer must be exactly 300,000 bytes (got ${buffer.byteLength})`);
+  if (buffer.byteLength !== EXPECTED_SNAPSHOT_BYTES) {
+    throw new Error(`Snapshot buffer must be exactly ${EXPECTED_SNAPSHOT_BYTES.toLocaleString()} bytes (got ${buffer.byteLength.toLocaleString()})`);
   }
 
   const response = await fetch('/api/rplace/board', {
@@ -284,6 +285,7 @@ export interface BackendPlatformFeatures {
   showLeaderboard: boolean;
   showRepositories: boolean;
   showRPlace: boolean;
+  showGeekstore?: boolean;
 }
 
 export async function fetchPlatformFeatures(): Promise<BackendPlatformFeatures | null> {

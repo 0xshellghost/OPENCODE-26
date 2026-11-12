@@ -14,6 +14,7 @@ import {
   User,
 } from 'lucide-react';
 import { IRoute } from 'types/navigation';
+import { useFeatures } from 'contexts/FeaturesContext';
 
 interface MobileMenuBarProps {
   routes: IRoute[];
@@ -42,6 +43,7 @@ const getFallbackIcon = (routeName: string, routePath: string) => {
 export default function MobileMenuBar(props: MobileMenuBarProps) {
   const { routes } = props;
   const pathname = usePathname();
+  const { features } = useFeatures();
 
   const bgColor = 'var(--nav-bg)';
   const borderColor = 'var(--border)';
@@ -76,6 +78,11 @@ export default function MobileMenuBar(props: MobileMenuBarProps) {
       <Flex justify="space-around" align="center" h="70px" px="8px" py="8px">
         {routes.map((route, index) => {
           if (route.layout === '/auth') return null;
+          if (route.path === '/winners' && !features.showWinners) return null;
+          if (route.path === '/milestones' && !features.showMilestones) return null;
+          if (route.path.includes('leaderboard') && !features.showLeaderboard) return null;
+          if (route.path === '/repos' && !features.showRepositories) return null;
+          if (route.path === '/geekstore' && !features.showGeekstore) return null;
 
           const active = isActive(route.path);
           const iconSize = active ? '26px' : '24px';

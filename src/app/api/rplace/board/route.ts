@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { EXPECTED_SNAPSHOT_BYTES } from 'config/canvas.config';
 
 function getRPlaceBaseUrl(): string {
   const raw =
@@ -15,7 +16,6 @@ const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Expose-Headers': 'X-Canvas-Sequence, ETag',
 };
 
-const EXPECTED_SNAPSHOT_BYTES = 300000; // 1000 * 600 / 2 (4-bit pixel indices)
 
 interface CachedSnapshot {
   buffer: ArrayBuffer;

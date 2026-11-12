@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useFeatures } from 'contexts/FeaturesContext';
+import { isAdminUser } from 'utils/jwt';
 import {
   Package,
   ShoppingBag,
@@ -28,6 +31,15 @@ const STATUS_TABS: Array<{ label: string; value: string }> = [
 ];
 
 export default function MyOrdersPage() {
+  const router = useRouter();
+  const { features } = useFeatures();
+
+  useEffect(() => {
+    if (!features.showGeekstore && !isAdminUser()) {
+      router.replace('/user/events');
+    }
+  }, [features.showGeekstore, router]);
+
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [page, setPage] = useState<number>(1);
   const limit = 5;
@@ -76,6 +88,10 @@ export default function MyOrdersPage() {
     setSelectedStatus(status);
     setPage(1);
   };
+
+  if (!features.showGeekstore && !isAdminUser()) {
+    return null;
+  }
 
   return (
     <div className="w-full max-w-[1344px] mx-auto px-4 sm:px-6 lg:px-8 py-6">

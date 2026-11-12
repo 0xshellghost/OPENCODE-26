@@ -145,14 +145,14 @@ function FlagshipCard({
   return (
     <div className="mb-6 sm:mb-8">
       <div className="flex items-center gap-2 mb-2.5">
-        <span className="w-2 h-2 rounded-full bg-[var(--secondary)] animate-ping" />
-        <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)] font-mono">
+        <span className="w-2 h-2 rounded-full bg-[var(--secondary)]" />
+        <span className="text-xs font-semibold tracking-wider uppercase text-[var(--secondary)] font-mono">
           Featured Flagship Arena
         </span>
       </div>
 
       <article
-        className="group relative flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl"
+        className="group relative flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl"
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',

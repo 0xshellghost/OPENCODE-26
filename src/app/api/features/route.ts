@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = {
   showLeaderboard: true,
   showRepositories: true,
   showRPlace: true,
+  showGeekstore: true,
   flagshipEvent: 'Opencode',
 };
 
@@ -25,8 +26,8 @@ function getConfig() {
 }
 
 function getBackendBase() {
-  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
-  return rawBase.replace(/\/+$/, '');
+  const rawBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:4000';
+  return rawBase.replace(/\/+$/, '').replace('localhost', '127.0.0.1');
 }
 
 export async function GET() {
@@ -46,6 +47,11 @@ export async function GET() {
       const json = await res.json();
       const data = json?.data || json;
       if (data && typeof data === 'object') {
+        const geekstoreVal =
+          typeof data.showGeekstore === 'boolean'
+            ? data.showGeekstore
+            : cache.showGeekstore;
+
         const merged = {
           ...getConfig(),
           showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : cache.showWinners,
@@ -53,6 +59,7 @@ export async function GET() {
           showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : cache.showLeaderboard,
           showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : cache.showRepositories,
           showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : cache.showRPlace,
+          showGeekstore: geekstoreVal,
         };
         cache = merged;
         return NextResponse.json(merged);
@@ -70,12 +77,18 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const current = getConfig();
 
+    const bodyGeekstore =
+      typeof body.showGeekstore === 'boolean'
+        ? body.showGeekstore
+        : current.showGeekstore;
+
     const updated = {
       showWinners: typeof body.showWinners === 'boolean' ? body.showWinners : current.showWinners,
       showMilestones: typeof body.showMilestones === 'boolean' ? body.showMilestones : current.showMilestones,
       showLeaderboard: typeof body.showLeaderboard === 'boolean' ? body.showLeaderboard : current.showLeaderboard,
       showRepositories: typeof body.showRepositories === 'boolean' ? body.showRepositories : current.showRepositories,
       showRPlace: typeof body.showRPlace === 'boolean' ? body.showRPlace : current.showRPlace,
+      showGeekstore: bodyGeekstore,
       flagshipEvent: body.flagshipEvent !== undefined ? body.flagshipEvent : (current.flagshipEvent ?? null),
     };
 

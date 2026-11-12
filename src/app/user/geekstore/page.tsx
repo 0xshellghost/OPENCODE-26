@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useFeatures } from 'contexts/FeaturesContext';
+import { isAdminUser } from 'utils/jwt';
 import {
   Search,
   Package,
@@ -50,6 +53,15 @@ interface SelectedProductState {
 }
 
 export default function GeekstorePage() {
+  const router = useRouter();
+  const { features } = useFeatures();
+
+  useEffect(() => {
+    if (!features.showGeekstore && !isAdminUser()) {
+      router.replace('/user/events');
+    }
+  }, [features.showGeekstore, router]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -225,6 +237,10 @@ export default function GeekstorePage() {
     }
   };
 
+  if (!features.showGeekstore && !isAdminUser()) {
+    return null;
+  }
+
   return (
     <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
       {/* Page Header */}
@@ -264,57 +280,50 @@ export default function GeekstorePage() {
       />
 
       {/* Hero Showcase Banner */}
-      <div className="relative mt-8 overflow-hidden rounded-[24px] border border-[var(--border)] bg-gradient-to-br from-[var(--surface-2)] via-[var(--surface)] to-[var(--surface-2)] p-6 sm:p-8 backdrop-blur-xl shadow-[var(--shadow)]">
-        {/* Decorative backdrop elements */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[var(--accent)]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-purple-500/10 blur-3xl" />
-
+      <div className="relative mt-6 overflow-hidden rounded-[20px] border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-7 backdrop-blur-xl shadow-[var(--shadow)]">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] px-3 py-1 border border-[var(--border-accent)] mb-3">
-              <Sparkles size={13} className="text-[var(--accent)] animate-pulse" />
-              <span className="text-[11px] font-bold tracking-wider uppercase text-[var(--accent)]">
-                Limited OpenCode &apos;26 Drop
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--fg)] tracking-tight">
-              Wear the Code. Fuel the Community.
+            <span className="text-[11px] font-mono font-semibold tracking-wider uppercase text-[var(--accent)] mb-2 block">
+              Exclusive Seasonal Apparel
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-normal font-['Cormorant_Garamond',Georgia,serif] text-[var(--fg)] tracking-tight">
+              Wear the Craft. Support the Community.
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-              Premium heavyweight fleece hoodies, breathable ring-spun tees, and holographic sticker packs crafted for IIIT Allahabad developers and open-source contributors.
+            <p className="mt-2 text-xs sm:text-sm text-[var(--muted)] leading-relaxed max-w-xl">
+              Heavyweight fleece hoodies, breathable ring-spun tees, and commemorative stickers crafted for IIIT Allahabad developers and open-source contributors.
             </p>
 
             {/* Perks Badges */}
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-[var(--muted)]">
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 text-[11px] text-[var(--muted)]">
               <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
-                <Truck size={13} className="text-[var(--accent)]" /> Campus Hand-Delivery
+                <Truck size={12} className="text-[var(--accent)]" /> Campus Hand-Delivery
               </span>
               <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
-                <ShieldCheck size={13} className="text-emerald-400" /> 100% Verified Quality
+                <ShieldCheck size={12} className="text-emerald-400" /> Verified Quality
               </span>
               <span className="flex items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-3 py-1 border border-[var(--border)]">
-                <Flame size={13} className="text-amber-400" /> Limited Batch
+                <Flame size={12} className="text-amber-400" /> Limited Batch
               </span>
             </div>
           </div>
 
           {/* Quick stats mini card */}
-          <div className="flex md:flex-col items-center gap-4 bg-[var(--surface-2)]/80 border border-[var(--border)] p-4 sm:p-5 rounded-2xl backdrop-blur-md">
-            <div className="text-center">
-              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--accent)]">
+          <div className="flex md:flex-col items-center gap-4 bg-[var(--surface-2)] border border-[var(--border)] p-4 sm:p-5 rounded-xl backdrop-blur-md shrink-0">
+            <div className="text-center min-w-[70px]">
+              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--accent)] tabular-nums">
                 {totalItems}
               </div>
-              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider">
-                Merch Styles
+              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider font-mono">
+                Catalog Items
               </div>
             </div>
             <div className="h-8 w-[1px] md:h-[1px] md:w-full bg-[var(--border)]" />
-            <div className="text-center">
-              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--fg)]">
+            <div className="text-center min-w-[70px]">
+              <div className="font-['DM_Mono',monospace] text-2xl font-bold text-[var(--fg)] tabular-nums">
                 {totalSelectedCount}
               </div>
-              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider">
-                In Your Order
+              <div className="text-[10px] text-[var(--subtle)] uppercase tracking-wider font-mono">
+                Selected
               </div>
             </div>
           </div>

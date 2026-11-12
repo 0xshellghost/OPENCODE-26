@@ -290,7 +290,7 @@ export default function ReposPage() {
             return (
               <AnimatedContent key={repo.name || idx} delay={idx * 0.03}>
                 <SpotlightCard
-                  className="group flex flex-col justify-between h-full p-[22px] rounded-[20px] border border-[var(--border)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent)] hover:shadow-[var(--shadow),0_0_20px_var(--accent-soft)]"
+                  className="group flex flex-col justify-between h-full p-[22px] rounded-[18px] border border-[var(--border)] transition-transform duration-200 transition-colors duration-200 hover:-translate-y-1 hover:border-[var(--accent)] hover:shadow-[var(--shadow),0_0_16px_var(--accent-soft)]"
                   spotlightColor="rgba(88, 185, 154, 0.12)"
                   style={{
                     background: 'var(--surface)',
@@ -328,7 +328,7 @@ export default function ReposPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`View ${repo.name} on GitHub`}
-                        className="p-2 rounded-xl bg-[var(--card-soft)] border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] hover:border-[var(--accent)] transition-all ml-2"
+                        className="p-2 rounded-xl bg-[var(--card-soft)] border border-[var(--border)] text-[var(--muted)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)] hover:border-[var(--accent)] transition-colors duration-200 ml-2"
                       >
                         <FaGithub size={16} />
                       </a>
