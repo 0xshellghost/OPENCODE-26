@@ -80,3 +80,21 @@ export async function FetchedRepos(eventName: string) {
   return reposData;
 }
 
+export async function FetchedEventDetails(eventName: string) {
+  const response = await fetch(
+    `${getApiBase()}/api/v1/events/${encodeURIComponent(eventName)}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch event details for ${eventName}`);
+  }
+
+  const result = await response.json();
+  return result?.data || result;
+}

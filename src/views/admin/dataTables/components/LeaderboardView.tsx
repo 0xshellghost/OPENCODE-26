@@ -4,6 +4,7 @@ import { useDeferredValue, useMemo, useState, useEffect } from 'react';
 import { FaSearchMinus } from 'react-icons/fa';
 import {
   Box,
+  Button,
   Flex,
   Text,
   Menu,
@@ -16,7 +17,7 @@ import { opencodeTokens } from 'theme/opencode-tokens';
 import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaTrophy } from 'react-icons/fa';
+import { FaUsers, FaCheck, FaBuilding, FaCalendarAlt, FaTrophy, FaEdit } from 'react-icons/fa';
 import { MdClear } from 'react-icons/md';
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import PageHeading from 'components/japanese/PageHeading';
@@ -27,6 +28,8 @@ import SearchProfileBanner from 'views/admin/profile/components/SearchProfileBan
 import { FetchedLeaderboard, type LeaderboardEntry } from 'api/leaderboard/leaderboard';
 import { FetchedEvents } from 'api/events/events';
 import { isMaintainer } from 'constants/Maintainers';
+import { isAdminUser } from 'utils/jwt';
+import EditEventModal from 'components/modals/EditEventModal';
 
 interface LeaderboardViewProps {
   initialEventName?: string;
@@ -70,6 +73,12 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
   const [selectedCollege, setSelectedCollege] = useState('All');
   const [firstYearOnly, setFirstYearOnly] = useState(false);
   const [isCollegeHovered, setIsCollegeHovered] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(isAdminUser());
+  }, []);
 
   const textColor = opencodeTokens.colors.text.primary;
   const mutedText = opencodeTokens.colors.text.secondary;
@@ -287,6 +296,34 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
                   </MenuList>
                 </Menu>
               </Box>
+            )}
+
+            {/* Admin Edit Event Button */}
+            {isAdmin && (
+              <Button
+                display="flex"
+                alignItems="center"
+                gap="8px"
+                px={{ base: '10px', md: '14px' }}
+                py={{ base: '8px', md: '10px' }}
+                h="auto"
+                bg={glassBg}
+                borderRadius="16px"
+                border="1px solid"
+                borderColor={filterBorder}
+                backdropFilter="blur(20px)"
+                boxShadow={opencodeTokens.shadows.glass}
+                transition="all 0.3s ease"
+                cursor="pointer"
+                fontSize="13px"
+                fontWeight="600"
+                color={textColor}
+                _hover={{ borderColor: opencodeTokens.colors.accent.sakura, color: opencodeTokens.colors.accent.sakura }}
+                onClick={() => setIsEditModalOpen(true)}
+                leftIcon={<FaEdit />}
+              >
+                Edit Event
+              </Button>
             )}
 
             {/* College Filter */}
@@ -573,6 +610,20 @@ export default function LeaderboardView({ initialEventName }: LeaderboardViewPro
           eventName={displayEventName}
         />
       </Box>
+
+      {/* Admin Edit Event Modal */}
+      {isAdmin && (
+        <EditEventModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          eventName={activeEvent}
+          onSuccess={(updated) => {
+            if (updated?.name && updated.name !== activeEvent) {
+              handleEventChange(updated.name);
+            }
+          }}
+        />
+      )}
     </Box>
   );
 }

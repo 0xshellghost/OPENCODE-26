@@ -345,3 +345,35 @@ export async function updatePlatformFeaturesInDb(
   const result = await response.json();
   return (result?.data || result) as BackendPlatformFeatures;
 }
+
+export async function updateEventDetails(
+  eventName: string,
+  formData: FormData
+) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found. Please sign in as admin.');
+
+  const baseUrl = getApiBase();
+  const url = `${baseUrl}/api/v1/admin/event/${encodeURIComponent(eventName)}/update`;
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.error ||
+        errorData?.message ||
+        `Failed to update event (HTTP ${response.status})`
+    );
+  }
+
+  return await response.json();
+}
+
