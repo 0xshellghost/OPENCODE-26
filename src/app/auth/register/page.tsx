@@ -1,7 +1,7 @@
 'use client';
 
 import { useToast } from '@chakra-ui/react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { ArrowRight, Code2, Users, Sprout, Loader2 } from 'lucide-react';
@@ -121,57 +121,10 @@ export default function Register() {
     setFieldErrors(previous => ({ ...previous, college: undefined }));
   };
 
-  const registerMutation = useMutation({
-    mutationFn: sendRegData,
-    onSuccess: () => {
-      setIsRedirecting(true);
-      setFormStatus({
-        type: 'success',
-        message: 'Registration successful! Welcome to OpenCode 2026. Redirecting...',
-      });
-      toast({
-        title: 'Registration Successful!',
-        description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
-        status: 'success',
-        duration: 3500,
-        isClosable: true,
-      });
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
-      const avatarUrl = formData.avatarUrl || (formData.githubId ? `https://github.com/${formData.githubId}.png` : '');
-      setTimeout(() => {
-        window.location.assign(
-          `/user/events?token=${encodeURIComponent(token)}&avatar_url=${encodeURIComponent(avatarUrl)}`
-        );
-      }, 1000);
-    },
-    onError: (error: Error & { fields?: RegistrationFieldErrors; status?: number }) => {
-      setIsRedirecting(false);
-      const errorMsg = error?.message || 'Please check your details and try again.';
-      if (error.fields) {
-        setFieldErrors(error.fields);
-        const firstField = Object.keys(error.fields)[0];
-        document.getElementById(`register-${firstField}`)?.focus();
-      }
-      if (error.status === 401) {
-        localStorage.removeItem('token');
-      }
-      setFormStatus({
-        type: 'error',
-        message: errorMsg,
-      });
-      toast({
-        title: 'Registration could not be completed',
-        description: errorMsg,
-        status: 'error',
-        duration: 6000,
-        isClosable: true,
-      });
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
+  const isSubmitting = isPending || isRedirecting;
 
-  const isSubmitting = registerMutation.isPending || isRedirecting;
-
-  const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event?: FormEvent<HTMLFormElement>) => {
     if (event?.preventDefault) {
       event.preventDefault();
     }
@@ -288,17 +241,7 @@ export default function Register() {
       resolved.avatarUrl?.trim() ||
       (resolved.githubId?.trim() ? `https://github.com/${resolved.githubId.trim()}.png` : '');
 
-    console.log('[Register] Calling registerMutation.mutate with:', {
-      name: resolved.name.trim(),
-      email: resolved.email.trim(),
-      githubId: resolved.githubId.trim(),
-      discordId: resolved.discordId.trim(),
-      college: resolved.college,
-      gender: resolved.gender.trim().toLowerCase(),
-      graduationYear: Number(resolved.graduationYear),
-    });
-
-    registerMutation.mutate({
+    const registrationPayload = {
       name: resolved.name.trim(),
       email: resolved.email.trim(),
       githubId: resolved.githubId.trim(),
@@ -310,7 +253,60 @@ export default function Register() {
       gender: resolved.gender.trim().toLowerCase(),
       graduationYear: Number(resolved.graduationYear),
       avatarUrl: resolvedAvatarUrl,
-    });
+    };
+
+    console.log('[Register] Calling sendRegData directly with payload:', registrationPayload);
+
+    try {
+      setIsPending(true);
+      const data = await sendRegData(registrationPayload);
+      console.log('[Register] Registration succeeded! Response:', data);
+
+      setIsRedirecting(true);
+      setFormStatus({
+        type: 'success',
+        message: 'Registration successful! Welcome to OpenCode 2026. Redirecting...',
+      });
+      toast({
+        title: 'Registration Successful!',
+        description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
+        status: 'success',
+        duration: 3500,
+        isClosable: true,
+      });
+
+      const currentToken = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
+      setTimeout(() => {
+        window.location.assign(
+          `/user/events?token=${encodeURIComponent(currentToken)}&avatar_url=${encodeURIComponent(resolvedAvatarUrl)}`
+        );
+      }, 1000);
+    } catch (error: any) {
+      setIsRedirecting(false);
+      console.error('[Register] Registration submission failed with error:', error);
+      const errorMsg = error?.message || 'Please check your details and try again.';
+      if (error.fields) {
+        setFieldErrors(error.fields);
+        const firstField = Object.keys(error.fields)[0];
+        document.getElementById(`register-${firstField}`)?.focus();
+      }
+      if (error.status === 401) {
+        localStorage.removeItem('token');
+      }
+      setFormStatus({
+        type: 'error',
+        message: errorMsg,
+      });
+      toast({
+        title: 'Registration could not be completed',
+        description: errorMsg,
+        status: 'error',
+        duration: 6000,
+        isClosable: true,
+      });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   if (!mounted) {
