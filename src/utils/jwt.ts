@@ -6,7 +6,15 @@ export interface JWTPayload {
   };
   id?: string;
   githubId?: string;
+  exp?: number;
   [key: string]: any;
+}
+
+export function isTokenActive(token: string | null | undefined): boolean {
+  const payload = parseJwt(token);
+  if (!payload) return false;
+  if (typeof payload.exp !== 'number') return false;
+  return payload.exp * 1000 > Date.now();
 }
 
 /**
@@ -15,17 +23,27 @@ export interface JWTPayload {
 export function parseJwt(token: string | null | undefined): JWTPayload | null {
   if (!token) return null;
   try {
-    const base64Url = token.split('.')[1];
-    if (!base64Url) return null;
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const pad = base64.length % 4;
+    if (pad) {
+      base64 += '='.repeat(4 - pad);
+    }
+    const binaryStr = atob(base64);
+    try {
+      const jsonPayload = decodeURIComponent(
+        binaryStr
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(''),
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return JSON.parse(binaryStr);
+    }
+  } catch (err) {
+    console.error('Failed to parse JWT token:', err);
     return null;
   }
 }

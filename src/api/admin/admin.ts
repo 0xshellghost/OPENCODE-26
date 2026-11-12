@@ -110,7 +110,7 @@ export async function deleteRepo(eventName: string, repoName: string) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/${repoName}/delete`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${encodeURIComponent(eventName)}/repos/${encodeURIComponent(repoName)}/delete`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
@@ -330,3 +330,35 @@ export async function updatePlatformFeaturesInDb(
   const data = result?.data !== undefined ? result.data : result;
   return data as BackendPlatformFeatures;
 }
+
+export async function updateEventDetails(
+  eventName: string,
+  formData: FormData
+) {
+  if (typeof window === 'undefined') return;
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found. Please sign in as admin.');
+
+  const baseUrl = getApiBase();
+  const url = `${baseUrl}/api/v1/admin/event/${encodeURIComponent(eventName)}/update`;
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.error ||
+        errorData?.message ||
+        `Failed to update event (HTTP ${response.status})`
+    );
+  }
+
+  return await response.json();
+}
+

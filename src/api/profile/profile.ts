@@ -41,6 +41,10 @@ export async function sendRegData(formData: any) {
     }
   }
 
+  if (token) {
+    token = token.trim();
+  }
+
   // Ensure avatarUrl is never missing (Prisma User model requires avatarUrl: String)
   const avatarUrl =
     formData.avatarUrl?.trim() ||
@@ -52,24 +56,35 @@ export async function sendRegData(formData: any) {
     graduationYear: Number(formData.graduationYear),
   };
 
-  const response = await fetch(
-    `${getApiBase()}/api/v1/register`,
-    {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${getApiBase()}/api/v1/register`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers,
+      credentials: 'include',
       body: JSON.stringify(payload),
-    },
-  );
+    });
+  } catch (netErr: any) {
+    console.error('Registration network error:', netErr);
+    throw new Error(`Network error while contacting server (${netErr?.message || 'CORS or offline'}). Please check your connection.`);
+  }
 
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
     const errorMsg = data?.error || data?.message || `Registration failed (${response.status}: ${response.statusText})`;
     console.error('Registration failed:', errorMsg);
-    throw new Error(errorMsg);
+    const error = new Error(errorMsg) as Error & { fields?: Record<string, string>; status?: number };
+    error.fields = data?.fields;
+    error.status = response.status;
+    throw error;
   }
 
   return data;

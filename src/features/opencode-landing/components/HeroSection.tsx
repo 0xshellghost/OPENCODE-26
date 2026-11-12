@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import SakuraCanvas from "./SakuraCanvas";
 import { ArrowRight, Sparkles, Terminal } from "lucide-react";
 import SpecularButton from "./SpecularButton";
+import { getApiBase } from "utils/apiBase";
 
 export default function HeroSection() {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -179,7 +179,7 @@ export default function HeroSection() {
               glow={1}
               followMouse
               proximity={250}
-              href="/auth/register"
+              href={`${getApiBase()}/api/v1/auth/github`}
               className="!bg-[#B8E5D5] hover:!bg-[#A3DAC7] !text-[#0C1C2C] font-semibold text-sm sm:text-base shadow-lg shadow-[#58B99A]/20"
             >
               <Terminal className="w-4 h-4 text-[#0C1C2C]" />

@@ -22,12 +22,13 @@ import {
   Check,
   ChevronDown,
   Crown,
+  Pencil,
   SearchX,
   Trophy,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import LeaderboardLoader from 'components/common/LeaderboardLoader';
 import ColumnsTable, {
@@ -40,6 +41,8 @@ import ContributorAvatar from 'components/common/ContributorAvatar';
 import { isMaintainer } from 'constants/Maintainers';
 import { FetchedLeaderboard } from '../../../../api/leaderboard/leaderboard';
 import { FetchedEvents } from '../../../../api/events/events';
+import { isAdminUser } from 'utils/jwt';
+import EditEventModal from 'components/modals/EditEventModal';
 
 const CONTROL_H = '44px';
 
@@ -83,6 +86,14 @@ function isFirstYear(item: { graduationYear?: string | number; year?: string }):
 export default function EventName() {
   const { eventName } = useParams<{ eventName: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(isAdminUser());
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollege, setSelectedCollege] = useState('All');
   const [firstYearOnly, setFirstYearOnly] = useState(false);
@@ -95,6 +106,19 @@ export default function EventName() {
 
   const eventLabel = safeDecode(eventName);
   const isOpencode = eventLabel.toLowerCase().includes('opencode');
+
+  const handleEventUpdated = useCallback(
+    (updatedEvent: any) => {
+      queryClient.invalidateQueries({ queryKey: ['EventInfo'] });
+      queryClient.invalidateQueries({ queryKey: ['LeadInfo'] });
+
+      const newName = updatedEvent?.name;
+      if (newName && newName.toLowerCase() !== eventLabel.toLowerCase()) {
+        router.push(`/user/leaderboard/${encodeURIComponent(newName)}`);
+      }
+    },
+    [eventLabel, queryClient, router]
+  );
 
   const { data: eventData } = useQuery({
     queryKey: ['EventInfo'],
@@ -396,6 +420,30 @@ export default function EventName() {
                     </MenuItem>
                   );
                 })}
+                {isAdmin && (
+                  <>
+                    <Box my="4px" mx="6px" borderTop="1px solid var(--border)" />
+                    <MenuItem
+                      onClick={() => setIsEditModalOpen(true)}
+                      bg="transparent"
+                      _hover={{ bg: 'var(--accent-soft)', color: 'var(--accent)' }}
+                      _focus={{ bg: 'var(--accent-soft)', color: 'var(--accent)' }}
+                      borderRadius="8px"
+                      mx="6px"
+                      w="calc(100% - 12px)"
+                      px="12px"
+                      py="8px"
+                      fontSize="12px"
+                      fontWeight="600"
+                      color="var(--accent)"
+                    >
+                      <Flex align="center" gap="8px">
+                        <Pencil size={13} />
+                        <Text noOfLines={1}>Edit &ldquo;{eventLabel}&rdquo;</Text>
+                      </Flex>
+                    </MenuItem>
+                  </>
+                )}
               </MenuList>
             </Portal>
           </Menu>
@@ -550,6 +598,28 @@ export default function EventName() {
             Clear
           </chakra.button>
         )}
+
+        {isAdmin && (
+          <chakra.button
+            type="button"
+            onClick={() => setIsEditModalOpen(true)}
+            aria-label="Edit this event"
+            display="flex"
+            alignItems="center"
+            gap="8px"
+            {...controlStyle}
+            _hover={{
+              borderColor: 'var(--accent)',
+              bg: 'var(--surface-2)',
+              color: 'var(--accent)',
+            }}
+          >
+            <Box display="flex" color="var(--accent)">
+              <Pencil size={14} />
+            </Box>
+            <span>Edit Event</span>
+          </chakra.button>
+        )}
         </Flex>
 
       </Flex>
@@ -647,6 +717,16 @@ export default function EventName() {
         >
           <ColumnsTable tableData={tableRows} eventName={eventLabel} />
         </Box>
+      )}
+
+      {/* Edit Event Modal for Admins */}
+      {isAdmin && (
+        <EditEventModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          eventName={eventLabel}
+          onSuccess={handleEventUpdated}
+        />
       )}
     </Flex>
   );
