@@ -520,15 +520,16 @@ export default function ManagementPage() {
     }
   };
 
-  const handleDeleteRepo = async () => {
-    if (!selectedEvent || !deleteRepoName) {
+  const handleDeleteRepo = async (targetRepo?: string) => {
+    const nameToDelete = targetRepo || deleteRepoName;
+    if (!selectedEvent || !nameToDelete) {
       toast({ title: 'Event and Repo Name are required.', status: 'warning', isClosable: true });
       return;
     }
     try {
-      await deleteRepo(selectedEvent, deleteRepoName);
+      await deleteRepo(selectedEvent, nameToDelete);
       toast({ title: 'Repo Deleted!', status: 'success', isClosable: true });
-      setDeleteRepoName('');
+      if (deleteRepoName === nameToDelete) setDeleteRepoName('');
       refetchRepos();
     } catch (error: any) {
       toast({ title: 'Error deleting repo', description: error.message, status: 'error', isClosable: true });
@@ -1757,9 +1758,7 @@ ON DUPLICATE KEY UPDATE
                             size="xs"
                             colorScheme="red"
                             variant="ghost"
-                            onClick={() => {
-                              setDeleteRepoName(repo.name);
-                            }}
+                            onClick={() => handleDeleteRepo(repo.name)}
                           >
                             <Icon as={Trash2} size={12} />
                           </Button>
@@ -1776,7 +1775,7 @@ ON DUPLICATE KEY UPDATE
             <Text fontSize="sm" fontWeight="600" mb="8px" color={textColor}>Delete Repository</Text>
             <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap="15px">
               <Input placeholder="Repository Name to Delete" variant="auth" value={deleteRepoName} onChange={(e) => setDeleteRepoName(e.target.value)} />
-              <Button colorScheme="red" w="100%" leftIcon={<Icon as={Trash2} />} onClick={handleDeleteRepo}>Delete Repo</Button>
+              <Button colorScheme="red" w="100%" leftIcon={<Icon as={Trash2} />} onClick={() => handleDeleteRepo()}>Delete Repo</Button>
             </Grid>
           </Box>
 

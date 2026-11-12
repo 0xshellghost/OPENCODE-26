@@ -109,7 +109,7 @@ export async function deleteRepo(eventName: string, repoName: string) {
   if (typeof window === 'undefined') return;
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
-  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${eventName}/repos/${repoName}/delete`, {
+  const response = await fetch(`${getApiBase()}/api/v1/admin/event/${encodeURIComponent(eventName)}/repos/${encodeURIComponent(repoName)}/delete`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   });
