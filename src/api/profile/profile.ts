@@ -32,7 +32,6 @@ export async function fetchLoggedInBasicDetails() {
 }
 
 export async function sendRegData(formData: any) {
-  console.log('[sendRegData] 1. Function called with formData:', formData);
   let token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   if (!token && typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
@@ -46,8 +45,6 @@ export async function sendRegData(formData: any) {
     token = token.trim();
   }
 
-  console.log('[sendRegData] 2. Auth token present:', Boolean(token), token ? `${token.substring(0, 10)}...` : 'none');
-
   // Ensure avatarUrl is never missing (Prisma User model requires avatarUrl: String)
   const avatarUrl =
     formData.avatarUrl?.trim() ||
@@ -59,9 +56,6 @@ export async function sendRegData(formData: any) {
     graduationYear: Number(formData.graduationYear),
   };
 
-  const targetUrl = `${getApiBase()}/api/v1/register`;
-  console.log('[sendRegData] 3. Sending POST request to:', targetUrl, 'payload:', payload);
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -71,24 +65,22 @@ export async function sendRegData(formData: any) {
 
   let response: Response;
   try {
-    response = await fetch(targetUrl, {
+    response = await fetch(`${getApiBase()}/api/v1/register`, {
       method: 'POST',
       headers,
       credentials: 'include',
       body: JSON.stringify(payload),
     });
-    console.log('[sendRegData] 4. Response received from backend:', response.status, response.statusText);
   } catch (netErr: any) {
-    console.error('[sendRegData] Network/fetch error (e.g. CORS, DNS, mixed content):', netErr);
+    console.error('Registration network error:', netErr);
     throw new Error(`Network error while contacting server (${netErr?.message || 'CORS or offline'}). Please check your connection.`);
   }
 
   const data = await response.json().catch(() => null);
-  console.log('[sendRegData] 5. Response JSON data:', data);
 
   if (!response.ok) {
     const errorMsg = data?.error || data?.message || `Registration failed (${response.status}: ${response.statusText})`;
-    console.error('[sendRegData] Registration failed on server:', errorMsg, data);
+    console.error('Registration failed:', errorMsg);
     const error = new Error(errorMsg) as Error & { fields?: Record<string, string>; status?: number };
     error.fields = data?.fields;
     error.status = response.status;

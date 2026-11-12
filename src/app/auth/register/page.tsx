@@ -129,8 +129,6 @@ export default function Register() {
       event.preventDefault();
     }
 
-    console.log('[Register] Submit initiated');
-
     // Resolve current values with DOM fallback in case browser autofill didn't trigger React onChange
     const resolved = { ...formData };
     if (typeof document !== 'undefined') {
@@ -166,8 +164,6 @@ export default function Register() {
         setFormData(prev => ({ ...prev, githubId: resolved.githubId }));
       }
     }
-
-    console.log('[Register] Form state resolved:', { resolved, hasToken: Boolean(token) });
 
     if (!token) {
       const authError = 'No GitHub sign-in detected. Please sign in with GitHub first so your account can be linked.';
@@ -208,8 +204,6 @@ export default function Register() {
       };
       const missingList = missingKeys.map(k => fieldLabels[k] || k).join(', ');
       const errorMsg = `Please fix or fill in the required fields: ${missingList}`;
-      
-      console.warn('[Register] Validation failed for fields:', missingKeys, errors);
 
       setFormStatus({
         type: 'error',
@@ -255,12 +249,9 @@ export default function Register() {
       avatarUrl: resolvedAvatarUrl,
     };
 
-    console.log('[Register] Calling sendRegData directly with payload:', registrationPayload);
-
     try {
       setIsPending(true);
       const data = await sendRegData(registrationPayload);
-      console.log('[Register] Registration succeeded! Response:', data);
 
       setIsRedirecting(true);
       setFormStatus({
@@ -283,7 +274,7 @@ export default function Register() {
       }, 1000);
     } catch (error: any) {
       setIsRedirecting(false);
-      console.error('[Register] Registration submission failed with error:', error);
+      console.error('Registration submission failed:', error);
       const errorMsg = error?.message || 'Please check your details and try again.';
       if (error.fields) {
         setFieldErrors(error.fields);
@@ -493,7 +484,6 @@ export default function Register() {
             type="submit"
             disabled={isSubmitting}
             onClick={(e) => {
-              console.log('[Register] Button clicked directly, isSubmitting:', isSubmitting);
               if (!isSubmitting) {
                 handleSubmit(e as any);
               }
