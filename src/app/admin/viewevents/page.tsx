@@ -4,13 +4,14 @@ import { Box, Button, SimpleGrid, useToast, Text, Flex, Badge, Icon } from '@cha
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { CalendarDays, Star } from 'lucide-react';
+import { CalendarDays, Star, Pencil } from 'lucide-react';
 import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
 import { updateFlagshipEvent } from 'api/admin/admin';
 import { getApiBase } from 'utils/apiBase';
+import EditEventModal from 'components/modals/EditEventModal';
 
 // 1. Define Types
 interface EventItem {
@@ -32,6 +33,7 @@ export default function Viewevents() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [updatingEventName, setUpdatingEventName] = useState<string | null>(null);
+  const [editingEventName, setEditingEventName] = useState<string | null>(null);
   const router = useRouter();
   const toast = useToast();
   const { features, setFlagshipEvent } = useFeatures();
@@ -176,6 +178,17 @@ export default function Viewevents() {
     }
   };
 
+  const handleEditSuccess = (updatedEvent: any) => {
+    if (!updatedEvent) return;
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.name.toLowerCase() === editingEventName?.toLowerCase()
+          ? { ...e, ...updatedEvent }
+          : e
+      )
+    );
+  };
+
   if (!isMounted) return null;
   if (isLoading)
     return (
@@ -271,6 +284,15 @@ export default function Viewevents() {
                   </Button>
                 )}
                 <Button
+                  colorScheme="purple"
+                  size="sm"
+                  variant="outline"
+                  leftIcon={<Icon as={Pencil} />}
+                  onClick={() => setEditingEventName(item.name)}
+                >
+                  Edit
+                </Button>
+                <Button
                   colorScheme="red"
                   size="sm"
                   variant="ghost"
@@ -283,6 +305,15 @@ export default function Viewevents() {
           );
         })}
       </SimpleGrid>
+
+      {editingEventName && (
+        <EditEventModal
+          isOpen={!!editingEventName}
+          onClose={() => setEditingEventName(null)}
+          eventName={editingEventName}
+          onSuccess={handleEditSuccess}
+        />
+      )}
     </Box>
   );
 }
