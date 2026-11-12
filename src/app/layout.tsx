@@ -63,7 +63,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Shippori+Mincho:wght@500;600&display=swap"
         />
       </head>
-      <body id="root"><AppWrappers>{children}</AppWrappers></body>
+      <body id="root" suppressHydrationWarning><AppWrappers>{children}</AppWrappers></body>
     </html>
   );
 }

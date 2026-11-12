@@ -35,6 +35,7 @@ export default function Register() {
   const [fieldErrors, setFieldErrors] = useState<RegistrationFieldErrors>({});
   const [collegeType, setCollegeType] = useState('IIIT Allahabad');
   const [otherCollege, setOtherCollege] = useState('');
+  const [mounted, setMounted] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [formStatus, setFormStatus] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const toast = useToast();
@@ -45,6 +46,7 @@ export default function Register() {
   });
 
   useEffect(() => {
+    setMounted(true);
     const params = new URLSearchParams(window.location.search);
     const tokenParam = params.get('token');
     const avatarParam = params.get('avatar_url') || params.get('avatarUrl');
@@ -263,6 +265,24 @@ export default function Register() {
     });
   };
 
+  if (!mounted) {
+    return (
+      <JapaneseBackground variant="auth">
+        <SiteNavbar />
+        <main className="oc-register-layout">
+          <header className="oc-register-intro">
+            <p className="oc-eyebrow"><span />JOIN THE JOURNEY</p>
+            <h1 className="oc-auth-heading">A place for<br />your potential.</h1>
+            <p className="oc-description">Complete your profile and become part of OpenCode 2026. Your first contribution is just the beginning.</p>
+          </header>
+          <div className="glass-panel oc-register-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '340px' }}>
+            <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent)' }} />
+          </div>
+        </main>
+      </JapaneseBackground>
+    );
+  }
+
   return (
     <JapaneseBackground variant="auth">
       <SiteNavbar />
@@ -426,6 +446,11 @@ export default function Register() {
           <button
             type="submit"
             disabled={isSubmitting}
+            onClick={(e) => {
+              if (!isSubmitting) {
+                handleSubmit(e as any);
+              }
+            }}
             className="oc-button"
             style={{
               width: '100%',
