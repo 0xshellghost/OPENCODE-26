@@ -9,6 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
+import { useFeatures } from 'contexts/FeaturesContext';
 
 interface SidebarLinksProps {
   routes: IRoute[];
@@ -20,6 +21,7 @@ export function SidebarLinks(props: SidebarLinksProps) {
   const pathname = usePathname();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { features } = useFeatures();
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = useCallback(
@@ -35,6 +37,12 @@ export function SidebarLinks(props: SidebarLinksProps) {
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
   const createLinks = (routes: IRoute[]) => {
     return routes.map((route, index: number) => {
+      if (route.path === '/winners' && !features.showWinners) return null;
+      if (route.path === '/milestones' && !features.showMilestones) return null;
+      if (route.path.includes('leaderboard') && !features.showLeaderboard) return null;
+      if (route.path === '/repos' && !features.showRepositories) return null;
+      if (route.path === '/geekstore' && !features.showGeekstore) return null;
+
       const href = route.layout + route.path;
       const isCurrentAdmin = pathname?.includes('/admin');
       

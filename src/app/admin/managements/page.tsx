@@ -71,6 +71,7 @@ import {
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
+  EXPECTED_SNAPSHOT_BYTES,
   encodeImageToSnapshot,
   renderSnapshotToCanvas,
 } from 'utils/rplaceProtocol';
@@ -182,7 +183,7 @@ export default function ManagementPage() {
   const [togglingFeature, setTogglingFeature] = useState<string | null>(null);
 
   const handleToggleFeature = async (
-    key: 'showWinners' | 'showMilestones' | 'showRPlace' | 'showRepositories' | 'showLeaderboard',
+    key: 'showWinners' | 'showMilestones' | 'showRPlace' | 'showRepositories' | 'showLeaderboard' | 'showGeekstore',
     val: boolean,
     label: string
   ) => {
@@ -715,10 +716,10 @@ ON DUPLICATE KEY UPDATE
     try {
       if (file.name.endsWith('.bin') || file.name.endsWith('.dat')) {
         const buffer = await file.arrayBuffer();
-        if (buffer.byteLength !== 300000) {
+        if (buffer.byteLength !== EXPECTED_SNAPSHOT_BYTES) {
           toast({
             title: 'Invalid Binary Snapshot Size',
-            description: `Expected exactly 300,000 bytes (got ${buffer.byteLength.toLocaleString()} bytes).`,
+            description: `Expected exactly ${EXPECTED_SNAPSHOT_BYTES.toLocaleString()} bytes (got ${buffer.byteLength.toLocaleString()} bytes).`,
             status: 'error',
             duration: 4000,
             isClosable: true,
@@ -731,7 +732,7 @@ ON DUPLICATE KEY UPDATE
         setCanvasBufferToUpload(buffer);
         setCanvasPreviewInfo({
           name: file.name,
-          size: `${(buffer.byteLength / 1024).toFixed(1)} KB (Exact 300 KB binary)`,
+          size: `${(buffer.byteLength / 1024).toFixed(1)} KB (Exact ${Math.round(EXPECTED_SNAPSHOT_BYTES / 1024)} KB binary)`,
           type: 'Raw 4-bit Binary Snapshot',
         });
         if (canvasPreviewRef.current) {
@@ -748,7 +749,7 @@ ON DUPLICATE KEY UPDATE
             setCanvasBufferToUpload(packedBuffer);
             setCanvasPreviewInfo({
               name: file.name,
-              size: `${img.naturalWidth}×${img.naturalHeight} px → Quantized to 1000×600 (300 KB)`,
+              size: `${img.naturalWidth}×${img.naturalHeight} px → Quantized to ${CANVAS_WIDTH}×${CANVAS_HEIGHT} (${Math.round(EXPECTED_SNAPSHOT_BYTES / 1024)} KB)`,
               type: '16-Color Quantized Image',
             });
           } catch (err: any) {
@@ -788,12 +789,12 @@ ON DUPLICATE KEY UPDATE
   };
 
   const handleGenerateBlankCanvas = () => {
-    const blank = new ArrayBuffer(300000); // 300,000 zero bytes = color 0 (white)
+    const blank = new ArrayBuffer(EXPECTED_SNAPSHOT_BYTES); // zero bytes = color 0 (white)
     setCanvasBufferToUpload(blank);
     setCanvasSnapshotFile(null);
     setCanvasPreviewInfo({
       name: 'blank-canvas.bin',
-      size: '300.0 KB (All White)',
+      size: `${(EXPECTED_SNAPSHOT_BYTES / 1024).toFixed(1)} KB (All White)`,
       type: 'Reset / Blank Snapshot',
     });
     if (canvasPreviewRef.current) {
@@ -999,6 +1000,33 @@ ON DUPLICATE KEY UPDATE
               isChecked={features.showLeaderboard}
               isDisabled={togglingFeature === 'showLeaderboard'}
               onChange={(e) => handleToggleFeature('showLeaderboard', e.target.checked, 'Leaderboard')}
+            />
+          </Flex>
+
+          <Flex
+            p="20px"
+            borderRadius="16px"
+            border="1px solid"
+            borderColor="var(--border)"
+            bg="var(--surface-2)"
+            align="center"
+            justify="space-between"
+          >
+            <Box>
+              <HStack spacing="8px" mb="4px">
+                <Text fontWeight="600" color={textColor}>GeekStore</Text>
+                <Badge colorScheme={features.showGeekstore ? 'green' : 'gray'}>
+                  {features.showGeekstore ? 'Visible' : 'Hidden'}
+                </Badge>
+              </HStack>
+              <Text fontSize="xs" color="gray.500">Show or hide the GeekStore tab in navigation.</Text>
+            </Box>
+            <Switch
+              colorScheme="brand"
+              size="lg"
+              isChecked={features.showGeekstore}
+              isDisabled={togglingFeature === 'showGeekstore'}
+              onChange={(e) => handleToggleFeature('showGeekstore', e.target.checked, 'GeekStore')}
             />
           </Flex>
         </Grid>
@@ -1229,7 +1257,7 @@ ON DUPLICATE KEY UPDATE
               borderRadius="full"
               fontSize="12px"
             >
-              1000 × 600 · 300 KB
+              {CANVAS_WIDTH} × {CANVAS_HEIGHT} · {Math.round(EXPECTED_SNAPSHOT_BYTES / 1024)} KB
             </Badge>
             <Button
               as={Link}
@@ -1249,7 +1277,7 @@ ON DUPLICATE KEY UPDATE
 
         <Text fontSize="sm" mb="20px" color="var(--fg-muted)">
           Upload a new snapshot to update or wipe the live community canvas. You can upload an image (PNG, JPG, WebP)
-          which will be automatically quantized to the 16-color palette and packed to 300 KB, or provide a raw 300,000-byte 
+          which will be automatically quantized to the 16-color palette and packed to {Math.round(EXPECTED_SNAPSHOT_BYTES / 1024)} KB, or provide a raw {EXPECTED_SNAPSHOT_BYTES.toLocaleString()}-byte 
           binary snapshot (<Text as="span" fontFamily="var(--f-mono)">.bin</Text>).
         </Text>
 
@@ -1285,7 +1313,7 @@ ON DUPLICATE KEY UPDATE
               {canvasSnapshotFile ? canvasSnapshotFile.name : 'Choose an image (.png, .jpg, .webp) or snapshot file (.bin)'}
             </Text>
             <Text fontSize="xs" color="var(--fg-muted)" mt="4px">
-              Images will be automatically scaled to 1000×600 and quantized to 16 colors.
+              Images will be automatically scaled to {CANVAS_WIDTH}×{CANVAS_HEIGHT} and quantized to 16 colors.
             </Text>
           </Box>
 

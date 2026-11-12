@@ -303,6 +303,25 @@ export const GeekstoreService = {
     buyData: DirectBuyPayload,
     idempotencyKey?: string,
   ): Promise<Order> {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedFlags = localStorage.getItem('oc-feature-flags');
+        if (storedFlags) {
+          const parsed = JSON.parse(storedFlags);
+          if (parsed && parsed.showGeekstore === false) {
+            const { isAdminUser } = await import('utils/jwt');
+            if (!isAdminUser()) {
+              throw new Error('GeekStore is currently disabled.');
+            }
+          }
+        }
+      } catch (err: any) {
+        if (err?.message === 'GeekStore is currently disabled.') {
+          throw err;
+        }
+      }
+    }
+
     const key = idempotencyKey || generateIdempotencyKey();
 
     return requestWithFallback<Order>(

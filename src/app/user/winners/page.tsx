@@ -13,7 +13,7 @@ import {
   TabPanels,
   Text,
 } from '@chakra-ui/react';
-import { Trophy } from 'lucide-react';
+import { Trophy, Medal, Award } from 'lucide-react';
 import { opencodeTokens } from '../../../theme/opencode-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -123,43 +123,53 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
       {winners.slice(0, 3).map((w, i) => (
         <Box
           key={w.githubid}
-          borderRadius="22px"
-          px={{ base: '18px', sm: '26px' }}
-          py={{ base: '18px', sm: '22px' }}
+          borderRadius="20px"
+          px={{ base: '18px', sm: '24px' }}
+          py={{ base: '18px', sm: '20px' }}
           w={{ base: '100%', sm: 'auto' }}
           minW={{ base: '100%', sm: '260px' }}
           maxW={{ base: '100%', sm: '320px' }}
           flex={{ base: '1 1 100%', sm: '1 1 260px' }}
           bg="var(--surface)"
-          backdropFilter="blur(24px)"
-          boxShadow={`0 10px 30px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}33`}
-          border={`1px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}66`}
+          backdropFilter="blur(20px)"
+          boxShadow="var(--shadow)"
+          border={`1px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}40`}
           position="relative"
-          transition="all 0.3s ease"
+          transition="transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease"
           _hover={{
-            transform: 'translateY(-3px)',
-            boxShadow: `0 14px 40px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}55`,
+            transform: 'translateY(-2px)',
+            borderColor: w.color || RANK_COLORS[w.position - 1] || '#F5C542',
           }}
         >
-          {/* ===== MEDAL ICON ===== */}
+          {/* ===== MEDAL BADGE (Vector SVG) ===== */}
           <Flex
             position="absolute"
-            top="-20px"
-            right="18px"
-            gap="6px"
-            fontSize="32px"
+            top="14px"
+            right="14px"
+            align="center"
+            gap="5px"
+            px="9px"
+            py="3px"
+            borderRadius="full"
+            bg="var(--surface-2)"
+            border={`1px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}55`}
+            color={w.color || RANK_COLORS[w.position - 1] || '#F5C542'}
+            fontSize="11px"
+            fontWeight="700"
+            fontFamily="var(--f-mono)"
           >
-            <span>{medals[i] || '🎖️'}</span>
+            {i === 0 ? <Trophy size={13} /> : <Medal size={13} />}
+            <span>#{w.position}</span>
           </Flex>
 
           {/* ===== USER INFO ===== */}
-          <Flex align="center" gap="14px" mb="14px">
+          <Flex align="center" gap="14px" mb="14px" pr="60px">
             <Avatar
               src={w.avatarUrl || `https://github.com/${w.githubid}.png`}
               name={w.name}
               size="md"
-              border={`3px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}`}
-              boxShadow={`0 0 16px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}44`}
+              border={`2.5px solid ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}`}
+              boxShadow={`0 0 12px ${w.color || RANK_COLORS[w.position - 1] || '#F5C542'}33`}
             />
             <Box minW={0}>
               <Text fontWeight="800" color={text} fontSize="15px" noOfLines={1} title={w.name}>
@@ -197,101 +207,80 @@ function TopThreeCards({ winners, isLoading }: { winners: Winner[]; isLoading?: 
   );
 }
 
-const StatCircle = ({
-  icon: Icon,
-  title,
-  statsList,
-  side,
-}: {
-  icon: any;
-  title: string;
-  statsList: { value: number; label: string }[];
-  side: 'left' | 'right';
-}) => {
+function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrations: number } }) {
   const glass = 'var(--surface)';
   const text = opencodeTokens.colors.text.primary;
   const muted = opencodeTokens.colors.text.secondary;
 
   return (
-    <Box
-      position="absolute"
-      top="50%"
-      transform="translateY(-50%)"
-      {...(side === 'left' ? { left: '20px' } : { right: '20px' })}
-      display={{ base: 'none', lg: 'flex' }}
-      w="200px"
-      h="200px"
-      borderRadius="50%"
-      bg={glass}
-      backdropFilter="blur(20px)"
-      border="1px solid var(--border)"
-      boxShadow="var(--shadow)"
-      flexDir="column"
-      alignItems="center"
-      justifyContent="center"
-      gap="8px"
-      textAlign="center"
-      zIndex={1}
-      transition="all 0.3s ease"
-      _hover={{
-        borderColor: 'var(--accent)',
-        boxShadow: '0 20px 45px var(--accent-soft)',
-      }}
+    <Flex
+      direction={{ base: 'column', sm: 'row' }}
+      align="center"
+      justify="center"
+      gap={{ base: '12px', sm: '20px' }}
+      my="20px"
+      w="100%"
+      maxW="680px"
+      mx="auto"
     >
       <Box
-        fontSize="28px"
-        color="var(--secondary)"
-        mb="4px"
-        filter="drop-shadow(0 0 12px var(--secondary-soft))"
+        flex="1"
+        w="100%"
+        p="14px 18px"
+        borderRadius="16px"
+        bg={glass}
+        border="1px solid var(--border)"
+        boxShadow="var(--shadow)"
+        backdropFilter="blur(16px)"
+        display="flex"
+        alignItems="center"
+        gap="14px"
       >
-        <Icon />
-      </Box>
-
-      <Text
-        fontSize="11px"
-        letterSpacing="0.14em"
-        textTransform="uppercase"
-        fontWeight="700"
-        color={muted}
-      >
-        {title}
-      </Text>
-
-      {statsList.map((s) => (
-        <Box key={s.label}>
-          <Text fontSize="22px" fontWeight="900" color={text} fontFamily="var(--f-mono)">
-            <CountUp to={s.value} separator="," duration={1.2} />
+        <Box p="9px" borderRadius="10px" bg="var(--accent-soft)" color="var(--accent)" flexShrink={0}>
+          <FaCodeBranch size={17} />
+        </Box>
+        <Box minW="0">
+          <Text fontSize="10px" letterSpacing="0.12em" textTransform="uppercase" fontWeight="700" color={muted}>
+            Contributions
+          </Text>
+          <Text fontSize="20px" fontWeight="900" color={text} fontFamily="var(--f-mono)" lineHeight="1.2">
+            <CountUp to={stats.totalPRs} separator="," duration={1.2} />
           </Text>
           <Text fontSize="11px" color={muted}>
-            {s.label}
+            Pull Requests Merged
           </Text>
         </Box>
-      ))}
-    </Box>
-  );
-};
+      </Box>
 
-function OverallSideStats({ stats }: { stats: { totalPRs: number; totalRegistrations: number } }) {
-  return (
-    <>
-      <StatCircle
-        icon={FaCodeBranch}
-        title="Contributions"
-        side="left"
-        statsList={[
-          { value: stats.totalPRs, label: 'Pull Requests Merged' },
-        ]}
-      />
-
-      <StatCircle
-        icon={FaUsers}
-        title="Community"
-        side="right"
-        statsList={[
-          { value: stats.totalRegistrations, label: 'Total Participants' },
-        ]}
-      />
-    </>
+      <Box
+        flex="1"
+        w="100%"
+        p="14px 18px"
+        borderRadius="16px"
+        bg={glass}
+        border="1px solid var(--border)"
+        boxShadow="var(--shadow)"
+        backdropFilter="blur(16px)"
+        display="flex"
+        alignItems="center"
+        gap="14px"
+      >
+        <Box p="9px" borderRadius="10px" bg="var(--secondary-soft)" color="var(--secondary)" flexShrink={0}>
+          <FaUsers size={17} />
+        </Box>
+        <Box minW="0">
+          <Text fontSize="10px" letterSpacing="0.12em" textTransform="uppercase" fontWeight="700" color={muted}>
+            Community
+          </Text>
+          <Text fontSize="20px" fontWeight="900" color={text} fontFamily="var(--f-mono)" lineHeight="1.2">
+            <CountUp to={stats.totalRegistrations} separator="," duration={1.2} />
+          </Text>
+          <Text fontSize="11px" color={muted}>
+            Total Participants
+          </Text>
+        </Box>
+      </Box>
+    </Flex>
   );
 }
 
@@ -444,25 +433,19 @@ function WinnersHeader() {
   return (
     <header style={{ textAlign: 'center', marginBottom: '32px', paddingBottom: '28px', borderBottom: '1px solid var(--line)', maxWidth: '100%', overflow: 'hidden' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%', width: '100%' }}>
-        <p className="oc-eyebrow" style={{ justifyContent: 'center', margin: '0 0 12px', maxWidth: '100%' }}>
-          <span />
-          <ShinyText text="HALL OF FAME" speed={5} />
-          <span />
-        </p>
         <h1
           style={{
             fontFamily: 'var(--f-display)',
             fontWeight: 300,
             fontSize: 'var(--fs-page-title, clamp(32px, 5.5vw, 54px))',
             lineHeight: 1.15,
-            letterSpacing: '0.02em',
+            letterSpacing: '0.01em',
             textAlign: 'center',
             margin: '0 0 10px',
             color: 'var(--fg)',
-            textShadow: '0 2px 20px rgba(0, 0, 0, 0.2)',
             maxWidth: '100%',
             wordBreak: 'break-word',
-            overflowWrap: 'break-word',
+            textWrap: 'balance',
           }}
         >
           <BlurText text="Legacy of Legends" delay={50} animateBy="words" direction="top" />
@@ -470,14 +453,6 @@ function WinnersHeader() {
         <p className="oc-description" style={{ textAlign: 'center', maxWidth: '540px', margin: 0 }}>
           Top Performers and their Journey through Opencode
         </p>
-        <Box
-          h="2px"
-          w="80px"
-          bg="var(--accent)"
-          borderRadius="full"
-          mt="16px"
-          opacity={0.8}
-        />
       </div>
     </header>
   );

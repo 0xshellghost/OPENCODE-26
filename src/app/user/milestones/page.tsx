@@ -101,19 +101,16 @@ export default function Milestones() {
         borderBottom="1px solid var(--line)"
       >
         <Box flex="1" minW="0">
-          <p className="oc-eyebrow" style={{ marginBottom: '12px' }}>
-            <span />
-            <ShinyText text="Highlights · OpenCode 2026" speed={5} />
-          </p>
           <h1
             style={{
               fontFamily: 'var(--f-display)',
               fontWeight: 300,
               fontSize: 'clamp(32px, 5.5vw, 54px)',
               lineHeight: 1.15,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.01em',
               color: 'var(--fg)',
               margin: '0 0 12px',
+              textWrap: 'balance',
             }}
           >
             <BlurText text="Moments that matter." delay={45} animateBy="words" direction="top" />
