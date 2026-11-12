@@ -54,13 +54,14 @@ interface SelectedProductState {
 
 export default function GeekstorePage() {
   const router = useRouter();
-  const { features } = useFeatures();
+  const { features, isLoading: isFeaturesLoading } = useFeatures();
 
   useEffect(() => {
+    if (isFeaturesLoading) return;
     if (!features.showGeekstore && !isAdminUser()) {
       router.replace('/user/events');
     }
-  }, [features.showGeekstore, router]);
+  }, [isFeaturesLoading, features.showGeekstore, router]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -236,6 +237,14 @@ export default function GeekstorePage() {
       window.open(ORDER_FORM_URL, '_blank', 'noopener,noreferrer');
     }
   };
+
+  if (isFeaturesLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!features.showGeekstore && !isAdminUser()) {
     return null;

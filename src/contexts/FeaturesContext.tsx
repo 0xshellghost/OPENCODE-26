@@ -1,7 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { fetchPlatformFeatures, updatePlatformFeaturesInDb } from 'api/admin/admin';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
+import {
+  fetchPlatformFeatures,
+  updatePlatformFeaturesInDb,
+} from 'api/admin/admin';
 
 export interface FeaturesConfig {
   showWinners: boolean;
@@ -10,209 +20,170 @@ export interface FeaturesConfig {
   showRepositories: boolean;
   showLeaderboard: boolean;
   showGeekstore: boolean;
-  flagshipEvent?: string | null;
+  flagshipEvent: string | null;
 }
 
-interface FeaturesContextType {
+export interface FeaturesContextType {
   features: FeaturesConfig;
+  isLoading: boolean;
+  error: Error | null;
   toggleFeature: (key: keyof FeaturesConfig, value: boolean) => Promise<boolean>;
   setFlagshipEvent: (eventName: string | null) => Promise<boolean>;
+  updateFeatures: (patch: Partial<FeaturesConfig>) => Promise<boolean>;
   refreshFeatures: () => Promise<void>;
 }
 
-const STORAGE_KEY = 'oc-feature-flags';
-
+// Initial defaults before authoritative backend response is retrieved.
+// Global settings are never assumed enabled before backend confirmation.
 const DEFAULT_FEATURES: FeaturesConfig = {
-  showWinners: true,
-  showMilestones: true,
-  showRepositories: true,
-  showRPlace: true,
-  showLeaderboard: true,
-  showGeekstore: true,
-  flagshipEvent: 'Rift CTF',
+  showWinners: false,
+  showMilestones: false,
+  showRepositories: false,
+  showRPlace: false,
+  showLeaderboard: false,
+  showGeekstore: false,
+  flagshipEvent: null,
 };
 
 const FeaturesContext = createContext<FeaturesContextType>({
   features: DEFAULT_FEATURES,
+  isLoading: true,
+  error: null,
   toggleFeature: async () => false,
   setFlagshipEvent: async () => false,
+  updateFeatures: async () => false,
   refreshFeatures: async () => {},
 });
 
 export function FeaturesProvider({ children }: { children: ReactNode }) {
   const [features, setFeatures] = useState<FeaturesConfig>(DEFAULT_FEATURES);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const refreshFeatures = useCallback(async () => {
     try {
-      // 1. Try to fetch directly from backend database API
+      setIsLoading(true);
+      setError(null);
+      // Fetch authoritative configuration directly from backend GET /api/v1/features
       const backendData = await fetchPlatformFeatures();
       if (backendData) {
-        setFeatures((prev) => {
-          const backendGeekstore =
-            typeof backendData.showGeekstore === 'boolean'
-              ? backendData.showGeekstore
-              : (prev.showGeekstore !== undefined ? prev.showGeekstore : DEFAULT_FEATURES.showGeekstore);
-
-          const next = {
-            ...prev,
-            showWinners: typeof backendData.showWinners === 'boolean' ? backendData.showWinners : prev.showWinners,
-            showMilestones: typeof backendData.showMilestones === 'boolean' ? backendData.showMilestones : prev.showMilestones,
-            showRPlace: typeof backendData.showRPlace === 'boolean' ? backendData.showRPlace : prev.showRPlace,
-            showRepositories: typeof backendData.showRepositories === 'boolean' ? backendData.showRepositories : prev.showRepositories,
-            showLeaderboard: typeof backendData.showLeaderboard === 'boolean' ? backendData.showLeaderboard : prev.showLeaderboard,
-            showGeekstore: backendGeekstore,
-          };
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          } catch {}
-          return next;
+        setFeatures({
+          showWinners: Boolean(backendData.showWinners),
+          showMilestones: Boolean(backendData.showMilestones),
+          showLeaderboard: Boolean(backendData.showLeaderboard),
+          showRepositories: Boolean(backendData.showRepositories),
+          showRPlace: Boolean(backendData.showRPlace),
+          showGeekstore: Boolean(backendData.showGeekstore),
+          flagshipEvent: backendData.flagshipEvent ?? null,
         });
-        return;
       }
-    } catch (e) {
-      console.warn('[FeaturesContext] Backend direct fetch failed, trying proxy:', e);
+    } catch (err: any) {
+      console.error('[FeaturesContext] Failed to retrieve authoritative features configuration:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
+      // Note: We deliberately do NOT fall back to local storage or static mock files
+    } finally {
+      setIsLoading(false);
     }
-
-    // 2. Fallback to Next.js API proxy
-    try {
-      const res = await fetch('/api/features');
-      if (res.ok) {
-        const data = await res.json();
-        if (data) {
-          setFeatures((prev) => {
-            const proxyGeekstore =
-              typeof data.showGeekstore === 'boolean'
-                ? data.showGeekstore
-                : (prev.showGeekstore !== undefined ? prev.showGeekstore : DEFAULT_FEATURES.showGeekstore);
-
-            const next = {
-              showWinners: typeof data.showWinners === 'boolean' ? data.showWinners : prev.showWinners,
-              showMilestones: typeof data.showMilestones === 'boolean' ? data.showMilestones : prev.showMilestones,
-              showRPlace: typeof data.showRPlace === 'boolean' ? data.showRPlace : prev.showRPlace,
-              showRepositories: typeof data.showRepositories === 'boolean' ? data.showRepositories : prev.showRepositories,
-              showLeaderboard: typeof data.showLeaderboard === 'boolean' ? data.showLeaderboard : prev.showLeaderboard,
-              showGeekstore: proxyGeekstore,
-              flagshipEvent: data.flagshipEvent !== undefined ? data.flagshipEvent : prev.flagshipEvent,
-            };
-            try {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-            } catch {}
-            return next;
-          });
-        }
-      }
-    } catch {}
   }, []);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setFeatures((prev) => ({ ...prev, ...JSON.parse(stored) }));
-      }
-    } catch {
-      // localStorage unavailable
-    }
     refreshFeatures();
   }, [refreshFeatures]);
 
-  const toggleFeature = useCallback(async (key: keyof FeaturesConfig, value: boolean) => {
-    let previousState: FeaturesConfig = DEFAULT_FEATURES;
-    setFeatures((prev) => {
-      previousState = prev;
-      const next = { ...prev, [key]: value };
+  const toggleFeature = useCallback(
+    async (key: keyof FeaturesConfig, value: boolean): Promise<boolean> => {
+      // 1. Partial payload for the targeted feature
+      const patch: Partial<FeaturesConfig> = { [key]: value };
+
+      // 2. Persist directly to backend authoritative API: PATCH /api/v1/admin/features
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-
-    let backendSuccess = false;
-    let backendAttempted = false;
-
-    // 1. Update in database via backend API
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      if (token) {
-        backendAttempted = true;
-        const res = await updatePlatformFeaturesInDb({ [key]: value });
-        if (res) {
-          backendSuccess = true;
+        const updatedConfig = await updatePlatformFeaturesInDb(patch);
+        // 3. Update confirmed configuration ONLY using returned backend data
+        if (updatedConfig) {
+          setFeatures({
+            showWinners: Boolean(updatedConfig.showWinners),
+            showMilestones: Boolean(updatedConfig.showMilestones),
+            showLeaderboard: Boolean(updatedConfig.showLeaderboard),
+            showRepositories: Boolean(updatedConfig.showRepositories),
+            showRPlace: Boolean(updatedConfig.showRPlace),
+            showGeekstore: Boolean(updatedConfig.showGeekstore),
+            flagshipEvent: updatedConfig.flagshipEvent ?? null,
+          });
+          return true;
         }
+        return false;
+      } catch (err) {
+        console.error(`[FeaturesContext] Failed to update feature ${String(key)}:`, err);
+        // Do NOT modify in-memory state on failure - keep last backend-confirmed configuration
+        throw err;
       }
-    } catch (dbErr) {
-      console.warn('[FeaturesContext] updatePlatformFeaturesInDb warning:', dbErr);
-      backendSuccess = false;
-    }
+    },
+    [],
+  );
 
-    // If backend persistence was attempted and failed, rollback immediately
-    if (backendAttempted && !backendSuccess) {
-      setFeatures(previousState);
+  const setFlagshipEvent = useCallback(
+    async (eventName: string | null): Promise<boolean> => {
+      const patch: Partial<FeaturesConfig> = { flagshipEvent: eventName };
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(previousState));
-      } catch {}
-      return false;
-    }
-
-    // 2. Also sync with Next.js local route for proxy cache consistency
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch('/api/features', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ [key]: value }),
-      });
-      if (res.ok) {
-        if (!backendAttempted) {
-          backendSuccess = true;
+        const updatedConfig = await updatePlatformFeaturesInDb(patch);
+        if (updatedConfig) {
+          setFeatures({
+            showWinners: Boolean(updatedConfig.showWinners),
+            showMilestones: Boolean(updatedConfig.showMilestones),
+            showLeaderboard: Boolean(updatedConfig.showLeaderboard),
+            showRepositories: Boolean(updatedConfig.showRepositories),
+            showRPlace: Boolean(updatedConfig.showRPlace),
+            showGeekstore: Boolean(updatedConfig.showGeekstore),
+            flagshipEvent: updatedConfig.flagshipEvent ?? null,
+          });
+          return true;
         }
+        return false;
+      } catch (err) {
+        console.error('[FeaturesContext] Failed to update flagship event:', err);
+        throw err;
       }
-    } catch (proxyErr) {
-      console.warn('[FeaturesContext] Next.js features proxy update warning:', proxyErr);
-    }
+    },
+    [],
+  );
 
-    if (!backendSuccess) {
-      // Rollback to previous state on total failure
-      setFeatures(previousState);
+  const updateFeatures = useCallback(
+    async (patch: Partial<FeaturesConfig>): Promise<boolean> => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(previousState));
-      } catch {}
-      return false;
-    }
-
-    return true;
-  }, []);
-
-  const setFlagshipEvent = useCallback(async (eventName: string | null) => {
-    setFeatures((prev) => {
-      const next = { ...prev, flagshipEvent: eventName };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch('/api/features', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ flagshipEvent: eventName }),
-      });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  }, []);
+        const updatedConfig = await updatePlatformFeaturesInDb(patch);
+        if (updatedConfig) {
+          setFeatures({
+            showWinners: Boolean(updatedConfig.showWinners),
+            showMilestones: Boolean(updatedConfig.showMilestones),
+            showLeaderboard: Boolean(updatedConfig.showLeaderboard),
+            showRepositories: Boolean(updatedConfig.showRepositories),
+            showRPlace: Boolean(updatedConfig.showRPlace),
+            showGeekstore: Boolean(updatedConfig.showGeekstore),
+            flagshipEvent: updatedConfig.flagshipEvent ?? null,
+          });
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.error('[FeaturesContext] Failed to batch update features:', err);
+        throw err;
+      }
+    },
+    [],
+  );
 
   return (
-    <FeaturesContext.Provider value={{ features, toggleFeature, setFlagshipEvent, refreshFeatures }}>
+    <FeaturesContext.Provider
+      value={{
+        features,
+        isLoading,
+        error,
+        toggleFeature,
+        setFlagshipEvent,
+        updateFeatures,
+        refreshFeatures,
+      }}
+    >
       {children}
     </FeaturesContext.Provider>
   );

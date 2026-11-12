@@ -9,7 +9,6 @@ import NFT from '../../../components/card/NFT';
 import { RingLoader } from 'react-spinners';
 import { useFeatures } from 'contexts/FeaturesContext';
 import { resolveImageUrl, getEventCoverImage, getEventLogoImage } from 'utils/eventImages';
-import { updateFlagshipEvent } from 'api/admin/admin';
 import { getApiBase } from 'utils/apiBase';
 
 // 1. Define Types
@@ -118,7 +117,6 @@ export default function Viewevents() {
   const handleSetFlagship = async (eventName: string) => {
     setUpdatingEventName(eventName);
     try {
-      await updateFlagshipEvent(eventName, true);
       await setFlagshipEvent(eventName);
       setEvents((prev) =>
         prev.map((e) => ({
@@ -150,7 +148,6 @@ export default function Viewevents() {
   const handleRemoveFlagship = async (eventName: string) => {
     setUpdatingEventName(eventName);
     try {
-      await updateFlagshipEvent(eventName, false);
       await setFlagshipEvent(null);
       setEvents((prev) =>
         prev.map((e) => (e.name.toLowerCase() === eventName.toLowerCase() ? { ...e, isFlagship: false } : e))
