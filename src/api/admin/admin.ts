@@ -224,30 +224,9 @@ export async function uploadEventLeaderboard(eventName: string, file: File) {
 }
 
 export async function updateFlagshipEvent(eventName: string, isFlagship = true) {
-  if (typeof window === 'undefined') return;
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error('No token found. Please sign in as admin.');
-
-  const baseUrl = getApiBase();
-  const url = `${baseUrl}/api/v1/admin/events/${encodeURIComponent(eventName)}/flagship`;
-
-  console.log('[updateFlagshipEvent] Sending PUT request to:', url, { isFlagship });
-
-  const response = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ isFlagship }),
+  return await updatePlatformFeaturesInDb({
+    flagshipEvent: isFlagship ? eventName : null,
   });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || errorData?.error || `Failed to update flagship event (HTTP ${response.status}: ${response.statusText})`);
-  }
-
-  return await response.json();
 }
 
 /**
@@ -285,30 +264,33 @@ export interface BackendPlatformFeatures {
   showLeaderboard: boolean;
   showRepositories: boolean;
   showRPlace: boolean;
-  showGeekstore?: boolean;
+  showGeekstore: boolean;
+  flagshipEvent: string | null;
 }
 
-export async function fetchPlatformFeatures(): Promise<BackendPlatformFeatures | null> {
+export async function fetchPlatformFeatures(): Promise<BackendPlatformFeatures> {
   const baseUrl = getApiBase();
   const url = `${baseUrl}/api/v1/features`;
 
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
-    if (response.ok) {
-      const data = await response.json();
-      return (data?.data || data) as BackendPlatformFeatures;
-    }
-  } catch (err) {
-    console.warn('[fetchPlatformFeatures] Could not fetch from backend:', err);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message ||
+        errorData?.error ||
+        `Failed to fetch platform features (HTTP ${response.status}: ${response.statusText})`
+    );
   }
 
-  return null;
+  const json = await response.json();
+  const data = json?.data !== undefined ? json.data : json;
+  return data as BackendPlatformFeatures;
 }
 
 export async function updatePlatformFeaturesInDb(
@@ -345,7 +327,8 @@ export async function updatePlatformFeaturesInDb(
   }
 
   const result = await response.json();
-  return (result?.data || result) as BackendPlatformFeatures;
+  const data = result?.data !== undefined ? result.data : result;
+  return data as BackendPlatformFeatures;
 }
 
 export async function updateEventDetails(

@@ -295,16 +295,15 @@ export default function EventCollection({
   const scenes = ['kyoto-evening', 'kyoto-garden', 'kyoto-torii'];
   const Icon = leaderboard ? Trophy : CalendarDays;
 
-  // Resolve flagship event: database isFlagship takes precedence, fallback to features config
+  // Resolve flagship event: authoritative features config takes precedence, fallback to database isFlagship
   const flagship = useMemo(() => {
-    const dbFlagship = events.find((e) => e.isFlagship === true);
-    if (dbFlagship) return dbFlagship;
-    if (!features?.flagshipEvent) return null;
-    return (
-      events.find(
+    if (features?.flagshipEvent) {
+      const match = events.find(
         (e) => e.name?.toLowerCase() === features.flagshipEvent?.toLowerCase(),
-      ) || null
-    );
+      );
+      if (match) return match;
+    }
+    return events.find((e) => e.isFlagship === true) || null;
   }, [events, features?.flagshipEvent]);
 
   // Filter out the flagship event so it isn't duplicated in the grid

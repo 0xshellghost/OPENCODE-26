@@ -32,13 +32,14 @@ const STATUS_TABS: Array<{ label: string; value: string }> = [
 
 export default function MyOrdersPage() {
   const router = useRouter();
-  const { features } = useFeatures();
+  const { features, isLoading: isFeaturesLoading } = useFeatures();
 
   useEffect(() => {
+    if (isFeaturesLoading) return;
     if (!features.showGeekstore && !isAdminUser()) {
       router.replace('/user/events');
     }
-  }, [features.showGeekstore, router]);
+  }, [isFeaturesLoading, features.showGeekstore, router]);
 
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [page, setPage] = useState<number>(1);
@@ -88,6 +89,14 @@ export default function MyOrdersPage() {
     setSelectedStatus(status);
     setPage(1);
   };
+
+  if (isFeaturesLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!features.showGeekstore && !isAdminUser()) {
     return null;

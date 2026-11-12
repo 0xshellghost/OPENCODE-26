@@ -5,6 +5,7 @@ import {
   Box,
   Flex,
   Icon,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -49,13 +50,14 @@ export default function Milestones() {
   const [selectedTab, setSelectedTab] = useState(0);
   const prefersReducedMotion = useReducedMotion();
   const router = useRouter();
-  const { features } = useFeatures();
+  const { features, isLoading: isFeaturesLoading } = useFeatures();
 
   React.useEffect(() => {
+    if (isFeaturesLoading) return;
     if (!features.showMilestones && !isAdminUser()) {
       router.replace('/user/events');
     }
-  }, [features.showMilestones, router]);
+  }, [isFeaturesLoading, features.showMilestones, router]);
 
   const WEEKS_TO_SHOW = [true, true, true, true, true];
   const SHOW_EVENTS = true;
@@ -84,6 +86,18 @@ export default function Milestones() {
     : [];
 
   const isLoading = leaderboardLoading || eventWinnersLoading;
+
+  if (isFeaturesLoading) {
+    return (
+      <Flex minH="60vh" align="center" justify="center">
+        <Spinner size="xl" color="var(--accent)" />
+      </Flex>
+    );
+  }
+
+  if (!features.showMilestones && !isAdminUser()) {
+    return null;
+  }
 
   return (
     <Box w="full" pt="0" pb="24px">

@@ -5,6 +5,7 @@ import {
   Box,
   Flex,
   Skeleton,
+  Spinner,
   Stack,
   Tabs,
   Tab,
@@ -461,13 +462,14 @@ function WinnersHeader() {
 export default function WinnersPodiumComparisonPage() {
   const [tab, setTab] = useState(0);
   const router = useRouter();
-  const { features } = useFeatures();
+  const { features, isLoading: isFeaturesLoading } = useFeatures();
 
   useEffect(() => {
+    if (isFeaturesLoading) return;
     if (!features.showWinners && !isAdminUser()) {
       router.replace('/user/events');
     }
-  }, [features.showWinners, router]);
+  }, [isFeaturesLoading, features.showWinners, router]);
 
   // 1. Fetch available events to determine active event name
   const { data: eventData } = useQuery({
@@ -540,6 +542,18 @@ export default function WinnersPodiumComparisonPage() {
   }, [leaderboardData]);
 
   const activeWinners = tab === 0 ? overallWinners : collegeWinners;
+
+  if (isFeaturesLoading) {
+    return (
+      <Flex minH="60vh" align="center" justify="center">
+        <Spinner size="xl" color="var(--accent)" />
+      </Flex>
+    );
+  }
+
+  if (!features.showWinners && !isAdminUser()) {
+    return null;
+  }
 
   return (
     <ClickSpark sparkColor="rgba(245, 197, 66, 0.75)" sparkSize={6} sparkRadius={26} sparkCount={7}>

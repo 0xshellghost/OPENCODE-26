@@ -64,7 +64,6 @@ import {
   removeMentor,
   fetchMentors,
   uploadEventLeaderboard,
-  updateFlagshipEvent,
   uploadRPlaceBoardSnapshot,
   MentorUser,
 } from 'api/admin/admin';
@@ -84,7 +83,7 @@ export default function ManagementPage() {
   const router = useRouter();
   const toast = useToast();
   const [isMounted, setIsMounted] = useState(false);
-  const { features, toggleFeature, setFlagshipEvent } = useFeatures();
+  const { features, toggleFeature, setFlagshipEvent, isLoading: isFeaturesLoading } = useFeatures();
   
   const textColor = 'var(--fg)';
   const cardBg = 'var(--surface)';
@@ -128,7 +127,6 @@ export default function ManagementPage() {
     }
     setIsUpdatingFlagship(true);
     try {
-      await updateFlagshipEvent(selectedFlagship, true);
       await setFlagshipEvent(selectedFlagship);
       toast({
         title: 'Flagship Event Updated',
@@ -154,9 +152,6 @@ export default function ManagementPage() {
   const handleRemoveFlagship = async () => {
     setIsUpdatingFlagship(true);
     try {
-      if (features.flagshipEvent) {
-        await updateFlagshipEvent(features.flagshipEvent, false);
-      }
       await setFlagshipEvent(null);
       setSelectedFlagship('');
       toast({
@@ -236,13 +231,6 @@ export default function ManagementPage() {
     queryFn: FetchedEvents,
   });
 
-  useEffect(() => {
-    const dbFlagship = eventData?.data?.find((e) => e.isFlagship)?.name;
-    if (dbFlagship && dbFlagship !== features.flagshipEvent) {
-      setFlagshipEvent(dbFlagship);
-      setSelectedFlagship(dbFlagship);
-    }
-  }, [eventData, features.flagshipEvent, setFlagshipEvent]);
 
   // Repos in Selected Event query
   const { data: reposData, refetch: refetchRepos, isLoading: isLoadingRepos } = useQuery({
@@ -894,7 +882,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showWinners}
-              isDisabled={togglingFeature === 'showWinners'}
+              isDisabled={togglingFeature === 'showWinners' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showWinners', e.target.checked, 'Winners')}
             />
           </Flex>
@@ -921,7 +909,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showMilestones}
-              isDisabled={togglingFeature === 'showMilestones'}
+              isDisabled={togglingFeature === 'showMilestones' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showMilestones', e.target.checked, 'Milestones')}
             />
           </Flex>
@@ -947,7 +935,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showRPlace}
-              isDisabled={togglingFeature === 'showRPlace'}
+              isDisabled={togglingFeature === 'showRPlace' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showRPlace', e.target.checked, 'RPlace')}
             />
           </Flex>
@@ -973,7 +961,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showRepositories}
-              isDisabled={togglingFeature === 'showRepositories'}
+              isDisabled={togglingFeature === 'showRepositories' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showRepositories', e.target.checked, 'Repositories')}
             />
           </Flex>
@@ -999,7 +987,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showLeaderboard}
-              isDisabled={togglingFeature === 'showLeaderboard'}
+              isDisabled={togglingFeature === 'showLeaderboard' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showLeaderboard', e.target.checked, 'Leaderboard')}
             />
           </Flex>
@@ -1026,7 +1014,7 @@ ON DUPLICATE KEY UPDATE
               colorScheme="brand"
               size="lg"
               isChecked={features.showGeekstore}
-              isDisabled={togglingFeature === 'showGeekstore'}
+              isDisabled={togglingFeature === 'showGeekstore' || isFeaturesLoading}
               onChange={(e) => handleToggleFeature('showGeekstore', e.target.checked, 'GeekStore')}
             />
           </Flex>
