@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { isTokenActive } from 'utils/jwt';
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -28,9 +29,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const check_login = useCallback(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
-      if (token) {
+      if (isTokenActive(token)) {
         setLoggedIn(true);
       } else {
+        if (token) localStorage.removeItem('token');
         setLoggedIn(false);
       }
     }
@@ -46,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     check_login();
-  }, []);
+  }, [check_login]);
 
   const value = useMemo(() => ({ isLoggedIn, check_login, logout }), [isLoggedIn, check_login, logout]);
 

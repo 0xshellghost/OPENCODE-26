@@ -14,12 +14,10 @@ export function openCinematicLanding() {
 const SafeAnimatePresence = AnimatePresence as React.FC<React.PropsWithChildren<any>>;
 
 export default function CinematicIntro() {
-  const [isOpen, setIsOpen] = useState(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("opencode_intro_completed") !== "true";
-    }
-    return true;
-  });
+  // The server and the browser must produce the same first render. Reading
+  // sessionStorage in the state initializer made returning visitors render no
+  // intro on the client while the server rendered it, breaking hydration.
+  const [isOpen, setIsOpen] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -29,7 +27,8 @@ export default function CinematicIntro() {
   useEffect(() => {
     // If already completed in this session, ensure intro is closed
     if (sessionStorage.getItem("opencode_intro_completed") === "true") {
-      setIsOpen(false);
+      const frame = window.requestAnimationFrame(() => setIsOpen(false));
+      return () => window.cancelAnimationFrame(frame);
     }
   }, []);
 

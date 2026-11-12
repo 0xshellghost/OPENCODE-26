@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Code2, Users, Trophy, ArrowRight } from 'lucide-react';
 import styles from './landing-content.module.css';
+import { getApiBase } from 'utils/apiBase';
 
 export default function LandingContent() {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -163,7 +164,7 @@ export default function LandingContent() {
         <p className={styles.joinDescription}>
           Join thousands of developers in the largest open-source celebration. Your first contribution is just a click away.
         </p>
-        <Link href="/auth/register" className={styles.joinButton}>
+        <Link href={`${getApiBase()}/api/v1/auth/github`} className={styles.joinButton}>
           Join GeekHaven 2026 <ArrowRight size={14} />
         </Link>
       </section>

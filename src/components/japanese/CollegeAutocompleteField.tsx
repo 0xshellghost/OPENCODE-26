@@ -21,6 +21,7 @@ interface CollegeAutocompleteFieldProps {
   required?: boolean;
   full?: boolean;
   hasError?: boolean;
+  error?: string;
 }
 
 // Extract acronym from college name (e.g. "Indian Institute of Technology" -> "iit")
@@ -116,7 +117,9 @@ export default function CollegeAutocompleteField({
   required = true,
   full = false,
   hasError = false,
+  error,
 }: CollegeAutocompleteFieldProps) {
+  const invalid = hasError || Boolean(error);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -225,8 +228,8 @@ export default function CollegeAutocompleteField({
 
   return (
     <div className={`oc-field${full ? ' oc-field-full' : ''}`} ref={containerRef}>
-      <span style={{ color: hasError ? '#f87171' : undefined }}>
-        {label} <span aria-hidden="true" style={{ color: hasError ? '#ef4444' : 'var(--accent)' }}>*</span>
+      <span style={{ color: invalid ? '#f87171' : undefined }}>
+        {label} <span aria-hidden="true" style={{ color: invalid ? '#ef4444' : 'var(--accent)' }}>*</span>
       </span>
 
       <div style={{ position: 'relative', width: '100%' }}>
@@ -250,11 +253,13 @@ export default function CollegeAutocompleteField({
           placeholder={placeholder}
           autoComplete="off"
           required={required}
+          aria-invalid={invalid}
+          aria-describedby={error ? `register-${name}-error` : undefined}
           style={{
             width: '100%',
             paddingRight: value ? '56px' : '36px',
-            borderColor: hasError ? '#ef4444' : (isOpen ? 'var(--accent)' : undefined),
-            boxShadow: hasError ? '0 0 0 1px #ef4444' : (isOpen ? '0 0 0 1px var(--accent-soft)' : undefined),
+            borderColor: invalid ? '#ef4444' : (isOpen ? 'var(--accent)' : undefined),
+            boxShadow: invalid ? '0 0 0 1px #ef4444' : (isOpen ? '0 0 0 1px var(--accent-soft)' : undefined),
           }}
         />
 
@@ -391,6 +396,11 @@ export default function CollegeAutocompleteField({
           </div>
         )}
       </div>
+      {error && (
+        <small id={`register-${name}-error`} role="alert" style={{ color: '#fca5a5', lineHeight: 1.4 }}>
+          {error}
+        </small>
+      )}
     </div>
   );
 }
