@@ -72,33 +72,38 @@ function getEventTrack(name?: string, description?: string, explicitTrack?: stri
 
   const text = `${name || ''} ${description || ''}`.toLowerCase();
 
-  // 1. Open Source & OpenCode (Flagship)
+  // 1. OpenCode Pre-Events / Challenges (Sketchathon, etc.)
+  if (/\b(sketchathon|pre-event|pre event|prelude)\b/i.test(text)) {
+    return 'OpenCode Pre-Event';
+  }
+
+  // 2. Open Source & OpenCode (Flagship)
   if (/\b(opencode|open code|inauguration|inaugration|open source|opensource|\bfoss\b|gsoc|hacktoberfest)\b/i.test(text)) {
     return 'Open Source Sprint';
   }
 
-  // 2. Gaming & Esports (Clash Royale, SmashKarts, FIFA, etc.)
+  // 3. Gaming & Esports (Clash Royale, SmashKarts, FIFA, etc.)
   if (/\b(clash royale|clash|smashkarts|smash karts|smash-karts|fifa|esports|valorant|bgmi|chess)\b/i.test(text)) {
     return 'Gaming & Esports';
   }
 
-  // 3. Gaming & Trivia (Pokémon Guesser, etc.)
+  // 4. Gaming & Trivia (Pokémon Guesser, etc.)
   if (/\b(pokemon|pok\u00e9mon|guesser|trivia|quiz)\b/i.test(text)) {
     return 'Gaming & Trivia';
   }
 
-  // 4. Web & Frontend (CSS Battle, etc.)
+  // 5. Web & Frontend (CSS Battle, etc.)
   if (/\b(css battle|cssbattle|css|frontend|front-end|web dev|webdev|web development|html|webd)\b/i.test(text)) {
     return 'Web & Frontend';
   }
 
-  // 5. Competitive Programming (CodeGuerra, etc.)
+  // 6. Competitive Programming (CodeGuerra, etc.)
   if (/\b(codeguerra|code guerra|guerra|competitive programming|\bcp\b|dsa|algo|algorithm|algorithms|bytecamp|leetcode|codeforces)\b/i.test(text)) {
     return 'Competitive Programming';
   }
 
-  // 6. Design & UI/UX (The Sticker Jam, Brand Rebrand, Sketchathon, etc.)
-  if (/\b(the sticker jam|sticker jam|sticker|brand rebrand|rebrand|sketchathon|sketch|design|ui\/ux|\bui\b|\bux\b|figma|graphic|creativity|creative|art)\b/i.test(text)) {
+  // 7. Design & UI/UX (The Sticker Jam, Brand Rebrand, etc.)
+  if (/\b(the sticker jam|sticker jam|sticker|brand rebrand|rebrand|design|ui\/ux|\bui\b|\bux\b|figma|graphic)\b/i.test(text)) {
     return 'Design & UI/UX';
   }
 
