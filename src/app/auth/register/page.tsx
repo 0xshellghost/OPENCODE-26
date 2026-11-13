@@ -4,7 +4,7 @@ import { useToast } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { ArrowRight, Code2, Users, Sprout, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Code2, Users, Sprout, Loader2, AlertCircle, Check } from 'lucide-react';
 import { sendRegData, fetchColleges } from 'api/profile/profile';
 import JapaneseBackground from 'components/japanese/JapaneseBackground';
 import SiteNavbar from 'components/navbar/SiteNavbar';
@@ -256,11 +256,11 @@ export default function Register() {
       setIsRedirecting(true);
       setFormStatus({
         type: 'success',
-        message: 'Registration successful! Welcome to OpenCode 2026. Redirecting...',
+        message: 'Profile created — taking you to the arenas...',
       });
       toast({
-        title: 'Registration Successful!',
-        description: 'Welcome to OpenCode 2026. Redirecting to your dashboard...',
+        title: "You're registered",
+        description: 'Welcome to OpenCode 2026. Taking you to your dashboard...',
         status: 'success',
         duration: 3500,
         isClosable: true,
@@ -459,24 +459,72 @@ export default function Register() {
 
           {formStatus && (
             <div
+              role={formStatus.type === 'error' ? 'alert' : 'status'}
+              aria-live="polite"
               style={{
-                padding: '12px 16px',
-                borderRadius: '10px',
-                marginBottom: '16px',
+                padding: '14px 18px',
+                borderRadius: '12px',
+                marginBottom: '18px',
                 fontSize: '13px',
                 lineHeight: '1.5',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: formStatus.type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.12)',
-                border: `1px solid ${formStatus.type === 'error' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(34, 197, 94, 0.35)'}`,
-                color: formStatus.type === 'error' ? '#fca5a5' : '#86efac',
+                alignItems: 'flex-start',
+                gap: '12px',
+                background:
+                  formStatus.type === 'error'
+                    ? 'rgba(239, 68, 68, 0.08)'
+                    : 'var(--accent-soft, rgba(88, 185, 154, 0.12))',
+                border:
+                  formStatus.type === 'error'
+                    ? '1px solid rgba(239, 68, 68, 0.28)'
+                    : '1px solid var(--border-accent, rgba(88, 185, 154, 0.35))',
+                color: 'var(--fg)',
+                boxShadow: formStatus.type === 'success' ? '0 4px 20px -4px var(--accent-soft)' : undefined,
+                transition: 'all 0.3s ease',
               }}
             >
-              <span className="shrink-0">
-                {formStatus.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
-              </span>
-              <span>{formStatus.message}</span>
+              <div
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  marginTop: '1px',
+                  background:
+                    formStatus.type === 'error'
+                      ? 'rgba(239, 68, 68, 0.16)'
+                      : 'var(--accent)',
+                  color:
+                    formStatus.type === 'error'
+                      ? '#ef4444'
+                      : 'var(--accent-ink, #07131F)',
+                }}
+              >
+                {formStatus.type === 'error' ? (
+                  <AlertCircle size={15} />
+                ) : (
+                  <Check size={15} strokeWidth={2.5} />
+                )}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {formStatus.type === 'success' ? (
+                  <>
+                    <p style={{ fontWeight: 600, color: 'var(--fg)', fontSize: '13.5px', marginBottom: '2px' }}>
+                      You&apos;re in.
+                    </p>
+                    <p style={{ color: 'var(--muted)', fontSize: '12px', margin: 0 }}>
+                      Profile created — taking you to the active arenas...
+                    </p>
+                  </>
+                ) : (
+                  <p style={{ color: 'var(--fg)', fontSize: '13px', margin: 0 }}>
+                    {formStatus.message}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 
@@ -511,7 +559,7 @@ export default function Register() {
             {isSubmitting ? (
               <>
                 <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                <span>Preparing your journey...</span>
+                <span>{isRedirecting ? 'Heading to arenas...' : 'Preparing your journey...'}</span>
               </>
             ) : (
               <>
