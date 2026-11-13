@@ -6,7 +6,6 @@ import IndiaMap from './IndiaMap'
 import YuzukiGuide from '../landing/YuzukiGuide'
 import { useSakura } from 'contexts/SakuraContext'
 import { useAuth } from 'contexts/AuthContext'
-import ThemeToggle from 'components/japanese/ThemeToggle'
 import OpenCodeLogo from 'components/common/OpenCodeLogo'
 import { chapters, defaultAssets, defaultNavigation, selfHostedAssets, type OpenCodeExperienceProps, type SceneParameters } from './experience-config'
 import styles from './opencode-experience.module.css'
@@ -251,7 +250,6 @@ export default function OpenCodeExperience({
           </nav>
 
           <div className={styles.headerRight}>
-            <ThemeToggle />
             {isLoggedIn ? (
               <button
                 type="button"

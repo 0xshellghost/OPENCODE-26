@@ -14,7 +14,6 @@ import {
   SimpleGrid,
   Text,
   chakra,
-  useColorMode,
 } from '@chakra-ui/react';
 import {
   Building2,
