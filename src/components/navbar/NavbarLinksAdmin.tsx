@@ -5,29 +5,24 @@ import {
   Box,
   Button,
   Flex,
-  Icon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
   Text,
-  useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useAuth } from 'contexts/AuthContext';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
 
 export default function HeaderLinks(props: { secondary: boolean }) {
   const { secondary } = props;
-  const { colorMode, toggleColorMode } = useColorMode();
   const [profileInitials, setProfileInitials] = useState('');
   const auth = useAuth();
   const router = useRouter();
 
-  const iconColor = 'var(--fg-muted)';
   const menuBg = 'var(--surface-2)';
   const menuHover = 'var(--surface)';
 
@@ -56,22 +51,6 @@ export default function HeaderLinks(props: { secondary: boolean }) {
 
   return (
     <Flex align="center" gap="12px">
-      {/* Theme toggle */}
-      <Button
-        aria-label="Toggle theme"
-        variant="ghost"
-        p="0"
-        minW="unset"
-        onClick={toggleColorMode}
-      >
-        <Icon
-          h="18px"
-          w="18px"
-          color={iconColor}
-          as={colorMode === 'light' ? Moon : Sun}
-        />
-      </Button>
-
       {!auth.isLoggedIn ? (
         <Button
           as={NextLink}

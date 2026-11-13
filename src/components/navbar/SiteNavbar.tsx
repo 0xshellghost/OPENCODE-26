@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from 'contexts/AuthContext';
 import { useFeatures } from 'contexts/FeaturesContext';
-import ThemeToggle from 'components/japanese/ThemeToggle';
 import SakuraToggle from 'components/common/SakuraToggle';
 import OpenCodeLogo from 'components/common/OpenCodeLogo';
 import { getNavSizing, type NavDensityConfig } from 'utils/navSizing';
@@ -285,7 +284,6 @@ export default function SiteNavbar() {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <div className="hidden sm:flex items-center gap-1 shrink-0">
               <SakuraToggle />
-              <ThemeToggle />
             </div>
 
             <div className="hidden sm:block w-[1px] h-4 bg-[var(--border)] mx-0.5 shrink-0" />
@@ -436,7 +434,6 @@ export default function SiteNavbar() {
           </span>
           <div className="flex items-center gap-2">
             <SakuraToggle />
-            <ThemeToggle />
           </div>
         </div>
 

@@ -37,30 +37,7 @@
   --yuzuki-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.75);
 }
 
-/* Light theme overrides */
-:global([data-theme="light"]) .root,
-:global(.chakra-ui-light) .root,
-:global(.light) .root {
-  --yuzuki-bg: rgba(255, 255, 255, 0.88);
-  --yuzuki-border: rgba(45, 139, 111, 0.25);
-  --yuzuki-border-hover: rgba(45, 139, 111, 0.55);
-  --yuzuki-rose: #2D8B6F;
-  --yuzuki-rose-ink: #ffffff;
-  --yuzuki-rose-glow: rgba(45, 139, 111, 0.3);
-  --yuzuki-char-stroke: #2D8B6F;
-  --yuzuki-char-fill: #0C1C2C;
-  --yuzuki-seal-bg: rgba(45, 139, 111, 0.14);
-  --yuzuki-seal-border: #2D8B6F;
-  --yuzuki-seal-color: #2D8B6F;
-  --yuzuki-muted: #4A5E6B;
-  --yuzuki-heading: #0C1C2C;
-  --yuzuki-body: #344955;
-  --yuzuki-scroll-bg: #F0F4F3;
-  --yuzuki-scroll-gradient: linear-gradient(180deg, #ffffff 0%, #E0EBE7 100%);
-  --yuzuki-scroll-border: rgba(45, 139, 111, 0.35);
-  --yuzuki-scroll-inset: rgba(45, 139, 111, 0.12);
-  --yuzuki-shadow: 0 24px 60px -15px rgba(7, 19, 31, 0.15);
-}
+
 
 /* ─── Name Banner (slim vertical glass banner, top-right) ─── */
 .banner {

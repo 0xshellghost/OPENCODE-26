@@ -2,13 +2,11 @@
 
 import Link from 'next/link';
 import { Home, ArrowLeft } from 'lucide-react';
-import ThemeToggle from 'components/japanese/ThemeToggle';
 
 export default function NotFound() {
   return (
     <div className="japanese-page flex flex-col min-h-screen items-center justify-center p-6 text-center relative overflow-hidden">
       <div className="oc-landing-theme absolute top-6 right-6">
-        <ThemeToggle />
       </div>
 
       {/* Decorative background blur */}

@@ -1,7 +1,6 @@
 // Chakra imports
 import { Box, Flex, useColorModeValue } from '@chakra-ui/react';
 import Footer from 'components/footer/FooterAuth';
-import FixedPlugin from 'components/fixedPlugin/FixedPlugin';
 // Assets
 import { ReactNode } from 'react';
 
@@ -48,7 +47,6 @@ function AuthIllustration(props: {
         </Box>
         <Footer mb={{ xl: '3vh' }} />
       </Flex>
-      <FixedPlugin />
     </Flex>
   );
 }

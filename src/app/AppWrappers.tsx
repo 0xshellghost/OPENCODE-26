@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import 'styles/App.css';
 import 'styles/MiniCalendar.css';
 
-import { ChakraProvider, cookieStorageManager } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 import { AuthProvider } from 'contexts/AuthContext';
 import { SidebarProvider } from 'contexts/SidebarContext';
 import { SakuraProvider } from 'contexts/SakuraContext';
@@ -19,6 +19,12 @@ import PageTransition from 'components/common/PageTransition';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
+
+const darkColorModeManager = {
+  type: 'cookie' as const,
+  get: () => 'dark' as const,
+  set: (_value: 'light' | 'dark') => {},
+};
 
 export default function AppWrappers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -178,7 +184,7 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
 
           <AuthProvider>
             <SidebarProvider>
-              <ChakraProvider theme={theme} colorModeManager={cookieStorageManager}>
+              <ChakraProvider theme={theme} colorModeManager={darkColorModeManager}>
                 <div
                   style={{
                     opacity: isLoading && pathname === '/' && !isExiting ? 0 : 1,

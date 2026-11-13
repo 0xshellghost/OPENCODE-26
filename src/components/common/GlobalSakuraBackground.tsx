@@ -128,8 +128,7 @@ export default function GlobalSakuraBackground() {
     };
     window.addEventListener('resize', handleResize, { passive: true });
 
-    const isLightMode = document.documentElement.classList.contains('chakra-ui-light');
-    const petalCount = isLightMode ? 14 : Math.min(35, Math.floor(width / 45));
+    const petalCount = Math.min(35, Math.floor(width / 45));
     const petals = Array.from({ length: petalCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
